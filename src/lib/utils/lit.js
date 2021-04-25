@@ -21,7 +21,7 @@ const PACKAGE_CACHE = {}
 
 export async function zipAndEncryptString (string) {
   const zip = new JSZip()
-  zip.file('index.html', string)
+  zip.file('string.txt', string)
   return encryptZip(zip)
 }
 
@@ -34,7 +34,7 @@ export async function zipAndEncryptFiles (files) {
   return encryptZip(zip)
 }
 
-export async function decryptZip (zip, symmKey) {
+export async function decryptZip (encryptedZipBlob, symmKey) {
   const keypair = await checkAndDeriveKeypair()
 
   console.log('Got keypair out of localstorage: ' + keypair)
@@ -52,24 +52,25 @@ export async function decryptZip (zip, symmKey) {
   const importedSymmKey = await importSymmetricKey(decryptedSymmKey)
 
   const decryptedZipArrayBuffer = await decryptWithSymmetricKey(
-    zip,
+    encryptedZipBlob,
     importedSymmKey
   )
 
   // unpack the zip
+  const zip = new JSZip()
   const unzipped = await zip.loadAsync(decryptedZipArrayBuffer)
 
   // load the files into data urls with the metadata attached
-  const files = await Promise.all(unzipped.files.map(async f => {
-    const dataUrl = await fileToDataUrl(f)
-    return {
-      type: f.type,
-      name: f.name,
-      dataUrl
-    }
-  }))
+  // const files = await Promise.all(unzipped.files.map(async f => {
+  //   // const dataUrl = await fileToDataUrl(f)
+  //   return {
+  //     type: f.type,
+  //     name: f.name,
+  //     file: f
+  //   }
+  // }))
 
-  return files
+  return unzipped.files
 }
 
 export async function encryptZip (zip) {
@@ -140,7 +141,9 @@ export async function encryptZip (zip) {
 }
 
 async function getNpmPackage (packageName) {
+  // console.log('getting npm package: ' + packageName)
   if (PACKAGE_CACHE[packageName]) {
+    // console.log('found in cache')
     return PACKAGE_CACHE[packageName]
   }
 
@@ -150,19 +153,31 @@ async function getNpmPackage (packageName) {
     throw Error(resp.statusText)
   }
   const blob = await resp.blob()
+  // console.log('got blob', blob)
   const dataUrl = await fileToDataUrl(blob)
+  // console.log('got dataUrl', dataUrl)
   PACKAGE_CACHE[packageName] = dataUrl
   return dataUrl
 }
 
-export async function createHtmlLIT ({ title, encryptedSymmetricKey, html, css, npmPackages = [] }) {
+export async function createHtmlLIT ({
+  title,
+  htmlBody,
+  css,
+  encryptedSymmetricKey,
+  encryptedZipDataUrl,
+  npmPackages = []
+}) {
   npmPackages.push('lit-js-sdk')
+  // console.log('createHtmlLIT with npmPackages', npmPackages)
   let scriptTags = ''
-  for (let i = 0; i < npmPackages; i++) {
+  for (let i = 0; i < npmPackages.length; i++) {
     const scriptDataUrl = await getNpmPackage(npmPackages[i])
     const tag = `<script src="${scriptDataUrl}"></script>\n`
     scriptTags += tag
   }
+
+  // console.log('scriptTags: ', scriptTags)
 
   return `
 <!DOCTYPE html>
@@ -172,12 +187,33 @@ export async function createHtmlLIT ({ title, encryptedSymmetricKey, html, css, 
     <style id="jss-server-side">${css}</style>
     ${scriptTags}
     <script>
-      window.encryptedSymmetricKey = ${encryptedSymmetricKey}
+      var encryptedSymmetricKey = ${encryptedSymmetricKey}
+      var encryptedZipDataUrl = "${encryptedZipDataUrl}"
+      var locked = true
     </script>
   </head>
   <body>
-    <div id="root">${html}</div>
+    <div id="root">${htmlBody}</div>
   </body>
 </html>
   `
+}
+
+export async function toggleLock () {
+  const mediaGridHolder = document.getElementById('mediaGridHolder')
+  if (window.locked) {
+    // save public content before decryption, so we can toggle back to the
+    // locked state in the future
+    window.publicContent = mediaGridHolder.innerHTML
+    // convert data url to blob
+    const encryptedZipBlob = await (await fetch(window.encryptedZipDataUrl)).blob()
+    const decryptedFiles = await decryptZip(encryptedZipBlob, JSON.stringify(window.encryptedSymmetricKey))
+    const mediaGridHtmlBody = await decryptedFiles['string.txt'].async('text')
+    mediaGridHolder.innerHTML = mediaGridHtmlBody
+
+    window.locked = false
+  } else {
+    mediaGridHolder.innerHTML = window.publicContent
+    window.locked = true
+  }
 }

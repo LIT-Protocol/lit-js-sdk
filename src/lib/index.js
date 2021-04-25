@@ -3,7 +3,8 @@ import {
   zipAndEncryptFiles,
   encryptZip,
   decryptZip,
-  createHtmlLIT
+  createHtmlLIT,
+  toggleLock
 } from './utils/lit'
 
 import {
@@ -20,7 +21,8 @@ const functions = {
   checkAndDeriveKeypair,
   connectWeb3,
   createHtmlLIT,
-  mintLIT
+  mintLIT,
+  toggleLock
 }
 
 export default functions
