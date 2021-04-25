@@ -1,6 +1,6 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "LIT Javascript SDK",
   "main": "build/index.js",
   "scripts": {
