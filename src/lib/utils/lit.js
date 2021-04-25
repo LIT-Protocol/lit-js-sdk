@@ -17,6 +17,8 @@ import {
 
 import { fileToDataUrl } from './browser'
 
+const PACKAGE_CACHE = {}
+
 export async function zipAndEncryptString (string) {
   const zip = new JSZip()
   zip.file('index.html', string)
@@ -135,4 +137,47 @@ export async function encryptZip (zip) {
     encryptedSymmetricKey: packed,
     encryptedZip: encryptedZipBlob
   }
+}
+
+async function getNpmPackage (packageName) {
+  if (PACKAGE_CACHE[packageName]) {
+    return PACKAGE_CACHE[packageName]
+  }
+
+  const resp = await fetch('https://unpkg.com/' + packageName)
+  if (!resp.ok) {
+    console.log('error with response: ', resp)
+    throw Error(resp.statusText)
+  }
+  const blob = await resp.blob()
+  const dataUrl = await fileToDataUrl(blob)
+  PACKAGE_CACHE[packageName] = dataUrl
+  return dataUrl
+}
+
+export async function createHtmlLIT ({ title, encryptedSymmetricKey, html, css, npmPackages = [] }) {
+  npmPackages.push('lit-js-sdk')
+  let scriptTags = ''
+  for (let i = 0; i < npmPackages; i++) {
+    const scriptDataUrl = await getNpmPackage(npmPackages[i])
+    const tag = `<script src="${scriptDataUrl}"></script>\n`
+    scriptTags += tag
+  }
+
+  return `
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>${title}</title>
+    <style id="jss-server-side">${css}</style>
+    ${scriptTags}
+    <script>
+      window.encryptedSymmetricKey = ${encryptedSymmetricKey}
+    </script>
+  </head>
+  <body>
+    <div id="root">${html}</div>
+  </body>
+</html>
+  `
 }

@@ -2,12 +2,14 @@ import {
   zipAndEncryptString,
   zipAndEncryptFiles,
   encryptZip,
-  decryptZip
+  decryptZip,
+  createHtmlLIT
 } from './utils/lit'
 
 import {
   checkAndDeriveKeypair,
-  connectWeb3
+  connectWeb3,
+  mintLIT
 } from './utils/eth'
 
 const functions = {
@@ -16,7 +18,9 @@ const functions = {
   encryptZip,
   decryptZip,
   checkAndDeriveKeypair,
-  connectWeb3
+  connectWeb3,
+  createHtmlLIT,
+  mintLIT
 }
 
 export default functions

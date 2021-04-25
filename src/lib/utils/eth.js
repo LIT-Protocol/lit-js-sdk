@@ -1,16 +1,25 @@
 import Web3 from 'web3'
-import Web3Modal from 'web3modal'
-import WalletConnectProvider from '@walletconnect/web3-provider'
-import Fortmatic from 'fortmatic'
-import Torus from '@toruslabs/torus-embed'
-import Authereum from 'authereum'
+
+import detectEthereumProvider from '@metamask/detect-provider'
 
 import naclUtil from 'tweetnacl-util'
 import nacl from 'tweetnacl'
-import { toBuffer, bufferToHex } from 'ethereumjs-util'
 import { getPublicKey, savePublicKey } from './cloudFunctions'
 
+import LIT from '../abis/LIT.json'
+
 const KEY_DERIVATION_SIGNATURE_BODY = 'I am creating an account to mint a LIT'
+
+const CHAINS = {
+  polygon: {
+    contractAddress: '0xb9A323711528D0c5a70df790929f4739f1cDd7fD',
+    chainId: 137
+  },
+  ethereum: {
+    contractAddress: '0x55485885e82E25446DEC314Ccb810Bda06B9e01B',
+    chainId: 1
+  }
+}
 
 export async function checkAndDeriveKeypair () {
   let keypair = localStorage.getItem('lit-keypair')
@@ -30,39 +39,17 @@ export async function checkAndDeriveKeypair () {
 }
 
 export async function connectWeb3 () {
-  const providerOptions = {
-    walletconnect: {
-      package: WalletConnectProvider,
-      options: {
-        infuraId: 'ddf1ca3700f34497bca2bf03607fde38' // don't care about using env vars for this because it will show up in the web site anyway
-      }
-    },
-    fortmatic: {
-      package: Fortmatic,
-      options: {
-        key: 'pk_live_E6E3D8C6CE0F7BC0' // don't care about using env vars for this because it will show up in the web site anyway
-      }
-    },
-    torus: {
-      package: Torus
-    },
-    authereum: {
-      package: Authereum
-    }
+  if (typeof window.ethereum === 'undefined') {
+    throw new Error({ errorCode: 'no_wallet', message: 'No web3 wallet was found' })
   }
 
-  const web3Modal = new Web3Modal({
-    network: 'mainnet', // optional
-    cacheProvider: true, // optional
-    providerOptions, // required
-    disableInjectedProvider: false
-  })
+  const provider = await detectEthereumProvider()
 
-  const provider = await web3Modal.connect()
+  // trigger metamask popup
+  const accounts = await provider.request({ method: 'eth_requestAccounts' })
+  const account = accounts[0]
 
   const web3 = new Web3(provider)
-  const accounts = await web3.eth.getAccounts()
-  const account = accounts[0]
   return { web3, account }
 }
 
@@ -106,7 +93,7 @@ async function deriveKeysViaSignature () {
   console.log('Signed message: ' + signature)
 
   // derive keypair
-  const data = toBuffer(signature)
+  const data = Buffer.from(signature.substring(2), 'hex')
   const hash = await crypto.subtle.digest('SHA-256', data)
   const uint8Hash = new Uint8Array(hash)
   const { publicKey, secretKey } = nacl.box.keyPair.fromSecretKey(uint8Hash)
@@ -165,7 +152,7 @@ export async function deriveEncryptionKeys () {
 
   console.log('public key: ' + keypair.publicKey)
   const asString = JSON.stringify(keypair)
-  localStorage.setItem('keypair', asString)
+  localStorage.setItem('lit-keypair', asString)
 
   // is it already saved on the server?
   const { pubkey, errorCode } = await getPublicKey({
@@ -180,5 +167,39 @@ export async function deriveEncryptionKeys () {
       msg,
       pubkey: keypair.publicKey
     })
+  }
+}
+
+export async function mintLIT ({ chain, quantity }) {
+  console.log(`minting ${quantity} tokens on ${chain}`)
+  await checkAndDeriveKeypair()
+  const { web3, account } = await connectWeb3()
+  const chainId = await web3.eth.getChainId()
+  if (chainId !== CHAINS[chain].chainId) {
+    return { errorCode: 'wrong_chain' }
+  }
+  const tokenAddress = CHAINS[chain].contractAddress
+  const contract = new web3.eth.Contract(LIT.abi, tokenAddress)
+  console.log('sending to chain...')
+  try {
+    const txReceipt = await contract.methods.mint(quantity).send({ from: account })
+    console.log('txReceipt: ', txReceipt)
+    const tokenId = txReceipt.events.TransferSingle.returnValues.id
+    return {
+      txHash: txReceipt.transactionHash,
+      tokenId,
+      tokenAddress,
+      mintingAddress: account
+    }
+  } catch (error) {
+    console.log(error)
+    if (error.code === 4001) {
+      // EIP-1193 userRejectedRequest error
+      console.log('User rejected request')
+      return { errorCode: 'user_rejected_request' }
+    } else {
+      console.error(error)
+    }
+    return { errorCode: 'unknown_error' }
   }
 }
