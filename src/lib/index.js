@@ -10,7 +10,8 @@ import {
 import {
   checkAndDeriveKeypair,
   connectWeb3,
-  mintLIT
+  mintLIT,
+  LIT_CHAINS
 } from './utils/eth'
 
 const functions = {
@@ -22,7 +23,8 @@ const functions = {
   connectWeb3,
   createHtmlLIT,
   mintLIT,
-  toggleLock
+  toggleLock,
+  LIT_CHAINS
 }
 
 export default functions

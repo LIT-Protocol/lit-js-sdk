@@ -10,7 +10,7 @@ import LIT from '../abis/LIT.json'
 
 const KEY_DERIVATION_SIGNATURE_BODY = 'I am creating an account to mint a LIT'
 
-const CHAINS = {
+export const LIT_CHAINS = {
   polygon: {
     contractAddress: '0xb9A323711528D0c5a70df790929f4739f1cDd7fD',
     chainId: 137
@@ -160,7 +160,7 @@ export async function deriveEncryptionKeys () {
   })
   if (errorCode === 'not_found' || pubkey !== keypair.publicKey) {
     // add it
-    const msg = 'I am saving my public key so that others can send me LITs'
+    const msg = `I am saving my public key so that others can send me LITs.  It is ${pubkey}`
     const res = await signMessage({ body: msg })
     await savePublicKey({
       sig: res.signature,
@@ -175,10 +175,10 @@ export async function mintLIT ({ chain, quantity }) {
   await checkAndDeriveKeypair()
   const { web3, account } = await connectWeb3()
   const chainId = await web3.eth.getChainId()
-  if (chainId !== CHAINS[chain].chainId) {
+  if (chainId !== LIT_CHAINS[chain].chainId) {
     return { errorCode: 'wrong_chain' }
   }
-  const tokenAddress = CHAINS[chain].contractAddress
+  const tokenAddress = LIT_CHAINS[chain].contractAddress
   const contract = new web3.eth.Contract(LIT.abi, tokenAddress)
   console.log('sending to chain...')
   try {
