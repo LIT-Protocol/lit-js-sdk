@@ -194,6 +194,12 @@ export async function createHtmlLIT ({
   </head>
   <body>
     <div id="root">${htmlBody}</div>
+    <script>
+      const unlockButton = document.getElementById('unlockButton')
+      unlockButton.onclick = function() {
+        LitJsSdk.default.toggleLock()
+      }
+    </script>
   </body>
 </html>
   `
@@ -201,6 +207,8 @@ export async function createHtmlLIT ({
 
 export async function toggleLock () {
   const mediaGridHolder = document.getElementById('mediaGridHolder')
+  const lockedHeader = document.getElementById('lockedHeader')
+
   if (window.locked) {
     // save public content before decryption, so we can toggle back to the
     // locked state in the future
@@ -210,10 +218,11 @@ export async function toggleLock () {
     const decryptedFiles = await decryptZip(encryptedZipBlob, JSON.stringify(window.encryptedSymmetricKey))
     const mediaGridHtmlBody = await decryptedFiles['string.txt'].async('text')
     mediaGridHolder.innerHTML = mediaGridHtmlBody
-
+    lockedHeader.innerText = 'UNLOCKED'
     window.locked = false
   } else {
     mediaGridHolder.innerHTML = window.publicContent
+    lockedHeader.innerText = 'LOCKED'
     window.locked = true
   }
 }
