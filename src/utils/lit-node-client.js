@@ -124,8 +124,8 @@ export default class LitNodeClient {
       async function (source) {
         const { value, done } = await source.next()
         const resp = Response.decode(value.slice())
-        if (resp.type === Response.Type.STORE_KEY_FRAGMENT) {
-          if (resp.storeKeyFragmentResponse.result === StoreKeyFragmentResponse.Result.success) {
+        if (resp.type === Response.Type.STORE_KEY_FRAGMENT_RESPONSE) {
+          if (resp.storeKeyFragmentResponse.result === StoreKeyFragmentResponse.Result.SUCCESS) {
             console.log('success storing key fragment')
           } else {
             console.log('error storing key fragment')
