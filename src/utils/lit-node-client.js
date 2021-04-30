@@ -13,6 +13,7 @@ import lp from 'it-length-prefixed'
 import multihashing from 'multihashing'
 import CID from 'cids'
 import pushable from 'it-pushable'
+import secrets from 'secrets.js-grempe'
 
 export default class LitNodeClient {
   constructor (config) {
@@ -23,11 +24,36 @@ export default class LitNodeClient {
   async saveEncryptionKey ({ contractAddress, tokenId, symmetricKey }) {
     const nodeKeys = Object.keys(this.connectedNodes)
     // split up into nodeKeys.length fragments
+    const numShares = nodeKeys.length
+    const threshold = Math.floor(numShares / 2)
+    // convert from base64 to hex
+    const secret = Buffer.from(symmetricKey, 'base64').toString('hex')
+    const kFrags = secrets.share(secret, numShares, threshold)
+    if (kFrags.length !== nodeKeys.length) {
+      throw new Error(`kFrags.length (${kFrags.length}) !== nodeKeys.length (${nodeKeys.length})`)
+    }
+    const storagePromises = []
+    const normalizedContractAddress = contractAddress.toLowerCase()
+    const normalizedTokenid = tokenId.toString(16).padStart(64, '0') // to hex and padded for consistent length
+    for (let i = 0; i < nodeKeys.length; i++) {
+      const key = `${normalizedContractAddress}|${normalizedTokenid}|${i}`
+      console.debug(`storing kFrag with key ${key} in node ${i + 1} of ${nodeKeys.length}`)
+      storagePromises.push(
+        this.storeData({
+          peerId: nodeKeys[i],
+          key,
+          val: kFrags[i]
+        })
+      )
+    }
+    await Promise.all(storagePromises)
+    console.log('all stored')
+    return { success: true }
   }
 
   async storeData ({ peerId, key, val }) {
     // const stream = await this.getStream(peerId)
-    const hashed = multihashing(Buffer.from('1'), 'sha2-256')
+    const hashed = multihashing(Buffer.from(key), 'sha2-256')
     const cid = new CID(hashed)
     const msg = JSON.stringify({ cmd: 'set', key: cid.toString(), val })
     const node = this.connectedNodes[peerId]

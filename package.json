@@ -6,7 +6,8 @@
   "main": "build/index.js",
   "scripts": {
     "start": "microbundle watch",
-    "build": "microbundle build"
+    "build": "microbundle build",
+    "prepare": "yarn build"
   },
   "repository": {
     "type": "git",
@@ -22,7 +23,8 @@
   ],
   "license": "GPL-3.0",
   "devDependencies": {
-    "microbundle": "^0.13.0"
+    "microbundle": "^0.13.0",
+    "standard": "^16.0.3"
   },
   "dependencies": {
     "@metamask/detect-provider": "^1.2.0",
@@ -42,6 +44,7 @@
     "multiaddr": "^9.0.1",
     "multihashing": "^0.3.3",
     "peer-id": "^0.14.8",
+    "secrets.js-grempe": "../secrets.js",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
     "web3": "^1.3.5"
