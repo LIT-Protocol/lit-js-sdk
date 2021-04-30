@@ -14,6 +14,8 @@ import {
   LIT_CHAINS
 } from './utils/eth'
 
+import LitNodeClient from './utils/lit-node-client'
+
 const functions = {
   zipAndEncryptString,
   zipAndEncryptFiles,
@@ -24,7 +26,8 @@ const functions = {
   createHtmlLIT,
   mintLIT,
   toggleLock,
-  LIT_CHAINS
+  LIT_CHAINS,
+  LitNodeClient
 }
 
 export default functions
