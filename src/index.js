@@ -16,6 +16,11 @@ import {
 
 import LitNodeClient from './utils/lit-node-client'
 
+import {
+  getUploadUrl,
+  createTokenMetadata
+} from './utils/cloudFunctions'
+
 const functions = {
   zipAndEncryptString,
   zipAndEncryptFiles,
@@ -27,7 +32,9 @@ const functions = {
   mintLIT,
   toggleLock,
   LIT_CHAINS,
-  LitNodeClient
+  LitNodeClient,
+  getUploadUrl,
+  createTokenMetadata
 }
 
 export default functions

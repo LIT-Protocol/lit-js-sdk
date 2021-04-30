@@ -14,11 +14,54 @@ import multihashing from 'multihashing'
 import CID from 'cids'
 import pushable from 'it-pushable'
 import secrets from 'secrets.js-grempe'
+import protons from 'protons'
+import uint8arrayFromString from 'uint8arrays/from-string'
+import uint8arrayToString from 'uint8arrays/to-string'
+
+const { Request, Response, StoreKeyFragmentResponse } = protons(`
+message Request {
+  enum Type {
+    GET_KEY_FRAGMENT = 0;
+    STORE_KEY_FRAGMENT = 1;
+  }
+  required Type type = 1;
+  optional GetKeyFragment getKeyFragment = 2;
+  optional StoreKeyFragment storeKeyFragment = 3;
+}
+message Response {
+  enum Type {
+    GET_KEY_FRAGMENT_RESPONSE = 0;
+    STORE_KEY_FRAGMENT_RESPONSE = 1;
+  }
+  required Type type = 1;
+  optional GetKeyFragmentResponse getKeyFragmentResponse = 2;
+  optional StoreKeyFragmentResponse storeKeyFragmentResponse = 3;
+}
+message GetKeyFragment {
+  required bytes keyId = 1;
+}
+message GetKeyFragmentResponse {
+  required bytes keyId = 1;
+  required bytes fragmentValue = 2;
+}
+message StoreKeyFragment {
+  required bytes keyId = 1;
+  required bytes fragmentValue = 2;
+}
+message StoreKeyFragmentResponse {
+  enum Result {
+    SUCCESS = 0;
+    ERROR = 1;
+  }
+  required Result result = 1;
+  optional string errorMessage = 2;
+}
+`)
 
 export default class LitNodeClient {
   constructor (config) {
     this.libp2p = null
-    this.connectedNodes = {}
+    this.connectedNodes = new Set()
   }
 
   async saveEncryptionKey ({ contractAddress, tokenId, symmetricKey }) {
@@ -39,7 +82,7 @@ export default class LitNodeClient {
       const key = `${normalizedContractAddress}|${normalizedTokenid}|${i}`
       console.debug(`storing kFrag with key ${key} in node ${i + 1} of ${nodeKeys.length}`)
       storagePromises.push(
-        this.storeData({
+        this.storeDataWithNode({
           peerId: nodeKeys[i],
           key,
           val: kFrags[i]
@@ -51,26 +94,48 @@ export default class LitNodeClient {
     return { success: true }
   }
 
-  async storeData ({ peerId, key, val }) {
-    // const stream = await this.getStream(peerId)
+  async storeDataWithNode ({ peerId, key, val }) {
     const hashed = multihashing(Buffer.from(key), 'sha2-256')
     const cid = new CID(hashed)
-    const msg = JSON.stringify({ cmd: 'set', key: cid.toString(), val })
-    const node = this.connectedNodes[peerId]
-    node.send(msg)
+    const msg = Request.encode({
+      type: Request.Type.STORE_KEY_FRAGMENT,
+      storeKeyFragment: {
+        keyId: uint8arrayFromString(cid.toString()),
+        fragmentValue: uint8arrayFromString(val)
+      }
+    })
+    return await this.sendCommandToPeer(peerId, msg)
   }
 
-  // async getStream (peerId) {
-  //   const conn = this.libp2p.connectionManager.get(peerId)
-  //   if (!conn) {
-  //     console.error('trying to store data but no connection to ' + peerId.toB58String())
-  //     return
-  //   }
-  //   console.log('streams: ')
-  // }
+  async getData ({ peerId, key }) {
+    const hashed = multihashing(Buffer.from(key), 'sha2-256')
+    const cid = new CID(hashed)
+    const msg = JSON.stringify({ cmd: 'get', key: cid.toString() })
+    return await this.sendCommandToPeer(peerId, msg)
+  }
 
-  dataReceived ({ peerId, msg }) {
-    console.log(`dataReceived from ${peerId.toB58String()}: ${msg}`)
+  async sendCommandToPeer (peerId, data) {
+    const connection = this.libp2p.connectionManager.get(PeerId.createFromB58String(peerId))
+    const { stream } = await connection.newStream(['/lit/1.0.0'])
+    const response = []
+    await pipe(
+      [data],
+      stream,
+      async function (source) {
+        const { value, done } = await source.next()
+        const resp = Response.decode(value.slice())
+        if (resp.type === Response.Type.STORE_KEY_FRAGMENT) {
+          if (resp.storeKeyFragmentResponse.result === StoreKeyFragmentResponse.Result.success) {
+            console.log('success storing key fragment')
+          } else {
+            console.log('error storing key fragment')
+          }
+        } else {
+          console.log('unknown response type')
+        }
+      }
+    )
+    return response
   }
 
   async connect () {
@@ -104,60 +169,19 @@ export default class LitNodeClient {
 
     // Listen for new connections to peers
     this.libp2p.connectionManager.on('peer:connect', async (connection) => {
-      console.debug(`Connected to ${connection.remotePeer.toB58String()}`)
-      const { stream } = await connection.newStream(['/lit/1.0.0'])
-      // write data
-      const p = pushable()
-      pipe(
-        p,
-        lp.encode(),
-        stream.sink
-      )
-      this.connectedNodes[connection.remotePeer.toB58String()] = {
-        send: p.push
+      const peerId = connection.remotePeer.toB58String()
+      console.debug(`Connected to ${peerId}`)
+      if (this.connectedNodes.has(peerId)) {
+        return
       }
-
-      // pipe(
-      //   stream.source,
-      //   lp.decode(),
-      //   async (source) => {
-      //     for await (const msg of source) {
-      //       // console.log(`Peer ${connection.remotePeer.toB58String()} responded with ${msg}`)
-      //       this.dataReceived({ peerId: connection.remotePeer, msg })
-      //     }
-      //   }
-      // )
-
-      // send some data
-      // const dialed = await libp2p.dialProtocol(connection.remotePeer, '/lit/1.0.0')
-      // // Write operation. Data sent as a buffer
-      // pipe(
-      //   p,
-      //   lp.encode(),
-      //   dialed.stream.sink
-      // )
-      // pipe(
-      //   dialed.stream.source,
-      //   lp.decode(),
-      //   async (source) => {
-      //     for await (const msg of source) {
-      //       console.log(`Peer ${connection.remotePeer.toB58String()} responded with ${msg}`)
-      //     }
-      //   }
-      // )
-      // const hashed = multihashing(Buffer.from('1'), 'sha2-256')
-      // const cid = new CID(hashed)
-      // const msg = JSON.stringify({ cmd: 'set', key: cid.toString(), val: 'woof' })
-      // p.push(msg)
-      // setTimeout(() => {
-      //   const msg = JSON.stringify({ cmd: 'get', key: cid.toString() })
-      //   p.push(msg)
-      // }, 3000)
+      this.connectedNodes.add(peerId)
     })
 
     // Listen for peers disconnecting
     this.libp2p.connectionManager.on('peer:disconnect', (connection) => {
-      console.debug(`Disconnected from ${connection.remotePeer.toB58String()}`)
+      const peerId = connection.remotePeer.toB58String()
+      console.debug(`Disconnected from ${peerId}`)
+      this.connectedNodes.delete(peerId)
     })
 
     await this.libp2p.start()
@@ -166,6 +190,7 @@ export default class LitNodeClient {
 
     // Export libp2p to the window so you can play with the API
     window.libp2p = this.libp2p
+    window.PeerId = PeerId
     // const hashed = multihashing(Buffer.from('1'), 'sha2-256')
     // window.cid = new CID(hashed)
 
