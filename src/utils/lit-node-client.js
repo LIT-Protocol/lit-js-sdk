@@ -18,7 +18,7 @@ import protons from 'protons'
 import uint8arrayFromString from 'uint8arrays/from-string'
 import uint8arrayToString from 'uint8arrays/to-string'
 
-const { Request, Response, StoreKeyFragmentResponse } = protons(`
+const { Request, Response, StoreKeyFragmentResponse, GetKeyFragmentResponse } = protons(`
 message Request {
   enum Type {
     GET_KEY_FRAGMENT = 0;
@@ -41,8 +41,14 @@ message GetKeyFragment {
   required bytes keyId = 1;
 }
 message GetKeyFragmentResponse {
-  required bytes keyId = 1;
-  required bytes fragmentValue = 2;
+  enum Result {
+    SUCCESS = 0;
+    NOT_FOUND = 1;
+    ERROR = 2;
+  }
+  required Result result = 1;
+  optional bytes keyId = 2;
+  optional bytes fragmentValue = 3;
 }
 message StoreKeyFragment {
   required bytes keyId = 1;
@@ -54,7 +60,7 @@ message StoreKeyFragmentResponse {
     ERROR = 1;
   }
   required Result result = 1;
-  optional string errorMessage = 2;
+  optional bytes errorMessage = 2;
 }
 `)
 
@@ -97,27 +103,32 @@ export default class LitNodeClient {
   async storeDataWithNode ({ peerId, key, val }) {
     const hashed = multihashing(Buffer.from(key), 'sha2-256')
     const cid = new CID(hashed)
-    const msg = Request.encode({
+    const data = Request.encode({
       type: Request.Type.STORE_KEY_FRAGMENT,
       storeKeyFragment: {
         keyId: uint8arrayFromString(cid.toString()),
         fragmentValue: uint8arrayFromString(val)
       }
     })
-    return await this.sendCommandToPeer(peerId, msg)
+    return await this.sendCommandToPeer({ peerId, data })
   }
 
-  async getData ({ peerId, key }) {
+  async getDataFromNode ({ peerId, key }) {
     const hashed = multihashing(Buffer.from(key), 'sha2-256')
     const cid = new CID(hashed)
-    const msg = JSON.stringify({ cmd: 'get', key: cid.toString() })
-    return await this.sendCommandToPeer(peerId, msg)
+    const data = Request.encode({
+      type: Request.Type.GET_KEY_FRAGMENT,
+      getKeyFragment: {
+        keyId: uint8arrayFromString(cid.toString())
+      }
+    })
+    return await this.sendCommandToPeer({ peerId, data })
   }
 
-  async sendCommandToPeer (peerId, data) {
+  async sendCommandToPeer ({ peerId, data }) {
     const connection = this.libp2p.connectionManager.get(PeerId.createFromB58String(peerId))
     const { stream } = await connection.newStream(['/lit/1.0.0'])
-    const response = []
+    let retVal = null
     await pipe(
       [data],
       stream,
@@ -127,15 +138,29 @@ export default class LitNodeClient {
         if (resp.type === Response.Type.STORE_KEY_FRAGMENT_RESPONSE) {
           if (resp.storeKeyFragmentResponse.result === StoreKeyFragmentResponse.Result.SUCCESS) {
             console.log('success storing key fragment')
+            retVal = true
           } else {
-            console.log('error storing key fragment')
+            console.log('error storing key fragment: ')
+            console.log(uint8arrayToString(resp.storeKeyFragmentResponse.errorMessage))
+            retVal = false
+          }
+        } else if (resp.type === Response.Type.GET_KEY_FRAGMENT_RESPONSE) {
+          if (resp.getKeyFragmentResponse.result === GetKeyFragmentResponse.Result.SUCCESS) {
+            console.log('success getting key fragment')
+            retVal = uint8arrayToString(resp.getKeyFragmentResponse.fragmentValue)
+          } else if (resp.getKeyFragmentResponse.result === GetKeyFragmentResponse.Result.NOT_FOUND) {
+            console.log('key fragment not found')
+            retVal = false
+          } else {
+            console.log('unknown error getting key fragment')
+            retVal = false
           }
         } else {
           console.log('unknown response type')
         }
       }
     )
-    return response
+    return retVal
   }
 
   async connect () {
