@@ -8,11 +8,13 @@ import {
 } from './utils/lit'
 
 import {
-  checkAndDeriveKeypair,
   connectWeb3,
   mintLIT,
-  LIT_CHAINS
+  checkAndSignAuthMessage
 } from './utils/eth'
+
+import { LIT_CHAINS, protobufs } from './lib/constants'
+import { kFragKey } from './lib/utils'
 
 import LitNodeClient from './utils/lit-node-client'
 
@@ -26,15 +28,17 @@ const functions = {
   zipAndEncryptFiles,
   encryptZip,
   decryptZip,
-  checkAndDeriveKeypair,
   connectWeb3,
+  checkAndSignAuthMessage,
   createHtmlLIT,
   mintLIT,
   toggleLock,
   LIT_CHAINS,
   LitNodeClient,
   getUploadUrl,
-  createTokenMetadata
+  createTokenMetadata,
+  protobufs,
+  kFragKey
 }
 
 export default functions

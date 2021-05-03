@@ -14,55 +14,13 @@ import multihashing from 'multihashing'
 import CID from 'cids'
 import pushable from 'it-pushable'
 import secrets from 'secrets.js-grempe'
-import protons from 'protons'
 import uint8arrayFromString from 'uint8arrays/from-string'
 import uint8arrayToString from 'uint8arrays/to-string'
+import { protobufs } from '../lib/constants'
+import { kFragKey } from '../lib/utils'
+import all from 'it-all'
 
-const { Request, Response, StoreKeyFragmentResponse, GetKeyFragmentResponse } = protons(`
-message Request {
-  enum Type {
-    GET_KEY_FRAGMENT = 0;
-    STORE_KEY_FRAGMENT = 1;
-  }
-  required Type type = 1;
-  optional GetKeyFragment getKeyFragment = 2;
-  optional StoreKeyFragment storeKeyFragment = 3;
-}
-message Response {
-  enum Type {
-    GET_KEY_FRAGMENT_RESPONSE = 0;
-    STORE_KEY_FRAGMENT_RESPONSE = 1;
-  }
-  required Type type = 1;
-  optional GetKeyFragmentResponse getKeyFragmentResponse = 2;
-  optional StoreKeyFragmentResponse storeKeyFragmentResponse = 3;
-}
-message GetKeyFragment {
-  required bytes keyId = 1;
-}
-message GetKeyFragmentResponse {
-  enum Result {
-    SUCCESS = 0;
-    NOT_FOUND = 1;
-    ERROR = 2;
-  }
-  required Result result = 1;
-  optional bytes keyId = 2;
-  optional bytes fragmentValue = 3;
-}
-message StoreKeyFragment {
-  required bytes keyId = 1;
-  required bytes fragmentValue = 2;
-}
-message StoreKeyFragmentResponse {
-  enum Result {
-    SUCCESS = 0;
-    ERROR = 1;
-  }
-  required Result result = 1;
-  optional bytes errorMessage = 2;
-}
-`)
+const { Request, Response, StoreKeyFragmentResponse, GetKeyFragmentResponse } = protobufs
 
 export default class LitNodeClient {
   constructor (config) {
@@ -70,28 +28,30 @@ export default class LitNodeClient {
     this.connectedNodes = new Set()
   }
 
-  async saveEncryptionKey ({ contractAddress, tokenId, symmetricKey }) {
-    const nodeKeys = Object.keys(this.connectedNodes)
-    // split up into nodeKeys.length fragments
-    const numShares = nodeKeys.length
+  async saveEncryptionKey ({ tokenAddress, tokenId, symmetricKey, authSig, chain }) {
+    const nodes = Array.from(this.connectedNodes)
+    // split up into nodes.length fragments
+    const numShares = nodes.length
     const threshold = Math.floor(numShares / 2)
     // convert from base64 to hex
-    const secret = Buffer.from(symmetricKey, 'base64').toString('hex')
+    const secret = Buffer.from(symmetricKey).toString('hex')
+    console.debug(`splitting up into ${numShares} shares with a threshold of ${threshold}`)
     const kFrags = secrets.share(secret, numShares, threshold)
-    if (kFrags.length !== nodeKeys.length) {
-      throw new Error(`kFrags.length (${kFrags.length}) !== nodeKeys.length (${nodeKeys.length})`)
+    if (kFrags.length !== nodes.length) {
+      throw new Error(`kFrags.length (${kFrags.length}) !== nodes.length (${nodes.length})`)
     }
     const storagePromises = []
-    const normalizedContractAddress = contractAddress.toLowerCase()
-    const normalizedTokenid = tokenId.toString(16).padStart(64, '0') // to hex and padded for consistent length
-    for (let i = 0; i < nodeKeys.length; i++) {
-      const key = `${normalizedContractAddress}|${normalizedTokenid}|${i}`
-      console.debug(`storing kFrag with key ${key} in node ${i + 1} of ${nodeKeys.length}`)
+    const normalizedTokenAddress = tokenAddress.toLowerCase()
+    for (let i = 0; i < nodes.length; i++) {
+      console.debug(`storing kFrag in node ${i + 1} of ${nodes.length}`)
       storagePromises.push(
         this.storeDataWithNode({
-          peerId: nodeKeys[i],
-          key,
-          val: kFrags[i]
+          peerId: nodes[i],
+          tokenAddress: normalizedTokenAddress,
+          tokenId,
+          val: kFrags[i],
+          authSig,
+          chain
         })
       )
     }
@@ -100,27 +60,47 @@ export default class LitNodeClient {
     return { success: true }
   }
 
-  async storeDataWithNode ({ peerId, key, val }) {
-    const hashed = multihashing(Buffer.from(key), 'sha2-256')
-    const cid = new CID(hashed)
+  async getEncryptionKeyFragments ({ tokenAddress, tokenId, authSig, chain }) {
+    // find providers
+    const keyId = kFragKey({ tokenAddress, tokenId, chain })
+    const cid = new CID(keyId)
+    const providers = await all(this.libp2p.contentRouting.findProviders(cid, { timeout: 3000 }))
+    console.log(`Found ${providers.length} providers`)
+    const kFragPromises = []
+    for (let i = 0; i < providers.length; i++) {
+      kFragPromises.push(this.getDataFromNode({
+        peerId: providers[i].id.toB58String(),
+        authSig,
+        keyId,
+        chain
+      }))
+    }
+    const kFrags = await Promise.all(kFragPromises)
+    return kFrags
+  }
+
+  async storeDataWithNode ({ peerId, tokenAddress, tokenId, val, authSig, chain }) {
+    console.debug(`storing data with node ${peerId} with tokenAddress ${tokenAddress} and tokenId ${tokenId}`)
     const data = Request.encode({
       type: Request.Type.STORE_KEY_FRAGMENT,
       storeKeyFragment: {
-        keyId: uint8arrayFromString(cid.toString()),
+        tokenAddress: uint8arrayFromString(tokenAddress),
+        tokenId: uint8arrayFromString(tokenId.toString()),
+        chain: uint8arrayFromString(chain),
         fragmentValue: uint8arrayFromString(val)
-      }
+      },
+      authSig: uint8arrayFromString(JSON.stringify(authSig))
     })
     return await this.sendCommandToPeer({ peerId, data })
   }
 
-  async getDataFromNode ({ peerId, key }) {
-    const hashed = multihashing(Buffer.from(key), 'sha2-256')
-    const cid = new CID(hashed)
+  async getDataFromNode ({ peerId, keyId, authSig, chain }) {
     const data = Request.encode({
       type: Request.Type.GET_KEY_FRAGMENT,
       getKeyFragment: {
-        keyId: uint8arrayFromString(cid.toString())
-      }
+        keyId: uint8arrayFromString(keyId)
+      },
+      authSig: uint8arrayFromString(authSig.sig)
     })
     return await this.sendCommandToPeer({ peerId, data })
   }

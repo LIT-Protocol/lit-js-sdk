@@ -1,8 +1,6 @@
 import JSZip from 'jszip'
 
 import {
-  encryptWithPubkey,
-  decryptWithPrivkey,
   importSymmetricKey,
   generateSymmetricKey,
   encryptWithSymmetricKey,
@@ -10,10 +8,10 @@ import {
   compareArrayBuffers
 } from './crypto'
 
-import {
-  checkAndDeriveKeypair,
-  decryptWithWeb3PrivateKey
-} from './eth'
+// import {
+//   checkAndDeriveKeypair,
+//   decryptWithWeb3PrivateKey
+// } from './eth'
 
 import { fileToDataUrl } from './browser'
 
@@ -35,21 +33,21 @@ export async function zipAndEncryptFiles (files) {
 }
 
 export async function decryptZip (encryptedZipBlob, symmKey) {
-  const keypair = await checkAndDeriveKeypair()
+  // const keypair = await checkAndDeriveKeypair()
 
-  console.log('Got keypair out of localstorage: ' + keypair)
-  const privkey = keypair.secretKey
+  // console.log('Got keypair out of localstorage: ' + keypair)
+  // const privkey = keypair.secretKey
 
-  let decryptedSymmKey = await decryptWithWeb3PrivateKey(symmKey)
-  if (!decryptedSymmKey) {
-    // fallback to trying the private derived via signature
-    console.log('probably not metamask')
-    decryptedSymmKey = decryptWithPrivkey(symmKey, privkey)
-  }
-  console.log('decrypted', decryptedSymmKey)
+  // let decryptedSymmKey = await decryptWithWeb3PrivateKey(symmKey)
+  // if (!decryptedSymmKey) {
+  //   // fallback to trying the private derived via signature
+  //   console.log('probably not metamask')
+  //   decryptedSymmKey = decryptWithPrivkey(symmKey, privkey)
+  // }
+  // console.log('decrypted', decryptedSymmKey)
 
   // import the decrypted symm key
-  const importedSymmKey = await importSymmetricKey(decryptedSymmKey)
+  const importedSymmKey = await importSymmetricKey(symmKey)
 
   const decryptedZipArrayBuffer = await decryptWithSymmetricKey(
     encryptedZipBlob,
@@ -92,13 +90,13 @@ export async function encryptZip (zip) {
 
   // encrypt the symmetric key with the
   // public key derived from the eth wallet
-  const keypair = await checkAndDeriveKeypair()
-  const pubkey = keypair.publicKey
-  const privkey = keypair.secretKey
+  // const keypair = await checkAndDeriveKeypair()
+  // const pubkey = keypair.publicKey
+  // const privkey = keypair.secretKey
 
   // encrypt symm key
-  const encryptedSymmKeyData = encryptWithPubkey(pubkey, JSON.stringify(exportedSymmKey), 'x25519-xsalsa20-poly1305')
-  const packed = JSON.stringify(encryptedSymmKeyData)
+  // const encryptedSymmKeyData = encryptWithPubkey(pubkey, JSON.stringify(exportedSymmKey), 'x25519-xsalsa20-poly1305')
+  // const packed = JSON.stringify(encryptedSymmKeyData)
 
   //   console.log('packed symmetric key ', packed)
   //   const unpacked = JSON.parse(packed)
@@ -135,7 +133,7 @@ export async function encryptZip (zip) {
   // console.log('saved')
 
   return {
-    encryptedSymmetricKey: packed,
+    symmetricKey: exportedSymmKey,
     encryptedZip: encryptedZipBlob
   }
 }

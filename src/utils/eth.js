@@ -7,36 +7,26 @@ import nacl from 'tweetnacl'
 import { getPublicKey, savePublicKey } from './cloudFunctions'
 
 import LIT from '../abis/LIT.json'
+import { LIT_CHAINS } from '../lib/constants'
 
-const KEY_DERIVATION_SIGNATURE_BODY = 'I am creating an account to mint a LIT'
+const AUTH_SIGNATURE_BODY = 'I am creating an account to use LITs at {{timestamp}}'
 
-export const LIT_CHAINS = {
-  polygon: {
-    contractAddress: '0xb9A323711528D0c5a70df790929f4739f1cDd7fD',
-    chainId: 137
-  },
-  ethereum: {
-    contractAddress: '0x55485885e82E25446DEC314Ccb810Bda06B9e01B',
-    chainId: 1
-  }
-}
-
-export async function checkAndDeriveKeypair () {
-  let keypair = localStorage.getItem('lit-keypair')
-  if (!keypair) {
-    await deriveEncryptionKeys()
-    keypair = localStorage.getItem('lit-keypair')
-  }
-  keypair = JSON.parse(keypair)
-  const { web3, account } = await connectWeb3()
-  // make sure we are on the right account
-  if (account !== keypair.address) {
-    await deriveEncryptionKeys()
-    keypair = localStorage.getItem('lit-keypair')
-    keypair = JSON.parse(keypair)
-  }
-  return keypair
-}
+// export async function checkAndDeriveKeypair () {
+//   let keypair = localStorage.getItem('lit-keypair')
+//   if (!keypair) {
+//     await deriveEncryptionKeys()
+//     keypair = localStorage.getItem('lit-keypair')
+//   }
+//   keypair = JSON.parse(keypair)
+//   const { web3, account } = await connectWeb3()
+//   // make sure we are on the right account
+//   if (account !== keypair.address) {
+//     await deriveEncryptionKeys()
+//     keypair = localStorage.getItem('lit-keypair')
+//     keypair = JSON.parse(keypair)
+//   }
+//   return keypair
+// }
 
 export async function connectWeb3 () {
   if (typeof window.ethereum === 'undefined') {
@@ -47,10 +37,39 @@ export async function connectWeb3 () {
 
   // trigger metamask popup
   const accounts = await provider.request({ method: 'eth_requestAccounts' })
-  const account = accounts[0]
+  const account = accounts[0].toLowerCase()
 
   const web3 = new Web3(provider)
   return { web3, account }
+}
+
+export async function checkAndSignAuthMessage () {
+  let authSig = localStorage.getItem('lit-auth-signature')
+  if (!authSig) {
+    await signAndSaveAuthMessage()
+    authSig = localStorage.getItem('lit-auth-signature')
+  }
+  authSig = JSON.parse(authSig)
+  const { web3, account } = await connectWeb3()
+  // make sure we are on the right account
+  if (account !== authSig.address) {
+    await signAndSaveAuthMessage()
+    authSig = localStorage.getItem('lit-auth-signature')
+    authSig = JSON.parse(authSig)
+  }
+  return authSig
+}
+
+export async function signAndSaveAuthMessage () {
+  const now = (new Date()).toISOString()
+  const body = AUTH_SIGNATURE_BODY.replace('{{timestamp}}', now)
+  const signedResult = await signMessage({ body })
+  localStorage.setItem('lit-auth-signature', JSON.stringify({
+    sig: signedResult.signature,
+    derivedVia: 'web3.eth.personal.sign',
+    signedMessage: body,
+    address: signedResult.address
+  }))
 }
 
 export async function signMessage ({ body }) {
@@ -58,7 +77,7 @@ export async function signMessage ({ body }) {
 
   console.log('signing with ', account)
   const signature = await web3.eth.personal.sign(body, account)
-  const address = web3.eth.accounts.recover(body, signature)
+  const address = web3.eth.accounts.recover(body, signature).toLowerCase()
 
   console.log('Signature: ', signature)
   console.log('recovered address: ', address)
@@ -73,106 +92,106 @@ export async function signMessage ({ body }) {
   return { signature, address }
 }
 
-export async function decryptWithWeb3PrivateKey (encryptedData) {
-  const { web3, account } = await connectWeb3()
-  try {
-    const decryptedMessage = ethereum
-      .request({
-        method: 'eth_decrypt',
-        params: [encryptedData, account]
-      })
-    return decryptedMessage
-  } catch (error) {
-    console.log(error)
-    return false
-  }
-}
-
-async function deriveKeysViaSignature () {
-  const { signature, address } = await signMessage({ body: KEY_DERIVATION_SIGNATURE_BODY })
-  console.log('Signed message: ' + signature)
-
-  // derive keypair
-  const data = Buffer.from(signature.substring(2), 'hex')
-  const hash = await crypto.subtle.digest('SHA-256', data)
-  const uint8Hash = new Uint8Array(hash)
-  const { publicKey, secretKey } = nacl.box.keyPair.fromSecretKey(uint8Hash)
-  return {
-    publicKey: naclUtil.encodeBase64(publicKey),
-    secretKey: naclUtil.encodeBase64(secretKey)
-  }
-}
-
-// this only works on metamask :(
-async function deriveKeysViaPrivateKey () {
-  try {
-    const { web3, account } = await connectWeb3()
-    /* global ethereum */
-    /* eslint no-undef: "error" */
-    const publicKey = await ethereum
-      .request({
-        method: 'eth_getEncryptionPublicKey',
-        params: [account] // you must have access to the specified account
-      })
-    return { publicKey }
-  } catch (error) {
-    console.log(error)
-    if (error.code === 4001) {
-      // EIP-1193 userRejectedRequest error
-      console.log("We can't encrypt anything without the key.")
-      error('You must accept the metamask request to derive your public encryption key')
-    } else {
-      console.error(error)
-    }
-    return { error }
-  }
-}
-
-export async function deriveEncryptionKeys () {
-  let keypair = {}
-  // key derivation via metamask is more desirable because then even this SDK can't see the secret key :-D
-  const { error, publicKey } = await deriveKeysViaPrivateKey()
-  if (!error) {
-    keypair = {
-      publicKey,
-      derivedVia: 'eth_getEncryptionPublicKey'
-    }
-  } else {
-    const { publicKey, secretKey } = await deriveKeysViaSignature()
-    keypair = {
-      publicKey,
-      secretKey,
-      derivedVia: 'web3.eth.personal.sign',
-      signedMessage: KEY_DERIVATION_SIGNATURE_BODY
-    }
-  }
-
-  const { web3, account } = await connectWeb3()
-  keypair.address = account
-
-  console.log('public key: ' + keypair.publicKey)
-  const asString = JSON.stringify(keypair)
-  localStorage.setItem('lit-keypair', asString)
-
-  // is it already saved on the server?
-  const { pubkey, errorCode } = await getPublicKey({
-    address: account
-  })
-  if (errorCode === 'not_found' || pubkey !== keypair.publicKey) {
-    // add it
-    const msg = `I am saving my public key so that others can send me LITs.  It is ${pubkey}`
-    const res = await signMessage({ body: msg })
-    await savePublicKey({
-      sig: res.signature,
-      msg,
-      pubkey: keypair.publicKey
-    })
-  }
-}
+// export async function decryptWithWeb3PrivateKey (encryptedData) {
+//   const { web3, account } = await connectWeb3()
+//   try {
+//     const decryptedMessage = ethereum
+//       .request({
+//         method: 'eth_decrypt',
+//         params: [encryptedData, account]
+//       })
+//     return decryptedMessage
+//   } catch (error) {
+//     console.log(error)
+//     return false
+//   }
+// }
+//
+// async function deriveKeysViaSignature () {
+//   const { signature, address } = await signMessage({ body: KEY_DERIVATION_SIGNATURE_BODY })
+//   console.log('Signed message: ' + signature)
+//
+//   // derive keypair
+//   const data = Buffer.from(signature.substring(2), 'hex')
+//   const hash = await crypto.subtle.digest('SHA-256', data)
+//   const uint8Hash = new Uint8Array(hash)
+//   const { publicKey, secretKey } = nacl.box.keyPair.fromSecretKey(uint8Hash)
+//   return {
+//     publicKey: naclUtil.encodeBase64(publicKey),
+//     secretKey: naclUtil.encodeBase64(secretKey)
+//   }
+// }
+//
+// // this only works on metamask :(
+// async function deriveKeysViaPrivateKey () {
+//   try {
+//     const { web3, account } = await connectWeb3()
+//     /* global ethereum */
+//     /* eslint no-undef: "error" */
+//     const publicKey = await ethereum
+//       .request({
+//         method: 'eth_getEncryptionPublicKey',
+//         params: [account] // you must have access to the specified account
+//       })
+//     return { publicKey }
+//   } catch (error) {
+//     console.log(error)
+//     if (error.code === 4001) {
+//       // EIP-1193 userRejectedRequest error
+//       console.log("We can't encrypt anything without the key.")
+//       error('You must accept the metamask request to derive your public encryption key')
+//     } else {
+//       console.error(error)
+//     }
+//     return { error }
+//   }
+// }
+//
+// export async function deriveEncryptionKeys () {
+//   let keypair = {}
+//   // key derivation via metamask is more desirable because then even this SDK can't see the secret key :-D
+//   const { error, publicKey } = await deriveKeysViaPrivateKey()
+//   if (!error) {
+//     keypair = {
+//       publicKey,
+//       derivedVia: 'eth_getEncryptionPublicKey'
+//     }
+//   } else {
+//     const { publicKey, secretKey } = await deriveKeysViaSignature()
+//     keypair = {
+//       publicKey,
+//       secretKey,
+//       derivedVia: 'web3.eth.personal.sign',
+//       signedMessage: KEY_DERIVATION_SIGNATURE_BODY
+//     }
+//   }
+//
+//   const { web3, account } = await connectWeb3()
+//   keypair.address = account
+//
+//   console.log('public key: ' + keypair.publicKey)
+//   const asString = JSON.stringify(keypair)
+//   localStorage.setItem('lit-keypair', asString)
+//
+//   // is it already saved on the server?
+//   const { pubkey, errorCode } = await getPublicKey({
+//     address: account
+//   })
+//   if (errorCode === 'not_found' || pubkey !== keypair.publicKey) {
+//     // add it
+//     const msg = `I am saving my public key so that others can send me LITs.  It is ${pubkey}`
+//     const res = await signMessage({ body: msg })
+//     await savePublicKey({
+//       sig: res.signature,
+//       msg,
+//       pubkey: keypair.publicKey
+//     })
+//   }
+// }
 
 export async function mintLIT ({ chain, quantity }) {
   console.log(`minting ${quantity} tokens on ${chain}`)
-  await checkAndDeriveKeypair()
+  const authSig = await checkAndSignAuthMessage()
   const { web3, account } = await connectWeb3()
   const chainId = await web3.eth.getChainId()
   if (chainId !== LIT_CHAINS[chain].chainId) {
@@ -189,7 +208,8 @@ export async function mintLIT ({ chain, quantity }) {
       txHash: txReceipt.transactionHash,
       tokenId,
       tokenAddress,
-      mintingAddress: account
+      mintingAddress: account,
+      authSig
     }
   } catch (error) {
     console.log(error)
