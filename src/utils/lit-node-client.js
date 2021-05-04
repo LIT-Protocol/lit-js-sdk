@@ -28,7 +28,16 @@ export default class LitNodeClient {
     this.connectedNodes = new Set()
   }
 
+  async getEncryptionKey ({ tokenAddress, tokenId, authSig, chain }) {
+    const kFrags = await this.getEncryptionKeyFragments({ tokenAddress, tokenId, authSig, chain })
+    const secret = secrets.combine(kFrags)
+    const symmetricKey = Buffer.from(secret, 'hex').toString()
+    console.log('recombined symmetric key: ' + symmetricKey)
+    return symmetricKey
+  }
+
   async saveEncryptionKey ({ tokenAddress, tokenId, symmetricKey, authSig, chain }) {
+    console.log(`saveEncryptionKey with tokenAddress ${tokenAddress} and tokenId ${tokenId} and symmetricKey ${symmetricKey} and authSig ${authSig} and chain ${chain}`)
     const nodes = Array.from(this.connectedNodes)
     // split up into nodes.length fragments
     const numShares = nodes.length

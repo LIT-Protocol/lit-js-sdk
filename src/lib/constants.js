@@ -1,4 +1,4 @@
-const protons = require('protons')
+import protons from 'protons'
 
 export const protobufs = protons(`
 message Request {

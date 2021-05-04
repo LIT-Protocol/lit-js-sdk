@@ -8,10 +8,9 @@ import {
   compareArrayBuffers
 } from './crypto'
 
-// import {
-//   checkAndDeriveKeypair,
-//   decryptWithWeb3PrivateKey
-// } from './eth'
+import {
+  checkAndSignAuthMessage
+} from './eth'
 
 import { fileToDataUrl } from './browser'
 
@@ -133,7 +132,7 @@ export async function encryptZip (zip) {
   // console.log('saved')
 
   return {
-    symmetricKey: exportedSymmKey,
+    symmetricKey: JSON.stringify(exportedSymmKey),
     encryptedZip: encryptedZipBlob
   }
 }
@@ -162,11 +161,13 @@ export async function createHtmlLIT ({
   title,
   htmlBody,
   css,
-  encryptedSymmetricKey,
   encryptedZipDataUrl,
+  tokenAddress,
+  tokenId,
+  chain,
   npmPackages = []
 }) {
-  npmPackages.push('lit-js-sdk')
+  // npmPackages.push('lit-js-sdk')
   // console.log('createHtmlLIT with npmPackages', npmPackages)
   let scriptTags = ''
   for (let i = 0; i < npmPackages.length; i++) {
@@ -185,10 +186,18 @@ export async function createHtmlLIT ({
     <style id="jss-server-side">${css}</style>
     ${scriptTags}
     <script>
-      var encryptedSymmetricKey = ${encryptedSymmetricKey}
       var encryptedZipDataUrl = "${encryptedZipDataUrl}"
+      var tokenAddress = "${tokenAddress}"
+      var tokenId = "${tokenId}"
+      var chain = "${chain}"
       var locked = true
+
+      function litJsSdkLoaded(){
+         var litNodeClient = new LitJsSdk.default.LitNodeClient()
+        litNodeClient.connect()
+      }
     </script>
+    <script onload='litJsSdkLoaded()' src="https://unpkg.com/lit-js-sdk"></script>
   </head>
   <body>
     <div id="root">${htmlBody}</div>
@@ -211,9 +220,19 @@ export async function toggleLock () {
     // save public content before decryption, so we can toggle back to the
     // locked state in the future
     window.publicContent = mediaGridHolder.innerHTML
+
+    const authSig = await checkAndSignAuthMessage()
+    // get the encryption key
+    const symmetricKey = await window.litNodeClient.getEncryptionKey({
+      tokenAddress: window.tokenAddress,
+      tokenId: window.tokenId,
+      authSig,
+      chain: window.chain
+    })
+
     // convert data url to blob
     const encryptedZipBlob = await (await fetch(window.encryptedZipDataUrl)).blob()
-    const decryptedFiles = await decryptZip(encryptedZipBlob, JSON.stringify(window.encryptedSymmetricKey))
+    const decryptedFiles = await decryptZip(encryptedZipBlob, symmetricKey)
     const mediaGridHtmlBody = await decryptedFiles['string.txt'].async('text')
     mediaGridHolder.innerHTML = mediaGridHtmlBody
     lockedHeader.innerText = 'UNLOCKED'
