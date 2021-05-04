@@ -1,13 +1,12 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.0.31",
+  "version": "1.0.34",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
-  "main": "build/index.umd.js",
+  "main": "dist/index.js",
   "scripts": {
     "start": "microbundle watch",
-    "build": "microbundle build --name LitJsSdk",
-    "prepare": "microbundle build --name LitJsSdk --external=none --define @process.env.NODE_DEBUG=false"
+    "build": "microbundle build --name LitJsSdk"
   },
   "repository": {
     "type": "git",
