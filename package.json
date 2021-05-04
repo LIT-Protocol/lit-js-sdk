@@ -1,13 +1,13 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.0.27",
+  "version": "1.0.29",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
   "main": "build/index.umd.js",
   "scripts": {
     "start": "microbundle watch",
     "build": "microbundle build --name LitJsSdk",
-    "prepare": "microbundle build --name LitJsSdk --external=none --globals=none"
+    "prepare": "microbundle build --name LitJsSdk --external=none"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   ],
   "license": "GPL-3.0",
   "devDependencies": {
+    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "microbundle": "^0.13.0",
     "standard": "^16.0.3"
   },
@@ -46,7 +47,6 @@
     "multihashing": "^0.3.3",
     "peer-id": "^0.14.8",
     "protons": "^2.0.1",
-    "rollup-plugin-node-polyfills": "^0.2.1",
     "secrets.js-grempe": "../secrets.js",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
