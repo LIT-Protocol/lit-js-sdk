@@ -1,3 +1,5 @@
+import 'regenerator-runtime/runtime'
+
 import {
   zipAndEncryptString,
   zipAndEncryptFiles,
@@ -18,11 +20,6 @@ import { kFragKey } from './lib/utils'
 
 import LitNodeClient from './utils/lit-node-client'
 
-import {
-  getUploadUrl,
-  createTokenMetadata
-} from './utils/cloudFunctions'
-
 const functions = {
   zipAndEncryptString,
   zipAndEncryptFiles,
@@ -35,8 +32,6 @@ const functions = {
   toggleLock,
   LIT_CHAINS,
   LitNodeClient,
-  getUploadUrl,
-  createTokenMetadata,
   protobufs,
   kFragKey
 }

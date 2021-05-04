@@ -4,7 +4,6 @@ import detectEthereumProvider from '@metamask/detect-provider'
 
 import naclUtil from 'tweetnacl-util'
 import nacl from 'tweetnacl'
-import { getPublicKey, savePublicKey } from './cloudFunctions'
 
 import LIT from '../abis/LIT.json'
 import { LIT_CHAINS } from '../lib/constants'
