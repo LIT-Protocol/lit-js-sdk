@@ -1,13 +1,13 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.0.26",
+  "version": "1.0.27",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
   "main": "build/index.umd.js",
   "scripts": {
     "start": "microbundle watch",
     "build": "microbundle build --name LitJsSdk",
-    "prepare": "yarn build"
+    "prepare": "microbundle build --name LitJsSdk --external=none --globals=none"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,10 @@
   ],
   "license": "GPL-3.0",
   "devDependencies": {
+    "microbundle": "^0.13.0",
+    "standard": "^16.0.3"
+  },
+  "dependencies": {
     "@metamask/detect-provider": "^1.2.0",
     "cids": "^1.1.6",
     "firebase": "^8.4.2",
@@ -38,17 +42,15 @@
     "libp2p-noise": "^3.0.0",
     "libp2p-webrtc-direct": "^0.6.0",
     "libp2p-websockets": "^0.15.6",
-    "microbundle": "^0.13.0",
     "multiaddr": "^9.0.1",
     "multihashing": "^0.3.3",
     "peer-id": "^0.14.8",
     "protons": "^2.0.1",
+    "rollup-plugin-node-polyfills": "^0.2.1",
     "secrets.js-grempe": "../secrets.js",
-    "standard": "^16.0.3",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
     "uint8arrays": "^2.1.5",
     "web3": "^1.3.5"
-  },
-  "dependencies": {}
+  }
 }
