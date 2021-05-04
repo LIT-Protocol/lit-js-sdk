@@ -1,6 +1,6 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
   "main": "build/index.umd.js",
@@ -24,7 +24,6 @@
   "license": "GPL-3.0",
   "devDependencies": {
     "microbundle": "^0.13.0",
-    "rollup-plugin-node-polyfills": "^0.2.1",
     "standard": "^16.0.3"
   },
   "dependencies": {
@@ -47,6 +46,7 @@
     "multihashing": "^0.3.3",
     "peer-id": "^0.14.8",
     "protons": "^2.0.1",
+    "rollup-plugin-node-polyfills": "^0.2.1",
     "secrets.js-grempe": "../secrets.js",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
