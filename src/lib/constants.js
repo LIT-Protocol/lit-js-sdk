@@ -10,6 +10,7 @@ message Request {
   optional GetKeyFragment getKeyFragment = 2;
   optional StoreKeyFragment storeKeyFragment = 3;
   optional bytes authSig = 4;
+  optional TokenParams tokenParams = 5;
 }
 message Response {
   enum Type {
@@ -21,7 +22,7 @@ message Response {
   optional StoreKeyFragmentResponse storeKeyFragmentResponse = 3;
 }
 message GetKeyFragment {
-  required bytes keyId = 1;
+  required bytes keyId = 4;
 }
 message GetKeyFragmentResponse {
   enum Result {
@@ -34,9 +35,6 @@ message GetKeyFragmentResponse {
   optional bytes fragmentValue = 3;
 }
 message StoreKeyFragment {
-  required bytes tokenAddress = 1;
-  required bytes tokenId = 2;
-  required bytes chain = 3;
   required bytes fragmentValue = 4;
 }
 message StoreKeyFragmentResponse {
@@ -47,6 +45,11 @@ message StoreKeyFragmentResponse {
   }
   required Result result = 1;
   optional bytes errorMessage = 2;
+}
+message TokenParams {
+  required bytes tokenAddress = 1;
+  required bytes tokenId = 2;
+  required bytes chain = 3;
 }
 `)
 

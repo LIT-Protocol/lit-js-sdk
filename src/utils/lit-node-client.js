@@ -62,14 +62,19 @@ export default class LitNodeClient {
 
   async getEncryptionKeyFragments ({ tokenAddress, tokenId, authSig, chain }) {
     // find providers
+    const normalizedTokenAddress = tokenAddress.toLowerCase()
     const keyId = kFragKey({ tokenAddress, tokenId, chain })
     const cid = new CID(keyId)
     const providers = await all(this.libp2p.contentRouting.findProviders(cid, { timeout: 3000 }))
     console.log(`Found ${providers.length} providers`)
     const kFragPromises = []
     for (let i = 0; i < providers.length; i++) {
+      const peerId = providers[i].id.toB58String()
+      console.debug(`Getting ${keyId} from ${peerId}`)
       kFragPromises.push(this.getDataFromNode({
-        peerId: providers[i].id.toB58String(),
+        peerId,
+        tokenAddress: normalizedTokenAddress,
+        tokenId,
         authSig,
         keyId,
         chain
@@ -84,23 +89,31 @@ export default class LitNodeClient {
     const data = Request.encode({
       type: Request.Type.STORE_KEY_FRAGMENT,
       storeKeyFragment: {
-        tokenAddress: uint8arrayFromString(tokenAddress),
-        tokenId: uint8arrayFromString(tokenId.toString()),
-        chain: uint8arrayFromString(chain),
         fragmentValue: uint8arrayFromString(val)
       },
-      authSig: uint8arrayFromString(JSON.stringify(authSig))
+      authSig: uint8arrayFromString(JSON.stringify(authSig)),
+      tokenParams: {
+        tokenAddress: uint8arrayFromString(tokenAddress),
+        tokenId: uint8arrayFromString(tokenId.toString()),
+        chain: uint8arrayFromString(chain)
+      }
     })
     return await this.sendCommandToPeer({ peerId, data })
   }
 
-  async getDataFromNode ({ peerId, keyId, authSig, chain }) {
+  async getDataFromNode ({ peerId, tokenAddress, tokenId, keyId, authSig, chain }) {
+    console.debug(`getDataFromNode ${peerId} with keyId ${keyId}`)
     const data = Request.encode({
       type: Request.Type.GET_KEY_FRAGMENT,
       getKeyFragment: {
         keyId: uint8arrayFromString(keyId)
       },
-      authSig: uint8arrayFromString(authSig.sig)
+      authSig: uint8arrayFromString(JSON.stringify(authSig)),
+      tokenParams: {
+        tokenAddress: uint8arrayFromString(tokenAddress),
+        tokenId: uint8arrayFromString(tokenId.toString()),
+        chain: uint8arrayFromString(chain)
+      }
     })
     return await this.sendCommandToPeer({ peerId, data })
   }
@@ -108,12 +121,15 @@ export default class LitNodeClient {
   async sendCommandToPeer ({ peerId, data }) {
     const connection = this.libp2p.connectionManager.get(PeerId.createFromB58String(peerId))
     const { stream } = await connection.newStream(['/lit/1.0.0'])
+    console.debug(`sendCommandToPeer ${peerId}`)
     let retVal = null
     await pipe(
       [data],
       stream,
       async function (source) {
+        console.debug('in sendCommandToPeer callback')
         const { value, done } = await source.next()
+        console.debug('got value from source.next()', value)
         const resp = Response.decode(value.slice())
         if (resp.type === Response.Type.STORE_KEY_FRAGMENT_RESPONSE) {
           if (resp.storeKeyFragmentResponse.result === StoreKeyFragmentResponse.Result.SUCCESS) {
