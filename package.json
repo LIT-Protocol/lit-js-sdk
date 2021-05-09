@@ -44,7 +44,7 @@
     "multihashing": "^0.3.3",
     "peer-id": "^0.14.8",
     "protons": "^2.0.1",
-    "secrets.js-grempe": "../secrets.js",
+    "secrets.js-lit": "^2.0.1",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
     "uint8arrays": "^2.1.5",
