@@ -26,7 +26,7 @@ message Response {
   optional bytes serverPubKey = 4;
 }
 message GetKeyFragment {
-  required bytes keyId = 4;
+  required bytes keyId = 1;
 }
 message GetKeyFragmentResponse {
   enum Result {
@@ -39,7 +39,7 @@ message GetKeyFragmentResponse {
   optional bytes fragmentValue = 3;
 }
 message StoreKeyFragment {
-  required bytes fragmentValue = 4;
+  required bytes fragmentValue = 1;
 }
 message StoreKeyFragmentResponse {
   enum Result {
