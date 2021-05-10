@@ -145,7 +145,7 @@ export default class LitNodeClient {
     await pipe(
       [data],
       stream,
-      async function (source) {
+      async (source) => {
         console.debug('in sendCommandToPeer callback')
         const { value, done } = await source.next()
         console.debug('got value from source.next()', value)
@@ -153,6 +153,7 @@ export default class LitNodeClient {
         if (resp.type === Response.Type.HANDSHAKE_RESPONSE) {
           // save pubkey
           this.serverPubKeys[peerId] = resp.serverPubKey
+          console.log('handshake success, got server pub key ', resp.serverPubKey)
           retVal = true
         } else if (resp.type === Response.Type.STORE_KEY_FRAGMENT_RESPONSE) {
           if (resp.storeKeyFragmentResponse.result === StoreKeyFragmentResponse.Result.SUCCESS) {
@@ -219,11 +220,10 @@ export default class LitNodeClient {
         return
       }
       this.connectedNodes.add(peerId)
-      // handshake
+      // handshake.  wait a second for the connection to settle.
       setTimeout(async () => {
         await this.handshakeWithSgx({ peerId })
-        console.log('server key is now: ', this.serverPubKeys[peerId])
-      }, 5000)
+      }, 1000)
     })
 
     // Listen for peers disconnecting
