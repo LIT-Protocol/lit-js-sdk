@@ -3,23 +3,27 @@ import protons from 'protons'
 export const protobufs = protons(`
 message Request {
   enum Type {
-    GET_KEY_FRAGMENT = 0;
-    STORE_KEY_FRAGMENT = 1;
+    HANDSHAKE = 0;
+    GET_KEY_FRAGMENT = 1;
+    STORE_KEY_FRAGMENT = 2;
   }
   required Type type = 1;
   optional GetKeyFragment getKeyFragment = 2;
   optional StoreKeyFragment storeKeyFragment = 3;
   optional bytes authSig = 4;
   optional TokenParams tokenParams = 5;
+  optional bytes clientPubkey = 6;
 }
 message Response {
   enum Type {
-    GET_KEY_FRAGMENT_RESPONSE = 0;
-    STORE_KEY_FRAGMENT_RESPONSE = 1;
+    HANDSHAKE_RESPONSE = 0;
+    GET_KEY_FRAGMENT_RESPONSE = 1;
+    STORE_KEY_FRAGMENT_RESPONSE = 2;
   }
   required Type type = 1;
   optional GetKeyFragmentResponse getKeyFragmentResponse = 2;
   optional StoreKeyFragmentResponse storeKeyFragmentResponse = 3;
+  optional bytes serverPubkey = 4';
 }
 message GetKeyFragment {
   required bytes keyId = 4;
