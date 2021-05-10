@@ -23,7 +23,7 @@ message Response {
   required Type type = 1;
   optional GetKeyFragmentResponse getKeyFragmentResponse = 2;
   optional StoreKeyFragmentResponse storeKeyFragmentResponse = 3;
-  optional bytes serverPubkey = 4';
+  optional bytes serverPubkey = 4;
 }
 message GetKeyFragment {
   required bytes keyId = 4;

@@ -26,6 +26,7 @@ export default class LitNodeClient {
   constructor (config) {
     this.libp2p = null
     this.connectedNodes = new Set()
+    this.serverPubKeys = {}
   }
 
   async getEncryptionKey ({ tokenAddress, tokenId, authSig, chain }) {
@@ -127,6 +128,15 @@ export default class LitNodeClient {
     return await this.sendCommandToPeer({ peerId, data })
   }
 
+  async handshakeWithSgx ({ peerId }) {
+    console.debug(`handshakeWithSgx ${peerId}`)
+    const data = Request.encode({
+      type: Request.Type.HANDSHAKE
+      // TODO clientPubKey:
+    })
+    return await this.sendCommandToPeer({ peerId, data })
+  }
+
   async sendCommandToPeer ({ peerId, data }) {
     const connection = this.libp2p.connectionManager.get(PeerId.createFromB58String(peerId))
     const { stream } = await connection.newStream(['/lit/1.0.0'])
@@ -140,7 +150,11 @@ export default class LitNodeClient {
         const { value, done } = await source.next()
         console.debug('got value from source.next()', value)
         const resp = Response.decode(value.slice())
-        if (resp.type === Response.Type.STORE_KEY_FRAGMENT_RESPONSE) {
+        if (resp.type === Response.Type.HANDSHAKE_RESPONSE) {
+          // save pubkey
+          this.serverPubKeys[peerId] = resp.serverPubKey
+          retVal = true
+        } else if (resp.type === Response.Type.STORE_KEY_FRAGMENT_RESPONSE) {
           if (resp.storeKeyFragmentResponse.result === StoreKeyFragmentResponse.Result.SUCCESS) {
             console.log('success storing key fragment')
             retVal = true
@@ -186,7 +200,7 @@ export default class LitNodeClient {
         peerDiscovery: {
           [Bootstrap.tag]: {
             enabled: true,
-            list: [`/ip4/127.0.0.1/tcp/9090/http/p2p-webrtc-direct/p2p/${hardcodedPeerId}`]
+            list: [`/ip4/51.222.108.215/tcp/9090/http/p2p-webrtc-direct/p2p/${hardcodedPeerId}`]
           }
         }
       }
@@ -205,6 +219,11 @@ export default class LitNodeClient {
         return
       }
       this.connectedNodes.add(peerId)
+      // handshake
+      setTimeout(async () => {
+        await this.handshakeWithSgx({ peerId })
+        console.log('server key is now: ', this.serverPubKeys[peerId])
+      }, 5000)
     })
 
     // Listen for peers disconnecting
