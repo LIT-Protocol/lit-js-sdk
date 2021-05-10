@@ -12,7 +12,7 @@ message Request {
   optional StoreKeyFragment storeKeyFragment = 3;
   optional bytes authSig = 4;
   optional TokenParams tokenParams = 5;
-  optional bytes clientPubkey = 6;
+  optional bytes clientPubKey = 6;
 }
 message Response {
   enum Type {
@@ -23,7 +23,7 @@ message Response {
   required Type type = 1;
   optional GetKeyFragmentResponse getKeyFragmentResponse = 2;
   optional StoreKeyFragmentResponse storeKeyFragmentResponse = 3;
-  optional bytes serverPubkey = 4;
+  optional bytes serverPubKey = 4;
 }
 message GetKeyFragment {
   required bytes keyId = 4;
