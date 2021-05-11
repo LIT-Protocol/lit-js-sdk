@@ -21,7 +21,7 @@ import naclUtil from 'tweetnacl-util'
 
 import { protobufs } from '../lib/constants'
 import { kFragKey } from '../lib/utils'
-import { encryptWithPubKey } from './crypto'
+import { encryptWithPubKey, decryptWithPrivKey } from './crypto'
 
 const { Request, Response, StoreKeyFragmentResponse, GetKeyFragmentResponse } = protobufs
 
@@ -34,7 +34,7 @@ export default class LitNodeClient {
 
   async getEncryptionKey ({ tokenAddress, tokenId, authSig, chain }) {
     const encryptedKFrags = await this.getEncryptionKeyFragments({ tokenAddress, tokenId, authSig, chain })
-    const commsKeypair = JSON.parse(localStorage.get('lit-comms-keypair'))
+    const commsKeypair = JSON.parse(localStorage.getItem('lit-comms-keypair'))
     // decrypt kfrags
     const kFrags = []
     for (let i = 0; i < encryptedKFrags.length; i++) {
@@ -129,7 +129,7 @@ export default class LitNodeClient {
 
   async getDataFromNode ({ peerId, tokenAddress, tokenId, keyId, authSig, chain }) {
     console.debug(`getDataFromNode ${peerId} with keyId ${keyId}`)
-    const commsKeypair = JSON.parse(localStorage.get('lit-comms-keypair'))
+    const commsKeypair = JSON.parse(localStorage.getItem('lit-comms-keypair'))
     const data = Request.encode({
       type: Request.Type.GET_KEY_FRAGMENT,
       getKeyFragment: {
