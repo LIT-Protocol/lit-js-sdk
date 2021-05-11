@@ -69,6 +69,12 @@ export async function signAndSaveAuthMessage () {
     signedMessage: body,
     address: signedResult.address
   }))
+  // store a keypair in localstorage for communication with sgx
+  const commsKeyPair = nacl.box.keyPair()
+  localStorage.setItem('lit-comms-keypair', JSON.stringify({
+    publicKey: naclUtil.encodeBase64(commsKeyPair.publicKey),
+    secretKey: naclUtil.encodeBase64(commsKeyPair.secretKey)
+  }))
 }
 
 export async function signMessage ({ body }) {

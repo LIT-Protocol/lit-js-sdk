@@ -33,7 +33,14 @@ export default class LitNodeClient {
   }
 
   async getEncryptionKey ({ tokenAddress, tokenId, authSig, chain }) {
-    const kFrags = await this.getEncryptionKeyFragments({ tokenAddress, tokenId, authSig, chain })
+    const encryptedKFrags = await this.getEncryptionKeyFragments({ tokenAddress, tokenId, authSig, chain })
+    const commsKeypair = JSON.parse(localStorage.get('lit-comms-keypair'))
+    // decrypt kfrags
+    const kFrags = []
+    for (let i = 0; i < encryptedKFrags.length; i++) {
+      const decrypted = decryptWithPrivKey(encryptedKFrags[i], commsKeypair.secretKey)
+      kFrags.push(decrypted)
+    }
     const secret = secrets.combine(kFrags)
     const symmetricKey = Buffer.from(secret, 'hex').toString()
     console.log('recombined symmetric key: ' + symmetricKey)
@@ -59,6 +66,7 @@ export default class LitNodeClient {
       const peerId = nodes[i]
       console.debug(`storing kFrag in node ${i + 1} of ${nodes.length}`)
       // encrypt kfrag with sgx key
+      console.log('kfrag before encrypting: ' + kFrags[i])
       const serverPubKey = naclUtil.encodeBase64(this.serverPubKeys[peerId])
       const encryptedKFrag = JSON.stringify(encryptWithPubKey(serverPubKey, kFrags[i], 'x25519-xsalsa20-poly1305'))
       console.log('encrypted kFrag is ' + encryptedKFrag)
@@ -121,6 +129,7 @@ export default class LitNodeClient {
 
   async getDataFromNode ({ peerId, tokenAddress, tokenId, keyId, authSig, chain }) {
     console.debug(`getDataFromNode ${peerId} with keyId ${keyId}`)
+    const commsKeypair = JSON.parse(localStorage.get('lit-comms-keypair'))
     const data = Request.encode({
       type: Request.Type.GET_KEY_FRAGMENT,
       getKeyFragment: {
@@ -131,7 +140,8 @@ export default class LitNodeClient {
         tokenAddress: uint8arrayFromString(tokenAddress),
         tokenId: uint8arrayFromString(tokenId.toString()),
         chain: uint8arrayFromString(chain)
-      }
+      },
+      clientPubKey: naclUtil.decodeBase64(commsKeypair.publicKey)
     })
     return await this.sendCommandToPeer({ peerId, data })
   }

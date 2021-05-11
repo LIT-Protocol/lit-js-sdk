@@ -93,6 +93,10 @@ export function encryptWithPubKey (
         throw new Error('Bad public key')
       }
 
+      // padding?  not needed for c decryption?
+      // const paddingBytes = new Uint8Array(32)
+      // paddingBytes.fill(0)
+      // const msgParamsUInt8Array = new Uint8Array([...paddingBytes, ...naclUtil.decodeUTF8(data)])
       const msgParamsUInt8Array = naclUtil.decodeUTF8(data)
       const nonce = nacl.randomBytes(nacl.box.nonceLength)
 
