@@ -16,9 +16,12 @@ import pushable from 'it-pushable'
 import secrets from 'secrets.js-lit'
 import uint8arrayFromString from 'uint8arrays/from-string'
 import uint8arrayToString from 'uint8arrays/to-string'
+import all from 'it-all'
+import naclUtil from 'tweetnacl-util'
+
 import { protobufs } from '../lib/constants'
 import { kFragKey } from '../lib/utils'
-import all from 'it-all'
+import { encryptWithPubKey } from './crypto'
 
 const { Request, Response, StoreKeyFragmentResponse, GetKeyFragmentResponse } = protobufs
 
@@ -53,13 +56,18 @@ export default class LitNodeClient {
     const storagePromises = []
     const normalizedTokenAddress = tokenAddress.toLowerCase()
     for (let i = 0; i < nodes.length; i++) {
+      const peerId = nodes[i]
       console.debug(`storing kFrag in node ${i + 1} of ${nodes.length}`)
+      // encrypt kfrag with sgx key
+      const serverPubKey = naclUtil.encodeBase64(this.serverPubKeys[peerId])
+      const encryptedKFrag = JSON.stringify(encryptWithPubKey(serverPubKey, kFrags[i], 'x25519-xsalsa20-poly1305'))
+      console.log('encrypted kFrag is ' + encryptedKFrag)
       storagePromises.push(
         this.storeDataWithNode({
-          peerId: nodes[i],
+          peerId,
           tokenAddress: normalizedTokenAddress,
           tokenId,
-          val: kFrags[i],
+          val: encryptedKFrag,
           authSig,
           chain
         })
@@ -153,7 +161,7 @@ export default class LitNodeClient {
         if (resp.type === Response.Type.HANDSHAKE_RESPONSE) {
           // save pubkey
           this.serverPubKeys[peerId] = resp.serverPubKey
-          console.log('handshake success, got server pub key ', resp.serverPubKey)
+          console.log('handshake success for ' + peerId + ' - got server pub key ' + naclUtil.encodeBase64(resp.serverPubKey))
           retVal = true
         } else if (resp.type === Response.Type.STORE_KEY_FRAGMENT_RESPONSE) {
           if (resp.storeKeyFragmentResponse.result === StoreKeyFragmentResponse.Result.SUCCESS) {

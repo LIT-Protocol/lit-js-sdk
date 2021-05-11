@@ -75,7 +75,7 @@ export async function encryptWithSymmetricKey (
 }
 
 // borrowed from eth-sig-util from meatmask.
-export function encryptWithPubkey (
+export function encryptWithPubKey (
   receiverPublicKey,
   data,
   version
@@ -121,7 +121,7 @@ export function encryptWithPubkey (
 }
 
 // borrowed from eth-sig-util from meatmask.
-export function decryptWithPrivkey (
+export function decryptWithPrivKey (
   encryptedData,
   receiverPrivateKey
 ) {
