@@ -38,7 +38,8 @@ export default class LitNodeClient {
     // decrypt kfrags
     const kFrags = []
     for (let i = 0; i < encryptedKFrags.length; i++) {
-      const decrypted = decryptWithPrivKey(encryptedKFrags[i], commsKeypair.secretKey)
+      console.log('decrypting kfrag ' + encryptedKFrags[i])
+      const decrypted = decryptWithPrivKey(JSON.parse(encryptedKFrags[i]), commsKeypair.secretKey)
       kFrags.push(decrypted)
     }
     const secret = secrets.combine(kFrags)
