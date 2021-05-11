@@ -153,13 +153,13 @@ export function decryptWithPrivKey (
       try {
         output = naclUtil.encodeUTF8(decryptedMessage)
       } catch (err) {
-        throw new Error('Decryption failed.')
+        throw new Error('Decryption failed.  Could not encode result as utf8')
       }
 
       if (output) {
         return output
       }
-      throw new Error('Decryption failed.')
+      throw new Error('Decryption failed.  Output is falsy')
     }
 
     default:
