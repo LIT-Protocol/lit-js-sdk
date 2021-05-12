@@ -140,6 +140,11 @@ export function decryptWithPrivKey (
         encryptedData.ephemPublicKey
       )
 
+      console.log('privateKey', receiverPrivateKey)
+      console.log('nonce', nonce)
+      console.log('ciphertext', ciphertext)
+      console.log('ephemPublicKey', ephemPublicKey)
+
       // decrypt
       const decryptedMessage = nacl.box.open(
         ciphertext,

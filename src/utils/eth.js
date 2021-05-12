@@ -75,6 +75,7 @@ export async function signAndSaveAuthMessage () {
     publicKey: naclUtil.encodeBase64(commsKeyPair.publicKey),
     secretKey: naclUtil.encodeBase64(commsKeyPair.secretKey)
   }))
+  console.log('generated and saved lit-comms-keypair')
 }
 
 export async function signMessage ({ body }) {
