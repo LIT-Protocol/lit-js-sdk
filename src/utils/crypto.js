@@ -148,6 +148,8 @@ export function decryptWithPrivKey (
         recieverEncryptionPrivateKey
       )
 
+      console.log('decrypted message: ', decryptedMessage)
+
       // return decrypted msg data
       let output
       try {
