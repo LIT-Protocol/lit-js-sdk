@@ -15,6 +15,11 @@ import {
   checkAndSignAuthMessage
 } from './utils/eth'
 
+import {
+  decryptWithPrivKey,
+  encryptWithPubKey
+} from './utils/crypto'
+
 import { LIT_CHAINS, protobufs } from './lib/constants'
 import { kFragKey } from './lib/utils'
 
@@ -33,7 +38,9 @@ const functions = {
   LIT_CHAINS,
   LitNodeClient,
   protobufs,
-  kFragKey
+  kFragKey,
+  encryptWithPubKey,
+  decryptWithPrivKey
 }
 
 export default functions
