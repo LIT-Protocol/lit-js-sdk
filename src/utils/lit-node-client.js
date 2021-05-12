@@ -38,13 +38,11 @@ export default class LitNodeClient {
     // decrypt kfrags
     const kFrags = []
     for (let i = 0; i < encryptedKFrags.length; i++) {
-      console.log('decrypting kfrag ' + encryptedKFrags[i])
       const decrypted = decryptWithPrivKey(JSON.parse(encryptedKFrags[i]), commsKeypair.secretKey)
       kFrags.push(decrypted)
     }
     const secret = secrets.combine(kFrags)
     const symmetricKey = Buffer.from(secret, 'hex').toString()
-    console.log('recombined symmetric key: ' + symmetricKey)
     return symmetricKey
   }
 
@@ -67,10 +65,8 @@ export default class LitNodeClient {
       const peerId = nodes[i]
       console.debug(`storing kFrag in node ${i + 1} of ${nodes.length}`)
       // encrypt kfrag with sgx key
-      console.log('kfrag before encrypting: ' + kFrags[i])
       const serverPubKey = naclUtil.encodeBase64(this.serverPubKeys[peerId])
       const encryptedKFrag = JSON.stringify(encryptWithPubKey(serverPubKey, kFrags[i], 'x25519-xsalsa20-poly1305'))
-      console.log('encrypted kFrag is ' + encryptedKFrag)
       storagePromises.push(
         this.storeDataWithNode({
           peerId,
