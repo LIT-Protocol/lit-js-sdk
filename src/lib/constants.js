@@ -32,7 +32,8 @@ message GetKeyFragmentResponse {
   enum Result {
     SUCCESS = 0;
     NOT_FOUND = 1;
-    ERROR = 2;
+    AUTH_FAILURE = 2;
+    ERROR = 3;
   }
   required Result result = 1;
   optional bytes keyId = 2;

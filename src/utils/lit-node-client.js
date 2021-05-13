@@ -162,8 +162,9 @@ export default class LitNodeClient {
       stream,
       async (source) => {
         console.debug('in sendCommandToPeer callback')
+        // seems like for await generators are broken in chrome for now, so pulling out the data manually.
         const { value, done } = await source.next()
-        console.debug('got value from source.next()', value)
+        // console.debug('got value from source.next()', value)
         const resp = Response.decode(value.slice())
         if (resp.type === Response.Type.HANDSHAKE_RESPONSE) {
           // save pubkey
