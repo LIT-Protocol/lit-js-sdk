@@ -175,6 +175,10 @@ export default class LitNodeClient {
           if (resp.storeKeyFragmentResponse.result === StoreKeyFragmentResponse.Result.SUCCESS) {
             console.log('success storing key fragment')
             retVal = true
+          } else if (resp.storeKeyFragmentResponse.result === StoreKeyFragmentResponse.Result.AUTH_FAILURE) {
+            console.log('auth failure.  user doesnt own token')
+            alert('You are not authorized to publish to this LIT')
+            retVal = false
           } else {
             console.log('error storing key fragment: ')
             console.log(uint8arrayToString(resp.storeKeyFragmentResponse.errorMessage))
@@ -186,6 +190,10 @@ export default class LitNodeClient {
             retVal = uint8arrayToString(resp.getKeyFragmentResponse.fragmentValue)
           } else if (resp.getKeyFragmentResponse.result === GetKeyFragmentResponse.Result.NOT_FOUND) {
             console.log('key fragment not found')
+            retVal = false
+          } else if (resp.getKeyFragmentResponse.result === GetKeyFragmentResponse.Result.AUTH_FAILURE) {
+            console.log('auth failure.  user doesnt own token')
+            alert('You are not authorized to unlock this LIT')
             retVal = false
           } else {
             console.log('unknown error getting key fragment')
