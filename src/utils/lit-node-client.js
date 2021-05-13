@@ -121,7 +121,11 @@ export default class LitNodeClient {
         chain: uint8arrayFromString(chain)
       }
     })
-    return await this.sendCommandToPeer({ peerId, data })
+    const ret = await this.sendCommandToPeer({ peerId, data })
+    if (ret === 'AUTH_FAILURE') {
+      alert('You are not authorized to publish to this LIT')
+    }
+    return ret
   }
 
   async getDataFromNode ({ peerId, tokenAddress, tokenId, keyId, authSig, chain }) {
@@ -140,7 +144,11 @@ export default class LitNodeClient {
       },
       clientPubKey: naclUtil.decodeBase64(commsKeypair.publicKey)
     })
-    return await this.sendCommandToPeer({ peerId, data })
+    const ret = await this.sendCommandToPeer({ peerId, data })
+    if (ret === 'AUTH_FAILURE') {
+      alert('You are not authorized to unlock to this LIT')
+    }
+    return ret
   }
 
   async handshakeWithSgx ({ peerId }) {
@@ -177,8 +185,7 @@ export default class LitNodeClient {
             retVal = true
           } else if (resp.storeKeyFragmentResponse.result === StoreKeyFragmentResponse.Result.AUTH_FAILURE) {
             console.log('auth failure.  user doesnt own token')
-            alert('You are not authorized to publish to this LIT')
-            retVal = false
+            retVal = 'AUTH_FAILURE'
           } else {
             console.log('error storing key fragment: ')
             console.log(uint8arrayToString(resp.storeKeyFragmentResponse.errorMessage))
@@ -193,8 +200,7 @@ export default class LitNodeClient {
             retVal = false
           } else if (resp.getKeyFragmentResponse.result === GetKeyFragmentResponse.Result.AUTH_FAILURE) {
             console.log('auth failure.  user doesnt own token')
-            alert('You are not authorized to unlock this LIT')
-            retVal = false
+            retVal = 'AUTH_FAILURE'
           } else {
             console.log('unknown error getting key fragment')
             retVal = false
