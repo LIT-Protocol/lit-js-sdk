@@ -1,7 +1,7 @@
 // import 'babel-polyfill'
 import Libp2p from 'libp2p'
 import Websockets from 'libp2p-websockets'
-import WebRTCDirect from 'libp2p-webrtc-direct'
+import WebRTCDirect from '@deconet/libp2p-webrtc-direct'
 import { NOISE } from 'libp2p-noise'
 import Mplex from 'libp2p-mplex'
 import KadDHT from 'libp2p-kad-dht'
@@ -216,7 +216,7 @@ export default class LitNodeClient {
         peerDiscovery: {
           [Bootstrap.tag]: {
             enabled: true,
-            list: [`/ip4/51.222.108.215/tcp/9090/http/p2p-webrtc-direct/p2p/${hardcodedPeerId}`]
+            list: [`/dns4/node1.litgateway.com/tcp/9090/https/p2p-webrtc-direct/p2p/${hardcodedPeerId}`]
           }
         }
       }
