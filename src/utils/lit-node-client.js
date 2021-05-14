@@ -26,7 +26,11 @@ import { encryptWithPubKey, decryptWithPrivKey } from './crypto'
 const { Request, Response, StoreKeyFragmentResponse, GetKeyFragmentResponse } = protobufs
 
 export default class LitNodeClient {
-  constructor (config = {}) {
+  constructor (
+    config = {
+      alertWhenUnauthorized: true
+    }
+  ) {
     this.config = config
     this.libp2p = null
     this.connectedNodes = new Set()
@@ -36,7 +40,10 @@ export default class LitNodeClient {
   async getEncryptionKey ({ tokenAddress, tokenId, authSig, chain }) {
     const encryptedKFrags = await this.getEncryptionKeyFragments({ tokenAddress, tokenId, authSig, chain })
     if (encryptedKFrags.some(k => k === 'AUTH_FAILURE')) {
-      alert('You are not authorized to unlock to this LIT')
+      if (this.config.alertWhenUnauthorized) {
+        alert('You are not authorized to unlock to this LIT')
+      }
+      document.dispatchEvent(new Event('authFailure'))
       return null
     }
     const commsKeypair = JSON.parse(localStorage.getItem('lit-comms-keypair'))
@@ -85,7 +92,10 @@ export default class LitNodeClient {
     }
     const resps = await Promise.all(storagePromises)
     if (resps.some(k => k === 'AUTH_FAILURE')) {
-      alert('You are not authorized to publish to this LIT')
+      if (this.config.alertWhenUnauthorized) {
+        alert('You are not authorized to publish to this LIT')
+      }
+      document.dispatchEvent(new Event('authFailure'))
       return { success: false }
     }
     console.log('all stored')
