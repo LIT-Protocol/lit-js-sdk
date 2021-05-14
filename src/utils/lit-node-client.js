@@ -26,7 +26,8 @@ import { encryptWithPubKey, decryptWithPrivKey } from './crypto'
 const { Request, Response, StoreKeyFragmentResponse, GetKeyFragmentResponse } = protobufs
 
 export default class LitNodeClient {
-  constructor (config) {
+  constructor (config = {}) {
+    this.config = config
     this.libp2p = null
     this.connectedNodes = new Set()
     this.serverPubKeys = {}
@@ -34,6 +35,10 @@ export default class LitNodeClient {
 
   async getEncryptionKey ({ tokenAddress, tokenId, authSig, chain }) {
     const encryptedKFrags = await this.getEncryptionKeyFragments({ tokenAddress, tokenId, authSig, chain })
+    if (encryptedKFrags.some(k => k === 'AUTH_FAILURE')) {
+      alert('You are not authorized to unlock to this LIT')
+      return null
+    }
     const commsKeypair = JSON.parse(localStorage.getItem('lit-comms-keypair'))
     // decrypt kfrags
     const kFrags = []
@@ -78,7 +83,11 @@ export default class LitNodeClient {
         })
       )
     }
-    await Promise.all(storagePromises)
+    const resps = await Promise.all(storagePromises)
+    if (resps.some(k => k === 'AUTH_FAILURE')) {
+      alert('You are not authorized to publish to this LIT')
+      return { success: false }
+    }
     console.log('all stored')
     return { success: true }
   }
@@ -121,11 +130,7 @@ export default class LitNodeClient {
         chain: uint8arrayFromString(chain)
       }
     })
-    const ret = await this.sendCommandToPeer({ peerId, data })
-    if (ret === 'AUTH_FAILURE') {
-      alert('You are not authorized to publish to this LIT')
-    }
-    return ret
+    return await this.sendCommandToPeer({ peerId, data })
   }
 
   async getDataFromNode ({ peerId, tokenAddress, tokenId, keyId, authSig, chain }) {
@@ -144,11 +149,7 @@ export default class LitNodeClient {
       },
       clientPubKey: naclUtil.decodeBase64(commsKeypair.publicKey)
     })
-    const ret = await this.sendCommandToPeer({ peerId, data })
-    if (ret === 'AUTH_FAILURE') {
-      alert('You are not authorized to unlock to this LIT')
-    }
-    return ret
+    return await this.sendCommandToPeer({ peerId, data })
   }
 
   async handshakeWithSgx ({ peerId }) {
