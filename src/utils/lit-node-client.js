@@ -28,7 +28,8 @@ const { Request, Response, StoreKeyFragmentResponse, GetKeyFragmentResponse } = 
 export default class LitNodeClient {
   constructor (
     config = {
-      alertWhenUnauthorized: true
+      alertWhenUnauthorized: true,
+      minNodeCount: 10
     }
   ) {
     this.config = config
@@ -264,6 +265,9 @@ export default class LitNodeClient {
       // handshake.  wait a second for the connection to settle.
       setTimeout(async () => {
         await this.handshakeWithSgx({ peerId })
+        if (Array.from(this.connectedNodes).length >= this.config.minNodeCount) {
+          document.dispatchEvent(new Event('ready'))
+        }
       }, 1000)
     })
 
