@@ -61,10 +61,18 @@ message TokenParams {
 export const LIT_CHAINS = {
   polygon: {
     contractAddress: '0xb9A323711528D0c5a70df790929f4739f1cDd7fD',
-    chainId: 137
+    chainId: 137,
+    name: 'Polygon',
+    symbol: 'MATIC',
+    decimals: 18,
+    rpcUrls: ['https://rpc-mainnet.maticvigil.com'],
+    blockExplorerUrls: ['https://explorer.matic.network']
   },
   ethereum: {
     contractAddress: '0x55485885e82E25446DEC314Ccb810Bda06B9e01B',
-    chainId: 1
+    chainId: 1,
+    name: 'Ethereum',
+    symbol: 'ETH',
+    decimals: 18
   }
 }

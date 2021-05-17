@@ -29,13 +29,14 @@ export default class LitNodeClient {
   constructor (
     config = {
       alertWhenUnauthorized: true,
-      minNodeCount: 10
+      minNodeCount: 8
     }
   ) {
     this.config = config
     this.libp2p = null
     this.connectedNodes = new Set()
     this.serverPubKeys = {}
+    this.ready = false
   }
 
   async getEncryptionKey ({ tokenAddress, tokenId, authSig, chain }) {
@@ -44,7 +45,7 @@ export default class LitNodeClient {
       if (this.config.alertWhenUnauthorized) {
         alert('You are not authorized to unlock to this LIT')
       }
-      document.dispatchEvent(new Event('authFailure'))
+      document.dispatchEvent(new Event('lit-authFailure'))
       return null
     }
     const commsKeypair = JSON.parse(localStorage.getItem('lit-comms-keypair'))
@@ -96,7 +97,7 @@ export default class LitNodeClient {
       if (this.config.alertWhenUnauthorized) {
         alert('You are not authorized to publish to this LIT')
       }
-      document.dispatchEvent(new Event('authFailure'))
+      document.dispatchEvent(new Event('lit-authFailure'))
       return { success: false }
     }
     console.log('all stored')
@@ -265,9 +266,6 @@ export default class LitNodeClient {
       // handshake.  wait a second for the connection to settle.
       setTimeout(async () => {
         await this.handshakeWithSgx({ peerId })
-        if (Array.from(this.connectedNodes).length >= this.config.minNodeCount) {
-          document.dispatchEvent(new Event('ready'))
-        }
       }, 1000)
     })
 
@@ -281,6 +279,15 @@ export default class LitNodeClient {
     await this.libp2p.start()
     console.debug(`libp2p id is ${this.libp2p.peerId.toB58String()}`)
     this.libp2p.multiaddrs.forEach((ma) => console.debug(`${ma.toString()}/p2p/${this.libp2p.peerId.toB58String()}`))
+
+    const interval = window.setInterval(() => {
+      if (Array.from(this.connectedNodes).length >= this.config.minNodeCount) {
+        clearInterval(interval)
+        this.ready = true
+        console.debug('lit is ready')
+        document.dispatchEvent(new Event('lit-ready'))
+      }
+    }, 1000)
 
     // Export libp2p to the window so you can play with the API
     window.libp2p = this.libp2p

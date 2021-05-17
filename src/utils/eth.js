@@ -200,8 +200,29 @@ export async function mintLIT ({ chain, quantity }) {
   const authSig = await checkAndSignAuthMessage()
   const { web3, account } = await connectWeb3()
   const chainId = await web3.eth.getChainId()
-  if (chainId !== LIT_CHAINS[chain].chainId) {
-    return { errorCode: 'wrong_chain' }
+  const selectedChain = LIT_CHAINS[chain]
+  if (chainId !== selectedChain.chainId) {
+    // the metamask chain switching thing does not work on mainnet
+    if (selectedChain.chainId !== 1) {
+      const data = [{
+        chainId: '0x' + selectedChain.chainId.toString('16'),
+        chainName: selectedChain.name,
+        nativeCurrency:
+                {
+                  name: selectedChain.name,
+                  symbol: selectedChain.symbol,
+                  decimals: selectedChain.decimals
+                },
+        rpcUrls: selectedChain.rpcUrls,
+        blockExplorerUrls: selectedChain.blockExplorerUrls
+      }]
+      const res = await ethereum.request({ method: 'wallet_addEthereumChain', params: data }).catch()
+      if (res) {
+        console.log(res)
+      }
+    } else {
+      return { errorCode: 'wrong_chain' }
+    }
   }
   const tokenAddress = LIT_CHAINS[chain].contractAddress
   const contract = new web3.eth.Contract(LIT.abi, tokenAddress)

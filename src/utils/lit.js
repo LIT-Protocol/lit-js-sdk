@@ -205,6 +205,10 @@ export async function createHtmlLIT ({
     <script>
       const unlockButton = document.getElementById('unlockButton')
       unlockButton.onclick = function() {
+        if (!window.litNodeClient.ready){
+          alert('The LIT network is still connecting.  Please try again in about 10 seconds.')
+          return
+        }
         LitJsSdk.default.toggleLock()
       }
     </script>
