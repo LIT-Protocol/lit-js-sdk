@@ -16,12 +16,22 @@ import { fileToDataUrl } from './browser'
 
 const PACKAGE_CACHE = {}
 
+/**
+ * Zip and encrypt a string.  This is used to encrypt any string that is to be locked and included in a LIT.  For example, on MintLIT, we render the HTML/CSS containing the locked files and a grid to view them to a string using ReactDOMServer.renderToString().
+ * @param {string} string The string to zip and encrypt
+ * @returns {Object} The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a single file called "string.txt"
+ */
 export async function zipAndEncryptString (string) {
   const zip = new JSZip()
   zip.file('string.txt', string)
   return encryptZip(zip)
 }
 
+/**
+ * Zip and encrypt multiple files.
+ * @param {array} files An array of the files you wish to zip and encrypt
+ * @returns {Object} The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
+ */
 export async function zipAndEncryptFiles (files) {
   // let's zip em
   const zip = new JSZip()
@@ -31,6 +41,12 @@ export async function zipAndEncryptFiles (files) {
   return encryptZip(zip)
 }
 
+/**
+ * Decrypt and unzip a zip that was created using encryptZip, zipAndEncryptString, or zipAndEncryptFiles.
+ * @param {Blob} encryptedZipBlob The encrypted zip as a Blob
+ * @param {Object} symmKey An object containing the symmetric key used that will be used to decrypt this zip.
+ * @returns {Array} An array of the decrypted files inside the zip.
+ */
 export async function decryptZip (encryptedZipBlob, symmKey) {
   // const keypair = await checkAndDeriveKeypair()
 
@@ -70,6 +86,11 @@ export async function decryptZip (encryptedZipBlob, symmKey) {
   return unzipped.files
 }
 
+/**
+ * Encrypt a zip file created with JSZip using a new random symmetric key via WebCrypto.
+ * @param {JSZip} zip The JSZip instance to encrypt
+ * @returns {Object} The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.
+ */
 export async function encryptZip (zip) {
   const zipBlob = await zip.generateAsync({ type: 'blob' })
   const zipBlobArrayBuffer = await zipBlob.arrayBuffer()
@@ -157,6 +178,19 @@ async function getNpmPackage (packageName) {
   return dataUrl
 }
 
+/**
+ * Create a ready-to-go LIT using provided HTML/CSS body and an encrypted zip data url
+ * @param {Object} params
+ * @param {string} params.title The title that will be used for the title tag in the outputted HTML
+ * @param {number} params.htmlBody The HTML body for the locked state of the LIT.  All users will be able to see this HTML.  This HTML must have a button with an id of "unlockButton" which will be automatically set up to decrypt and load the encryptedZipDataUrl
+ * @param {string} params.css Any CSS you would like to include in the outputted HTML
+ * @param {number} params.encryptedZipDataUrl a data URL of the encrypted zip that contains the locked content that only token holders will be able to view.
+ * @param {string} params.tokenAddress The token address of the corresponding NFT for this LIT.  ERC721 and ERC 1155 tokens are currently supported.
+ * @param {number} params.tokenId The ID of the token of the corresponding NFT for this LIT.  Only holders of this token ID will be able to unlock and decrypt this LIT.
+ * @param {string} params.chain The chain that the corresponding NFT was minted on.  "ethereum" and "polygon" are currently supported.
+ * @param {Array} [params.npmPackages=[]] An array of strings of NPM package names that should be embedded into this LIT.  These packages will be pulled down via unpkg, converted to data URLs, and embedded in the LIT HTML.  You can include any packages from npmjs.com.
+ * @returns {string} The HTML string that is now a LIT.  You can send this HTML around and only token holders will be able to unlock and decrypt the content inside it.  Included in the HTML is this LIT JS SDK itself, the encrypted locked content, an automatic connection to the LIT nodes network, and a handler for a button with id "unlockButton" which will perform the unlock operation when clicked.
+ */
 export async function createHtmlLIT ({
   title,
   htmlBody,
@@ -167,6 +201,7 @@ export async function createHtmlLIT ({
   chain,
   npmPackages = []
 }) {
+  // uncomment this to embed the LIT JS SDK directly instead of retrieving it from unpkg when a user views the LIT
   // npmPackages.push('lit-js-sdk')
   // console.log('createHtmlLIT with npmPackages', npmPackages)
   let scriptTags = ''
@@ -217,6 +252,9 @@ export async function createHtmlLIT ({
   `
 }
 
+/**
+ * Lock and unlock the encrypted content inside a LIT.  This content is only viewable by holders of the NFT that corresponds to this LIT.  Locked content will be decrypted and placed into the HTML element with id "mediaGridHolder".  The HTML element with the id "lockedHeader" will have it's text automatically changed to LOCKED or UNLOCKED to denote the state of the LIT.  Note that if you're creating a LIT using the createHtmlLIT function, you do not need to use this function, because this function is automatically bound to any button in your HTML with the id "unlockButton".
+ */
 export async function toggleLock () {
   const mediaGridHolder = document.getElementById('mediaGridHolder')
   const lockedHeader = document.getElementById('lockedHeader')

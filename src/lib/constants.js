@@ -58,6 +58,19 @@ message TokenParams {
 }
 `)
 
+/**
+ * @typedef {Object} LITChain
+ * @property {string} contractAddress - The address of the token contract
+ * @property {string} chainId - The chain ID of the chain that this token contract is deployed on.  Used for EVM chains.
+ * @property {string} name - The human readable name of the chain
+ */
+
+/**
+ * Pre-deployed token contracts that you may use for minting LITs.  These are ERC1155 contracts that let you mint any quantity of a given token.  Use the chain name as a key in this object.  Currently "polygon" and "ethereum" are supported.
+ * @constant
+ * @type {LITChain}
+ * @default
+*/
 export const LIT_CHAINS = {
   polygon: {
     contractAddress: '0xb9A323711528D0c5a70df790929f4739f1cDd7fD',

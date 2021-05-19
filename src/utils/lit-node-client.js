@@ -25,6 +25,12 @@ import { encryptWithPubKey, decryptWithPrivKey } from './crypto'
 
 const { Request, Response, StoreKeyFragmentResponse, GetKeyFragmentResponse } = protobufs
 
+/**
+ * A LIT node client.  Connects directly to the LIT nodes to store and retrieve encryption keys.
+ * @param {Object} config
+ * @param {boolean} [config.alertWhenUnauthorized=true] Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  If you turn this off, you should create an event listener for the "lit-authFailure" event on the document, and show your own error to the user.
+ * @param {number} [config.minNodeCount=8] The minimum number of nodes that must be connected for the LitNodeClient to be ready to use.
+ */
 export default class LitNodeClient {
   constructor (
     config = {
@@ -39,7 +45,16 @@ export default class LitNodeClient {
     this.ready = false
   }
 
-  async getEncryptionKey ({ tokenAddress, tokenId, authSig, chain }) {
+  /**
+ * Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user is a holder of the NFT that corresponds to this LIT.  This NFT token address and ID was specified when this LIT was created.
+ * @param {Object} params
+ * @param {string} params.tokenAddress The token address of the NFT that corresponds to this LIT.  This should be an ERC721 or ERC1155 token.
+ * @param {string} params.tokenId The token ID of the NFT that corresponds to this LIT
+* @param {string} params.chain The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
+ * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
+ * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
+ */
+  async getEncryptionKey ({ tokenAddress, tokenId, chain, authSig }) {
     const encryptedKFrags = await this.getEncryptionKeyFragments({ tokenAddress, tokenId, authSig, chain })
     if (encryptedKFrags.some(k => k === 'AUTH_FAILURE')) {
       if (this.config.alertWhenUnauthorized) {
@@ -60,8 +75,18 @@ export default class LitNodeClient {
     return symmetricKey
   }
 
-  async saveEncryptionKey ({ tokenAddress, tokenId, symmetricKey, authSig, chain }) {
-    console.log(`saveEncryptionKey with tokenAddress ${tokenAddress} and tokenId ${tokenId} and symmetricKey ${symmetricKey} and authSig ${authSig} and chain ${chain}`)
+  /**
+ * Securely save the symmetric encryption key to the LIT nodes.
+ * @param {Object} params
+ * @param {string} params.tokenAddress The token address of the NFT that corresponds to this LIT.  This should be an ERC721 or ERC1155 token.
+ * @param {string} params.tokenId The token ID of the NFT that corresponds to this LIT
+ * @param {string} params.chain The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
+ * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
+ * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be split up using threshold encryption so that the LIT nodes cannot decrypt a given LIT.
+ * @returns {Object} An object that gives the status of the operation, denoted via a boolean with the key "success"
+ */
+  async saveEncryptionKey ({ tokenAddress, tokenId, chain, authSig, symmetricKey }) {
+    // console.log(`saveEncryptionKey with tokenAddress ${tokenAddress} and tokenId ${tokenId} and symmetricKey ${symmetricKey} and authSig ${authSig} and chain ${chain}`)
     const nodes = Array.from(this.connectedNodes)
     // split up into nodes.length fragments
     const numShares = nodes.length

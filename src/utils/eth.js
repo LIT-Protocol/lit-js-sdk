@@ -10,6 +10,14 @@ import { LIT_CHAINS } from '../lib/constants'
 
 const AUTH_SIGNATURE_BODY = 'I am creating an account to use LITs at {{timestamp}}'
 
+/**
+ * @typedef {Object} AuthSig
+ * @property {string} sig - The actual hex-encoded signature
+ * @property {string} derivedVia - The method used to derive the signature
+ * @property {string} signedMessage - The message that was signed
+ * @property {string} address - The crypto wallet address that signed the message
+ */
+
 // export async function checkAndDeriveKeypair () {
 //   let keypair = localStorage.getItem('lit-keypair')
 //   if (!keypair) {
@@ -42,6 +50,10 @@ export async function connectWeb3 () {
   return { web3, account }
 }
 
+/**
+ * Check for an existing cryptographic authentication signature and create one of it does not exist.  This is used to prove ownership of a given crypto wallet address to the LIT nodes.  The result is stored in LocalStorage so the user doesn't have to sign every time they perform an operation.
+ * @returns {AuthSig} The AuthSig created or retrieved
+ */
 export async function checkAndSignAuthMessage () {
   let authSig = localStorage.getItem('lit-auth-signature')
   if (!authSig) {
@@ -195,6 +207,13 @@ export async function signMessage ({ body }) {
 //   }
 // }
 
+/**
+ * Mint a LIT using our ERC1155 contract.
+ * @param {Object} params
+ * @param {string} params.chain The chain to mint on.  "ethereum" and "polygon" are currently supported.
+ * @param {number} params.quantity The number of tokens to mint.  Note that these will be fungible, so they will not have serial numbers.
+ * @returns {Object} The txHash, tokenId, tokenAddress, mintingAddress, and authSig.
+ */
 export async function mintLIT ({ chain, quantity }) {
   console.log(`minting ${quantity} tokens on ${chain}`)
   const authSig = await checkAndSignAuthMessage()

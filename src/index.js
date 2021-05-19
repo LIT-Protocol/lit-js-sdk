@@ -20,6 +20,8 @@ import {
   encryptWithPubKey
 } from './utils/crypto'
 
+import { fileToDataUrl } from './utils/browser'
+
 import { LIT_CHAINS, protobufs } from './lib/constants'
 import { kFragKey } from './lib/utils'
 
@@ -40,7 +42,8 @@ const functions = {
   protobufs,
   kFragKey,
   encryptWithPubKey,
-  decryptWithPrivKey
+  decryptWithPrivKey,
+  fileToDataUrl
 }
 
 export default functions
