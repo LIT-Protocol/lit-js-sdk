@@ -135,7 +135,7 @@ First, obtain an authSig from the user.  This will ask their metamask to sign a 
 
 ```
 const authSig = await checkAndSignAuthMessage()
-``
+```
 
 Next, obtain the symmetric key from the LIT network.  It's important that you have a connected LitNodeClient accessible at window.litNodeClient for this to work.
 
