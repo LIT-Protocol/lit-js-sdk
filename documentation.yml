@@ -1,8 +1,7 @@
 toc:
   - name: Welcome
     description: |
-      Welcome to the LIT JS SDK API documentation.  To understand how these functions fit together, please view the README in the github repo for this SDK.
-  - name: Minting using our token contracts
+      Welcome to the LIT JS SDK API documentation.  To understand how these functions fit together, please view the README in the github repo for this SDK, located at https://github.com/LIT-Protocol/lit-js-sdk/blob/main/README.md
   - mintLIT
   - LitNodeClient
   - createHtmlLIT

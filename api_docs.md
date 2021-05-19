@@ -3,45 +3,40 @@
 ### Table of Contents
 
 *   [Welcome][1]
-*   [Minting using our token contracts][2]
-*   [mintLIT][3]
-    *   [Parameters][4]
-*   [LitNodeClient][5]
-    *   [Parameters][6]
-    *   [getEncryptionKey][7]
-        *   [Parameters][8]
-    *   [saveEncryptionKey][9]
-        *   [Parameters][10]
-*   [createHtmlLIT][11]
-    *   [Parameters][12]
-*   [toggleLock][13]
-*   [Encryption and decryption utilities][14]
-*   [zipAndEncryptString][15]
-    *   [Parameters][16]
-*   [zipAndEncryptFiles][17]
-    *   [Parameters][18]
-*   [encryptZip][19]
-    *   [Parameters][20]
-*   [decryptZip][21]
-    *   [Parameters][22]
-*   [Other Utilities][23]
-*   [fileToDataUrl][24]
-    *   [Parameters][25]
-*   [checkAndSignAuthMessage][26]
-*   [Types][27]
-*   [AuthSig][28]
-    *   [Properties][29]
-*   [LITChain][30]
-    *   [Properties][31]
-*   [LIT_CHAINS][32]
+*   [mintLIT][2]
+    *   [Parameters][3]
+*   [LitNodeClient][4]
+    *   [Parameters][5]
+    *   [getEncryptionKey][6]
+        *   [Parameters][7]
+    *   [saveEncryptionKey][8]
+        *   [Parameters][9]
+*   [createHtmlLIT][10]
+    *   [Parameters][11]
+*   [toggleLock][12]
+*   [Encryption and decryption utilities][13]
+*   [zipAndEncryptString][14]
+    *   [Parameters][15]
+*   [zipAndEncryptFiles][16]
+    *   [Parameters][17]
+*   [encryptZip][18]
+    *   [Parameters][19]
+*   [decryptZip][20]
+    *   [Parameters][21]
+*   [Other Utilities][22]
+*   [fileToDataUrl][23]
+    *   [Parameters][24]
+*   [checkAndSignAuthMessage][25]
+*   [Types][26]
+*   [AuthSig][27]
+    *   [Properties][28]
+*   [LITChain][29]
+    *   [Properties][30]
+*   [LIT_CHAINS][31]
 
 ## Welcome
 
-Welcome to the LIT JS SDK API documentation.  To understand how these functions fit together, please view the README in the github repo for this SDK.
-
-## Minting using our token contracts
-
-
+Welcome to the LIT JS SDK API documentation.  To understand how these functions fit together, please view the README in the github repo for this SDK, located at [https://github.com/LIT-Protocol/lit-js-sdk/blob/main/README.md][32]
 
 ## mintLIT
 
@@ -219,67 +214,67 @@ Type: [LITChain][40]
 
 [1]: #welcome
 
-[2]: #minting-using-our-token-contracts
+[2]: #mintlit
 
-[3]: #mintlit
+[3]: #parameters
 
-[4]: #parameters
+[4]: #litnodeclient
 
-[5]: #litnodeclient
+[5]: #parameters-1
 
-[6]: #parameters-1
+[6]: #getencryptionkey
 
-[7]: #getencryptionkey
+[7]: #parameters-2
 
-[8]: #parameters-2
+[8]: #saveencryptionkey
 
-[9]: #saveencryptionkey
+[9]: #parameters-3
 
-[10]: #parameters-3
+[10]: #createhtmllit
 
-[11]: #createhtmllit
+[11]: #parameters-4
 
-[12]: #parameters-4
+[12]: #togglelock
 
-[13]: #togglelock
+[13]: #encryption-and-decryption-utilities
 
-[14]: #encryption-and-decryption-utilities
+[14]: #zipandencryptstring
 
-[15]: #zipandencryptstring
+[15]: #parameters-5
 
-[16]: #parameters-5
+[16]: #zipandencryptfiles
 
-[17]: #zipandencryptfiles
+[17]: #parameters-6
 
-[18]: #parameters-6
+[18]: #encryptzip
 
-[19]: #encryptzip
+[19]: #parameters-7
 
-[20]: #parameters-7
+[20]: #decryptzip
 
-[21]: #decryptzip
+[21]: #parameters-8
 
-[22]: #parameters-8
+[22]: #other-utilities
 
-[23]: #other-utilities
+[23]: #filetodataurl
 
-[24]: #filetodataurl
+[24]: #parameters-9
 
-[25]: #parameters-9
+[25]: #checkandsignauthmessage
 
-[26]: #checkandsignauthmessage
+[26]: #types
 
-[27]: #types
+[27]: #authsig
 
-[28]: #authsig
+[28]: #properties
 
-[29]: #properties
+[29]: #litchain
 
-[30]: #litchain
+[30]: #properties-1
 
-[31]: #properties-1
+[31]: #lit_chains
 
-[32]: #lit_chains
+[32]: https://github.com/LIT-Protocol/lit-js-sdk/blob/main/README.md
 
 [33]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
