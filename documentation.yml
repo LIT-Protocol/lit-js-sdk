@@ -11,6 +11,10 @@ toc:
   - zipAndEncryptFiles
   - encryptZip
   - decryptZip
+  - decryptWithSymmetricKey
+  - encryptWithSymmetricKey
+  - encryptWithPubKey
+  - decryptWithPrivKey
   - name: Other Utilities
   - fileToDataUrl
   - checkAndSignAuthMessage

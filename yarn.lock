@@ -958,29 +958,6 @@
     "@babel/helper-validator-identifier" "^7.14.0"
     to-fast-properties "^2.0.0"
 
-"@deconet/libp2p-webrtc-direct@^0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@deconet/libp2p-webrtc-direct/-/libp2p-webrtc-direct-0.6.1.tgz#2ce7b0f2216cc981f077c9e36646d0ce3ea01b5a"
-  integrity sha512-YABpVSLEinChTI59O01zqmvXE9RNSjYMAw1ii4A/5i1Go38DUmG/nYaaqcKJnDXVJFFpngUqLRLzb3l3uCulaA==
-  dependencies:
-    abortable-iterator "^3.0.0"
-    class-is "^1.1.0"
-    concat-stream "^2.0.0"
-    debug "^4.3.1"
-    detect-node "^2.0.4"
-    err-code "^3.0.0"
-    libp2p-interfaces libp2p/js-interfaces#chore/skip-abort-while-reading-for-webrtc
-    libp2p-utils "^0.3.0"
-    libp2p-webrtc-peer "^10.0.1"
-    mafmt "^9.0.0"
-    multibase "^4.0.4"
-    once "^1.4.0"
-    request "^2.88.0"
-    stream-to-it "^0.2.2"
-    uint8arrays "^2.1.2"
-    wrtc "~0.4.6"
-    xhr "^2.5.0"
-
 "@ethersproject/abi@5.0.7":
   version "5.0.7"
   resolved "https://registry.yarnpkg.com/@ethersproject/abi/-/abi-5.0.7.tgz#79e52452bd3ca2956d0e1c964207a58ad1a0ee7b"
@@ -1155,6 +1132,29 @@
     "@ethersproject/logger" "^5.1.0"
     "@ethersproject/properties" "^5.1.0"
     "@ethersproject/strings" "^5.1.0"
+
+"@lit-protocol/libp2p-webrtc-direct@^0.6.1":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@lit-protocol/libp2p-webrtc-direct/-/libp2p-webrtc-direct-0.6.1.tgz#22581ff43565449eb17a281123bdaf767b947e8a"
+  integrity sha512-IMaTkK5e3zuOsv7gGHjydxFH70Fv6oZnU7tLbY6ITTsQQ1lLxPQd+Vou+ApgD5INYOyoENf/gjUnGUJxmoHaoQ==
+  dependencies:
+    abortable-iterator "^3.0.0"
+    class-is "^1.1.0"
+    concat-stream "^2.0.0"
+    debug "^4.3.1"
+    detect-node "^2.0.4"
+    err-code "^3.0.0"
+    libp2p-interfaces libp2p/js-interfaces#chore/skip-abort-while-reading-for-webrtc
+    libp2p-utils "^0.3.0"
+    libp2p-webrtc-peer "^10.0.1"
+    mafmt "^9.0.0"
+    multibase "^4.0.4"
+    once "^1.4.0"
+    request "^2.88.0"
+    stream-to-it "^0.2.2"
+    uint8arrays "^2.1.2"
+    wrtc "~0.4.6"
+    xhr "^2.5.0"
 
 "@metamask/detect-provider@^1.2.0":
   version "1.2.0"

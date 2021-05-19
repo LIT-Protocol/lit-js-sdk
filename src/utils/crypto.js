@@ -36,6 +36,12 @@ export async function generateSymmetricKey () {
   return symmKey
 }
 
+/**
+ * Decrypt an encrypted blob with a symmetric key.  Uses AES-CBC via SubtleCrypto
+ * @param {Blob} encryptedBlob The encrypted blob that should be decrypted
+ * @param {Object} symmKey The symmetric key
+ * @returns {Blob} The decrypted blob
+ */
 export async function decryptWithSymmetricKey (
   encryptedBlob,
   symmKey
@@ -55,6 +61,12 @@ export async function decryptWithSymmetricKey (
 
 // used this as an example
 // https://github.com/infotechinc/symmetric-encryption-in-browser/blob/master/crypto.js
+/**
+ * Encrypt a blob with a symmetric key
+ * @param {Object} symmKey The symmetric key
+ * @param {Blob} data The blob to encrypt
+ * @returns {Blob} The encrypted blob
+ */
 export async function encryptWithSymmetricKey (
   symmKey,
   data
@@ -75,6 +87,13 @@ export async function encryptWithSymmetricKey (
 }
 
 // borrowed from eth-sig-util from meatmask.
+/**
+ * Encrypt a blob with the public key of a receiver
+ * @param {string} receiverPublicKey The base64 encoded 32 byte public key.  The corresponding private key will be able to decrypt this blob
+ * @param {Blob} data The blob to encrypt
+ * @param {string} version The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
+ * @returns {Blob} The encrypted blob
+ */
 export function encryptWithPubKey (
   receiverPublicKey,
   data,
@@ -125,6 +144,13 @@ export function encryptWithPubKey (
 }
 
 // borrowed from eth-sig-util from meatmask.
+/**
+ * Decrypt a blob with a private key
+ * @param {Blob} encryptedData The blob to decrypt
+ * @param {string} receiverPrivateKey The base64 encoded 32 byte private key.  The corresponding public key was used to encrypt this blob
+ * @param {string} version The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
+ * @returns {Blob} The decrypted blob
+ */
 export function decryptWithPrivKey (
   encryptedData,
   receiverPrivateKey

@@ -1,6 +1,6 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.0.56",
+  "version": "1.0.57",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
   "main": "build/index.js",
@@ -26,7 +26,7 @@
     "microbundle": "^0.13.0"
   },
   "dependencies": {
-    "@deconet/libp2p-webrtc-direct": "^0.6.1",
+    "@lit-protocol/libp2p-webrtc-direct": "^0.6.1",
     "@metamask/detect-provider": "^1.2.0",
     "cids": "^1.1.6",
     "it-all": "^1.0.5",

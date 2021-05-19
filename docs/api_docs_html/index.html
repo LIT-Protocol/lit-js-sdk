@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset='utf-8'>
-  <title>lit-js-sdk 1.0.56 | Documentation</title>
+  <title>lit-js-sdk 1.0.57 | Documentation</title>
   <meta name='description' content='LIT Javascript SDK'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' rel='stylesheet'>
@@ -15,7 +15,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>lit-js-sdk</h3>
-          <div class='mb1'><code>1.0.56</code></div>
+          <div class='mb1'><code>1.0.57</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -146,6 +146,46 @@
                   href='#decryptzip'
                   class="">
                   decryptZip
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#decryptwithsymmetrickey'
+                  class="">
+                  decryptWithSymmetricKey
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#encryptwithsymmetrickey'
+                  class="">
+                  encryptWithSymmetricKey
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#encryptwithpubkey'
+                  class="">
+                  encryptWithPubKey
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#decryptwithprivkey'
+                  class="">
+                  decryptWithPrivKey
                   
                 </a>
                 
@@ -1209,6 +1249,348 @@
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>:
         An array of the decrypted files inside the zip.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='decryptwithsymmetrickey'>
+      decryptWithSymmetricKey
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Decrypt an encrypted blob with a symmetric key.  Uses AES-CBC via SubtleCrypto</p>
+
+    <div class='pre p1 fill-light mt0'>decryptWithSymmetricKey(encryptedBlob: <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>, symmKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>encryptedBlob</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>)</code>
+	    The encrypted blob that should be decrypted
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>symmKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    The symmetric key
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></code>:
+        The decrypted blob
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='encryptwithsymmetrickey'>
+      encryptWithSymmetricKey
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Encrypt a blob with a symmetric key</p>
+
+    <div class='pre p1 fill-light mt0'>encryptWithSymmetricKey(symmKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, data: <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>): <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>symmKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    The symmetric key
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>data</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>)</code>
+	    The blob to encrypt
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></code>:
+        The encrypted blob
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='encryptwithpubkey'>
+      encryptWithPubKey
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Encrypt a blob with the public key of a receiver</p>
+
+    <div class='pre p1 fill-light mt0'>encryptWithPubKey(receiverPublicKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, data: <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>, version: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>receiverPublicKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The base64 encoded 32 byte public key.  The corresponding private key will be able to decrypt this blob
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>data</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>)</code>
+	    The blob to encrypt
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>version</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></code>:
+        The encrypted blob
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='decryptwithprivkey'>
+      decryptWithPrivKey
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Decrypt a blob with a private key</p>
+
+    <div class='pre p1 fill-light mt0'>decryptWithPrivKey(encryptedData: <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>, receiverPrivateKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, version: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>encryptedData</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>)</code>
+	    The blob to decrypt
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>receiverPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The base64 encoded 32 byte private key.  The corresponding public key was used to encrypt this blob
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>version</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></code>:
+        The decrypted blob
 
       
     

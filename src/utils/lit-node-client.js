@@ -1,7 +1,7 @@
 // import 'babel-polyfill'
 import Libp2p from 'libp2p'
 import Websockets from 'libp2p-websockets'
-import WebRTCDirect from '@deconet/libp2p-webrtc-direct'
+import WebRTCDirect from '@lit-protocol/libp2p-webrtc-direct'
 import { NOISE } from 'libp2p-noise'
 import Mplex from 'libp2p-mplex'
 import KadDHT from 'libp2p-kad-dht'
@@ -46,14 +46,14 @@ export default class LitNodeClient {
   }
 
   /**
- * Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user is a holder of the NFT that corresponds to this LIT.  This NFT token address and ID was specified when this LIT was created.
- * @param {Object} params
- * @param {string} params.tokenAddress The token address of the NFT that corresponds to this LIT.  This should be an ERC721 or ERC1155 token.
- * @param {string} params.tokenId The token ID of the NFT that corresponds to this LIT
-* @param {string} params.chain The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
- * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
- * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
- */
+   * Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user is a holder of the NFT that corresponds to this LIT.  This NFT token address and ID was specified when this LIT was created.
+   * @param {Object} params
+   * @param {string} params.tokenAddress The token address of the NFT that corresponds to this LIT.  This should be an ERC721 or ERC1155 token.
+   * @param {string} params.tokenId The token ID of the NFT that corresponds to this LIT
+  * @param {string} params.chain The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
+   * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
+   * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
+  */
   async getEncryptionKey ({ tokenAddress, tokenId, chain, authSig }) {
     const encryptedKFrags = await this.getEncryptionKeyFragments({ tokenAddress, tokenId, authSig, chain })
     if (encryptedKFrags.some(k => k === 'AUTH_FAILURE')) {
