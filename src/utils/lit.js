@@ -179,7 +179,7 @@ async function getNpmPackage (packageName) {
 }
 
 /**
- * Create a ready-to-go LIT using provided HTML/CSS body and an encrypted zip data url
+ * Create a ready-to-go LIT using provided HTML/CSS body and an encrypted zip data url.  You need to design your LIT with HTML and CSS, and provide an unlock button with the id "unlockButton" inside your HTML.  This function will handle the rest.
  * @param {Object} params
  * @param {string} params.title The title that will be used for the title tag in the outputted HTML
  * @param {number} params.htmlBody The HTML body for the locked state of the LIT.  All users will be able to see this HTML.  This HTML must have a button with an id of "unlockButton" which will be automatically set up to decrypt and load the encryptedZipDataUrl

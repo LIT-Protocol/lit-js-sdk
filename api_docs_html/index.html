@@ -59,16 +59,6 @@
               
                 
                 <li><a
-                  href='#lit-node-client'
-                  class="h5 bold black caps">
-                  LIT Node Client
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
                   href='#litnodeclient'
                   class=" toggle-sibling">
                   LitNodeClient
@@ -98,16 +88,6 @@
                   
                   
                 </div>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#creating-the-lit-html'
-                  class="h5 bold black caps">
-                  Creating the LIT HTML
-                  
-                </a>
                 
                 </li>
               
@@ -183,9 +163,9 @@
               
                 
                 <li><a
-                  href='#utilities'
+                  href='#other-utilities'
                   class="h5 bold black caps">
-                  Utilities
+                  Other Utilities
                   
                 </a>
                 
@@ -282,8 +262,7 @@
   </h2>
 
   
-    <p>You may use our pre-deployed token contracts to mint your LIT, or you may supply your own.  Our contracts are ERC1155 tokens on Polygon and Ethereum.  Using these contracts is the easiest way to get started.</p>
-
+    
   
 </section></div>
           
@@ -302,7 +281,7 @@
   </div>
   
 
-  <p>Mint a LIT using our ERC1155 contract.</p>
+  <p>This function mints a LIT using our pre-deployed token contracts.  You may our contracts, or you may supply your own.  Our contracts are ERC1155 tokens on Polygon and Ethereum.  Using these contracts is the easiest way to get started.</p>
 
     <div class='pre p1 fill-light mt0'>mintLIT(params: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
   
@@ -394,20 +373,6 @@
           
         
           
-            <div class='keyline-top-not py2'><section class='py2 clearfix'>
-
-  <h2 id='lit-node-client' class='mt0'>
-    LIT Node Client
-  </h2>
-
-  
-    <p>A client that connects directly to the LIT nodes to store and retrieve encryption keys for LITs.  Only holders of an NFT that corresponds with a LIT may store and retrieve the keys.</p>
-
-  
-</section></div>
-          
-        
-          
           <section class='p2 mb2 clearfix bg-white minishadow'>
 
   
@@ -421,7 +386,7 @@
   </div>
   
 
-  <p>A LIT node client.  Connects directly to the LIT nodes to store and retrieve encryption keys.</p>
+  <p>A LIT node client.  Connects directly to the LIT nodes to store and retrieve encryption keys.  Only holders of an NFT that corresponds with a LIT may store and retrieve the keys.</p>
 
     <div class='pre p1 fill-light mt0'>new LitNodeClient(config: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
   
@@ -769,20 +734,6 @@
           
         
           
-            <div class='keyline-top-not py2'><section class='py2 clearfix'>
-
-  <h2 id='creating-the-lit-html' class='mt0'>
-    Creating the LIT HTML
-  </h2>
-
-  
-    <p>Creates a barebones HTML LIT with built in unlock functionality.  You need to design your LIT with HTML and CSS, and provide an unlock button with the id "unlockButton" inside your HTML.</p>
-
-  
-</section></div>
-          
-        
-          
           <section class='p2 mb2 clearfix bg-white minishadow'>
 
   
@@ -796,7 +747,7 @@
   </div>
   
 
-  <p>Create a ready-to-go LIT using provided HTML/CSS body and an encrypted zip data url</p>
+  <p>Create a ready-to-go LIT using provided HTML/CSS body and an encrypted zip data url.  You need to design your LIT with HTML and CSS, and provide an unlock button with the id "unlockButton" inside your HTML.  This function will handle the rest.</p>
 
     <div class='pre p1 fill-light mt0'>createHtmlLIT(params: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></div>
   
@@ -1306,8 +1257,8 @@
           
             <div class='keyline-top-not py2'><section class='py2 clearfix'>
 
-  <h2 id='utilities' class='mt0'>
-    Utilities
+  <h2 id='other-utilities' class='mt0'>
+    Other Utilities
   </h2>
 
   

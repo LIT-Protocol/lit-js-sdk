@@ -3,16 +3,8 @@ toc:
     description: |
       Welcome to the LIT JS SDK API documentation.  To understand how these functions fit together, please view the README in the github repo for this SDK.
   - name: Minting using our token contracts
-    description: |
-      You may use our pre-deployed token contracts to mint your LIT, or you may supply your own.  Our contracts are ERC1155 tokens on Polygon and Ethereum.  Using these contracts is the easiest way to get started.
   - mintLIT
-  - name: LIT Node Client
-    description: |
-      A client that connects directly to the LIT nodes to store and retrieve encryption keys for LITs.  Only holders of an NFT that corresponds with a LIT may store and retrieve the keys.
   - LitNodeClient
-  - name: Creating the LIT HTML
-    description: |
-      Creates a barebones HTML LIT with built in unlock functionality.  You need to design your LIT with HTML and CSS, and provide an unlock button with the id "unlockButton" inside your HTML.
   - createHtmlLIT
   - toggleLock
   - name: Encryption and decryption utilities
@@ -20,7 +12,7 @@ toc:
   - zipAndEncryptFiles
   - encryptZip
   - decryptZip
-  - name: Utilities
+  - name: Other Utilities
   - fileToDataUrl
   - checkAndSignAuthMessage
   - name: Types
