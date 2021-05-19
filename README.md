@@ -161,6 +161,10 @@ const mediaGridHtmlBody = await decryptedFiles['string.txt'].async('text')
 document.getElementById('mediaGridHolder').innerHTML = mediaGridHtmlBody
 ```
 
-## Questions?  Support?
+
+## API
+You can find API documentation at https://lit-protocol.github.io/lit-js-sdk/api_docs_html/index.html
+
+## Questions or Support
 
 Email chris@litprotocol.com for help.
