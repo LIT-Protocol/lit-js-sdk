@@ -41,6 +41,7 @@ message GetKeyFragmentResponse {
 }
 message StoreKeyFragment {
   required bytes fragmentValue = 1;
+  required bytes fragmentNumber = 2;
 }
 message StoreKeyFragmentResponse {
   enum Result {

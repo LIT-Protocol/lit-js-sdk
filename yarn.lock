@@ -1133,10 +1133,10 @@
     "@ethersproject/properties" "^5.1.0"
     "@ethersproject/strings" "^5.1.0"
 
-"@lit-protocol/libp2p-webrtc-direct@^0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@lit-protocol/libp2p-webrtc-direct/-/libp2p-webrtc-direct-0.6.1.tgz#22581ff43565449eb17a281123bdaf767b947e8a"
-  integrity sha512-IMaTkK5e3zuOsv7gGHjydxFH70Fv6oZnU7tLbY6ITTsQQ1lLxPQd+Vou+ApgD5INYOyoENf/gjUnGUJxmoHaoQ==
+"@lit-protocol/libp2p-webrtc-direct@^0.6.4":
+  version "0.6.4"
+  resolved "https://registry.yarnpkg.com/@lit-protocol/libp2p-webrtc-direct/-/libp2p-webrtc-direct-0.6.4.tgz#44dd457c0f674d8c4e1c5c130777310e1b8b471f"
+  integrity sha512-5r/CH7ZPpVOj0dsR52RI9n6euxq3vN5SRExU2l3SDcao1iV9jqQSUjCQoZPwMJl0QNxKAEgFetRZv/Ua68ikjw==
   dependencies:
     abortable-iterator "^3.0.0"
     class-is "^1.1.0"

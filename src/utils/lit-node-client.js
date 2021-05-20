@@ -111,6 +111,7 @@ export default class LitNodeClient {
           peerId,
           tokenAddress: normalizedTokenAddress,
           tokenId,
+          fragmentNumber: i,
           val: encryptedKFrag,
           authSig,
           chain
@@ -153,12 +154,13 @@ export default class LitNodeClient {
     return kFrags
   }
 
-  async storeDataWithNode ({ peerId, tokenAddress, tokenId, val, authSig, chain }) {
+  async storeDataWithNode ({ peerId, tokenAddress, tokenId, fragmentNumber, val, authSig, chain }) {
     console.debug(`storing data with node ${peerId} with tokenAddress ${tokenAddress} and tokenId ${tokenId}`)
     const data = Request.encode({
       type: Request.Type.STORE_KEY_FRAGMENT,
       storeKeyFragment: {
-        fragmentValue: uint8arrayFromString(val)
+        fragmentValue: uint8arrayFromString(val),
+        fragmentNumber: uint8arrayFromString(fragmentNumber)
       },
       authSig: uint8arrayFromString(JSON.stringify(authSig)),
       tokenParams: {
