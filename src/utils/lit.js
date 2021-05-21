@@ -9,10 +9,12 @@ import {
 } from './crypto'
 
 import {
-  checkAndSignAuthMessage
+  checkAndSignAuthMessage,
+  getMerkleProof
 } from './eth'
 
 import { fileToDataUrl } from './browser'
+import { LIT_CHAINS } from '../lib/constants'
 
 const PACKAGE_CACHE = {}
 
@@ -265,12 +267,18 @@ export async function toggleLock () {
     window.publicContent = mediaGridHolder.innerHTML
 
     const authSig = await checkAndSignAuthMessage()
+
+    // get the merkle proof
+    const { balanceStorageSlot } = LIT_CHAINS[window.chain]
+    const merkleProof = await getMerkleProof({ window.tokenAddress, balanceStorageSlot, window.tokenId })
+
     // get the encryption key
     const symmetricKey = await window.litNodeClient.getEncryptionKey({
       tokenAddress: window.tokenAddress,
       tokenId: window.tokenId,
       authSig,
-      chain: window.chain
+      chain: window.chain,
+      merkleProof
     })
 
     // convert data url to blob
