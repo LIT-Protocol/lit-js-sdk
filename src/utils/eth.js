@@ -42,9 +42,9 @@ export async function getMerkleProof ({ tokenAddress, balanceStorageSlot, tokenI
   console.log('rpcProof: ', rpcProof)
 
   return {
-    header: Header.fromRpc(rpcBlock).toJson(),
-    accountProof: Proof.fromRpc(rpcProof.accountProof).toJson(),
-    storageProof: Proof.fromRpc(rpcProof.storageProof[0].proof).toJson(),
+    header: rpcBlock,
+    accountProof: rpcProof.accountProof,
+    storageProof: rpcProof.storageProof[0].proof,
     blockHash: rpcBlock.hash
   }
 }
@@ -70,14 +70,39 @@ export async function getMerkleProof ({ tokenAddress, balanceStorageSlot, tokenI
  * Check for an existing cryptographic authentication signature and create one of it does not exist.  This is used to prove ownership of a given crypto wallet address to the LIT nodes.  The result is stored in LocalStorage so the user doesn't have to sign every time they perform an operation.
  * @returns {AuthSig} The AuthSig created or retrieved
  */
-export async function checkAndSignAuthMessage () {
+export async function checkAndSignAuthMessage ({ chain }) {
+  const { web3, account } = await connectWeb3()
+  const chainId = await web3.request({ method: 'eth_chainId', params: [] })
+  const selectedChain = LIT_CHAINS[chain]
+  if (chainId !== selectedChain.chainId) {
+    // the metamask chain switching thing does not work on mainnet
+    if (selectedChain.chainId !== 1) {
+      const data = [{
+        chainId: '0x' + selectedChain.chainId.toString('16'),
+        chainName: selectedChain.name,
+        nativeCurrency:
+                {
+                  name: selectedChain.name,
+                  symbol: selectedChain.symbol,
+                  decimals: selectedChain.decimals
+                },
+        rpcUrls: selectedChain.rpcUrls,
+        blockExplorerUrls: selectedChain.blockExplorerUrls
+      }]
+      const res = await web3.request({ method: 'wallet_addEthereumChain', params: data }).catch()
+      if (res) {
+        console.log(res)
+      }
+    } else {
+      return { errorCode: 'wrong_chain' }
+    }
+  }
   let authSig = localStorage.getItem('lit-auth-signature')
   if (!authSig) {
     await signAndSaveAuthMessage()
     authSig = localStorage.getItem('lit-auth-signature')
   }
   authSig = JSON.parse(authSig)
-  const { web3, account } = await connectWeb3()
   // make sure we are on the right account
   if (account !== authSig.address) {
     await signAndSaveAuthMessage()
@@ -239,33 +264,11 @@ export async function signMessage ({ body }) {
  */
 export async function mintLIT ({ chain, quantity }) {
   console.log(`minting ${quantity} tokens on ${chain}`)
-  const authSig = await checkAndSignAuthMessage()
-  const { web3, account } = await connectWeb3()
-  const chainId = await web3.request({ method: 'eth_chainId', params: [] })
-  const selectedChain = LIT_CHAINS[chain]
-  if (chainId !== selectedChain.chainId) {
-    // the metamask chain switching thing does not work on mainnet
-    if (selectedChain.chainId !== 1) {
-      const data = [{
-        chainId: '0x' + selectedChain.chainId.toString('16'),
-        chainName: selectedChain.name,
-        nativeCurrency:
-                {
-                  name: selectedChain.name,
-                  symbol: selectedChain.symbol,
-                  decimals: selectedChain.decimals
-                },
-        rpcUrls: selectedChain.rpcUrls,
-        blockExplorerUrls: selectedChain.blockExplorerUrls
-      }]
-      const res = await web3.request({ method: 'wallet_addEthereumChain', params: data }).catch()
-      if (res) {
-        console.log(res)
-      }
-    } else {
-      return { errorCode: 'wrong_chain' }
-    }
+  const authSig = await checkAndSignAuthMessage({ chain })
+  if (authSig.errorCode) {
+    return authSig
   }
+  const { web3, account } = await connectWeb3()
   const tokenAddress = LIT_CHAINS[chain].contractAddress
   const contract = new Contract(tokenAddress, LIT.abi, new Web3Provider(web3).getSigner())
   console.log('sending to chain...')

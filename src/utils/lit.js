@@ -266,7 +266,10 @@ export async function toggleLock () {
     // locked state in the future
     window.publicContent = mediaGridHolder.innerHTML
 
-    const authSig = await checkAndSignAuthMessage()
+    const authSig = await checkAndSignAuthMessage({ chain: window.chain })
+    if (authSig.errorCode && authSig.errorCode === 'wrong_chain') {
+      alert('You are connected to the wrong blockchain.  Please switch your metamask to ' + window.chain)
+    }
 
     // get the merkle proof
     const { balanceStorageSlot } = LIT_CHAINS[window.chain]

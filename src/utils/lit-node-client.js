@@ -131,7 +131,7 @@ export default class LitNodeClient {
     return { success: true }
   }
 
-  async getEncryptionKeyFragments ({ tokenAddress, tokenId, authSig, chain }) {
+  async getEncryptionKeyFragments ({ tokenAddress, tokenId, authSig, chain, merkleProof }) {
     // find providers
     const normalizedTokenAddress = tokenAddress.toLowerCase()
     const keyId = kFragKey({ tokenAddress, tokenId, chain })
@@ -148,7 +148,8 @@ export default class LitNodeClient {
         tokenId,
         authSig,
         keyId,
-        chain
+        chain,
+        merkleProof
       }))
     }
     const kFrags = await Promise.all(kFragPromises)
