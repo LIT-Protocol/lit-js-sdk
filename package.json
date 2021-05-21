@@ -1,13 +1,15 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.0.65",
+  "version": "1.0.66",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
-  "main": "build/index.js",
+  "module": "build/index.js",
+  "main": "build/index.web.js",
   "scripts": {
     "start": "microbundle watch",
     "build": "microbundle build",
-    "buildWeb": "parcel build --global LitJsSdk -d build --out-file index.web.js --public-url ./ src/index.js"
+    "buildWeb": "parcel build --global LitJsSdk -d build --out-file index.web.js --public-url ./ src/index.js",
+    "esbuild": "node esbuild.js"
   },
   "repository": {
     "type": "git",
@@ -21,11 +23,23 @@
   "keywords": [
     "library"
   ],
+  "browser": {
+    "http": false,
+    "https": false,
+    "crypto": false,
+    "stream": false,
+    "url": false,
+    "os": false,
+    "assert": false,
+    "request": "xhr"
+  },
   "license": "GPL-3.0",
   "devDependencies": {
+    "esbuild": "^0.12.1",
     "microbundle": "^0.13.0"
   },
   "dependencies": {
+    "@esbuild-plugins/node-modules-polyfill": "^0.1.1",
     "@lit-protocol/libp2p-webrtc-direct": "^0.6.4",
     "@metamask/detect-provider": "^1.2.0",
     "cids": "^1.1.6",
@@ -47,6 +61,7 @@
     "peer-id": "^0.14.8",
     "protons": "^2.0.1",
     "secrets.js-lit": "^2.0.1",
+    "stream": "^0.0.2",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
     "uint8arrays": "^2.1.5",
