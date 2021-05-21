@@ -1,4 +1,6 @@
-import Web3 from 'web3'
+import { Contract } from '@ethersproject/contracts'
+import { verifyMessage } from '@ethersproject/wallet'
+import { Web3Provider } from '@ethersproject/providers'
 
 import detectEthereumProvider from '@metamask/detect-provider'
 
@@ -13,12 +15,31 @@ import { LIT_CHAINS } from '../lib/constants'
 
 const AUTH_SIGNATURE_BODY = 'I am creating an account to use LITs at {{timestamp}}'
 
+export async function connectWeb3 () {
+  if (typeof window.ethereum === 'undefined') {
+    throw new Error({ errorCode: 'no_wallet', message: 'No web3 wallet was found' })
+  }
+
+  const provider = await detectEthereumProvider()
+
+  // trigger metamask popup
+  const accounts = await provider.request({ method: 'eth_requestAccounts' })
+  const account = accounts[0].toLowerCase()
+
+  return { web3: provider, account }
+}
+
 // taken from the excellent repo https://github.com/zmitton/eth-proof
 export async function getMerkleProof ({ tokenAddress, balanceStorageSlot, tokenId }) {
+  console.log(`getMerkleProof for { tokenAddress, balanceStorageSlot, tokenId } ${tokenAddress}, ${balanceStorageSlot}, ${tokenId}`)
   const { web3, account } = await connectWeb3()
   const storageAddress = mappingAt(balanceStorageSlot, tokenId, account)
-  const rpcBlock = await web3.eth.getBlock('latest')
-  const rpcProof = await web3.eth.getProof(tokenAddress, [storageAddress], rpcBlock.number)
+  console.log('storageAddress: ', storageAddress)
+  const rpcBlock = await web3.request({ method: 'eth_getBlockByNumber', params: ['latest', false] })
+  console.log('rpcBlock: ', rpcBlock)
+  // const rpcProof = await web3.eth.getProof(tokenAddress, [storageAddress], rpcBlock.number)
+  const rpcProof = await web3.request({ method: 'eth_getProof', params: [tokenAddress, [storageAddress], rpcBlock.number] })
+  console.log('rpcProof: ', rpcProof)
 
   return {
     header: Header.fromRpc(rpcBlock).toJson(),
@@ -27,14 +48,6 @@ export async function getMerkleProof ({ tokenAddress, balanceStorageSlot, tokenI
     blockHash: rpcBlock.hash
   }
 }
-
-/**
- * @typedef {Object} AuthSig
- * @property {string} sig - The actual hex-encoded signature
- * @property {string} derivedVia - The method used to derive the signature
- * @property {string} signedMessage - The message that was signed
- * @property {string} address - The crypto wallet address that signed the message
- */
 
 // export async function checkAndDeriveKeypair () {
 //   let keypair = localStorage.getItem('lit-keypair')
@@ -52,22 +65,6 @@ export async function getMerkleProof ({ tokenAddress, balanceStorageSlot, tokenI
 //   }
 //   return keypair
 // }
-
-export async function connectWeb3 () {
-  if (typeof window.ethereum === 'undefined') {
-    throw new Error({ errorCode: 'no_wallet', message: 'No web3 wallet was found' })
-  }
-
-  const provider = await detectEthereumProvider()
-
-  // trigger metamask popup
-  const accounts = await provider.request({ method: 'eth_requestAccounts' })
-  const account = accounts[0].toLowerCase()
-
-  const web3 = new Web3(provider)
-  window.litWeb3 = web3 // for debug
-  return { web3, account }
-}
 
 /**
  * Check for an existing cryptographic authentication signature and create one of it does not exist.  This is used to prove ownership of a given crypto wallet address to the LIT nodes.  The result is stored in LocalStorage so the user doesn't have to sign every time they perform an operation.
@@ -109,12 +106,19 @@ export async function signAndSaveAuthMessage () {
   console.log('generated and saved lit-comms-keypair')
 }
 
+/**
+ * @typedef {Object} AuthSig
+ * @property {string} sig - The actual hex-encoded signature
+ * @property {string} derivedVia - The method used to derive the signature
+ * @property {string} signedMessage - The message that was signed
+ * @property {string} address - The crypto wallet address that signed the message
+ */
 export async function signMessage ({ body }) {
   const { web3, account } = await connectWeb3()
 
   console.log('signing with ', account)
-  const signature = await web3.eth.personal.sign(body, account)
-  const address = web3.eth.accounts.recover(body, signature).toLowerCase()
+  const signature = await web3.request({ method: 'eth_sign', params: [account, body] })
+  const address = verifyMessage(body, signature).toLowerCase()
 
   console.log('Signature: ', signature)
   console.log('recovered address: ', address)
@@ -237,7 +241,7 @@ export async function mintLIT ({ chain, quantity }) {
   console.log(`minting ${quantity} tokens on ${chain}`)
   const authSig = await checkAndSignAuthMessage()
   const { web3, account } = await connectWeb3()
-  const chainId = await web3.eth.getChainId()
+  const chainId = await web3.request({ method: 'eth_chainId', params: [] })
   const selectedChain = LIT_CHAINS[chain]
   if (chainId !== selectedChain.chainId) {
     // the metamask chain switching thing does not work on mainnet
@@ -254,7 +258,7 @@ export async function mintLIT ({ chain, quantity }) {
         rpcUrls: selectedChain.rpcUrls,
         blockExplorerUrls: selectedChain.blockExplorerUrls
       }]
-      const res = await ethereum.request({ method: 'wallet_addEthereumChain', params: data }).catch()
+      const res = await web3.request({ method: 'wallet_addEthereumChain', params: data }).catch()
       if (res) {
         console.log(res)
       }
@@ -263,12 +267,14 @@ export async function mintLIT ({ chain, quantity }) {
     }
   }
   const tokenAddress = LIT_CHAINS[chain].contractAddress
-  const contract = new web3.eth.Contract(LIT.abi, tokenAddress)
+  const contract = new Contract(tokenAddress, LIT.abi, new Web3Provider(web3).getSigner())
   console.log('sending to chain...')
   try {
-    const txReceipt = await contract.methods.mint(quantity).send({ from: account })
+    const tx = await contract.mint(quantity)
+    console.log('sent to chain.  waiting to be mined...')
+    const txReceipt = await tx.wait()
     console.log('txReceipt: ', txReceipt)
-    const tokenId = txReceipt.events.TransferSingle.returnValues.id
+    const tokenId = txReceipt.events[0].args[3].toNumber()
     return {
       txHash: txReceipt.transactionHash,
       tokenId,
