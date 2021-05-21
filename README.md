@@ -131,10 +131,10 @@ Now, you can send the NFT that corresponds to this LIT to anyone, and they can u
 
 To unlock a LIT, you must retrieve the encryption key from the server.  This SDK provides a convenience function to do this for you called `toggleLock`.  It will pull down the encryption key, and decrypt content located at `window.encryptedZipDataUrl`, and then load the content into a div with id `mediaGridHolder`.  You may use `toggleLock` or implement parts of it yourself if you have further customizations.  Here's how it works.
 
-First, obtain an authSig from the user.  This will ask their metamask to sign a message proving they own the crypto address that presumably owns the NFT.
+First, obtain an authSig from the user.  This will ask their metamask to sign a message proving they own the crypto address that presumably owns the NFT.  Pass the chain you're using.  Currently "polygon" and "ethereum" are supported
 
 ```
-const authSig = await checkAndSignAuthMessage()
+const authSig = await checkAndSignAuthMessage({chain: 'polygon'})
 ```
 
 Next, obtain the symmetric key from the LIT network.  It's important that you have a connected LitNodeClient accessible at window.litNodeClient for this to work.

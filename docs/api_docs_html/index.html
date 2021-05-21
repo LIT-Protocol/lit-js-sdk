@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset='utf-8'>
-  <title>lit-js-sdk 1.0.57 | Documentation</title>
+  <title>lit-js-sdk 1.0.84 | Documentation</title>
   <meta name='description' content='LIT Javascript SDK'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' rel='stylesheet'>
@@ -15,7 +15,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>lit-js-sdk</h3>
-          <div class='mb1'><code>1.0.57</code></div>
+          <div class='mb1'><code>1.0.84</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -570,6 +570,14 @@
 
 
               
+                <tr>
+  <td class='break-word'><span class='code bold'>params.merkleProof</span> <code class='quiet'>any</code>
+  </td>
+  <td class='break-word'><span></span></td>
+</tr>
+
+
+              
             </tbody>
           </table>
           
@@ -697,6 +705,14 @@
   </td>
   <td class='break-word'><span>The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be split up using threshold encryption so that the LIT nodes cannot decrypt a given LIT.
 </span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.merkleProof</span> <code class='quiet'>any</code>
+  </td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
@@ -1714,7 +1730,7 @@
 
   <p>Check for an existing cryptographic authentication signature and create one of it does not exist.  This is used to prove ownership of a given crypto wallet address to the LIT nodes.  The result is stored in LocalStorage so the user doesn't have to sign every time they perform an operation.</p>
 
-    <div class='pre p1 fill-light mt0'>checkAndSignAuthMessage(): <a href="#authsig">AuthSig</a></div>
+    <div class='pre p1 fill-light mt0'>checkAndSignAuthMessage(params: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="#authsig">AuthSig</a></div>
   
   
 
@@ -1725,6 +1741,44 @@
   
   
 
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    
+          </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.chain</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  </td>
+  <td class='break-word'><span>The chain you want to use.  "polygon" and "ethereum" are currently supported.
+</span></td>
+</tr>
+
+
+              
+            </tbody>
+          </table>
+          
+        </div>
+      
+    </div>
   
 
   
