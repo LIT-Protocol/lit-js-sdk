@@ -29,6 +29,8 @@
     "@lit-protocol/libp2p-webrtc-direct": "^0.6.4",
     "@metamask/detect-provider": "^1.2.0",
     "cids": "^1.1.6",
+    "eth-object": "^1.0.3",
+    "eth-util-lite": "^1.0.1",
     "it-all": "^1.0.5",
     "it-length-prefixed": "^5.0.2",
     "it-pipe": "^1.1.0",

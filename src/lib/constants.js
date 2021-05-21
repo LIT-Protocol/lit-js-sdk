@@ -13,6 +13,7 @@ message Request {
   optional bytes authSig = 4;
   optional TokenParams tokenParams = 5;
   optional bytes clientPubKey = 6;
+  optional bytes merkleProof = 7;
 }
 message Response {
   enum Type {
@@ -80,13 +81,15 @@ export const LIT_CHAINS = {
     symbol: 'MATIC',
     decimals: 18,
     rpcUrls: ['https://rpc-mainnet.maticvigil.com'],
-    blockExplorerUrls: ['https://explorer.matic.network']
+    blockExplorerUrls: ['https://explorer.matic.network'],
+    balanceStorageSlot: 1
   },
   ethereum: {
     contractAddress: '0x55485885e82E25446DEC314Ccb810Bda06B9e01B',
     chainId: 1,
     name: 'Ethereum',
     symbol: 'ETH',
-    decimals: 18
+    decimals: 18,
+    balanceStorageSlot: 1
   }
 }

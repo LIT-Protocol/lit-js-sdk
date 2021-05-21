@@ -54,8 +54,8 @@ export default class LitNodeClient {
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
    * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
   */
-  async getEncryptionKey ({ tokenAddress, tokenId, chain, authSig }) {
-    const encryptedKFrags = await this.getEncryptionKeyFragments({ tokenAddress, tokenId, authSig, chain })
+  async getEncryptionKey ({ tokenAddress, tokenId, chain, authSig, merkleProof }) {
+    const encryptedKFrags = await this.getEncryptionKeyFragments({ tokenAddress, tokenId, authSig, chain, merkleProof })
     if (encryptedKFrags.some(k => k === 'AUTH_FAILURE')) {
       if (this.config.alertWhenUnauthorized) {
         alert('You are not authorized to unlock to this LIT')
@@ -85,7 +85,7 @@ export default class LitNodeClient {
  * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be split up using threshold encryption so that the LIT nodes cannot decrypt a given LIT.
  * @returns {Object} An object that gives the status of the operation, denoted via a boolean with the key "success"
  */
-  async saveEncryptionKey ({ tokenAddress, tokenId, chain, authSig, symmetricKey }) {
+  async saveEncryptionKey ({ tokenAddress, tokenId, chain, authSig, symmetricKey, merkleProof }) {
     // console.log(`saveEncryptionKey with tokenAddress ${tokenAddress} and tokenId ${tokenId} and symmetricKey ${symmetricKey} and authSig ${authSig} and chain ${chain}`)
     const nodes = Array.from(this.connectedNodes)
     // split up into nodes.length fragments
@@ -114,7 +114,8 @@ export default class LitNodeClient {
           fragmentNumber: i,
           val: encryptedKFrag,
           authSig,
-          chain
+          chain,
+          merkleProof
         })
       )
     }
@@ -154,7 +155,7 @@ export default class LitNodeClient {
     return kFrags
   }
 
-  async storeDataWithNode ({ peerId, tokenAddress, tokenId, fragmentNumber, val, authSig, chain }) {
+  async storeDataWithNode ({ peerId, tokenAddress, tokenId, fragmentNumber, val, authSig, chain, merkleProof }) {
     console.debug(`storing data with node ${peerId} with tokenAddress ${tokenAddress} and tokenId ${tokenId}`)
     const data = Request.encode({
       type: Request.Type.STORE_KEY_FRAGMENT,
@@ -167,12 +168,13 @@ export default class LitNodeClient {
         tokenAddress: uint8arrayFromString(tokenAddress),
         tokenId: uint8arrayFromString(tokenId.toString()),
         chain: uint8arrayFromString(chain)
-      }
+      },
+      merkleProof: uint8arrayFromString(JSON.stringify(merkleProof))
     })
     return await this.sendCommandToPeer({ peerId, data })
   }
 
-  async getDataFromNode ({ peerId, tokenAddress, tokenId, keyId, authSig, chain }) {
+  async getDataFromNode ({ peerId, tokenAddress, tokenId, keyId, authSig, chain, merkleProof }) {
     console.debug(`getDataFromNode ${peerId} with keyId ${keyId}`)
     const commsKeypair = JSON.parse(localStorage.getItem('lit-comms-keypair'))
     const data = Request.encode({
@@ -186,7 +188,8 @@ export default class LitNodeClient {
         tokenId: uint8arrayFromString(tokenId.toString()),
         chain: uint8arrayFromString(chain)
       },
-      clientPubKey: naclUtil.decodeBase64(commsKeypair.publicKey)
+      clientPubKey: naclUtil.decodeBase64(commsKeypair.publicKey),
+      merkleProof: uint8arrayFromString(JSON.stringify(merkleProof))
     })
     return await this.sendCommandToPeer({ peerId, data })
   }

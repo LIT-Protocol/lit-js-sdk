@@ -12,7 +12,8 @@ import {
 import {
   connectWeb3,
   mintLIT,
-  checkAndSignAuthMessage
+  checkAndSignAuthMessage,
+  getMerkleProof
 } from './utils/eth'
 
 import {
@@ -43,7 +44,8 @@ const functions = {
   kFragKey,
   encryptWithPubKey,
   decryptWithPrivKey,
-  fileToDataUrl
+  fileToDataUrl,
+  getMerkleProof
 }
 
 export default functions

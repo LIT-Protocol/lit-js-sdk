@@ -5,10 +5,27 @@ import detectEthereumProvider from '@metamask/detect-provider'
 import naclUtil from 'tweetnacl-util'
 import nacl from 'tweetnacl'
 
+import { Header, Proof, Receipt, Transaction } from 'eth-object'
+import { mappingAt } from 'eth-util-lite'
+
 import LIT from '../abis/LIT.json'
 import { LIT_CHAINS } from '../lib/constants'
 
 const AUTH_SIGNATURE_BODY = 'I am creating an account to use LITs at {{timestamp}}'
+
+// taken from the excellent repo https://github.com/zmitton/eth-proof
+export async function getMerkleProof ({ tokenAddress, balanceStorageSlot, tokenId }) {
+  const { web3, account } = await connectWeb3()
+  const storageAddress = mappingAt(balanceStorageSlot, tokenId, holderAddress)
+  const rpcBlock = await web3.eth.getBlock('latest')
+  const rpcProof = await web3.eth.getProof(tokenAddress, [storageAddress], rpcBlock.number)
+
+  return {
+    header: Header.fromRpc(rpcBlock),
+    accountProof: Proof.fromRpc(rpcProof.accountProof),
+    storageProof: Proof.fromRpc(rpcProof.storageProof[0].proof)
+  }
+}
 
 /**
  * @typedef {Object} AuthSig
@@ -47,6 +64,7 @@ export async function connectWeb3 () {
   const account = accounts[0].toLowerCase()
 
   const web3 = new Web3(provider)
+  window.litWeb3 = web3 // for debug
   return { web3, account }
 }
 
