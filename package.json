@@ -1,10 +1,9 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.0.66",
+  "version": "1.0.77",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
-  "module": "build/index.js",
-  "main": "build/index.web.js",
+  "main": "build/index.js",
   "scripts": {
     "start": "microbundle watch",
     "build": "microbundle build",
