@@ -1,5 +1,5 @@
 #!/bin/zsh
 
 yarn build
-yarn esbuild
+yarn buildWeb
 yarn publish

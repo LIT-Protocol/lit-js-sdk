@@ -22,9 +22,6 @@
   "keywords": [
     "library"
   ],
-  "browser": {
-    "crypto": false
-  },
   "license": "GPL-3.0",
   "devDependencies": {
     "esbuild": "^0.12.1",

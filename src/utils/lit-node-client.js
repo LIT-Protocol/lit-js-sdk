@@ -71,7 +71,7 @@ export default class LitNodeClient {
       kFrags.push(decrypted)
     }
     const secret = secrets.combine(kFrags)
-    const symmetricKey = Buffer.from(secret, 'hex').toString()
+    const symmetricKey = uint8arrayToString(uint8arrayFromString(secret, 'base16'))
     return symmetricKey
   }
 
@@ -92,7 +92,7 @@ export default class LitNodeClient {
     const numShares = nodes.length
     const threshold = Math.floor(numShares / 2)
     // convert from base64 to hex
-    const secret = Buffer.from(symmetricKey).toString('hex')
+    const secret = uint8arrayToString(uint8arrayFromString(symmetricKey), 'base16')
     console.debug(`splitting up into ${numShares} shares with a threshold of ${threshold}`)
     const kFrags = secrets.share(secret, numShares, threshold)
     if (kFrags.length !== nodes.length) {
