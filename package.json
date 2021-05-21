@@ -1,6 +1,6 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.0.81",
+  "version": "1.0.82",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
   "main": "build/index.js",
@@ -36,6 +36,7 @@
     "@ethersproject/wallet": "^5.2.0",
     "@lit-protocol/libp2p-webrtc-direct": "^0.6.4",
     "@metamask/detect-provider": "^1.2.0",
+    "buffer": "^6.0.3",
     "cids": "^1.1.6",
     "eth-object": "^1.0.3",
     "eth-util-lite": "^1.0.1",
