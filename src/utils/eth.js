@@ -16,14 +16,15 @@ const AUTH_SIGNATURE_BODY = 'I am creating an account to use LITs at {{timestamp
 // taken from the excellent repo https://github.com/zmitton/eth-proof
 export async function getMerkleProof ({ tokenAddress, balanceStorageSlot, tokenId }) {
   const { web3, account } = await connectWeb3()
-  const storageAddress = mappingAt(balanceStorageSlot, tokenId, holderAddress)
+  const storageAddress = mappingAt(balanceStorageSlot, tokenId, account)
   const rpcBlock = await web3.eth.getBlock('latest')
   const rpcProof = await web3.eth.getProof(tokenAddress, [storageAddress], rpcBlock.number)
 
   return {
-    header: Header.fromRpc(rpcBlock),
-    accountProof: Proof.fromRpc(rpcProof.accountProof),
-    storageProof: Proof.fromRpc(rpcProof.storageProof[0].proof)
+    header: Header.fromRpc(rpcBlock).toJson(),
+    accountProof: Proof.fromRpc(rpcProof.accountProof).toJson(),
+    storageProof: Proof.fromRpc(rpcProof.storageProof[0].proof).toJson(),
+    blockHash: rpcBlock.hash
   }
 }
 
