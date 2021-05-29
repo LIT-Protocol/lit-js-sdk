@@ -82,7 +82,8 @@ export const LIT_CHAINS = {
     decimals: 18,
     rpcUrls: ['https://rpc-mainnet.maticvigil.com'],
     blockExplorerUrls: ['https://explorer.matic.network'],
-    balanceStorageSlot: 1
+    balanceStorageSlot: 1,
+    type: 'ERC1155'
   },
   ethereum: {
     contractAddress: '0x55485885e82E25446DEC314Ccb810Bda06B9e01B',
@@ -90,6 +91,16 @@ export const LIT_CHAINS = {
     name: 'Ethereum',
     symbol: 'ETH',
     decimals: 18,
-    balanceStorageSlot: 1
+    balanceStorageSlot: 1,
+    type: 'ERC1155'
+  },
+  kovan: {
+    contractAddress: '0xA9b2180C2A479Ba9b263878C4d81AE4e0E717846',
+    chainId: 42,
+    name: 'Ethereum',
+    symbol: 'ETH',
+    decimals: 18,
+    balanceStorageSlot: 1,
+    type: 'ERC20'
   }
 }

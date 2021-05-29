@@ -144,7 +144,7 @@ export async function signMessage ({ body }) {
   const { web3, account } = await connectWeb3()
 
   console.log('signing with ', account)
-  const signature = await web3.request({ method: 'eth_sign', params: [account, body] })
+  const signature = await web3.request({ method: 'personal_sign', params: [account, body] })
   const address = verifyMessage(body, signature).toLowerCase()
 
   console.log('Signature: ', signature)
