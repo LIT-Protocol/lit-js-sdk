@@ -76,11 +76,13 @@ export async function checkAndSignAuthMessage ({ chain }) {
   const { web3, account } = await connectWeb3()
   const chainId = await web3.request({ method: 'eth_chainId', params: [] })
   const selectedChain = LIT_CHAINS[chain]
-  if (chainId !== selectedChain.chainId) {
+  const selectedChainId = '0x' + selectedChain.chainId.toString('16')
+  console.debug(`checkAndSignAuthMessage with chainId ${chainId} and chain set to ${chain} and selectedChain is `, selectedChain)
+  if (chainId !== selectedChainId) {
     // the metamask chain switching thing does not work on mainnet
     if (selectedChain.chainId !== 1) {
       const data = [{
-        chainId: '0x' + selectedChain.chainId.toString('16'),
+        chainId: selectedChainId,
         chainName: selectedChain.name,
         nativeCurrency:
                 {
