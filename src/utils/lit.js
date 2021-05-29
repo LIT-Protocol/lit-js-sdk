@@ -274,7 +274,7 @@ export async function toggleLock () {
     // get the merkle proof
     // const { balanceStorageSlot } = LIT_CHAINS[window.chain]
     // const merkleProof = await getMerkleProof({ tokenAddress: window.tokenAddress, balanceStorageSlot, tokenId: window.tokenId })
-    const merkleProof = ''
+    const merkleProof = {}
 
     // get the encryption key
     const symmetricKey = await window.litNodeClient.getEncryptionKey({
