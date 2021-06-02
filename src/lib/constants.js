@@ -100,6 +100,8 @@ export const LIT_CHAINS = {
     name: 'Ethereum',
     symbol: 'ETH',
     decimals: 18,
+    rpcUrls: ['https://kovan.infura.io/v3/ddf1ca3700f34497bca2bf03607fde38'],
+    blockExplorerUrls: ['https://kovan.etherscan.io'],
     balanceStorageSlot: 1,
     type: 'ERC20'
   }
