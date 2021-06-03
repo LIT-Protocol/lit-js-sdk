@@ -33,7 +33,8 @@ export async function connectWeb3 () {
 export async function getMerkleProof ({ tokenAddress, balanceStorageSlot, tokenId }) {
   console.log(`getMerkleProof for { tokenAddress, balanceStorageSlot, tokenId } ${tokenAddress}, ${balanceStorageSlot}, ${tokenId}`)
   const { web3, account } = await connectWeb3()
-  const storageAddress = mappingAt(balanceStorageSlot, tokenId, account)
+  console.log(`getting mappingAt(${balanceStorageSlot}, ${tokenId}, ${account})`)
+  const storageAddress = mappingAt(balanceStorageSlot, parseInt(tokenId), account)
   console.log('storageAddress: ', storageAddress)
   const rpcBlock = await web3.request({ method: 'eth_getBlockByNumber', params: ['latest', false] })
   console.log('rpcBlock: ', rpcBlock)

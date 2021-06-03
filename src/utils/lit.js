@@ -272,9 +272,10 @@ export async function toggleLock () {
     }
 
     // get the merkle proof
-    // const { balanceStorageSlot } = LIT_CHAINS[window.chain]
+    const { balanceStorageSlot } = LIT_CHAINS[window.chain]
+    let merkleProof = null
     try {
-      const merkleProof = await getMerkleProof({ tokenAddress: window.tokenAddress, balanceStorageSlot, tokenId: window.tokenId })
+      merkleProof = await getMerkleProof({ tokenAddress: window.tokenAddress, balanceStorageSlot, tokenId: window.tokenId })
     } catch (e) {
       console.log(e)
       alert('Error - could not obtain merke proof.  Some nodes do not support this operation yet.  Please try another ETH node.')

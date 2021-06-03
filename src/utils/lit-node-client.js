@@ -35,7 +35,8 @@ export default class LitNodeClient {
   constructor (
     config = {
       alertWhenUnauthorized: true,
-      minNodeCount: 8
+      minNodeCount: 8,
+      bootstrapUrls: ['/dns4/node1.litgateway.com/tcp/9090/https/p2p-webrtc-direct/p2p/12D3KooWK1KtaAV5rWjbAmZcd62VYSmEz1k81jzr87JAcSS7rKdQ']
     }
   ) {
     this.config = config
@@ -258,7 +259,6 @@ export default class LitNodeClient {
   }
 
   async connect () {
-    const hardcodedPeerId = '12D3KooWK1KtaAV5rWjbAmZcd62VYSmEz1k81jzr87JAcSS7rKdQ'
     // Create our libp2p node
     this.libp2p = await Libp2p.create({
       modules: {
@@ -275,7 +275,7 @@ export default class LitNodeClient {
         peerDiscovery: {
           [Bootstrap.tag]: {
             enabled: true,
-            list: [`/dns4/node1.litgateway.com/tcp/9090/https/p2p-webrtc-direct/p2p/${hardcodedPeerId}`]
+            list: this.config.bootstrapUrls
           }
         }
       }
