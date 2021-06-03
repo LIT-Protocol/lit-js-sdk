@@ -235,7 +235,7 @@ export async function createHtmlLIT ({
         window.litNodeClient = litNodeClient
       }
     </script>
-    <script onload='litJsSdkLoaded()' src="https://unpkg.com/lit-js-sdk@^1/build/index.web.js"></script>
+    <script onload='litJsSdkLoaded()' src="https://cdn.jsdelivr.net/npm/lit-js-sdk@1/build/index.web.js"></script>
   </head>
   <body>
     <div id="root">${htmlBody}</div>
