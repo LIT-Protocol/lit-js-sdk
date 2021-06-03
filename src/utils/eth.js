@@ -15,6 +15,16 @@ import { LIT_CHAINS } from '../lib/constants'
 
 const AUTH_SIGNATURE_BODY = 'I am creating an account to use LITs at {{timestamp}}'
 
+function chainHexIdToChainName (chainHexId) {
+  for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
+    const chainName = Object.keys(LIT_CHAINS)[i]
+    const litChainHexId = '0x' + LIT_CHAINS[chainName].chainId.toString('16')
+    if (litChainHexId === chainHexId) {
+      return chainName
+    }
+  }
+}
+
 export async function connectWeb3 () {
   if (typeof window.ethereum === 'undefined') {
     throw new Error({ errorCode: 'no_wallet', message: 'No web3 wallet was found' })
@@ -269,15 +279,15 @@ export async function signMessage ({ body }) {
  */
 export async function mintLIT ({ chain, quantity }) {
   console.log(`minting ${quantity} tokens on ${chain}`)
-  const authSig = await checkAndSignAuthMessage({ chain })
-  if (authSig.errorCode) {
-    return authSig
-  }
-  const { web3, account } = await connectWeb3()
-  const tokenAddress = LIT_CHAINS[chain].contractAddress
-  const contract = new Contract(tokenAddress, LIT.abi, new Web3Provider(web3).getSigner())
-  console.log('sending to chain...')
   try {
+    const authSig = await checkAndSignAuthMessage({ chain })
+    if (authSig.errorCode) {
+      return authSig
+    }
+    const { web3, account } = await connectWeb3()
+    const tokenAddress = LIT_CHAINS[chain].contractAddress
+    const contract = new Contract(tokenAddress, LIT.abi, new Web3Provider(web3).getSigner())
+    console.log('sending to chain...')
     const tx = await contract.mint(quantity)
     console.log('sent to chain.  waiting to be mined...')
     const txReceipt = await tx.wait()
@@ -310,12 +320,15 @@ export async function mintLIT ({ chain, quantity }) {
  * @param {number} params.accountAddress The account address to check
  * @returns {array} The token ids owned by the accountAddress
  */
-export async function findLITs ({ chain }) {
-  console.log(`findLITs for ${chain}`)
-  const { web3, account } = await connectWeb3()
-  const tokenAddress = LIT_CHAINS[chain].contractAddress
-  const contract = new Contract(tokenAddress, LIT.abi, new Web3Provider(web3).getSigner())
+export async function findLITs () {
+  console.log('findLITs')
+
   try {
+    const { web3, account } = await connectWeb3()
+    const chainHexId = await web3.request({ method: 'eth_chainId', params: [] })
+    const chain = chainHexIdToChainName(chainHexId)
+    const tokenAddress = LIT_CHAINS[chain].contractAddress
+    const contract = new Contract(tokenAddress, LIT.abi, new Web3Provider(web3).getSigner())
     console.log('getting maxTokenid')
     const maxTokenId = await contract.tokenIds()
     const accounts = []
@@ -327,7 +340,8 @@ export async function findLITs ({ chain }) {
     console.log('getting balanceOfBatch')
     const balances = await contract.balanceOfBatch(accounts, tokenIds)
     // console.log('balances', balances)
-    return balances.map((b, i) => b.toNumber() === 0 ? null : i).filter(b => b !== null)
+    const tokenIdsWithNonzeroBalances = balances.map((b, i) => b.toNumber() === 0 ? null : i).filter(b => b !== null)
+    return { tokenIds: tokenIdsWithNonzeroBalances, chain }
   } catch (error) {
     console.log(error)
     if (error.code === 4001) {
@@ -350,10 +364,11 @@ export async function findLITs ({ chain }) {
  */
 export async function sendLIT ({ tokenMetadata, to }) {
   console.log('sendLIT for ', tokenMetadata)
-  const { web3, account } = await connectWeb3()
-  const { tokenAddress, tokenId, chain } = tokenMetadata
-  const contract = new Contract(tokenAddress, LIT.abi, new Web3Provider(web3).getSigner())
+
   try {
+    const { web3, account } = await connectWeb3()
+    const { tokenAddress, tokenId, chain } = tokenMetadata
+    const contract = new Contract(tokenAddress, LIT.abi, new Web3Provider(web3).getSigner())
     console.log('transferring')
     const maxTokenId = await contract.safeTransferFrom(account, to, tokenId, 1, [])
     console.log('sent to chain')
