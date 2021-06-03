@@ -302,3 +302,71 @@ export async function mintLIT ({ chain, quantity }) {
     return { errorCode: 'unknown_error' }
   }
 }
+
+/**
+ * Finds the tokens that the current user owns from the predeployed LIT contracts
+ * @param {Object} params
+ * @param {string} params.chain The chain that was minted on. "ethereum" and "polygon" are currently supported.
+ * @param {number} params.accountAddress The account address to check
+ * @returns {array} The token ids owned by the accountAddress
+ */
+export async function findLITs ({ chain }) {
+  console.log(`findLITs for ${chain}`)
+  const { web3, account } = await connectWeb3()
+  const tokenAddress = LIT_CHAINS[chain].contractAddress
+  const contract = new Contract(tokenAddress, LIT.abi, new Web3Provider(web3).getSigner())
+  try {
+    console.log('getting maxTokenid')
+    const maxTokenId = await contract.tokenIds()
+    const accounts = []
+    const tokenIds = []
+    for (let i = 0; i <= maxTokenId; i++) {
+      accounts.push(account)
+      tokenIds.push(i)
+    }
+    console.log('getting balanceOfBatch')
+    const balances = await contract.balanceOfBatch(accounts, tokenIds)
+    // console.log('balances', balances)
+    return balances.map((b, i) => b.toNumber() === 0 ? null : i).filter(b => b !== null)
+  } catch (error) {
+    console.log(error)
+    if (error.code === 4001) {
+      // EIP-1193 userRejectedRequest error
+      console.log('User rejected request')
+      return { errorCode: 'user_rejected_request' }
+    } else {
+      console.error(error)
+    }
+    return { errorCode: 'unknown_error' }
+  }
+}
+
+/**
+ * Send a token to another account
+ * @param {Object} params
+ * @param {string} params.tokenMetadata The token metadata of the token to be transferred.  Should include tokenId, tokenAddress, and chain
+ * @param {number} params.to The account address to send the token to
+ * @returns {Object} Success or error
+ */
+export async function sendLIT ({ tokenMetadata, to }) {
+  console.log('sendLIT for ', tokenMetadata)
+  const { web3, account } = await connectWeb3()
+  const { tokenAddress, tokenId, chain } = tokenMetadata
+  const contract = new Contract(tokenAddress, LIT.abi, new Web3Provider(web3).getSigner())
+  try {
+    console.log('transferring')
+    const maxTokenId = await contract.safeTransferFrom(account, to, tokenId, 1, [])
+    console.log('sent to chain')
+    return { success: true }
+  } catch (error) {
+    console.log(error)
+    if (error.code === 4001) {
+      // EIP-1193 userRejectedRequest error
+      console.log('User rejected request')
+      return { errorCode: 'user_rejected_request' }
+    } else {
+      console.error(error)
+    }
+    return { errorCode: 'unknown_error' }
+  }
+}
