@@ -1,6 +1,6 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
   "main": "build/index.js",
@@ -25,7 +25,8 @@
   "license": "GPL-3.0",
   "devDependencies": {
     "esbuild": "^0.12.1",
-    "microbundle": "^0.13.0"
+    "microbundle": "^0.13.0",
+    "standard": "^16.0.3"
   },
   "dependencies": {
     "@ethersproject/contracts": "^5.2.0",
