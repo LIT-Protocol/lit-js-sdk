@@ -13,6 +13,10 @@ import {
   getMerkleProof
 } from './eth'
 
+import {
+  sendMessageToFrameParent
+} from './frameComms'
+
 import { fileToDataUrl } from './browser'
 import { LIT_CHAINS } from '../lib/constants'
 
@@ -228,6 +232,7 @@ export async function createHtmlLIT ({
       var tokenId = "${tokenId}"
       var chain = "${chain}"
       var locked = true
+      var useLitPostMessageProxy = false
 
       function litJsSdkLoaded(){
          var litNodeClient = new LitJsSdk.default.LitNodeClient()
@@ -257,7 +262,7 @@ export async function createHtmlLIT ({
 /**
  * Lock and unlock the encrypted content inside a LIT.  This content is only viewable by holders of the NFT that corresponds to this LIT.  Locked content will be decrypted and placed into the HTML element with id "mediaGridHolder".  The HTML element with the id "lockedHeader" will have it's text automatically changed to LOCKED or UNLOCKED to denote the state of the LIT.  Note that if you're creating a LIT using the createHtmlLIT function, you do not need to use this function, because this function is automatically bound to any button in your HTML with the id "unlockButton".
  */
-export async function toggleLock () {
+export async function toggleLock ({ encryptionKeyFromParentFrame }) {
   const mediaGridHolder = document.getElementById('mediaGridHolder')
   const lockedHeader = document.getElementById('lockedHeader')
 
@@ -266,30 +271,43 @@ export async function toggleLock () {
     // locked state in the future
     window.publicContent = mediaGridHolder.innerHTML
 
-    const authSig = await checkAndSignAuthMessage({ chain: window.chain })
-    if (authSig.errorCode && authSig.errorCode === 'wrong_chain') {
-      alert('You are connected to the wrong blockchain.  Please switch your metamask to ' + window.chain)
-    }
-
-    // get the merkle proof
-    const { balanceStorageSlot } = LIT_CHAINS[window.chain]
-    let merkleProof = null
-    try {
-      merkleProof = await getMerkleProof({ tokenAddress: window.tokenAddress, balanceStorageSlot, tokenId: window.tokenId })
-    } catch (e) {
-      console.log(e)
-      alert('Error - could not obtain merke proof.  Some nodes do not support this operation yet.  Please try another ETH node.')
+    if (window.useLitPostMessageProxy && !encryptionKeyFromParentFrame) {
+      // instead of asking the network for the key part, ask the parent frame
+      // the parentframe will then call toggleLock again but with the encryptionKeyFromParentFrame set
+      sendMessageToFrameParent({ command: 'signAndGetEncryptionKey', target: 'LitNodeClient', params: { tokenAddress: window.tokenAddress, tokenId: window.tokenId, chain: window.chain } })
       return
     }
 
-    // get the encryption key
-    const symmetricKey = await window.litNodeClient.getEncryptionKey({
-      tokenAddress: window.tokenAddress,
-      tokenId: window.tokenId,
-      authSig,
-      chain: window.chain,
-      merkleProof
-    })
+    let symmetricKey = null
+
+    if (!encryptionKeyFromParentFrame) {
+      const authSig = await checkAndSignAuthMessage({ chain: window.chain })
+      if (authSig.errorCode && authSig.errorCode === 'wrong_chain') {
+        alert('You are connected to the wrong blockchain.  Please switch your metamask to ' + window.chain)
+      }
+
+      // get the merkle proof
+      const { balanceStorageSlot } = LIT_CHAINS[window.chain]
+      let merkleProof = null
+      try {
+        merkleProof = await getMerkleProof({ tokenAddress: window.tokenAddress, balanceStorageSlot, tokenId: window.tokenId })
+      } catch (e) {
+        console.log(e)
+        alert('Error - could not obtain merke proof.  Some nodes do not support this operation yet.  Please try another ETH node.')
+        return
+      }
+      // get the encryption key
+      symmetricKey = await window.litNodeClient.getEncryptionKey({
+        tokenAddress: window.tokenAddress,
+        tokenId: window.tokenId,
+        authSig,
+        chain: window.chain,
+        merkleProof
+      })
+    } else {
+      // parent frame got it for us
+      symmetricKey = encryptionKeyFromParentFrame
+    }
 
     // convert data url to blob
     const encryptedZipBlob = await (await fetch(window.encryptedZipDataUrl)).blob()

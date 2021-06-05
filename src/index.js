@@ -30,6 +30,19 @@ import { kFragKey } from './lib/utils'
 
 import LitNodeClient from './utils/lit-node-client'
 
+import {
+  listenForChildFrameMessages,
+  listenForFrameParentMessages,
+  sendMessageToFrameParent,
+  inIframe
+} from './utils/frameComms'
+
+if (inIframe()) {
+  listenForFrameParentMessages()
+} else {
+  listenForChildFrameMessages()
+}
+
 const functions = {
   zipAndEncryptString,
   zipAndEncryptFiles,
@@ -49,7 +62,8 @@ const functions = {
   fileToDataUrl,
   getMerkleProof,
   findLITs,
-  sendLIT
+  sendLIT,
+  sendMessageToFrameParent
 }
 
 export default functions
