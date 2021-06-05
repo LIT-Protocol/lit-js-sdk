@@ -233,24 +233,14 @@ export async function createHtmlLIT ({
       var chain = "${chain}"
       var locked = true
       var useLitPostMessageProxy = false
-
-      function litJsSdkLoaded(){
-         var litNodeClient = new LitJsSdk.default.LitNodeClient()
-        litNodeClient.connect()
-        window.litNodeClient = litNodeClient
-      }
     </script>
-    <script onload='litJsSdkLoaded()' src="https://cdn.jsdelivr.net/npm/lit-js-sdk@1.1/build/index.web.js"></script>
+    <script onload='LitJsSdk.default.litJsSdkLoadedInALIT()' src="https://cdn.jsdelivr.net/npm/lit-js-sdk@1.1/build/index.web.js"></script>
   </head>
   <body>
     <div id="root">${htmlBody}</div>
     <script>
       const unlockButton = document.getElementById('unlockButton')
       unlockButton.onclick = function() {
-        if (!window.litNodeClient.ready){
-          alert('The LIT network is still connecting.  Please try again in about 10 seconds.')
-          return
-        }
         LitJsSdk.default.toggleLock()
       }
     </script>
@@ -262,7 +252,7 @@ export async function createHtmlLIT ({
 /**
  * Lock and unlock the encrypted content inside a LIT.  This content is only viewable by holders of the NFT that corresponds to this LIT.  Locked content will be decrypted and placed into the HTML element with id "mediaGridHolder".  The HTML element with the id "lockedHeader" will have it's text automatically changed to LOCKED or UNLOCKED to denote the state of the LIT.  Note that if you're creating a LIT using the createHtmlLIT function, you do not need to use this function, because this function is automatically bound to any button in your HTML with the id "unlockButton".
  */
-export async function toggleLock ({ encryptionKeyFromParentFrame }) {
+export async function toggleLock () {
   const mediaGridHolder = document.getElementById('mediaGridHolder')
   const lockedHeader = document.getElementById('lockedHeader')
 
@@ -271,54 +261,61 @@ export async function toggleLock ({ encryptionKeyFromParentFrame }) {
     // locked state in the future
     window.publicContent = mediaGridHolder.innerHTML
 
-    if (window.useLitPostMessageProxy && !encryptionKeyFromParentFrame) {
-      // instead of asking the network for the key part, ask the parent frame
-      // the parentframe will then call toggleLock again but with the encryptionKeyFromParentFrame set
-      sendMessageToFrameParent({ command: 'signAndGetEncryptionKey', target: 'LitNodeClient', params: { tokenAddress: window.tokenAddress, tokenId: window.tokenId, chain: window.chain } })
+    if (!window.litNodeClient.ready && !window.useLitPostMessageProxy) {
+      alert('The LIT network is still connecting.  Please try again in about 10 seconds.')
       return
     }
 
-    let symmetricKey = null
-
-    if (!encryptionKeyFromParentFrame) {
-      const authSig = await checkAndSignAuthMessage({ chain: window.chain })
-      if (authSig.errorCode && authSig.errorCode === 'wrong_chain') {
-        alert('You are connected to the wrong blockchain.  Please switch your metamask to ' + window.chain)
-      }
-
-      // get the merkle proof
-      const { balanceStorageSlot } = LIT_CHAINS[window.chain]
-      let merkleProof = null
-      try {
-        merkleProof = await getMerkleProof({ tokenAddress: window.tokenAddress, balanceStorageSlot, tokenId: window.tokenId })
-      } catch (e) {
-        console.log(e)
-        alert('Error - could not obtain merke proof.  Some nodes do not support this operation yet.  Please try another ETH node.')
-        return
-      }
-      // get the encryption key
-      symmetricKey = await window.litNodeClient.getEncryptionKey({
-        tokenAddress: window.tokenAddress,
-        tokenId: window.tokenId,
-        authSig,
-        chain: window.chain,
-        merkleProof
-      })
-    } else {
-      // parent frame got it for us
-      symmetricKey = encryptionKeyFromParentFrame
+    const authSig = await checkAndSignAuthMessage({ chain: window.chain })
+    if (authSig.errorCode && authSig.errorCode === 'wrong_chain') {
+      alert('You are connected to the wrong blockchain.  Please switch your metamask to ' + window.chain)
+      return
     }
 
-    // convert data url to blob
-    const encryptedZipBlob = await (await fetch(window.encryptedZipDataUrl)).blob()
-    const decryptedFiles = await decryptZip(encryptedZipBlob, symmetricKey)
-    const mediaGridHtmlBody = await decryptedFiles['string.txt'].async('text')
-    mediaGridHolder.innerHTML = mediaGridHtmlBody
-    lockedHeader.innerText = 'UNLOCKED'
-    window.locked = false
+    // get the merkle proof
+    const { balanceStorageSlot } = LIT_CHAINS[window.chain]
+    let merkleProof = null
+    try {
+      merkleProof = await getMerkleProof({ tokenAddress: window.tokenAddress, balanceStorageSlot, tokenId: window.tokenId })
+    } catch (e) {
+      console.log(e)
+      alert('Error - could not obtain merkle proof.  Some nodes do not support this operation yet.  Please try another ETH node.')
+      return
+    }
+
+    if (window.useLitPostMessageProxy) {
+      // instead of asking the network for the key part, ask the parent frame
+      // the parentframe will then call unlockLit() with the encryption key
+      sendMessageToFrameParent({ command: 'getEncryptionKey', target: 'LitNodeClient', params: { tokenAddress: window.tokenAddress, tokenId: window.tokenId, chain: window.chain, authSig, merkleProof } })
+      return
+    }
+
+    // get the encryption key
+    const symmetricKey = await window.litNodeClient.getEncryptionKey({
+      tokenAddress: window.tokenAddress,
+      tokenId: window.tokenId,
+      authSig,
+      chain: window.chain,
+      merkleProof
+    })
+
+    await unlockLitWithKey({ symmetricKey })
   } else {
     mediaGridHolder.innerHTML = window.publicContent
     lockedHeader.innerText = 'LOCKED'
     window.locked = true
   }
+}
+
+async function unlockLitWithKey ({ symmetricKey }) {
+  const mediaGridHolder = document.getElementById('mediaGridHolder')
+  const lockedHeader = document.getElementById('lockedHeader')
+
+  // convert data url to blob
+  const encryptedZipBlob = await (await fetch(window.encryptedZipDataUrl)).blob()
+  const decryptedFiles = await decryptZip(encryptedZipBlob, symmetricKey)
+  const mediaGridHtmlBody = await decryptedFiles['string.txt'].async('text')
+  mediaGridHolder.innerHTML = mediaGridHtmlBody
+  lockedHeader.innerText = 'UNLOCKED'
+  window.locked = false
 }

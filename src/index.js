@@ -28,12 +28,13 @@ import { fileToDataUrl } from './utils/browser'
 import { LIT_CHAINS, protobufs } from './lib/constants'
 import { kFragKey } from './lib/utils'
 
-import LitNodeClient from './utils/lit-node-client'
+import LitNodeClient from './utils/litNodeClient'
+
+import { litJsSdkLoadedInALIT } from './utils/init'
 
 import {
   listenForChildFrameMessages,
   listenForFrameParentMessages,
-  sendMessageToFrameParent,
   inIframe
 } from './utils/frameComms'
 
@@ -63,7 +64,7 @@ const functions = {
   getMerkleProof,
   findLITs,
   sendLIT,
-  sendMessageToFrameParent
+  litJsSdkLoadedInALIT
 }
 
 export default functions

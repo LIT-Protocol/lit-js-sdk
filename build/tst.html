@@ -1043,21 +1043,10 @@
       var locked = true
       var useLitPostMessageProxy = false
 
-      function litJsSdkLoaded(){
 
-        LitJsSdk.default.sendMessageToFrameParent({command: 'LIT_SYN'}, '*')
-        setTimeout(function(){
-          if (!useLitPostMessageProxy){
-            console.log('no parent frame lit node connection.  connecting ourselves.')
-            // we're on our own with no parent frame.  initiate our own connection to lit nodes
-            var litNodeClient = new LitJsSdk.default.LitNodeClient()
-            litNodeClient.connect()
-            window.litNodeClient = litNodeClient
-          }
-        }, 1000)
-      }
+
     </script>
-    <script onload='litJsSdkLoaded()' src="/index.web.js"></script>
+    <script onload='LitJsSdk.default.litJsSdkLoadedInALIT()' src="/index.web.js"></script>
   </head>
   <body>
     <div id="root"><div class="MuiContainer-root MuiContainer-maxWidthLg"><div class="makeStyles-root-2"><div class="MuiGrid-root makeStyles-gridContainer-5 MuiGrid-container MuiGrid-justify-xs-space-between"><div class="MuiGrid-root makeStyles-leftAlignedText-3 MuiGrid-item"><h3 class="MuiTypography-root MuiTypography-h3">this is a testtt</h3><h6 class="MuiTypography-root MuiTypography-subtitle1">thing</h6></div><div class="MuiGrid-root makeStyles-rightAlignedText-4 MuiGrid-item"><h6 class="MuiTypography-root MuiTypography-subtitle1">1<!-- --> edition</h6><div style="height:1px"></div><div style="height:8px"></div><button class="MuiButtonBase-root MuiButton-root MuiButton-contained" tabindex="0" type="button" id="unlockButton"><span class="MuiButton-label"><span class="MuiButton-startIcon MuiButton-iconSizeMedium"><svg class="MuiSvgIcon-root" focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"></path></svg></span>Unlock</span></button></div></div><h5 class="MuiTypography-root MuiTypography-h5" id="lockedHeader">LOCKED</h5><div style="height:16px"></div></div><div id="mediaGridHolder" class="makeStyles-mediaGridHolder-1"><div class="makeStyles-root-6"><div class="MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-justify-xs-center"></div></div></div></div></div>
