@@ -8,6 +8,7 @@
     "start": "microbundle watch",
     "build": "microbundle build",
     "buildWeb": "parcel build --global LitJsSdk -d build --out-file index.web.js --public-url ./ src/index.js",
+    "cdnDeploy": "yarn build; yarn buildWeb",
     "esbuild": "node esbuild.js"
   },
   "repository": {
