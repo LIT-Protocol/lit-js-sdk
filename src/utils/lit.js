@@ -234,7 +234,7 @@ export async function createHtmlLIT ({
       var locked = true
       var useLitPostMessageProxy = false
     </script>
-    <script onload='LitJsSdk.default.litJsSdkLoadedInALIT()' src="https://cdn.jsdelivr.net/npm/lit-js-sdk@1.1/build/index.web.js"></script>
+    <script onload='LitJsSdk.default.litJsSdkLoadedInALIT()' src="https://jscdn.litgateway.com/index.web.js"></script>
   </head>
   <body>
     <div id="root">${htmlBody}</div>
