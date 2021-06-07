@@ -6,7 +6,8 @@ import {
   encryptZip,
   decryptZip,
   createHtmlLIT,
-  toggleLock
+  toggleLock,
+  unlockLitWithKey
 } from './utils/lit'
 
 import {
@@ -64,7 +65,8 @@ const functions = {
   getMerkleProof,
   findLITs,
   sendLIT,
-  litJsSdkLoadedInALIT
+  litJsSdkLoadedInALIT,
+  unlockLitWithKey
 }
 
 export default functions

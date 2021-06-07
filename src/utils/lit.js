@@ -307,7 +307,7 @@ export async function toggleLock () {
   }
 }
 
-async function unlockLitWithKey ({ symmetricKey }) {
+export async function unlockLitWithKey ({ symmetricKey }) {
   const mediaGridHolder = document.getElementById('mediaGridHolder')
   const lockedHeader = document.getElementById('lockedHeader')
 

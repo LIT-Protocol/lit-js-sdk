@@ -1,5 +1,6 @@
 import { checkAndSignAuthMessage, getMerkleProof } from './eth'
 import { LIT_CHAINS } from '../lib/constants'
+import { unlockLitWithKey } from './lit'
 
 export const listenForChildFrameMessages = async () => {
   console.log('calling listenForChildFrameMessages from ' + window.origin)
@@ -76,7 +77,7 @@ export const listenForFrameParentMessages = async () => {
       }
       if (respondingToCommand === 'getEncryptionKey') {
         const { encryptionKey } = event.data
-        LitJsSdk.default.toggleLock({ encryptionKeyFromParentFrame: encryptionKey })
+        unlockLitWithKey({ symmetricKey: encryptionKey })
       }
     }
   }, false)
