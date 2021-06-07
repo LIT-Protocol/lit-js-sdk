@@ -261,7 +261,7 @@ export async function toggleLock () {
     // locked state in the future
     window.publicContent = mediaGridHolder.innerHTML
 
-    if (!window.litNodeClient.ready && !window.useLitPostMessageProxy) {
+    if (!window.useLitPostMessageProxy && !window.litNodeClient.ready) {
       alert('The LIT network is still connecting.  Please try again in about 10 seconds.')
       return
     }
