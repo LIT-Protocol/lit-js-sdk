@@ -27,7 +27,7 @@
   "devDependencies": {
     "esbuild": "^0.12.1",
     "microbundle": "^0.13.0",
-    "parcel": "^1.12.4",
+    "parcel": "1.12.3",
     "standard": "^16.0.3"
   },
   "dependencies": {
