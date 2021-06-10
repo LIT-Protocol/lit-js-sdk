@@ -3,7 +3,16 @@
 
 The LIT Protocol provides a decentralized way to encrypt and lock content that can be unlocked and decrypted by satisfying some on-chain verifable conditions, such as ownership of an NFT.  Simply put, it enables the creation of locked NFTs that can only be unlocked by owners of that NFT.  LITs are HTML/JS/CSS web pages that can be interactive and dynamic.
 
+## State of the network today
+
+Right now, the LIT Protocol is in an alpha state.  It is unaudited and the nodes are not as distributed as they will be when we launch a mainnet.  The network is not ready to store high value things like crypto wallets or private keys, because the cryptoeconomic guarantees that will protect the network are not in place yet.  That said, it is highly unlikely that any locked or private content would leak or be exposed given that the architecture of the network is inherently secure and private.
+
+## How does the LIT protocol work?
+
+This SDK will encrypt your content, split the key, and upload key fragments to independent LIT Protocol nodes.  When someone wants to access the content, the SDK will send a signed message and a merkle proof that proves that they own the NFT associated with the content.  The LIT nodes will then send down the key fragements and the SDK will combine them and decrypt the content.
+
 ## Installation
+
 Use yarn or npm to add the lit-js-sdk to your product:
 
 ```
@@ -16,11 +25,13 @@ You can then import it like so:
 import LitJsSdk from 'lit-js-sdk'
 ```
 
-We also provide a web-ready package with all dependencies included at build/index.web.js.  You can import this into your HTML webpage using a script tag and unpkg:
+We also provide a web-ready package with all dependencies included at build/index.web.js.  You can import this into your HTML webpage using a script tag:
 
 ```
-<script onload='litJsSdkLoaded()' src="https://unpkg.com/lit-js-sdk@^1/build/index.web.js"></script>
+<script onload='litJsSdkLoaded()' src="https://jscdn.litgateway.com/index.web.js"></script>
 ```
+
+You can then use all the sdk functions via LitJsSdk.default for example `LitJsSdk.default.toggleLock()`
 
 Note that if you use a script tag like this, you will likely need to initialize a connection to the LIT Network using something like this:
 
@@ -148,7 +159,7 @@ const symmetricKey = await window.litNodeClient.getEncryptionKey({
 })
 ```
 
-Finally, decrypt the content and inject it into the webpage.
+Finally, decrypt the content and inject it into the webpage.  We provide a convenience function to unlock the LIT once you have the symmetric encryption key that does the same thing as the code below, located here: https://lit-protocol.github.io/lit-js-sdk/api_docs_html/index.html#unlocklitwithkey
 
 ```
 // convert data url to blob
