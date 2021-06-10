@@ -35,7 +35,7 @@ export default class LitNodeClient {
   constructor (
     config = {
       alertWhenUnauthorized: true,
-      minNodeCount: 8,
+      minNodeCount: 6,
       bootstrapUrls: ['/dns4/node1.litgateway.com/tcp/9090/https/p2p-webrtc-direct/p2p/12D3KooWK1KtaAV5rWjbAmZcd62VYSmEz1k81jzr87JAcSS7rKdQ', '/dns4/node1.litgateway.com/tcp/9091/https/p2p-webrtc-direct/p2p/QmfLL5EqgyJKrD1oe8ZFGLM7HXGadGuQR9RqEeM1hBVqtP', '/dns4/node1.litgateway.com/tcp/9092/https/p2p-webrtc-direct/p2p/Qmeo7u9goqqKA3Fkj7VmT7EkpgtjZK6DaJBWYBGW5czo2A', '/dns4/node1.litgateway.com/tcp/9093/https/p2p-webrtc-direct/p2p/QmVVtPgZWPNUmcPf57PWjij1kosrZhbHNgrMwkog1Eyn1H', '/dns4/node1.litgateway.com/tcp/9094/https/p2p-webrtc-direct/p2p/QmRae8zUD7vdQjf4cAegtuFX78BfrWmdhdsVaWN9VDVFs9', '/dns4/node1.litgateway.com/tcp/9095/https/p2p-webrtc-direct/p2p/QmU7e6JrtVt6PnpShJkdaN9W68eVX9JRxYxo9nVLupUGtG', '/dns4/node1.litgateway.com/tcp/9096/https/p2p-webrtc-direct/p2p/QmZK4A6CRL8gcsooCpiWuxkguXJartbGDizjs7f11ALevm', '/dns4/node1.litgateway.com/tcp/9097/https/p2p-webrtc-direct/p2p/QmUA9MUPs3eG7vcuQvZzwWEodzdW7xaDFyanpmuwjWEMk1', '/dns4/node1.litgateway.com/tcp/9098/https/p2p-webrtc-direct/p2p/QmYJpEuUaojzYhWXShH29xQzXbJoS2YyKyEdkKP77nK1Q4', '/dns4/node1.litgateway.com/tcp/9099/https/p2p-webrtc-direct/p2p/QmeJiT66sYz4P9y44W1LaoWjw42AefFxJnagyDCNpJys1w']
     }
   ) {
@@ -68,8 +68,12 @@ export default class LitNodeClient {
     // decrypt kfrags
     const kFrags = []
     for (let i = 0; i < encryptedKFrags.length; i++) {
-      const decrypted = decryptWithPrivKey(JSON.parse(encryptedKFrags[i]), commsKeypair.secretKey)
-      kFrags.push(decrypted)
+      if (encryptedKFrags[i].error) {
+        console.log(`kFrag number ${i} has an error`, encryptedKFrags[i].error)
+      } else {
+        const decrypted = decryptWithPrivKey(JSON.parse(encryptedKFrags[i]), commsKeypair.secretKey)
+        kFrags.push(decrypted)
+      }
     }
     const secret = secrets.combine(kFrags)
     const symmetricKey = uint8arrayToString(uint8arrayFromString(secret, 'base16'))
@@ -91,7 +95,8 @@ export default class LitNodeClient {
     const nodes = Array.from(this.connectedNodes)
     // split up into nodes.length fragments
     const numShares = nodes.length
-    const threshold = Math.floor(numShares / 2)
+    // FIXME for now, hardcode the threshold to 3 while we are running only 10 nodes, which provides some nice redundancy.
+    const threshold = 3 // Math.floor(numShares / 2)
     // convert from base64 to hex
     const secret = uint8arrayToString(uint8arrayFromString(symmetricKey), 'base16')
     console.debug(`splitting up into ${numShares} shares with a threshold of ${threshold}`)
@@ -117,7 +122,7 @@ export default class LitNodeClient {
           authSig,
           chain,
           merkleProof
-        })
+        }).catch(error => ({ error }))
       )
     }
     const resps = await Promise.all(storagePromises)
@@ -128,7 +133,7 @@ export default class LitNodeClient {
       document.dispatchEvent(new Event('lit-authFailure'))
       return { success: false }
     }
-    console.log('all stored')
+    console.log('all stored: ', resps)
     return { success: true }
   }
 
@@ -143,15 +148,17 @@ export default class LitNodeClient {
     for (let i = 0; i < providers.length; i++) {
       const peerId = providers[i].id.toB58String()
       console.debug(`Getting ${keyId} from ${peerId}`)
-      kFragPromises.push(this.getDataFromNode({
-        peerId,
-        tokenAddress: normalizedTokenAddress,
-        tokenId,
-        authSig,
-        keyId,
-        chain,
-        merkleProof
-      }))
+      kFragPromises.push(
+        this.getDataFromNode({
+          peerId,
+          tokenAddress: normalizedTokenAddress,
+          tokenId,
+          authSig,
+          keyId,
+          chain,
+          merkleProof
+        }).catch(error => ({ error }))
+      )
     }
     const kFrags = await Promise.all(kFragPromises)
     return kFrags
