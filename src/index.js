@@ -24,7 +24,10 @@ import {
   encryptWithPubKey
 } from './utils/crypto'
 
-import { fileToDataUrl } from './utils/browser'
+import {
+  fileToDataUrl,
+  injectViewerIFrame
+} from './utils/browser'
 
 import { LIT_CHAINS, protobufs } from './lib/constants'
 import { kFragKey } from './lib/utils'
@@ -66,7 +69,8 @@ const functions = {
   findLITs,
   sendLIT,
   litJsSdkLoadedInALIT,
-  unlockLitWithKey
+  unlockLitWithKey,
+  injectViewerIFrame
 }
 
 export default functions

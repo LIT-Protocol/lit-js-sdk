@@ -251,6 +251,7 @@ export async function createHtmlLIT ({
 
 /**
  * Lock and unlock the encrypted content inside a LIT.  This content is only viewable by holders of the NFT that corresponds to this LIT.  Locked content will be decrypted and placed into the HTML element with id "mediaGridHolder".  The HTML element with the id "lockedHeader" will have it's text automatically changed to LOCKED or UNLOCKED to denote the state of the LIT.  Note that if you're creating a LIT using the createHtmlLIT function, you do not need to use this function, because this function is automatically bound to any button in your HTML with the id "unlockButton".
+ * @returns {Promise} the promise will resolve when the LIT has been unlocked or an error message has been shown informing the user that they are not authorized to unlock the LIT
  */
 export async function toggleLock () {
   const mediaGridHolder = document.getElementById('mediaGridHolder')
@@ -307,6 +308,12 @@ export async function toggleLock () {
   }
 }
 
+/**
+ * Manually unlock a LIT with a symmetric key.  You can obtain this key by calling "checkAndSignAuthMessage" to get an authSig, then calling "getMerkleProof" to get the merkle proof, and then "LitNodeClient.getEncryptionKey" to get the key.  If you want to see an example, check out the implementation of "toggleLock" which does all those operations and then calls this function at the end (unlockLitWithKey)
+ * @param {Object} params
+ * @param {Object} params.symmetricKey The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
+ * @returns {promise} A promise that will resolve when the LIT is unlocked
+ */
 export async function unlockLitWithKey ({ symmetricKey }) {
   const mediaGridHolder = document.getElementById('mediaGridHolder')
   const lockedHeader = document.getElementById('lockedHeader')
