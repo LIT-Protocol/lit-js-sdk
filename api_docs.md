@@ -11,45 +11,45 @@
         *   [Parameters][7]
     *   [saveEncryptionKey][8]
         *   [Parameters][9]
-*   [createHtmlLIT][10]
+*   [unlockLitWithKey][10]
     *   [Parameters][11]
-*   [toggleLock][12]
-*   [Encryption and decryption utilities][13]
-*   [zipAndEncryptString][14]
+*   [findLITs][12]
+    *   [Parameters][13]
+*   [sendLIT][14]
     *   [Parameters][15]
-*   [zipAndEncryptFiles][16]
+*   [createHtmlLIT][16]
     *   [Parameters][17]
-*   [encryptZip][18]
-    *   [Parameters][19]
-*   [decryptZip][20]
-    *   [Parameters][21]
-*   [decryptWithSymmetricKey][22]
+*   [toggleLock][18]
+*   [injectViewerIFrame][19]
+    *   [Parameters][20]
+*   [Encryption and decryption utilities][21]
+*   [zipAndEncryptString][22]
     *   [Parameters][23]
-*   [encryptWithSymmetricKey][24]
+*   [zipAndEncryptFiles][24]
     *   [Parameters][25]
-*   [encryptWithPubKey][26]
+*   [encryptZip][26]
     *   [Parameters][27]
-*   [decryptWithPrivKey][28]
+*   [decryptZip][28]
     *   [Parameters][29]
-*   [Other Utilities][30]
-*   [fileToDataUrl][31]
-    *   [Parameters][32]
-*   [checkAndSignAuthMessage][33]
-    *   [Parameters][34]
-*   [Types][35]
-*   [AuthSig][36]
-    *   [Properties][37]
-*   [LITChain][38]
-    *   [Properties][39]
-*   [LIT_CHAINS][40]
-*   [injectViewerIFrame][41]
+*   [decryptWithSymmetricKey][30]
+    *   [Parameters][31]
+*   [encryptWithSymmetricKey][32]
+    *   [Parameters][33]
+*   [encryptWithPubKey][34]
+    *   [Parameters][35]
+*   [decryptWithPrivKey][36]
+    *   [Parameters][37]
+*   [Other Utilities][38]
+*   [fileToDataUrl][39]
+    *   [Parameters][40]
+*   [checkAndSignAuthMessage][41]
     *   [Parameters][42]
-*   [findLITs][43]
-    *   [Parameters][44]
-*   [sendLIT][45]
-    *   [Parameters][46]
-*   [unlockLitWithKey][47]
-    *   [Parameters][48]
+*   [Types][43]
+*   [AuthSig][44]
+    *   [Properties][45]
+*   [LITChain][46]
+    *   [Properties][47]
+*   [LIT_CHAINS][48]
 
 ## Welcome
 
@@ -112,6 +112,44 @@ Securely save the symmetric encryption key to the LIT nodes.
 
 Returns **[Object][50]** An object that gives the status of the operation, denoted via a boolean with the key "success"
 
+## unlockLitWithKey
+
+Manually unlock a LIT with a symmetric key.  You can obtain this key by calling "checkAndSignAuthMessage" to get an authSig, then calling "getMerkleProof" to get the merkle proof, and then "LitNodeClient.getEncryptionKey" to get the key.  If you want to see an example, check out the implementation of "toggleLock" which does all those operations and then calls this function at the end (unlockLitWithKey)
+
+### Parameters
+
+*   `params` **[Object][50]** 
+
+    *   `params.symmetricKey` **[Object][50]** The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
+
+Returns **[promise][55]** A promise that will resolve when the LIT is unlocked
+
+## findLITs
+
+Finds the tokens that the current user owns from the predeployed LIT contracts
+
+### Parameters
+
+*   `params` **[Object][50]** 
+
+    *   `params.chain` **[string][51]** The chain that was minted on. "ethereum" and "polygon" are currently supported.
+    *   `params.accountAddress` **[number][52]** The account address to check
+
+Returns **[array][56]** The token ids owned by the accountAddress
+
+## sendLIT
+
+Send a token to another account
+
+### Parameters
+
+*   `params` **[Object][50]** 
+
+    *   `params.tokenMetadata` **[string][51]** The token metadata of the token to be transferred.  Should include tokenId, tokenAddress, and chain
+    *   `params.to` **[number][52]** The account address to send the token to
+
+Returns **[Object][50]** Success or error
+
 ## createHtmlLIT
 
 Create a ready-to-go LIT using provided HTML/CSS body and an encrypted zip data url.  You need to design your LIT with HTML and CSS, and provide an unlock button with the id "unlockButton" inside your HTML.  This function will handle the rest.
@@ -127,7 +165,7 @@ Create a ready-to-go LIT using provided HTML/CSS body and an encrypted zip data 
     *   `params.tokenAddress` **[string][51]** The token address of the corresponding NFT for this LIT.  ERC721 and ERC 1155 tokens are currently supported.
     *   `params.tokenId` **[number][52]** The ID of the token of the corresponding NFT for this LIT.  Only holders of this token ID will be able to unlock and decrypt this LIT.
     *   `params.chain` **[string][51]** The chain that the corresponding NFT was minted on.  "ethereum" and "polygon" are currently supported.
-    *   `params.npmPackages` **[Array][55]** An array of strings of NPM package names that should be embedded into this LIT.  These packages will be pulled down via unpkg, converted to data URLs, and embedded in the LIT HTML.  You can include any packages from npmjs.com. (optional, default `[]`)
+    *   `params.npmPackages` **[Array][56]** An array of strings of NPM package names that should be embedded into this LIT.  These packages will be pulled down via unpkg, converted to data URLs, and embedded in the LIT HTML.  You can include any packages from npmjs.com. (optional, default `[]`)
 
 Returns **[string][51]** The HTML string that is now a LIT.  You can send this HTML around and only token holders will be able to unlock and decrypt the content inside it.  Included in the HTML is this LIT JS SDK itself, the encrypted locked content, an automatic connection to the LIT nodes network, and a handler for a button with id "unlockButton" which will perform the unlock operation when clicked.
 
@@ -135,7 +173,23 @@ Returns **[string][51]** The HTML string that is now a LIT.  You can send this H
 
 Lock and unlock the encrypted content inside a LIT.  This content is only viewable by holders of the NFT that corresponds to this LIT.  Locked content will be decrypted and placed into the HTML element with id "mediaGridHolder".  The HTML element with the id "lockedHeader" will have it's text automatically changed to LOCKED or UNLOCKED to denote the state of the LIT.  Note that if you're creating a LIT using the createHtmlLIT function, you do not need to use this function, because this function is automatically bound to any button in your HTML with the id "unlockButton".
 
-Returns **[Promise][56]** the promise will resolve when the LIT has been unlocked or an error message has been shown informing the user that they are not authorized to unlock the LIT
+Returns **[Promise][55]** the promise will resolve when the LIT has been unlocked or an error message has been shown informing the user that they are not authorized to unlock the LIT
+
+## injectViewerIFrame
+
+Inject an iFrame into the current page that will display a LIT.  This function safely sandboxes the content in the iFrame so that the LIT cannot see cookies or localStorage of the parent website.
+
+### Parameters
+
+*   `params` **[Object][50]** 
+
+    *   `params.symmetricKey` **[Object][50]** The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
+    *   `params.destinationId`  
+    *   `params.title`  
+    *   `params.fileUrl`  
+    *   `params.className`  
+
+Returns **[promise][55]** A promise that will resolve when the LIT is unlocked
 
 ## Encryption and decryption utilities
 
@@ -157,7 +211,7 @@ Zip and encrypt multiple files.
 
 ### Parameters
 
-*   `files` **[array][55]** An array of the files you wish to zip and encrypt
+*   `files` **[array][56]** An array of the files you wish to zip and encrypt
 
 Returns **[Object][50]** The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
 
@@ -180,7 +234,7 @@ Decrypt and unzip a zip that was created using encryptZip, zipAndEncryptString, 
 *   `encryptedZipBlob` **[Blob][57]** The encrypted zip as a Blob
 *   `symmKey` **[Object][50]** An object containing the symmetric key used that will be used to decrypt this zip.
 
-Returns **[Array][55]** An array of the decrypted files inside the zip.
+Returns **[Array][56]** An array of the decrypted files inside the zip.
 
 ## decryptWithSymmetricKey
 
@@ -285,60 +339,6 @@ Pre-deployed token contracts that you may use for minting LITs.  These are ERC11
 
 Type: [LITChain][58]
 
-## injectViewerIFrame
-
-Inject an iFrame into the current page that will display a LIT.  This function safely sandboxes the content in the iFrame so that the LIT cannot see cookies or localStorage of the parent website.
-
-### Parameters
-
-*   `params` **[Object][50]** 
-
-    *   `params.symmetricKey` **[Object][50]** The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
-    *   `params.destinationId`  
-    *   `params.title`  
-    *   `params.fileUrl`  
-    *   `params.className`  
-
-Returns **[promise][56]** A promise that will resolve when the LIT is unlocked
-
-## findLITs
-
-Finds the tokens that the current user owns from the predeployed LIT contracts
-
-### Parameters
-
-*   `params` **[Object][50]** 
-
-    *   `params.chain` **[string][51]** The chain that was minted on. "ethereum" and "polygon" are currently supported.
-    *   `params.accountAddress` **[number][52]** The account address to check
-
-Returns **[array][55]** The token ids owned by the accountAddress
-
-## sendLIT
-
-Send a token to another account
-
-### Parameters
-
-*   `params` **[Object][50]** 
-
-    *   `params.tokenMetadata` **[string][51]** The token metadata of the token to be transferred.  Should include tokenId, tokenAddress, and chain
-    *   `params.to` **[number][52]** The account address to send the token to
-
-Returns **[Object][50]** Success or error
-
-## unlockLitWithKey
-
-Manually unlock a LIT with a symmetric key.  You can obtain this key by calling "checkAndSignAuthMessage" to get an authSig, then calling "getMerkleProof" to get the merkle proof, and then "LitNodeClient.getEncryptionKey" to get the key.  If you want to see an example, check out the implementation of "toggleLock" which does all those operations and then calls this function at the end (unlockLitWithKey)
-
-### Parameters
-
-*   `params` **[Object][50]** 
-
-    *   `params.symmetricKey` **[Object][50]** The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
-
-Returns **[promise][56]** A promise that will resolve when the LIT is unlocked
-
 [1]: #welcome
 
 [2]: #mintlit
@@ -357,83 +357,83 @@ Returns **[promise][56]** A promise that will resolve when the LIT is unlocked
 
 [9]: #parameters-3
 
-[10]: #createhtmllit
+[10]: #unlocklitwithkey
 
 [11]: #parameters-4
 
-[12]: #togglelock
+[12]: #findlits
 
-[13]: #encryption-and-decryption-utilities
+[13]: #parameters-5
 
-[14]: #zipandencryptstring
+[14]: #sendlit
 
-[15]: #parameters-5
+[15]: #parameters-6
 
-[16]: #zipandencryptfiles
+[16]: #createhtmllit
 
-[17]: #parameters-6
+[17]: #parameters-7
 
-[18]: #encryptzip
+[18]: #togglelock
 
-[19]: #parameters-7
+[19]: #injectvieweriframe
 
-[20]: #decryptzip
+[20]: #parameters-8
 
-[21]: #parameters-8
+[21]: #encryption-and-decryption-utilities
 
-[22]: #decryptwithsymmetrickey
+[22]: #zipandencryptstring
 
 [23]: #parameters-9
 
-[24]: #encryptwithsymmetrickey
+[24]: #zipandencryptfiles
 
 [25]: #parameters-10
 
-[26]: #encryptwithpubkey
+[26]: #encryptzip
 
 [27]: #parameters-11
 
-[28]: #decryptwithprivkey
+[28]: #decryptzip
 
 [29]: #parameters-12
 
-[30]: #other-utilities
+[30]: #decryptwithsymmetrickey
 
-[31]: #filetodataurl
+[31]: #parameters-13
 
-[32]: #parameters-13
+[32]: #encryptwithsymmetrickey
 
-[33]: #checkandsignauthmessage
+[33]: #parameters-14
 
-[34]: #parameters-14
+[34]: #encryptwithpubkey
 
-[35]: #types
+[35]: #parameters-15
 
-[36]: #authsig
+[36]: #decryptwithprivkey
 
-[37]: #properties
+[37]: #parameters-16
 
-[38]: #litchain
+[38]: #other-utilities
 
-[39]: #properties-1
+[39]: #filetodataurl
 
-[40]: #lit_chains
+[40]: #parameters-17
 
-[41]: #injectvieweriframe
+[41]: #checkandsignauthmessage
 
-[42]: #parameters-15
+[42]: #parameters-18
 
-[43]: #findlits
+[43]: #types
 
-[44]: #parameters-16
+[44]: #authsig
 
-[45]: #sendlit
+[45]: #properties
 
-[46]: #parameters-17
+[46]: #litchain
 
-[47]: #unlocklitwithkey
+[47]: #properties-1
 
-[48]: #parameters-18
+[48]: #lit_chains
 
 [49]: https://github.com/LIT-Protocol/lit-js-sdk/blob/main/README.md
 
@@ -447,9 +447,9 @@ Returns **[promise][56]** A promise that will resolve when the LIT is unlocked
 
 [54]: #authsig
 
-[55]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[55]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
 
-[56]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[56]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
 
 [57]: https://developer.mozilla.org/docs/Web/API/Blob
 

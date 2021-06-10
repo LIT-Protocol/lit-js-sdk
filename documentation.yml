@@ -4,8 +4,12 @@ toc:
       Welcome to the LIT JS SDK API documentation.  To understand how these functions fit together, please view the README in the github repo for this SDK, located at https://github.com/LIT-Protocol/lit-js-sdk/blob/main/README.md
   - mintLIT
   - LitNodeClient
+  - unlockLitWithKey
+  - findLITs
+  - sendLIT
   - createHtmlLIT
   - toggleLock
+  - injectViewerIFrame
   - name: Encryption and decryption utilities
   - zipAndEncryptString
   - zipAndEncryptFiles
