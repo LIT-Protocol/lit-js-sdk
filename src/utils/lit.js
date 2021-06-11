@@ -260,6 +260,7 @@ export async function createHtmlLIT ({
       unlockButton.onclick = function() {
         LitJsSdk.default.toggleLock()
       }
+      unlockButton.disabled = true
     </script>
   </body>
 </html>
