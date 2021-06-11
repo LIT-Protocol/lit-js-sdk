@@ -1,3 +1,19 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [LIT Protocol JS SDK](#lit-protocol-js-sdk)
+  - [State of the network today](#state-of-the-network-today)
+  - [How does the LIT protocol work?](#how-does-the-lit-protocol-work)
+  - [Installation](#installation)
+  - [Using the LIT Protocol](#using-the-lit-protocol)
+    - [Minting LITs](#minting-lits)
+    - [Unlocking LITs](#unlocking-lits)
+  - [API](#api)
+  - [Questions or Support](#questions-or-support)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 # LIT Protocol JS SDK
 

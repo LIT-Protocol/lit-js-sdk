@@ -233,13 +233,30 @@ export async function createHtmlLIT ({
       var chain = "${chain}"
       var locked = true
       var useLitPostMessageProxy = false
+
+      document.addEventListener('lit-ready', function(){
+        var unlockButton = document.getElementById('unlockButton')
+        if (unlockButton) {
+          unlockButton.disabled = false
+        }
+
+        var loadingSpinner = document.getElementById('loadingSpinner')
+        if (loadingSpinner) {
+          loadingSpinner.style = 'display: none;'
+        }
+
+        var loadingText = document.getElementById('loadingText')
+        if (loadingText){
+          loadingText.innerText = ''
+        }
+      })
     </script>
     <script onload='LitJsSdk.default.litJsSdkLoadedInALIT()' src="https://jscdn.litgateway.com/index.web.js"></script>
   </head>
   <body>
     <div id="root">${htmlBody}</div>
     <script>
-      const unlockButton = document.getElementById('unlockButton')
+      var unlockButton = document.getElementById('unlockButton')
       unlockButton.onclick = function() {
         LitJsSdk.default.toggleLock()
       }

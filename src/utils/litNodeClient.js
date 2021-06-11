@@ -301,10 +301,10 @@ export default class LitNodeClient {
         return
       }
       this.connectedNodes.add(peerId)
-      // handshake.  wait a second for the connection to settle.
+      // handshake.  wait a bit for the connection to settle.
       setTimeout(async () => {
         await this.handshakeWithSgx({ peerId })
-      }, 1000)
+      }, 500)
     })
 
     // Listen for peers disconnecting
@@ -319,13 +319,13 @@ export default class LitNodeClient {
     this.libp2p.multiaddrs.forEach((ma) => console.debug(`${ma.toString()}/p2p/${this.libp2p.peerId.toB58String()}`))
 
     const interval = window.setInterval(() => {
-      if (Array.from(this.connectedNodes).length >= this.config.minNodeCount) {
+      if (Object.keys(this.serverPubKeys).length >= this.config.minNodeCount) {
         clearInterval(interval)
         this.ready = true
         console.debug('lit is ready')
         document.dispatchEvent(new Event('lit-ready'))
       }
-    }, 1000)
+    }, 500)
 
     // Export libp2p to the window so you can play with the API
     window.libp2p = this.libp2p
