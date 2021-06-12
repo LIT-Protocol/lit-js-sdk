@@ -21,7 +21,7 @@ The LIT Protocol provides a decentralized way to encrypt and lock content that c
 
 ## State of the network today
 
-Right now, the LIT Protocol is in an alpha state.  It is unaudited and the nodes are not as distributed as they will be when we launch a mainnet.  The network is not ready to store high value things like crypto wallets or private keys, because the cryptoeconomic guarantees that will protect the network are not in place yet.  That said, it is highly unlikely that any locked or private content would leak or be exposed given that the architecture of the network is inherently secure and private.
+Right now, the LIT Protocol is in an alpha state.  It is unaudited and the nodes are not as distributed as they will be when we launch a mainnet.  There are various security improvements to be made, and cryptoeconomic guarantees as a result of staking are not in place yet.  However, we believe it is highly unlikely that any locked or private content would leak or be exposed given that the architecture of the network is inherently secure and private.
 
 ## How does the LIT protocol work?
 

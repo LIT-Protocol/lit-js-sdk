@@ -49,8 +49,20 @@ export async function getMerkleProof ({ tokenAddress, balanceStorageSlot, tokenI
   const rpcBlock = await web3.request({ method: 'eth_getBlockByNumber', params: ['latest', false] })
   console.log('rpcBlock: ', rpcBlock)
   // const rpcProof = await web3.eth.getProof(tokenAddress, [storageAddress], rpcBlock.number)
-  const rpcProof = await web3.request({ method: 'eth_getProof', params: [tokenAddress, [storageAddress], rpcBlock.number] })
-  console.log('rpcProof: ', rpcProof)
+
+  // you may need to try the below twicce because sometimes the proof isn't available for the latest block on polygon because the node just isn't fast enough
+  let tries = 0
+  let rpcProof = null
+  while (!rpcProof && tries < 3) {
+    try {
+      rpcProof = await web3.request({ method: 'eth_getProof', params: [tokenAddress, [storageAddress], rpcBlock.number] })
+      console.log('rpcProof: ', rpcProof)
+    } catch (e) {
+      console.log(e)
+      console.log(`error getting rpc proof, have made ${tries} attempts`)
+      tries++
+    }
+  }
 
   return {
     header: rpcBlock,
