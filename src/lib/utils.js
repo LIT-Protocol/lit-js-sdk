@@ -9,3 +9,9 @@ export const kFragKey = ({ tokenAddress, tokenId, chain }) => {
   const cid = new CID(hashed)
   return cid.toString()
 }
+
+export const printError = (e) => {
+  console.log('Error Stack', e.stack)
+  console.log('Error Name', e.name)
+  console.log('Error Message', e.message)
+}

@@ -80,7 +80,7 @@ export const LIT_CHAINS = {
     name: 'Polygon',
     symbol: 'MATIC',
     decimals: 18,
-    rpcUrls: ['https://rpc-mainnet.maticvigil.com'],
+    rpcUrls: ['https://floral-rough-flower.matic.quiknode.pro/a17b25f97cc396bb2b6aaf85a005f579bf93dc73/'],
     blockExplorerUrls: ['https://explorer.matic.network'],
     balanceStorageSlot: 1,
     type: 'ERC1155'

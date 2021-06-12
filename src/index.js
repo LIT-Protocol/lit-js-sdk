@@ -30,7 +30,7 @@ import {
 } from './utils/browser'
 
 import { LIT_CHAINS, protobufs } from './lib/constants'
-import { kFragKey } from './lib/utils'
+import { kFragKey, printError } from './lib/utils'
 
 import LitNodeClient from './utils/litNodeClient'
 
@@ -70,7 +70,8 @@ const functions = {
   sendLIT,
   litJsSdkLoadedInALIT,
   unlockLitWithKey,
-  injectViewerIFrame
+  injectViewerIFrame,
+  printError
 }
 
 export default functions
