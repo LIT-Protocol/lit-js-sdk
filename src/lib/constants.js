@@ -85,6 +85,17 @@ export const LIT_CHAINS = {
     balanceStorageSlot: 1,
     type: 'ERC1155'
   },
+  fantom: {
+    contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
+    chainId: 250,
+    name: 'Fantom',
+    symbol: 'FTM',
+    decimals: 18,
+    rpcUrls: ['https://rpcapi.fantom.network'],
+    blockExplorerUrls: ['https://ftmscan.com'],
+    balanceStorageSlot: 1,
+    type: 'ERC1155'
+  },
   ethereum: {
     contractAddress: '0x55485885e82E25446DEC314Ccb810Bda06B9e01B',
     chainId: 1,
