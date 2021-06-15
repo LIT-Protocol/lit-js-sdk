@@ -3,6 +3,7 @@ import Libp2p from 'libp2p'
 import Websockets from 'libp2p-websockets'
 import WebRTCDirect from '@lit-protocol/libp2p-webrtc-direct'
 import { NOISE } from 'libp2p-noise'
+import { FaultTolerance } from 'libp2p/src/transport-manager'
 import Mplex from 'libp2p-mplex'
 import KadDHT from 'libp2p-kad-dht'
 import PeerId from 'peer-id'
@@ -141,6 +142,13 @@ export default class LitNodeClient {
       document.dispatchEvent(new Event('lit-authFailure'))
       return { success: false }
     }
+    const badRespCount = resps.filter(k => k === false).length
+    console.log('bad resp count', badRespCount)
+    if ((numShares - badRespCount) < this.config.minNodeCount) {
+      alert('An error occurred and your LIT was not stored.  Please try again.')
+      document.dispatchEvent(new Event('lit-storageFailure'))
+      return { success: false }
+    }
     console.log('all stored: ', resps)
     return { success: true }
   }
@@ -150,7 +158,7 @@ export default class LitNodeClient {
     const normalizedTokenAddress = tokenAddress.toLowerCase()
     const keyId = kFragKey({ tokenAddress, tokenId, chain })
     const cid = new CID(keyId)
-    const providers = await all(this.libp2p.contentRouting.findProviders(cid, { timeout: 3000 }))
+    const providers = await all(this.libp2p.contentRouting.findProviders(cid, { timeout: 60000 }))
     console.log(`Found ${providers.length} providers`)
     const kFragPromises = []
     for (let i = 0; i < providers.length; i++) {
@@ -282,6 +290,9 @@ export default class LitNodeClient {
         streamMuxer: [Mplex],
         dht: KadDHT,
         peerDiscovery: [Bootstrap]
+      },
+      transportManager: {
+        faultTolerance: FaultTolerance.NO_FATAL // dont care if cant listen
       },
       config: {
         dht: {
