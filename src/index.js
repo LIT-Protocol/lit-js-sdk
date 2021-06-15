@@ -42,10 +42,13 @@ import {
   inIframe
 } from './utils/frameComms'
 
-if (inIframe()) {
-  listenForFrameParentMessages()
-} else {
-  listenForChildFrameMessages()
+if (typeof window !== 'undefined') {
+  // only run this in browser
+  if (inIframe()) {
+    listenForFrameParentMessages()
+  } else {
+    listenForChildFrameMessages()
+  }
 }
 
 const functions = {
