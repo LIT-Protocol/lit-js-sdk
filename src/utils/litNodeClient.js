@@ -45,7 +45,7 @@ export default class LitNodeClient {
     this.serverPubKeys = {}
     this.ready = false
 
-    if (window && window.localStorage) {
+    if (typeof window !== 'undefined' && window && window.localStorage) {
       let configOverride = window.localStorage.getItem('LitNodeClientConfig')
       if (configOverride) {
         configOverride = JSON.parse(configOverride)
