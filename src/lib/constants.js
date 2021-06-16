@@ -95,7 +95,8 @@ export const LIT_CHAINS = {
     rpcUrls: ['https://rpcapi.fantom.network'],
     blockExplorerUrls: ['https://ftmscan.com'],
     balanceStorageSlot: 1,
-    type: 'ERC1155'
+    type: 'ERC1155',
+    websocketUrl: 'wss://wsapi.fantom.network'
   },
   ethereum: {
     contractAddress: '0x55485885e82E25446DEC314Ccb810Bda06B9e01B',
