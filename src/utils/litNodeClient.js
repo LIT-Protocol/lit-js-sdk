@@ -135,6 +135,7 @@ export default class LitNodeClient {
       )
     }
     const resps = await Promise.all(storagePromises)
+    console.log('resps: ', resps)
     if (resps.some(k => k === 'AUTH_FAILURE')) {
       if (this.config.alertWhenUnauthorized) {
         alert('You are not authorized to publish to this LIT')
@@ -149,7 +150,7 @@ export default class LitNodeClient {
       document.dispatchEvent(new Event('lit-storageFailure'))
       return { success: false }
     }
-    console.log('all stored: ', resps)
+
     return { success: true }
   }
 
@@ -177,6 +178,7 @@ export default class LitNodeClient {
       )
     }
     const kFrags = await Promise.all(kFragPromises)
+    console.log('kFrags: ', kFrags)
     return kFrags
   }
 

@@ -86,18 +86,18 @@ export const LIT_CHAINS = {
     type: 'ERC1155',
     websocketUrl: 'wss://floral-rough-flower.matic.quiknode.pro/a17b25f97cc396bb2b6aaf85a005f579bf93dc73/'
   },
-  fantom: {
-    contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
-    chainId: 250,
-    name: 'Fantom',
-    symbol: 'FTM',
-    decimals: 18,
-    rpcUrls: ['https://rpcapi.fantom.network'],
-    blockExplorerUrls: ['https://ftmscan.com'],
-    balanceStorageSlot: 1,
-    type: 'ERC1155',
-    websocketUrl: 'wss://wsapi.fantom.network'
-  },
+  // fantom: { // the block hashes on fantom are funky and prevent it from producing the proper merkle proof
+  //   contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
+  //   chainId: 250,
+  //   name: 'Fantom',
+  //   symbol: 'FTM',
+  //   decimals: 18,
+  //   rpcUrls: ['https://rpcapi.fantom.network'],
+  //   blockExplorerUrls: ['https://ftmscan.com'],
+  //   balanceStorageSlot: 1,
+  //   type: 'ERC1155',
+  //   websocketUrl: 'wss://wsapi.fantom.network'
+  // },
   ethereum: {
     contractAddress: '0x55485885e82E25446DEC314Ccb810Bda06B9e01B',
     chainId: 1,
