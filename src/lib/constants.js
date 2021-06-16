@@ -83,7 +83,8 @@ export const LIT_CHAINS = {
     rpcUrls: ['https://floral-rough-flower.matic.quiknode.pro/a17b25f97cc396bb2b6aaf85a005f579bf93dc73/'],
     blockExplorerUrls: ['https://explorer.matic.network'],
     balanceStorageSlot: 1,
-    type: 'ERC1155'
+    type: 'ERC1155',
+    websocketUrl: 'wss://floral-rough-flower.matic.quiknode.pro/a17b25f97cc396bb2b6aaf85a005f579bf93dc73/'
   },
   fantom: {
     contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
@@ -103,7 +104,8 @@ export const LIT_CHAINS = {
     symbol: 'ETH',
     decimals: 18,
     balanceStorageSlot: 1,
-    type: 'ERC1155'
+    type: 'ERC1155',
+    websocketUrl: 'wss://mainnet.infura.io/ws/v3/ddf1ca3700f34497bca2bf03607fde38'
   },
   kovan: {
     contractAddress: '0xA9b2180C2A479Ba9b263878C4d81AE4e0E717846',

@@ -142,7 +142,7 @@ export default class LitNodeClient {
       document.dispatchEvent(new Event('lit-authFailure'))
       return { success: false }
     }
-    const badRespCount = resps.filter(k => k === false).length
+    const badRespCount = resps.filter(k => k === false || k.error).length
     console.log('bad resp count', badRespCount)
     if ((numShares - badRespCount) < this.config.minNodeCount) {
       alert('An error occurred and your LIT was not stored.  Please try again.')
