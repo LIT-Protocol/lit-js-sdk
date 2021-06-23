@@ -292,20 +292,20 @@ export async function toggleLock () {
     }
 
     // get the merkle proof
-    const { balanceStorageSlot } = LIT_CHAINS[window.chain]
-    let merkleProof = null
-    try {
-      merkleProof = await getMerkleProof({ tokenAddress: window.tokenAddress, balanceStorageSlot, tokenId: window.tokenId })
-    } catch (e) {
-      console.log(e)
-      alert('Error - could not obtain merkle proof.  Some nodes do not support this operation yet.  Please try another ETH node.')
-      return
-    }
+    // const { balanceStorageSlot } = LIT_CHAINS[window.chain]
+    // let merkleProof = null
+    // try {
+    //   merkleProof = await getMerkleProof({ tokenAddress: window.tokenAddress, balanceStorageSlot, tokenId: window.tokenId })
+    // } catch (e) {
+    //   console.log(e)
+    //   alert('Error - could not obtain merkle proof.  Some nodes do not support this operation yet.  Please try another ETH node.')
+    //   return
+    // }
 
     if (window.useLitPostMessageProxy) {
       // instead of asking the network for the key part, ask the parent frame
       // the parentframe will then call unlockLit() with the encryption key
-      sendMessageToFrameParent({ command: 'getEncryptionKey', target: 'LitNodeClient', params: { tokenAddress: window.tokenAddress, tokenId: window.tokenId, chain: window.chain, authSig, merkleProof } })
+      sendMessageToFrameParent({ command: 'getEncryptionKey', target: 'LitNodeClient', params: { tokenAddress: window.tokenAddress, tokenId: window.tokenId, chain: window.chain, authSig } })
       return
     }
 
@@ -314,8 +314,7 @@ export async function toggleLock () {
       tokenAddress: window.tokenAddress,
       tokenId: window.tokenId,
       authSig,
-      chain: window.chain,
-      merkleProof
+      chain: window.chain
     })
 
     await unlockLitWithKey({ symmetricKey })
