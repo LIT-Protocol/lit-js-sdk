@@ -53,6 +53,7 @@
     "libp2p-websockets": "^0.15.6",
     "multiaddr": "^9.0.1",
     "multihashing": "^0.3.3",
+    "pako": "^2.0.3",
     "peer-id": "^0.14.8",
     "protons": "^2.0.1",
     "secrets.js-lit": "^2.0.1",

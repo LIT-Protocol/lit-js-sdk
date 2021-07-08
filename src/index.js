@@ -31,6 +31,7 @@ import {
 
 import { LIT_CHAINS, protobufs } from './lib/constants'
 import { kFragKey, printError } from './lib/utils'
+import { init } from './lib/bls-sdk.js'
 
 import LitNodeClient from './utils/litNodeClient'
 
@@ -50,6 +51,10 @@ if (typeof window !== 'undefined') {
     listenForChildFrameMessages()
   }
 }
+
+init().then((exports) => {
+  window.wasmExports = exports
+})
 
 const functions = {
   zipAndEncryptString,
