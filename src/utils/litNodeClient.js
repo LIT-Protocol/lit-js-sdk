@@ -17,6 +17,7 @@ import all from 'it-all'
 import naclUtil from 'tweetnacl-util'
 
 import { mostCommonString } from '../lib/utils'
+import { wasmBlsSdkHelpers } from '../lib/bls-sdk'
 import { encryptWithPubKey, decryptWithPrivKey } from './crypto'
 
 /**
@@ -68,27 +69,58 @@ export default class LitNodeClient {
   /**
  * Securely save the symmetric encryption key to the LIT nodes.
  * @param {Object} params
- * @param {string} params.tokenAddress The token address of the NFT that corresponds to this LIT.  This should be an ERC721 or ERC1155 token.
- * @param {string} params.tokenId The token ID of the NFT that corresponds to this LIT
+ * @param {Array} params.accessControlConditions The access control conditions under which this key will be able to be decrypted
  * @param {string} params.chain The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
  * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
  * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be split up using threshold encryption so that the LIT nodes cannot decrypt a given LIT.
  * @returns {Object} An object that gives the status of the operation, denoted via a boolean with the key "success"
  */
   async saveEncryptionKey ({ accessControlConditions, chain, authSig, symmetricKey }) {
+    /* accessControlConditions looks like this:
+    accessControlConditions: [
+        {
+          contractAddress: tokenAddress,
+          method: 'balanceOf',
+          parameters: [
+            ':userAddress',
+            tokenId
+          ],
+          returnValueTest: {
+            comparator: '>',
+            value: 0
+          }
+        }
+      ]
+    */
     // encrypt with network pubkey
-
+    const encryptedKey = wasmBlsSdkHelpers.encrypt(uint8arrayFromString(this.subnetPubKey, 'base16'), symmetricKey)
     // hash the encrypted pubkey
-
+    const hashOfKey = await crypto.subtle.digest('SHA-256', encryptedKey)
+    // hash the access control conditions
+    const conditions = JSON.stringify(accessControlConditions)
+    const encoder = new TextEncoder()
+    const data = encoder.encode(conditions)
+    const hashOfConditions = await crypto.subtle.digest('SHA-256', data)
     // create access control conditions on lit nodes
+    const nodePromises = []
+    for (const url in this.connectedNodes) {
+      nodePromises.push(this.storeEncryptionConditionWithNode({ url, key: hashOfConditions, val: hashOfKey }))
+    }
   }
 
   async getEncryptionKeyDecryptionShares ({ accessControlConditions, authSig, chain }) {
 
   }
 
-  async storeDataWithNode ({ peerId, accessControlConditions, fragmentNumber, val, authSig, chain }) {
-
+  async storeEncryptionConditionWithNode ({ url, key, val, authSig, chain }) {
+    const urlWithPath = `${url}/web/encryption/store`
+    const data = {
+      key,
+      val,
+      authSig,
+      chain
+    }
+    return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
   async getDataFromNode ({ peerId, accessControlConditions, authSig, chain }) {
@@ -115,6 +147,7 @@ export default class LitNodeClient {
       .then(response => response.json())
       .then(data => {
         console.log('Success:', data)
+        return data
       })
   }
 
@@ -143,5 +176,7 @@ export default class LitNodeClient {
         document.dispatchEvent(new Event('lit-ready'))
       }
     }, 500)
+
+    window.wasmBlsSdkHelpers = wasmBlsSdkHelpers // for debug
   }
 }

@@ -100,11 +100,11 @@ function base64ToUint8Array (b) {
 
 let isWasming = false
 
-const wasmHelpers = new function () {
+export const wasmBlsSdkHelpers = new function () {
   // s is secret key unit8array
   this.sk_bytes_to_pk_bytes = function (s) {
     isWasming = true
-    let pkBytes = []
+    const pkBytes = []
     try {
       // set sk bytes
       for (let i = 0; i < s.length; i++) {
@@ -129,7 +129,7 @@ const wasmHelpers = new function () {
   // m is message uint8array
   this.sign_msg = function (s, m) {
     isWasming = true
-    let sigBytes = []
+    const sigBytes = []
     try {
       // set secret key bytes
       for (let i = 0; i < s.length; i++) {
@@ -187,7 +187,7 @@ const wasmHelpers = new function () {
       return
     }
     const RNG_VALUES_SIZE = wasmExports.get_rng_values_size()
-    let rngValues = new Uint32Array(RNG_VALUES_SIZE)
+    const rngValues = new Uint32Array(RNG_VALUES_SIZE)
     window.crypto.getRandomValues(rngValues)
     for (let i = 0; i < rngValues.length; i++) {
       wasmExports.set_rng_value(i, rngValues[i])
@@ -198,7 +198,7 @@ const wasmHelpers = new function () {
   // m is message uint8array
   this.encrypt = function (p, m) {
     isWasming = true
-    let ctBytes = []
+    const ctBytes = []
     try {
       wasmHelpers.set_rng_values()
       // set public key bytes
@@ -228,7 +228,7 @@ const wasmHelpers = new function () {
   // c is message uint8array
   this.decrypt = function (s, c) {
     isWasming = true
-    let msgBytes = []
+    const msgBytes = []
     try {
       // set secret key bytes
       for (let i = 0; i < s.length; i++) {
@@ -253,9 +253,9 @@ const wasmHelpers = new function () {
 
   this.generate_poly = function (threshold) {
     wasmHelpers.set_rng_values()
-    let polySize = poly_sizes_by_threshold[threshold]
+    const polySize = poly_sizes_by_threshold[threshold]
     wasmExports.generate_poly(threshold)
-    let polyBytes = []
+    const polyBytes = []
     for (let i = 0; i < polySize; i++) {
       const polyByte = wasmExports.get_poly_byte(i)
       polyBytes.push(polyByte)
@@ -283,7 +283,7 @@ const wasmHelpers = new function () {
 
   this.get_mc_bytes = function (threshold) {
     const mcBytes = []
-    let mcSize = commitment_sizes_by_threshold[threshold]
+    const mcSize = commitment_sizes_by_threshold[threshold]
     for (let i = 0; i < mcSize; i++) {
       const mcByte = wasmExports.get_mc_byte(i)
       mcBytes.push(mcByte)
@@ -323,9 +323,9 @@ const wasmHelpers = new function () {
     // set the signature shares
     for (let shareIndex = 0; shareIndex < sigshares.length; shareIndex++) {
       const share = sigshares[shareIndex]
-      let sigHex = share.shareHex
-      let sigBytes = hexToUint8Array(sigHex)
-      let sigIndex = share.shareIndex
+      const sigHex = share.shareHex
+      const sigBytes = hexToUint8Array(sigHex)
+      const sigIndex = share.shareIndex
       for (let byteIndex = 0; byteIndex < sigBytes.length; byteIndex++) {
         const sigByte = sigBytes[byteIndex]
         // NB shareIndex is used instead of sigIndex so we can interate
@@ -340,7 +340,7 @@ const wasmHelpers = new function () {
     // combine the signatures
     wasmExports.combine_signature_shares(sigshares.length, mcBytes.length)
     // read the combined signature
-    let sigBytes = []
+    const sigBytes = []
     for (let i = 0; i < sigLen; i++) {
       const sigByte = wasmExports.get_sig_byte(i)
       sigBytes.push(sigByte)
@@ -366,7 +366,7 @@ const wasmHelpers = new function () {
     // set derivedShareIndex
     wasmExports.set_share_indexes(uiShareIndex, derivedShareIndex)
     // read decryption share
-    let dshareBytes = []
+    const dshareBytes = []
     for (let i = 0; i < decryptionShareLen; i++) {
       const dshareByte = wasmExports.get_decryption_shares_byte(i, uiShareIndex)
       dshareBytes.push(dshareByte)
@@ -383,7 +383,7 @@ const wasmHelpers = new function () {
     // combine decryption shares
     const msgSize = wasmExports.combine_decryption_shares(totalShares, mcSize, ctSize)
     // read msg
-    let msgBytes = []
+    const msgBytes = []
     for (let i = 0; i < msgSize; i++) {
       const msgByte = wasmExports.get_msg_byte(i)
       msgBytes.push(msgByte)
@@ -404,7 +404,7 @@ async function load (module, imports) {
   }
 }
 
-export async function init () {
+export async function initWasmBlsSdk () {
   let b = ''
 
   b += 'eNrsvQt4XtdVIHre5/wv6bct27LkxzknTpHzaJXElp3EcXycOI7rpEnbtA1toGkbN8nvPPxqaS9'
@@ -2787,7 +2787,7 @@ export async function init () {
   const { instance, module } = await load(await input, imports)
 
   wasm = instance.exports
-  init.__wbindgen_wasm_module = module
+  initWasmBlsSdk.__wbindgen_wasm_module = module
 
   return wasm
 }

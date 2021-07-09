@@ -30,7 +30,7 @@ import {
 
 import { LIT_CHAINS, protobufs } from './lib/constants'
 import { kFragKey, printError } from './lib/utils'
-import { init } from './lib/bls-sdk.js'
+import { initWasmBlsSdk } from './lib/bls-sdk.js'
 
 import LitNodeClient from './utils/litNodeClient'
 
@@ -51,7 +51,7 @@ if (typeof window !== 'undefined') {
   }
 }
 
-init().then((exports) => {
+initWasmBlsSdk().then((exports) => {
   window.wasmExports = exports
 })
 

@@ -27,7 +27,7 @@ const PACKAGE_CACHE = {}
  * @param {string} string The string to zip and encrypt
  * @returns {Object} The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a single file called "string.txt"
  */
-export async function zipAndEncryptString (string) {
+export async function zipAndEncryptString(string) {
   const zip = new JSZip()
   zip.file('string.txt', string)
   return encryptZip(zip)
@@ -38,7 +38,7 @@ export async function zipAndEncryptString (string) {
  * @param {array} files An array of the files you wish to zip and encrypt
  * @returns {Object} The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
  */
-export async function zipAndEncryptFiles (files) {
+export async function zipAndEncryptFiles(files) {
   // let's zip em
   const zip = new JSZip()
   for (let i = 0; i < files.length; i++) {
@@ -53,7 +53,7 @@ export async function zipAndEncryptFiles (files) {
  * @param {Object} symmKey An object containing the symmetric key used that will be used to decrypt this zip.
  * @returns {Array} An array of the decrypted files inside the zip.
  */
-export async function decryptZip (encryptedZipBlob, symmKey) {
+export async function decryptZip(encryptedZipBlob, symmKey) {
   // const keypair = await checkAndDeriveKeypair()
 
   // console.log('Got keypair out of localstorage: ' + keypair)
@@ -97,7 +97,7 @@ export async function decryptZip (encryptedZipBlob, symmKey) {
  * @param {JSZip} zip The JSZip instance to encrypt
  * @returns {Object} The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.
  */
-export async function encryptZip (zip) {
+export async function encryptZip(zip) {
   const zipBlob = await zip.generateAsync({ type: 'blob' })
   const zipBlobArrayBuffer = await zipBlob.arrayBuffer()
   console.log('blob', zipBlob)
@@ -111,7 +111,7 @@ export async function encryptZip (zip) {
   // to download the encrypted zip file for testing, uncomment this
   // saveAs(encryptedZipBlob, 'encrypted.bin')
 
-  const exportedSymmKey = await crypto.subtle.exportKey('jwk', symmKey)
+  const exportedSymmKey = await crypto.subtle.exportKey('raw', symmKey)
   console.log('exportedSymmKey', exportedSymmKey)
 
   // encrypt the symmetric key with the
@@ -164,7 +164,7 @@ export async function encryptZip (zip) {
   }
 }
 
-async function getNpmPackage (packageName) {
+async function getNpmPackage(packageName) {
   // console.log('getting npm package: ' + packageName)
   if (PACKAGE_CACHE[packageName]) {
     // console.log('found in cache')
@@ -197,7 +197,7 @@ async function getNpmPackage (packageName) {
  * @param {Array} [params.npmPackages=[]] An array of strings of NPM package names that should be embedded into this LIT.  These packages will be pulled down via unpkg, converted to data URLs, and embedded in the LIT HTML.  You can include any packages from npmjs.com.
  * @returns {string} The HTML string that is now a LIT.  You can send this HTML around and only token holders will be able to unlock and decrypt the content inside it.  Included in the HTML is this LIT JS SDK itself, the encrypted locked content, an automatic connection to the LIT nodes network, and a handler for a button with id "unlockButton" which will perform the unlock operation when clicked.
  */
-export async function createHtmlLIT ({
+export async function createHtmlLIT({
   title,
   htmlBody,
   css,
@@ -271,7 +271,7 @@ export async function createHtmlLIT ({
  * Lock and unlock the encrypted content inside a LIT.  This content is only viewable by holders of the NFT that corresponds to this LIT.  Locked content will be decrypted and placed into the HTML element with id "mediaGridHolder".  The HTML element with the id "lockedHeader" will have it's text automatically changed to LOCKED or UNLOCKED to denote the state of the LIT.  Note that if you're creating a LIT using the createHtmlLIT function, you do not need to use this function, because this function is automatically bound to any button in your HTML with the id "unlockButton".
  * @returns {Promise} the promise will resolve when the LIT has been unlocked or an error message has been shown informing the user that they are not authorized to unlock the LIT
  */
-export async function toggleLock () {
+export async function toggleLock() {
   const mediaGridHolder = document.getElementById('mediaGridHolder')
   const lockedHeader = document.getElementById('lockedHeader')
 
@@ -331,7 +331,7 @@ export async function toggleLock () {
  * @param {Object} params.symmetricKey The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
  * @returns {promise} A promise that will resolve when the LIT is unlocked
  */
-export async function unlockLitWithKey ({ symmetricKey }) {
+export async function unlockLitWithKey({ symmetricKey }) {
   const mediaGridHolder = document.getElementById('mediaGridHolder')
   const lockedHeader = document.getElementById('lockedHeader')
 
