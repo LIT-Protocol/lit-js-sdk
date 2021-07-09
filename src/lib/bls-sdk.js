@@ -200,7 +200,7 @@ export const wasmBlsSdkHelpers = new function () {
     isWasming = true
     const ctBytes = []
     try {
-      wasmHelpers.set_rng_values()
+      wasmBlsSdkHelpers.set_rng_values()
       // set public key bytes
       for (let i = 0; i < p.length; i++) {
         wasmExports.set_pk_byte(i, p[i])
@@ -221,7 +221,7 @@ export const wasmBlsSdkHelpers = new function () {
       isWasming = false
     }
     isWasming = false
-    return ctBytes
+    return Uint8Array.from(ctBytes)
   }
 
   // s is secret key uint8array
@@ -252,7 +252,7 @@ export const wasmBlsSdkHelpers = new function () {
   }
 
   this.generate_poly = function (threshold) {
-    wasmHelpers.set_rng_values()
+    wasmBlsSdkHelpers.set_rng_values()
     const polySize = poly_sizes_by_threshold[threshold]
     wasmExports.generate_poly(threshold)
     const polyBytes = []
@@ -319,7 +319,7 @@ export const wasmBlsSdkHelpers = new function () {
 
   this.combine_signatures = function (mcBytes, sigshares) {
     // set master commitment in wasm
-    wasmHelpers.set_mc_bytes(mcBytes)
+    wasmBlsSdkHelpers.set_mc_bytes(mcBytes)
     // set the signature shares
     for (let shareIndex = 0; shareIndex < sigshares.length; shareIndex++) {
       const share = sigshares[shareIndex]

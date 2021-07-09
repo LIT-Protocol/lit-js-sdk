@@ -76,6 +76,7 @@ export default class LitNodeClient {
  * @returns {Object} An object that gives the status of the operation, denoted via a boolean with the key "success"
  */
   async saveEncryptionKey ({ accessControlConditions, chain, authSig, symmetricKey }) {
+    console.log('saveEncryptionKey')
     /* accessControlConditions looks like this:
     accessControlConditions: [
         {
@@ -96,16 +97,23 @@ export default class LitNodeClient {
     const encryptedKey = wasmBlsSdkHelpers.encrypt(uint8arrayFromString(this.subnetPubKey, 'base16'), symmetricKey)
     // hash the encrypted pubkey
     const hashOfKey = await crypto.subtle.digest('SHA-256', encryptedKey)
+    const hashOfKeyStr = uint8arrayToString(new Uint8Array(hashOfKey), 'base16')
+    window.hashOfKey = hashOfKey
+    window.uint8arrayToString = uint8arrayToString
+    console.log('hashOfKey', hashOfKey)
+    console.log('hashOfKeyStr', hashOfKeyStr)
     // hash the access control conditions
     const conditions = JSON.stringify(accessControlConditions)
     const encoder = new TextEncoder()
     const data = encoder.encode(conditions)
     const hashOfConditions = await crypto.subtle.digest('SHA-256', data)
+    const hashOfConditionsStr = uint8arrayToString(new Uint8Array(hashOfConditions), 'base16')
     // create access control conditions on lit nodes
     const nodePromises = []
-    for (const url in this.connectedNodes) {
-      nodePromises.push(this.storeEncryptionConditionWithNode({ url, key: hashOfConditions, val: hashOfKey }))
+    for (const url of this.connectedNodes) {
+      nodePromises.push(this.storeEncryptionConditionWithNode({ url, key: hashOfKeyStr, val: hashOfConditionsStr, authSig, chain }))
     }
+    await Promise.all(nodePromises)
   }
 
   async getEncryptionKeyDecryptionShares ({ accessControlConditions, authSig, chain }) {
@@ -113,11 +121,12 @@ export default class LitNodeClient {
   }
 
   async storeEncryptionConditionWithNode ({ url, key, val, authSig, chain }) {
+    console.log('storeEncryptionConditionWithNode')
     const urlWithPath = `${url}/web/encryption/store`
     const data = {
       key,
       val,
-      authSig,
+      auth_sig: authSig,
       chain
     }
     return await this.sendCommandToNode({ url: urlWithPath, data })
@@ -137,6 +146,7 @@ export default class LitNodeClient {
   }
 
   async sendCommandToNode ({ url, data }) {
+    console.log(`sendCommandToNode with url ${url} and data`, data)
     return await fetch(url, {
       method: 'POST',
       headers: {
