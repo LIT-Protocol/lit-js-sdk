@@ -96,21 +96,32 @@ export default class LitNodeClient {
   }
 
   async handshakeWithSgx ({ url }) {
-    console.debug(`handshakeWithSgx ${url}`)
+    const urlWithPath = `${url}/web/handshake`
+    console.debug(`handshakeWithSgx ${urlWithPath}`)
     const data = {
       client_public_key: 'test'
     }
-    return await this.sendCommandToNode({ url, data })
+    return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
   async sendCommandToNode ({ url, data }) {
-
+    return await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data)
+      })
   }
 
   async connect () {
     // handshake with each node
-    for (const url of this.bootstrapUrls) {
-      this.handshakeWithSgx(url)
+    for (const url of this.config.bootstrapUrls) {
+      this.handshakeWithSgx({ url })
         .then(resp => {
           this.connectedNodes.add(url)
           this.serverKeys[url] = {
