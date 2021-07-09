@@ -14,7 +14,6 @@ import {
   connectWeb3,
   mintLIT,
   checkAndSignAuthMessage,
-  getMerkleProof,
   findLITs,
   sendLIT
 } from './utils/eth'
@@ -73,7 +72,6 @@ const functions = {
   encryptWithPubKey,
   decryptWithPrivKey,
   fileToDataUrl,
-  getMerkleProof,
   findLITs,
   sendLIT,
   litJsSdkLoadedInALIT,
