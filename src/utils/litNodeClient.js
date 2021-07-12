@@ -27,7 +27,7 @@ import { encryptWithPubKey, decryptWithPrivKey } from './crypto'
  * @param {number} [config.minNodeCount=8] The minimum number of nodes that must be connected for the LitNodeClient to be ready to use.
  */
 export default class LitNodeClient {
-  constructor (
+  constructor(
     config = {
       alertWhenUnauthorized: true,
       minNodeCount: 2,
@@ -59,11 +59,16 @@ export default class LitNodeClient {
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
    * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
   */
-  async getEncryptionKey ({ accessControlConditions, chain, authSig }) {
+  async getEncryptionKey({ accessControlConditions, toDecrypt, chain, authSig }) {
     // ask each node to decrypt the content
+    const nodePromises = []
+    for (const url of this.connectedNodes) {
+      nodePromises.push(this.getDecryptionShare({ url, accessControlConditions, toDecrypt, authSig, chain }))
+    }
+    const decryptionShares = await Promise.all(nodePromises)
+    console.log('decryptionShares', decryptionShares)
 
     // combine the decryption shares
-
   }
 
   /**
@@ -75,7 +80,7 @@ export default class LitNodeClient {
  * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be split up using threshold encryption so that the LIT nodes cannot decrypt a given LIT.
  * @returns {Object} An object that gives the status of the operation, denoted via a boolean with the key "success"
  */
-  async saveEncryptionKey ({ accessControlConditions, chain, authSig, symmetricKey }) {
+  async saveEncryptionKey({ accessControlConditions, chain, authSig, symmetricKey }) {
     console.log('saveEncryptionKey')
     /* accessControlConditions looks like this:
     accessControlConditions: [
@@ -114,38 +119,44 @@ export default class LitNodeClient {
       nodePromises.push(this.storeEncryptionConditionWithNode({ url, key: hashOfKeyStr, val: hashOfConditionsStr, authSig, chain }))
     }
     await Promise.all(nodePromises)
+
+    return encryptedKey
   }
 
-  async getEncryptionKeyDecryptionShares ({ accessControlConditions, authSig, chain }) {
-
-  }
-
-  async storeEncryptionConditionWithNode ({ url, key, val, authSig, chain }) {
+  async storeEncryptionConditionWithNode({ url, key, val, authSig, chain }) {
     console.log('storeEncryptionConditionWithNode')
     const urlWithPath = `${url}/web/encryption/store`
     const data = {
       key,
       val,
-      auth_sig: authSig,
+      authSig,
       chain
     }
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
-  async getDataFromNode ({ peerId, accessControlConditions, authSig, chain }) {
-
-  }
-
-  async handshakeWithSgx ({ url }) {
-    const urlWithPath = `${url}/web/handshake`
-    console.debug(`handshakeWithSgx ${urlWithPath}`)
+  async getDecryptionShare({ url, accessControlConditions, toDecrypt, authSig, chain }) {
+    console.log('getDecryptionShare')
+    const urlWithPath = `${url}/web/encryption/retrieve`
     const data = {
-      client_public_key: 'test'
+      accessControlConditions,
+      toDecrypt,
+      authSig,
+      chain
     }
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
-  async sendCommandToNode ({ url, data }) {
+  async handshakeWithSgx({ url }) {
+    const urlWithPath = `${url}/web/handshake`
+    console.debug(`handshakeWithSgx ${urlWithPath}`)
+    const data = {
+      clientPublicKey: 'test'
+    }
+    return await this.sendCommandToNode({ url: urlWithPath, data })
+  }
+
+  async sendCommandToNode({ url, data }) {
     console.log(`sendCommandToNode with url ${url} and data`, data)
     return await fetch(url, {
       method: 'POST',
@@ -161,16 +172,16 @@ export default class LitNodeClient {
       })
   }
 
-  async connect () {
+  async connect() {
     // handshake with each node
     for (const url of this.config.bootstrapUrls) {
       this.handshakeWithSgx({ url })
         .then(resp => {
           this.connectedNodes.add(url)
           this.serverKeys[url] = {
-            serverPubKey: resp.server_public_key,
-            subnetPubKey: resp.subnet_public_key,
-            networkPubKey: resp.network_public_key
+            serverPubKey: resp.serverPublicKey,
+            subnetPubKey: resp.subnetPublicKey,
+            networkPubKey: resp.networkPublicKey
           }
         })
     }

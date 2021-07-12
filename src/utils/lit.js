@@ -112,7 +112,7 @@ export async function encryptZip(zip) {
   // saveAs(encryptedZipBlob, 'encrypted.bin')
 
   const exportedSymmKey = await crypto.subtle.exportKey('raw', symmKey)
-  console.log('exportedSymmKey', exportedSymmKey)
+  // console.log('exportedSymmKey', exportedSymmKey)
 
   // encrypt the symmetric key with the
   // public key derived from the eth wallet
@@ -202,8 +202,8 @@ export async function createHtmlLIT({
   htmlBody,
   css,
   encryptedZipDataUrl,
-  tokenAddress,
-  tokenId,
+  accessControlConditions,
+  encryptedSymmetricKey,
   chain,
   npmPackages = []
 }) {
@@ -228,9 +228,9 @@ export async function createHtmlLIT({
     ${scriptTags}
     <script>
       var encryptedZipDataUrl = "${encryptedZipDataUrl}"
-      var tokenAddress = "${tokenAddress}"
-      var tokenId = "${tokenId}"
+      var accessControlConditions = ${accessControlConditions}
       var chain = "${chain}"
+      var encryptedSymmetricKey = "${encryptedSymmetricKey}"
       var locked = true
       var useLitPostMessageProxy = false
 
@@ -311,8 +311,8 @@ export async function toggleLock() {
 
     // get the encryption key
     const symmetricKey = await window.litNodeClient.getEncryptionKey({
-      tokenAddress: window.tokenAddress,
-      tokenId: window.tokenId,
+      accessControlConditions: window.accessControlConditions,
+      toDecrypt: window.encryptedSymmetricKey,
       authSig,
       chain: window.chain
     })
