@@ -69,135 +69,148 @@ export default class LitNodeClient {
     console.log('decryptionShares', decryptionShares)
 
     // combine the decryption shares
-  }
 
-  /**
- * Securely save the symmetric encryption key to the LIT nodes.
- * @param {Object} params
- * @param {Array} params.accessControlConditions The access control conditions under which this key will be able to be decrypted
- * @param {string} params.chain The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
- * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
- * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be split up using threshold encryption so that the LIT nodes cannot decrypt a given LIT.
- * @returns {Object} An object that gives the status of the operation, denoted via a boolean with the key "success"
- */
-  async saveEncryptionKey({ accessControlConditions, chain, authSig, symmetricKey }) {
-    console.log('saveEncryptionKey')
-    /* accessControlConditions looks like this:
-    accessControlConditions: [
-        {
-          contractAddress: tokenAddress,
-          method: 'balanceOf',
-          parameters: [
-            ':userAddress',
-            tokenId
-          ],
-          returnValueTest: {
-            comparator: '>',
-            value: 0
-          }
-        }
-      ]
-    */
-    // encrypt with network pubkey
-    const encryptedKey = wasmBlsSdkHelpers.encrypt(uint8arrayFromString(this.subnetPubKey, 'base16'), symmetricKey)
-    // hash the encrypted pubkey
-    const hashOfKey = await crypto.subtle.digest('SHA-256', encryptedKey)
-    const hashOfKeyStr = uint8arrayToString(new Uint8Array(hashOfKey), 'base16')
-    window.hashOfKey = hashOfKey
-    window.uint8arrayToString = uint8arrayToString
-    console.log('hashOfKey', hashOfKey)
-    console.log('hashOfKeyStr', hashOfKeyStr)
-    // hash the access control conditions
-    const conditions = JSON.stringify(accessControlConditions)
-    const encoder = new TextEncoder()
-    const data = encoder.encode(conditions)
-    const hashOfConditions = await crypto.subtle.digest('SHA-256', data)
-    const hashOfConditionsStr = uint8arrayToString(new Uint8Array(hashOfConditions), 'base16')
-    // create access control conditions on lit nodes
-    const nodePromises = []
-    for (const url of this.connectedNodes) {
-      nodePromises.push(this.storeEncryptionConditionWithNode({ url, key: hashOfKeyStr, val: hashOfConditionsStr, authSig, chain }))
-    }
-    await Promise.all(nodePromises)
+    // set decryption shares bytes in wasm
 
-    return encryptedKey
-  }
+    decryptionShares.forEach(s => {
+      const shareAsBytes = uint8arrayFromString(s.decryptionShares, 'base16')
+      for (let i = 0; i < s.shareAsBytes.length; i++) {
+        wasmBlsSdkHelpers.set_decryption_shares_byte(i, share_index, dshare_bytes[i]);
+      }
 
-  async storeEncryptionConditionWithNode({ url, key, val, authSig, chain }) {
-    console.log('storeEncryptionConditionWithNode')
-    const urlWithPath = `${url}/web/encryption/store`
-    const data = {
-      key,
-      val,
-      authSig,
-      chain
-    }
-    return await this.sendCommandToNode({ url: urlWithPath, data })
-  }
-
-  async getDecryptionShare({ url, accessControlConditions, toDecrypt, authSig, chain }) {
-    console.log('getDecryptionShare')
-    const urlWithPath = `${url}/web/encryption/retrieve`
-    const data = {
-      accessControlConditions,
-      toDecrypt,
-      authSig,
-      chain
-    }
-    return await this.sendCommandToNode({ url: urlWithPath, data })
-  }
-
-  async handshakeWithSgx({ url }) {
-    const urlWithPath = `${url}/web/handshake`
-    console.debug(`handshakeWithSgx ${urlWithPath}`)
-    const data = {
-      clientPublicKey: 'test'
-    }
-    return await this.sendCommandToNode({ url: urlWithPath, data })
-  }
-
-  async sendCommandToNode({ url, data }) {
-    console.log(`sendCommandToNode with url ${url} and data`, data)
-    return await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
     })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Success:', data)
-        return data
+
+  }
+
+}
+
+/**
+* Securely save the symmetric encryption key to the LIT nodes.
+* @param {Object} params
+* @param {Array} params.accessControlConditions The access control conditions under which this key will be able to be decrypted
+* @param {string} params.chain The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
+* @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
+* @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be split up using threshold encryption so that the LIT nodes cannot decrypt a given LIT.
+* @returns {Object} An object that gives the status of the operation, denoted via a boolean with the key "success"
+*/
+async saveEncryptionKey({ accessControlConditions, chain, authSig, symmetricKey }) {
+  console.log('saveEncryptionKey')
+  /* accessControlConditions looks like this:
+  accessControlConditions: [
+      {
+        contractAddress: tokenAddress,
+        method: 'balanceOf',
+        parameters: [
+          ':userAddress',
+          tokenId
+        ],
+        returnValueTest: {
+          comparator: '>',
+          value: 0
+        }
+      }
+    ]
+  */
+  // encrypt with network pubkey
+  const encryptedKey = wasmBlsSdkHelpers.encrypt(uint8arrayFromString(this.subnetPubKey, 'base16'), symmetricKey)
+  // hash the encrypted pubkey
+  const hashOfKey = await crypto.subtle.digest('SHA-256', encryptedKey)
+  const hashOfKeyStr = uint8arrayToString(new Uint8Array(hashOfKey), 'base16')
+  window.hashOfKey = hashOfKey
+  window.uint8arrayToString = uint8arrayToString
+  console.log('hashOfKey', hashOfKey)
+  console.log('hashOfKeyStr', hashOfKeyStr)
+  // hash the access control conditions
+  const conditions = JSON.stringify(accessControlConditions)
+  const encoder = new TextEncoder()
+  const data = encoder.encode(conditions)
+  const hashOfConditions = await crypto.subtle.digest('SHA-256', data)
+  const hashOfConditionsStr = uint8arrayToString(new Uint8Array(hashOfConditions), 'base16')
+  // create access control conditions on lit nodes
+  const nodePromises = []
+  for (const url of this.connectedNodes) {
+    nodePromises.push(this.storeEncryptionConditionWithNode({ url, key: hashOfKeyStr, val: hashOfConditionsStr, authSig, chain }))
+  }
+  await Promise.all(nodePromises)
+
+  return encryptedKey
+}
+
+async storeEncryptionConditionWithNode({ url, key, val, authSig, chain }) {
+  console.log('storeEncryptionConditionWithNode')
+  const urlWithPath = `${url}/web/encryption/store`
+  const data = {
+    key,
+    val,
+    authSig,
+    chain
+  }
+  return await this.sendCommandToNode({ url: urlWithPath, data })
+}
+
+async getDecryptionShare({ url, accessControlConditions, toDecrypt, authSig, chain }) {
+  console.log('getDecryptionShare')
+  const urlWithPath = `${url}/web/encryption/retrieve`
+  const data = {
+    accessControlConditions,
+    toDecrypt,
+    authSig,
+    chain
+  }
+  return await this.sendCommandToNode({ url: urlWithPath, data })
+}
+
+async handshakeWithSgx({ url }) {
+  const urlWithPath = `${url}/web/handshake`
+  console.debug(`handshakeWithSgx ${urlWithPath}`)
+  const data = {
+    clientPublicKey: 'test'
+  }
+  return await this.sendCommandToNode({ url: urlWithPath, data })
+}
+
+async sendCommandToNode({ url, data }) {
+  console.log(`sendCommandToNode with url ${url} and data`, data)
+  return await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success:', data)
+      return data
+    })
+}
+
+async connect() {
+  // handshake with each node
+  for (const url of this.config.bootstrapUrls) {
+    this.handshakeWithSgx({ url })
+      .then(resp => {
+        this.connectedNodes.add(url)
+        this.serverKeys[url] = {
+          serverPubKey: resp.serverPublicKey,
+          subnetPubKey: resp.subnetPublicKey,
+          networkPubKey: resp.networkPublicKey
+        }
       })
   }
 
-  async connect() {
-    // handshake with each node
-    for (const url of this.config.bootstrapUrls) {
-      this.handshakeWithSgx({ url })
-        .then(resp => {
-          this.connectedNodes.add(url)
-          this.serverKeys[url] = {
-            serverPubKey: resp.serverPublicKey,
-            subnetPubKey: resp.subnetPublicKey,
-            networkPubKey: resp.networkPublicKey
-          }
-        })
+  const interval = window.setInterval(() => {
+    if (Object.keys(this.serverKeys).length >= this.config.minNodeCount) {
+      clearInterval(interval)
+      // pick the most common public keys for the subnet and network from the bunch, in case some evil node returned a bad key
+      this.subnetPubKey = mostCommonString(Object.values(this.serverKeys).map(keysFromSingleNode => keysFromSingleNode.subnetPubKey))
+      this.networkPubKey = mostCommonString(Object.values(this.serverKeys).map(keysFromSingleNode => keysFromSingleNode.networkPubKey))
+      this.ready = true
+      console.debug('lit is ready')
+      document.dispatchEvent(new Event('lit-ready'))
     }
+  }, 500)
 
-    const interval = window.setInterval(() => {
-      if (Object.keys(this.serverKeys).length >= this.config.minNodeCount) {
-        clearInterval(interval)
-        // pick the most common public keys for the subnet and network from the bunch, in case some evil node returned a bad key
-        this.subnetPubKey = mostCommonString(Object.values(this.serverKeys).map(keysFromSingleNode => keysFromSingleNode.subnetPubKey))
-        this.networkPubKey = mostCommonString(Object.values(this.serverKeys).map(keysFromSingleNode => keysFromSingleNode.networkPubKey))
-        this.ready = true
-        console.debug('lit is ready')
-        document.dispatchEvent(new Event('lit-ready'))
-      }
-    }, 500)
-
-    window.wasmBlsSdkHelpers = wasmBlsSdkHelpers // for debug
-  }
+  window.wasmBlsSdkHelpers = wasmBlsSdkHelpers // for debug
+}
 }
