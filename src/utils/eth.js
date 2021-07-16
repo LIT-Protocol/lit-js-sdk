@@ -7,15 +7,12 @@ import detectEthereumProvider from '@metamask/detect-provider'
 import naclUtil from 'tweetnacl-util'
 import nacl from 'tweetnacl'
 
-import { Header, Proof, Receipt, Transaction } from 'eth-object'
-import { mappingAt } from 'eth-util-lite'
-
 import LIT from '../abis/LIT.json'
 import { LIT_CHAINS } from '../lib/constants'
 
 const AUTH_SIGNATURE_BODY = 'I am creating an account to use LITs at {{timestamp}}'
 
-function chainHexIdToChainName (chainHexId) {
+function chainHexIdToChainName(chainHexId) {
   for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
     const chainName = Object.keys(LIT_CHAINS)[i]
     const litChainHexId = '0x' + LIT_CHAINS[chainName].chainId.toString('16')
@@ -25,7 +22,7 @@ function chainHexIdToChainName (chainHexId) {
   }
 }
 
-export async function connectWeb3 () {
+export async function connectWeb3() {
   if (typeof window.ethereum === 'undefined') {
     throw new Error({ errorCode: 'no_wallet', message: 'No web3 wallet was found' })
   }
@@ -40,40 +37,40 @@ export async function connectWeb3 () {
 }
 
 // taken from the excellent repo https://github.com/zmitton/eth-proof
-export async function getMerkleProof ({ tokenAddress, balanceStorageSlot, tokenId }) {
-  console.log(`getMerkleProof for { tokenAddress, balanceStorageSlot, tokenId } ${tokenAddress}, ${balanceStorageSlot}, ${tokenId}`)
-  const { web3, account } = await connectWeb3()
-  console.log(`getting mappingAt(${balanceStorageSlot}, ${tokenId}, ${account})`)
-  const storageAddress = mappingAt(balanceStorageSlot, parseInt(tokenId), account)
-  console.log('storageAddress: ', storageAddress)
+// export async function getMerkleProof({ tokenAddress, balanceStorageSlot, tokenId }) {
+//   console.log(`getMerkleProof for { tokenAddress, balanceStorageSlot, tokenId } ${tokenAddress}, ${balanceStorageSlot}, ${tokenId}`)
+//   const { web3, account } = await connectWeb3()
+//   console.log(`getting mappingAt(${balanceStorageSlot}, ${tokenId}, ${account})`)
+//   const storageAddress = mappingAt(balanceStorageSlot, parseInt(tokenId), account)
+//   console.log('storageAddress: ', storageAddress)
 
-  // you may need to try the below twicce because sometimes the proof isn't available for the latest block on polygon because the node just isn't fast enough
-  let tries = 0
-  let rpcProof = null
-  let rpcBlock = null
-  while (!rpcProof && tries < 6) {
-    try {
-      if (!rpcBlock) {
-        // only set the rpc block once
-        rpcBlock = await web3.request({ method: 'eth_getBlockByNumber', params: ['latest', false] })
-        console.log('rpcBlock: ', rpcBlock)
-      }
-      rpcProof = await web3.request({ method: 'eth_getProof', params: [tokenAddress, [storageAddress], rpcBlock.number] })
-      console.log('rpcProof: ', rpcProof)
-    } catch (e) {
-      console.log(e)
-      console.log(`error getting rpc proof, have made ${tries} attempts`)
-      tries++
-    }
-  }
+//   // you may need to try the below twicce because sometimes the proof isn't available for the latest block on polygon because the node just isn't fast enough
+//   let tries = 0
+//   let rpcProof = null
+//   let rpcBlock = null
+//   while (!rpcProof && tries < 6) {
+//     try {
+//       if (!rpcBlock) {
+//         // only set the rpc block once
+//         rpcBlock = await web3.request({ method: 'eth_getBlockByNumber', params: ['latest', false] })
+//         console.log('rpcBlock: ', rpcBlock)
+//       }
+//       rpcProof = await web3.request({ method: 'eth_getProof', params: [tokenAddress, [storageAddress], rpcBlock.number] })
+//       console.log('rpcProof: ', rpcProof)
+//     } catch (e) {
+//       console.log(e)
+//       console.log(`error getting rpc proof, have made ${tries} attempts`)
+//       tries++
+//     }
+//   }
 
-  return {
-    header: rpcBlock,
-    accountProof: rpcProof.accountProof,
-    storageProof: rpcProof.storageProof[0].proof,
-    blockHash: rpcBlock.hash
-  }
-}
+//   return {
+//     header: rpcBlock,
+//     accountProof: rpcProof.accountProof,
+//     storageProof: rpcProof.storageProof[0].proof,
+//     blockHash: rpcBlock.hash
+//   }
+// }
 
 // export async function checkAndDeriveKeypair () {
 //   let keypair = localStorage.getItem('lit-keypair')
@@ -98,7 +95,7 @@ export async function getMerkleProof ({ tokenAddress, balanceStorageSlot, tokenI
  * @param {string} params.chain The chain you want to use.  "polygon" and "ethereum" are currently supported.
  * @returns {AuthSig} The AuthSig created or retrieved
  */
-export async function checkAndSignAuthMessage ({ chain }) {
+export async function checkAndSignAuthMessage({ chain }) {
   const { web3, account } = await connectWeb3()
   const chainId = await web3.request({ method: 'eth_chainId', params: [] })
   const selectedChain = LIT_CHAINS[chain]
@@ -111,11 +108,11 @@ export async function checkAndSignAuthMessage ({ chain }) {
         chainId: selectedChainId,
         chainName: selectedChain.name,
         nativeCurrency:
-                {
-                  name: selectedChain.name,
-                  symbol: selectedChain.symbol,
-                  decimals: selectedChain.decimals
-                },
+        {
+          name: selectedChain.name,
+          symbol: selectedChain.symbol,
+          decimals: selectedChain.decimals
+        },
         rpcUrls: selectedChain.rpcUrls,
         blockExplorerUrls: selectedChain.blockExplorerUrls
       }]
@@ -142,7 +139,7 @@ export async function checkAndSignAuthMessage ({ chain }) {
   return authSig
 }
 
-export async function signAndSaveAuthMessage () {
+export async function signAndSaveAuthMessage() {
   const now = (new Date()).toISOString()
   const body = AUTH_SIGNATURE_BODY.replace('{{timestamp}}', now)
   const signedResult = await signMessage({ body })
@@ -168,7 +165,7 @@ export async function signAndSaveAuthMessage () {
  * @property {string} signedMessage - The message that was signed
  * @property {string} address - The crypto wallet address that signed the message
  */
-export async function signMessage ({ body }) {
+export async function signMessage({ body }) {
   const { web3, account } = await connectWeb3()
 
   console.log('signing with ', account)
@@ -292,7 +289,7 @@ export async function signMessage ({ body }) {
  * @param {number} params.quantity The number of tokens to mint.  Note that these will be fungible, so they will not have serial numbers.
  * @returns {Object} The txHash, tokenId, tokenAddress, mintingAddress, and authSig.
  */
-export async function mintLIT ({ chain, quantity }) {
+export async function mintLIT({ chain, quantity }) {
   console.log(`minting ${quantity} tokens on ${chain}`)
   try {
     const authSig = await checkAndSignAuthMessage({ chain })
@@ -335,7 +332,7 @@ export async function mintLIT ({ chain, quantity }) {
  * @param {number} params.accountAddress The account address to check
  * @returns {array} The token ids owned by the accountAddress
  */
-export async function findLITs () {
+export async function findLITs() {
   console.log('findLITs')
 
   try {
@@ -377,7 +374,7 @@ export async function findLITs () {
  * @param {number} params.to The account address to send the token to
  * @returns {Object} Success or error
  */
-export async function sendLIT ({ tokenMetadata, to }) {
+export async function sendLIT({ tokenMetadata, to }) {
   console.log('sendLIT for ', tokenMetadata)
 
   try {

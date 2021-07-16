@@ -28,8 +28,8 @@ import {
   injectViewerIFrame
 } from './utils/browser'
 
-import { LIT_CHAINS, protobufs } from './lib/constants'
-import { kFragKey, printError } from './lib/utils'
+import { LIT_CHAINS } from './lib/constants'
+import { printError } from './lib/utils'
 import { initWasmBlsSdk } from './lib/bls-sdk.js'
 
 import LitNodeClient from './utils/litNodeClient'
@@ -67,8 +67,6 @@ const functions = {
   toggleLock,
   LIT_CHAINS,
   LitNodeClient,
-  protobufs,
-  kFragKey,
   encryptWithPubKey,
   decryptWithPrivKey,
   fileToDataUrl,

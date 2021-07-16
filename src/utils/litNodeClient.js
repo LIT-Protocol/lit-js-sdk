@@ -1,24 +1,10 @@
-// import 'babel-polyfill'
-import Libp2p from 'libp2p'
-import Websockets from 'libp2p-websockets'
-import WebRTCDirect from '@lit-protocol/libp2p-webrtc-direct'
-import { NOISE } from 'libp2p-noise'
-import { FaultTolerance } from 'libp2p/src/transport-manager'
-import Mplex from 'libp2p-mplex'
-import KadDHT from 'libp2p-kad-dht'
-import PeerId from 'peer-id'
-import Bootstrap from 'libp2p-bootstrap'
-import pipe from 'it-pipe'
-import CID from 'cids'
-import secrets from 'secrets.js-lit'
+
 import uint8arrayFromString from 'uint8arrays/from-string'
 import uint8arrayToString from 'uint8arrays/to-string'
-import all from 'it-all'
 import naclUtil from 'tweetnacl-util'
 
 import { mostCommonString } from '../lib/utils'
 import { wasmBlsSdkHelpers } from '../lib/bls-sdk'
-import { encryptWithPubKey, decryptWithPrivKey } from './crypto'
 
 /**
  * A LIT node client.  Connects directly to the LIT nodes to store and retrieve encryption keys.  Only holders of an NFT that corresponds with a LIT may store and retrieve the keys.
@@ -27,7 +13,7 @@ import { encryptWithPubKey, decryptWithPrivKey } from './crypto'
  * @param {number} [config.minNodeCount=8] The minimum number of nodes that must be connected for the LitNodeClient to be ready to use.
  */
 export default class LitNodeClient {
-  constructor(
+  constructor (
     config = {
       alertWhenUnauthorized: true,
       minNodeCount: 2,
@@ -60,7 +46,7 @@ export default class LitNodeClient {
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
    * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
   */
-  async getEncryptionKey({ accessControlConditions, toDecrypt, chain, authSig }) {
+  async getEncryptionKey ({ accessControlConditions, toDecrypt, chain, authSig }) {
     // ask each node to decrypt the content
     const nodePromises = []
     for (const url of this.connectedNodes) {
@@ -108,7 +94,7 @@ export default class LitNodeClient {
   * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be split up using threshold encryption so that the LIT nodes cannot decrypt a given LIT.
   * @returns {Object} An object that gives the status of the operation, denoted via a boolean with the key "success"
   */
-  async saveEncryptionKey({ accessControlConditions, chain, authSig, symmetricKey }) {
+  async saveEncryptionKey ({ accessControlConditions, chain, authSig, symmetricKey }) {
     console.log('saveEncryptionKey')
     /* accessControlConditions looks like this:
     accessControlConditions: [
@@ -152,7 +138,7 @@ export default class LitNodeClient {
     return encryptedKey
   }
 
-  async storeEncryptionConditionWithNode({ url, key, val, authSig, chain }) {
+  async storeEncryptionConditionWithNode ({ url, key, val, authSig, chain }) {
     console.log('storeEncryptionConditionWithNode')
     const urlWithPath = `${url}/web/encryption/store`
     const data = {
@@ -164,7 +150,7 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
-  async getDecryptionShare({ url, accessControlConditions, toDecrypt, authSig, chain }) {
+  async getDecryptionShare ({ url, accessControlConditions, toDecrypt, authSig, chain }) {
     console.log('getDecryptionShare')
     const urlWithPath = `${url}/web/encryption/retrieve`
     const data = {
@@ -176,7 +162,7 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
-  async handshakeWithSgx({ url }) {
+  async handshakeWithSgx ({ url }) {
     const urlWithPath = `${url}/web/handshake`
     console.debug(`handshakeWithSgx ${urlWithPath}`)
     const data = {
@@ -185,7 +171,7 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
-  async sendCommandToNode({ url, data }) {
+  async sendCommandToNode ({ url, data }) {
     console.log(`sendCommandToNode with url ${url} and data`, data)
     return await fetch(url, {
       method: 'POST',
@@ -201,7 +187,7 @@ export default class LitNodeClient {
       })
   }
 
-  async connect() {
+  async connect () {
     // handshake with each node
     for (const url of this.config.bootstrapUrls) {
       this.handshakeWithSgx({ url })
