@@ -1,4 +1,3 @@
-import { checkAndSignAuthMessage, getMerkleProof } from './eth'
 import { LIT_CHAINS } from '../lib/constants'
 import { unlockLitWithKey } from './lit'
 
