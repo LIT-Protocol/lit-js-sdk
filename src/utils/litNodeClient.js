@@ -94,7 +94,7 @@ export default class LitNodeClient {
     }
 
     const decrypted = wasmBlsSdkHelpers.combine_decryption_shares(decryptionShares.length, pkSetAsBytes.length, ciphertextAsBytes.length)
-    console.log('decrypted is ', decrypted)
+    // console.log('decrypted is ', uint8arrayToString(decrypted, 'base16'))
 
     return decrypted
   }
@@ -128,6 +128,7 @@ export default class LitNodeClient {
     */
     // encrypt with network pubkey
     const encryptedKey = wasmBlsSdkHelpers.encrypt(uint8arrayFromString(this.subnetPubKey, 'base16'), symmetricKey)
+    console.log('symmetric key encrypted with LIT network key: ', uint8arrayToString(encryptedKey, 'base16'))
     // hash the encrypted pubkey
     const hashOfKey = await crypto.subtle.digest('SHA-256', encryptedKey)
     const hashOfKeyStr = uint8arrayToString(new Uint8Array(hashOfKey), 'base16')

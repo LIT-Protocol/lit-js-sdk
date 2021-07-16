@@ -113,8 +113,8 @@ export async function encryptZip (zip) {
   // to download the encrypted zip file for testing, uncomment this
   // saveAs(encryptedZipBlob, 'encrypted.bin')
 
-  const exportedSymmKey = await crypto.subtle.exportKey('raw', symmKey)
-  // console.log('exportedSymmKey', exportedSymmKey)
+  const exportedSymmKey = new Uint8Array(await crypto.subtle.exportKey('raw', symmKey))
+  console.log('exportedSymmKey in hex', uint8arrayToString(exportedSymmKey, 'base16'))
 
   // encrypt the symmetric key with the
   // public key derived from the eth wallet
@@ -161,7 +161,7 @@ export async function encryptZip (zip) {
   // console.log('saved')
 
   return {
-    symmetricKey: JSON.stringify(exportedSymmKey),
+    symmetricKey: exportedSymmKey,
     encryptedZip: encryptedZipBlob
   }
 }

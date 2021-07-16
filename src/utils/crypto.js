@@ -21,7 +21,7 @@ export function compareArrayBuffers (buf1, buf2) {
 export async function importSymmetricKey (symmKey) {
   const importedSymmKey = await crypto.subtle.importKey(
     'raw',
-    uint8arrayFromString(symmKey, 'base16'),
+    symmKey,
     SYMM_KEY_ALGO_PARAMS,
     true,
     ['encrypt', 'decrypt']
