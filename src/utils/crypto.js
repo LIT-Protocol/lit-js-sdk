@@ -8,7 +8,38 @@ const SYMM_KEY_ALGO_PARAMS = {
   length: 256
 }
 
-export function compareArrayBuffers (buf1, buf2) {
+export function canonicalAccessControlConditionFormatter(cond) {
+  // need to return in the exact format below:
+  /*
+  pub struct JsonAccessControlCondition {
+    pub contract_address: String,
+    pub chain: String,
+    pub standard_contract_type: String,
+    pub method: String,
+    pub parameters: Vec<String>,
+    pub return_value_test: JsonReturnValueTest,
+  }
+  */
+
+  return {
+    contractAddress: cond.contractAddress,
+    chain: cond.chain,
+    standardContractType: cond.standardContractType,
+    method: cond.method,
+    parameters: cond.parameters,
+    returnValueTest: cond.returnValueTest
+  }
+}
+
+export function hashAccessControlConditions(accessControlConditions) {
+  const conds = accessControlConditions.map(c => canonicalAccessControlConditionFormatter(c))
+  const toHash = JSON.stringify(conds)
+  const encoder = new TextEncoder()
+  const data = encoder.encode(toHash)
+  return crypto.subtle.digest('SHA-256', data)
+}
+
+export function compareArrayBuffers(buf1, buf2) {
   if (buf1.byteLength !== buf2.byteLength) return false
   const dv1 = new Uint8Array(buf1)
   const dv2 = new Uint8Array(buf2)
@@ -18,7 +49,7 @@ export function compareArrayBuffers (buf1, buf2) {
   return true
 }
 
-export async function importSymmetricKey (symmKey) {
+export async function importSymmetricKey(symmKey) {
   const importedSymmKey = await crypto.subtle.importKey(
     'raw',
     symmKey,
@@ -28,7 +59,7 @@ export async function importSymmetricKey (symmKey) {
   )
   return importedSymmKey
 }
-export async function generateSymmetricKey () {
+export async function generateSymmetricKey() {
   const symmKey = await crypto.subtle.generateKey(
     SYMM_KEY_ALGO_PARAMS,
     true,
@@ -43,7 +74,7 @@ export async function generateSymmetricKey () {
  * @param {Object} symmKey The symmetric key
  * @returns {Blob} The decrypted blob
  */
-export async function decryptWithSymmetricKey (
+export async function decryptWithSymmetricKey(
   encryptedBlob,
   symmKey
 ) {
@@ -68,7 +99,7 @@ export async function decryptWithSymmetricKey (
  * @param {Blob} data The blob to encrypt
  * @returns {Blob} The encrypted blob
  */
-export async function encryptWithSymmetricKey (
+export async function encryptWithSymmetricKey(
   symmKey,
   data
 ) {
@@ -95,7 +126,7 @@ export async function encryptWithSymmetricKey (
  * @param {string} version The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
  * @returns {Blob} The encrypted blob
  */
-export function encryptWithPubKey (
+export function encryptWithPubKey(
   receiverPublicKey,
   data,
   version
@@ -152,7 +183,7 @@ export function encryptWithPubKey (
  * @param {string} version The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
  * @returns {Blob} The decrypted blob
  */
-export function decryptWithPrivKey (
+export function decryptWithPrivKey(
   encryptedData,
   receiverPrivateKey
 ) {

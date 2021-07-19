@@ -20,7 +20,8 @@ import {
 
 import {
   decryptWithPrivKey,
-  encryptWithPubKey
+  encryptWithPubKey,
+  canonicalAccessControlConditionFormatter
 } from './utils/crypto'
 
 import {
@@ -75,7 +76,8 @@ const functions = {
   litJsSdkLoadedInALIT,
   unlockLitWithKey,
   injectViewerIFrame,
-  printError
+  printError,
+  canonicalAccessControlConditionFormatter
 }
 
 export default functions

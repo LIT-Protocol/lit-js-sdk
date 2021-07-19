@@ -5,6 +5,7 @@ import naclUtil from 'tweetnacl-util'
 
 import { mostCommonString } from '../lib/utils'
 import { wasmBlsSdkHelpers } from '../lib/bls-sdk'
+import { hashAccessControlConditions } from './crypto'
 
 /**
  * A LIT node client.  Connects directly to the LIT nodes to store and retrieve encryption keys.  Only holders of an NFT that corresponds with a LIT may store and retrieve the keys.
@@ -96,22 +97,7 @@ export default class LitNodeClient {
   */
   async saveEncryptionKey ({ accessControlConditions, chain, authSig, symmetricKey }) {
     console.log('saveEncryptionKey')
-    /* accessControlConditions looks like this:
-    accessControlConditions: [
-        {
-          contractAddress: tokenAddress,
-          method: 'balanceOf',
-          parameters: [
-            ':userAddress',
-            tokenId
-          ],
-          returnValueTest: {
-            comparator: '>',
-            value: 0
-          }
-        }
-      ]
-    */
+
     // encrypt with network pubkey
     const encryptedKey = wasmBlsSdkHelpers.encrypt(uint8arrayFromString(this.subnetPubKey, 'base16'), symmetricKey)
     console.log('symmetric key encrypted with LIT network key: ', uint8arrayToString(encryptedKey, 'base16'))
@@ -123,10 +109,7 @@ export default class LitNodeClient {
     console.log('hashOfKey', hashOfKey)
     console.log('hashOfKeyStr', hashOfKeyStr)
     // hash the access control conditions
-    const conditions = JSON.stringify(accessControlConditions)
-    const encoder = new TextEncoder()
-    const data = encoder.encode(conditions)
-    const hashOfConditions = await crypto.subtle.digest('SHA-256', data)
+    const hashOfConditions = await hashAccessControlConditions(accessControlConditions)
     const hashOfConditionsStr = uint8arrayToString(new Uint8Array(hashOfConditions), 'base16')
     // create access control conditions on lit nodes
     const nodePromises = []

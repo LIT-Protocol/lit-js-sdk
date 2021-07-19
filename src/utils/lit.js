@@ -7,12 +7,11 @@ import {
   generateSymmetricKey,
   encryptWithSymmetricKey,
   decryptWithSymmetricKey,
-  compareArrayBuffers
+  canonicalAccessControlConditionFormatter
 } from './crypto'
 
 import {
-  checkAndSignAuthMessage,
-  getMerkleProof
+  checkAndSignAuthMessage
 } from './eth'
 
 import {
@@ -219,6 +218,8 @@ export async function createHtmlLIT ({
     scriptTags += tag
   }
 
+  const formattedAccessControlConditions = accessControlConditions.map(c => canonicalAccessControlConditionFormatter(c))
+
   // console.log('scriptTags: ', scriptTags)
 
   return `
@@ -230,7 +231,7 @@ export async function createHtmlLIT ({
     ${scriptTags}
     <script>
       var encryptedZipDataUrl = "${encryptedZipDataUrl}"
-      var accessControlConditions = ${JSON.stringify(accessControlConditions)}
+      var accessControlConditions = ${JSON.stringify(formattedAccessControlConditions)}
       var chain = "${chain}"
       var encryptedSymmetricKey = "${uint8arrayToString(encryptedSymmetricKey, 'base16')}"
       var locked = true
