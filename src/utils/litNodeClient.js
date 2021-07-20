@@ -5,7 +5,7 @@ import naclUtil from 'tweetnacl-util'
 
 import { mostCommonString } from '../lib/utils'
 import { wasmBlsSdkHelpers } from '../lib/bls-sdk'
-import { hashAccessControlConditions } from './crypto'
+import { hashAccessControlConditions, hashResourceId } from './crypto'
 
 /**
  * A LIT node client.  Connects directly to the LIT nodes to store and retrieve encryption keys.  Only holders of an NFT that corresponds with a LIT may store and retrieve the keys.
@@ -14,7 +14,7 @@ import { hashAccessControlConditions } from './crypto'
  * @param {number} [config.minNodeCount=8] The minimum number of nodes that must be connected for the LitNodeClient to be ready to use.
  */
 export default class LitNodeClient {
-  constructor (
+  constructor(
     config = {
       alertWhenUnauthorized: true,
       minNodeCount: 2,
@@ -39,7 +39,88 @@ export default class LitNodeClient {
   }
 
   /**
-   * Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user is a holder of the NFT that corresponds to this LIT.  This NFT token address and ID was specified when this LIT was created.
+ * Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user meets the access control conditions specified when the data was encrypted.  That access control condition is typically that the user is a holder of the NFT that corresponds to this encrypted data.  This NFT token address and ID was specified when this LIT was created.
+ * @param {Object} params
+ * @param {string} params.tokenAddress The token address of the NFT that corresponds to this LIT.  This should be an ERC721 or ERC1155 token.
+ * @param {string} params.tokenId The token ID of the NFT that corresponds to this LIT
+* @param {string} params.chain The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
+ * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
+ * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
+*/
+  async getSignedToken({ accessControlConditions, chain, authSig, resourceId }) {
+    // ask each node to decrypt the content
+    const nodePromises = []
+    for (const url of this.connectedNodes) {
+      nodePromises.push(this.getSigningShare({ url, accessControlConditions, resourceId, authSig, chain }))
+    }
+    const signatureShares = await Promise.all(nodePromises)
+    console.log('signatureShares', signatureShares)
+
+    // sort the decryption shares by share index.  this is important when combining the shares.
+    signatureShares.sort((a, b) => a.shareIndex - b.shareIndex)
+
+    // combine the signature shares
+
+    // // set signature shares bytes in wasm
+    // signatureShares.forEach((s, idx) => {
+    //   wasmExports.set_share_indexes(idx, s.shareIndex)
+    //   const shareAsBytes = uint8arrayFromString(s.decryptionShare, 'base16')
+    //   for (let i = 0; i < shareAsBytes.length; i++) {
+    //     wasmExports.set_decryption_shares_byte(i, idx, shareAsBytes[i])
+    //   }
+    // })
+
+    // // set the public key set bytes in wasm
+    const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, 'base16')
+    // wasmBlsSdkHelpers.set_mc_bytes(pkSetAsBytes)
+
+    // // set the ciphertext bytes
+    // const ciphertextAsBytes = uint8arrayFromString(toDecrypt, 'base16')
+    // for (let i = 0; i < ciphertextAsBytes.length; i++) {
+    //   wasmExports.set_ct_byte(i, ciphertextAsBytes[i])
+    // }
+
+    const justSigShares = signatureShares.map(s => ({
+      shareHex: s.signatureShare,
+      shareIndex: s.shareIndex
+    }))
+    const signature = wasmBlsSdkHelpers.combine_signatures(pkSetAsBytes, justSigShares)
+    console.log('signature is ', uint8arrayToString(signature, 'base16'))
+
+    return signature
+  }
+
+  /**
+   *
+   *
+  * Securely save the symmetric encryption key to the LIT nodes.
+  * @param {Object} params
+  * @param {Array} params.accessControlConditions The access control conditions under which this key will be able to be decrypted
+  * @param {string} params.chain The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
+  * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
+  * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be split up using threshold encryption so that the LIT nodes cannot decrypt a given LIT.
+  * @returns {Object} An object that gives the status of the operation, denoted via a boolean with the key "success"
+  */
+  async saveSigningCondition({ accessControlConditions, chain, authSig, resourceId }) {
+    console.log('saveSigningCondition')
+
+    // hash the resource id
+    const hashOfResourceId = await hashResourceId(resourceId)
+    const hashOfResourceIdStr = uint8arrayToString(new Uint8Array(hashOfResourceId), 'base16')
+
+    // hash the access control conditions
+    const hashOfConditions = await hashAccessControlConditions(accessControlConditions)
+    const hashOfConditionsStr = uint8arrayToString(new Uint8Array(hashOfConditions), 'base16')
+    // create access control conditions on lit nodes
+    const nodePromises = []
+    for (const url of this.connectedNodes) {
+      nodePromises.push(this.storeSigningConditionWithNode({ url, key: hashOfResourceIdStr, val: hashOfConditionsStr, authSig, chain }))
+    }
+    await Promise.all(nodePromises)
+  }
+
+  /**
+   * Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user meets the access control conditions specified when the data was encrypted.  That access control condition is typically that the user is a holder of the NFT that corresponds to this encrypted data.  This NFT token address and ID was specified when this LIT was created.
    * @param {Object} params
    * @param {string} params.tokenAddress The token address of the NFT that corresponds to this LIT.  This should be an ERC721 or ERC1155 token.
    * @param {string} params.tokenId The token ID of the NFT that corresponds to this LIT
@@ -47,7 +128,7 @@ export default class LitNodeClient {
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
    * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
   */
-  async getEncryptionKey ({ accessControlConditions, toDecrypt, chain, authSig }) {
+  async getEncryptionKey({ accessControlConditions, toDecrypt, chain, authSig }) {
     // ask each node to decrypt the content
     const nodePromises = []
     for (const url of this.connectedNodes) {
@@ -95,7 +176,7 @@ export default class LitNodeClient {
   * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be split up using threshold encryption so that the LIT nodes cannot decrypt a given LIT.
   * @returns {Object} An object that gives the status of the operation, denoted via a boolean with the key "success"
   */
-  async saveEncryptionKey ({ accessControlConditions, chain, authSig, symmetricKey }) {
+  async saveEncryptionKey({ accessControlConditions, chain, authSig, symmetricKey }) {
     console.log('saveEncryptionKey')
 
     // encrypt with network pubkey
@@ -104,10 +185,7 @@ export default class LitNodeClient {
     // hash the encrypted pubkey
     const hashOfKey = await crypto.subtle.digest('SHA-256', encryptedKey)
     const hashOfKeyStr = uint8arrayToString(new Uint8Array(hashOfKey), 'base16')
-    window.hashOfKey = hashOfKey
-    window.uint8arrayToString = uint8arrayToString
-    console.log('hashOfKey', hashOfKey)
-    console.log('hashOfKeyStr', hashOfKeyStr)
+
     // hash the access control conditions
     const hashOfConditions = await hashAccessControlConditions(accessControlConditions)
     const hashOfConditionsStr = uint8arrayToString(new Uint8Array(hashOfConditions), 'base16')
@@ -121,7 +199,19 @@ export default class LitNodeClient {
     return encryptedKey
   }
 
-  async storeEncryptionConditionWithNode ({ url, key, val, authSig, chain }) {
+  async storeSigningConditionWithNode({ url, key, val, authSig, chain }) {
+    console.log('storeSigningConditionWithNode')
+    const urlWithPath = `${url}/web/signing/store`
+    const data = {
+      key,
+      val,
+      authSig,
+      chain
+    }
+    return await this.sendCommandToNode({ url: urlWithPath, data })
+  }
+
+  async storeEncryptionConditionWithNode({ url, key, val, authSig, chain }) {
     console.log('storeEncryptionConditionWithNode')
     const urlWithPath = `${url}/web/encryption/store`
     const data = {
@@ -133,7 +223,19 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
-  async getDecryptionShare ({ url, accessControlConditions, toDecrypt, authSig, chain }) {
+  async getSigningShare({ url, accessControlConditions, resourceId, authSig, chain }) {
+    console.log('getSigningShare')
+    const urlWithPath = `${url}/web/signing/retrieve`
+    const data = {
+      accessControlConditions,
+      resourceId,
+      authSig,
+      chain
+    }
+    return await this.sendCommandToNode({ url: urlWithPath, data })
+  }
+
+  async getDecryptionShare({ url, accessControlConditions, toDecrypt, authSig, chain }) {
     console.log('getDecryptionShare')
     const urlWithPath = `${url}/web/encryption/retrieve`
     const data = {
@@ -145,7 +247,7 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
-  async handshakeWithSgx ({ url }) {
+  async handshakeWithSgx({ url }) {
     const urlWithPath = `${url}/web/handshake`
     console.debug(`handshakeWithSgx ${urlWithPath}`)
     const data = {
@@ -154,7 +256,7 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
-  async sendCommandToNode ({ url, data }) {
+  async sendCommandToNode({ url, data }) {
     console.log(`sendCommandToNode with url ${url} and data`, data)
     return await fetch(url, {
       method: 'POST',
@@ -170,7 +272,7 @@ export default class LitNodeClient {
       })
   }
 
-  async connect () {
+  async connect() {
     // handshake with each node
     for (const url of this.config.bootstrapUrls) {
       this.handshakeWithSgx({ url })

@@ -8,6 +8,24 @@ const SYMM_KEY_ALGO_PARAMS = {
   length: 256
 }
 
+export function canonicalResourceIdFormatter(resId) {
+  // need to return in the exact format below:
+
+  return {
+    baseUrl: resId.baseUrl,
+    path: resId.path,
+    orgId: resId.orgId
+  }
+}
+
+export function hashResourceId(resourceId) {
+  const resId = canonicalResourceIdFormatter(resourceId)
+  const toHash = JSON.stringify(resId)
+  const encoder = new TextEncoder()
+  const data = encoder.encode(toHash)
+  return crypto.subtle.digest('SHA-256', data)
+}
+
 export function canonicalAccessControlConditionFormatter(cond) {
   // need to return in the exact format below:
   /*
