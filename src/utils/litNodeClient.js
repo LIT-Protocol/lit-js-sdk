@@ -48,10 +48,17 @@ export default class LitNodeClient {
  * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
 */
   async getSignedToken({ accessControlConditions, chain, authSig, resourceId }) {
-    // ask each node to decrypt the content
+    // we need to send jwt params iat (issued at) and exp (expiration)
+    // because the nodes may have different wall clock times
+    // the nodes will verify that these params are withing a grace period
+    const now = Date.now()
+    const iat = Math.floor(now / 1000)
+    const exp = iat + (12 * 60 * 60) // 12 hours in seconds
+
+    // ask each node to sign the content
     const nodePromises = []
     for (const url of this.connectedNodes) {
-      nodePromises.push(this.getSigningShare({ url, accessControlConditions, resourceId, authSig, chain }))
+      nodePromises.push(this.getSigningShare({ url, accessControlConditions, resourceId, authSig, chain, iat, exp }))
     }
     const signatureShares = await Promise.all(nodePromises)
     console.log('signatureShares', signatureShares)
@@ -61,33 +68,21 @@ export default class LitNodeClient {
 
     // combine the signature shares
 
-    // // set signature shares bytes in wasm
-    // signatureShares.forEach((s, idx) => {
-    //   wasmExports.set_share_indexes(idx, s.shareIndex)
-    //   const shareAsBytes = uint8arrayFromString(s.decryptionShare, 'base16')
-    //   for (let i = 0; i < shareAsBytes.length; i++) {
-    //     wasmExports.set_decryption_shares_byte(i, idx, shareAsBytes[i])
-    //   }
-    // })
-
-    // // set the public key set bytes in wasm
     const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, 'base16')
-    // wasmBlsSdkHelpers.set_mc_bytes(pkSetAsBytes)
 
-    // // set the ciphertext bytes
-    // const ciphertextAsBytes = uint8arrayFromString(toDecrypt, 'base16')
-    // for (let i = 0; i < ciphertextAsBytes.length; i++) {
-    //   wasmExports.set_ct_byte(i, ciphertextAsBytes[i])
-    // }
-
-    const justSigShares = signatureShares.map(s => ({
+    const sigShares = signatureShares.map(s => ({
       shareHex: s.signatureShare,
       shareIndex: s.shareIndex
     }))
-    const signature = wasmBlsSdkHelpers.combine_signatures(pkSetAsBytes, justSigShares)
+    const signature = wasmBlsSdkHelpers.combine_signatures(pkSetAsBytes, sigShares)
     console.log('signature is ', uint8arrayToString(signature, 'base16'))
 
-    return signature
+    const unsignedJwt = mostCommonString(signatureShares.map(s => s.unsignedJwt))
+
+    // convert the sig to base64 and append to the jwt
+    const finalJwt = `${unsignedJwt}.${uint8arrayToString(signature, 'base64url')}`
+
+    return finalJwt
   }
 
   /**
@@ -223,14 +218,16 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
-  async getSigningShare({ url, accessControlConditions, resourceId, authSig, chain }) {
+  async getSigningShare({ url, accessControlConditions, resourceId, authSig, chain, iat, exp }) {
     console.log('getSigningShare')
     const urlWithPath = `${url}/web/signing/retrieve`
     const data = {
       accessControlConditions,
       resourceId,
       authSig,
-      chain
+      chain,
+      iat,
+      exp
     }
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
