@@ -5,7 +5,8 @@
   "source": "src/index.js",
   "main": "build/index.js",
   "scripts": {
-    "start": "microbundle watch --no-compress ",
+    "start": "microbundle watch",
+    "startNoCompressUseThisIfYouGetATerserErrorMaximumCallStackSizeExceeded": "microbundle watch --no-compress ",
     "build": "microbundle build",
     "buildWebWithParcel": "parcel build --global LitJsSdk -d build --out-file index.web.js --public-url ./ src/index.js",
     "cdnDeploy": "yarn build; yarn buildWeb",
