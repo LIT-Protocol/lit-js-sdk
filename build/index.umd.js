@@ -10789,7 +10789,27 @@
 	}
 
 	/**
-	 * A LIT node client.  Connects directly to the LIT nodes to store and retrieve encryption keys.  Only holders of an NFT that corresponds with a LIT may store and retrieve the keys.
+	 * @typedef {Object} AccessControlCondition
+	 * @property {string} contractAddress - The address of the contract that will be queried
+	 * @property {string} chain - The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+	 * @property {string} standardContractType - If the contract is an ERC20, ERC721, or ERC1155, please put that here
+	 * @property {string} method - The smart contract function to call
+	 * @property {Array} parameters - The parameters to use when calling the smart contract.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
+	 * @property {Object} returnValueTest - An object containing two keys: "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.
+	 */
+	//  pub base_url: String,
+	//  pub path: String,
+	//  pub org_id: String,
+
+	/**
+	 * @typedef {Object} ResourceId
+	 * @property {string} baseUrl - The base url of the resource that will be authorized
+	 * @property {string} path - The path of the url of the resource that will be authorized
+	 * @property {string} orgId - Optional.  The org id that the user would be authorized to belong to.
+	 */
+
+	/**
+	 * A LIT node client.  Connects directly to the LIT nodes to store and retrieve encryption keys and signing requests.  Only holders of an NFT that corresponds with a LIT may store and retrieve the keys.
 	 * @param {Object} config
 	 * @param {boolean} [config.alertWhenUnauthorized=true] Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  If you turn this off, you should create an event listener for the "lit-authFailure" event on the document, and show your own error to the user.
 	 * @param {number} [config.minNodeCount=8] The minimum number of nodes that must be connected for the LitNodeClient to be ready to use.
@@ -10824,13 +10844,10 @@
 	    }
 	  }
 	  /**
-	  * Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user meets the access control conditions specified when the data was encrypted.  That access control condition is typically that the user is a holder of the NFT that corresponds to this encrypted data.  This NFT token address and ID was specified when this LIT was created.
+	  * Verify a JWT from the LIT network.  Use this for auth on your server.  For some background, users can define resources (URLs) for authorization via on-chain conditions using the saveSigningCondition function.  Other users can then request a signed JWT proving that their ETH account meets those on-chain conditions using the getSignedToken function.  Then, servers can verify that JWT using this function.  A successful verification proves that the user meets the on-chain conditions defined in the saveSigningCondition step.  For example, the on-chain condition could be posession of a specific NFT.
 	  * @param {Object} params
-	  * @param {string} params.tokenAddress The token address of the NFT that corresponds to this LIT.  This should be an ERC721 or ERC1155 token.
-	  * @param {string} params.tokenId The token ID of the NFT that corresponds to this LIT
-	  * @param {string} params.chain The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
-	  * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
-	  * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
+	  * @param {string} params.jwt A JWT signed by the LIT network using the BLS12-381 algorithm
+	  * @returns {boolean} A boolean that represents whether or not the token verifies successfully.  A "true" result indicates that the token was successfully verified.
 	  */
 
 
@@ -10838,29 +10855,30 @@
 
 	  _proto.verifyJwt = function verifyJwt(_ref) {
 	    var jwt = _ref.jwt;
-	    var pubKey = uint8arrayFromString__default['default'](this.networkPubKey, 'base16');
-	    console.log('pubkey is ', pubKey);
+	    var pubKey = uint8arrayFromString__default['default'](this.networkPubKey, 'base16'); // console.log('pubkey is ', pubKey)
+
 	    var jwtParts = jwt.split('.');
-	    var sig = uint8arrayFromString__default['default'](jwtParts[2], 'base64url');
-	    console.log('sig is ', uint8arrayToString__default['default'](sig, 'base16'));
-	    var unsignedJwt = jwtParts[0] + "." + jwtParts[1];
-	    console.log('unsignedJwt is ', unsignedJwt);
-	    var message = uint8arrayFromString__default['default'](unsignedJwt);
-	    console.log('message is ', message); // p is public key uint8array
+	    var sig = uint8arrayFromString__default['default'](jwtParts[2], 'base64url'); // console.log('sig is ', uint8arrayToString(sig, 'base16'))
+
+	    var unsignedJwt = jwtParts[0] + "." + jwtParts[1]; // console.log('unsignedJwt is ', unsignedJwt)
+
+	    var message = uint8arrayFromString__default['default'](unsignedJwt); // console.log('message is ', message)
+	    // TODO check for expiration
+	    // p is public key uint8array
 	    // s is signature uint8array
 	    // m is message uint8array
 	    // function is: function (p, s, m)
 
-	    return wasmBlsSdkHelpers.verify(pubKey, sig, message);
+	    return Boolean(wasmBlsSdkHelpers.verify(pubKey, sig, message));
 	  }
 	  /**
-	  * Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user meets the access control conditions specified when the data was encrypted.  That access control condition is typically that the user is a holder of the NFT that corresponds to this encrypted data.  This NFT token address and ID was specified when this LIT was created.
+	  * Request a signed JWT from the LIT network.  Before calling this function, you must either create or know of a resource id and access control conditions for the item you wish to gain authorization for.  You can create an access control condition using the saveSigningCondition function.
 	  * @param {Object} params
-	  * @param {string} params.tokenAddress The token address of the NFT that corresponds to this LIT.  This should be an ERC721 or ERC1155 token.
-	  * @param {string} params.tokenId The token ID of the NFT that corresponds to this LIT
-	  * @param {string} params.chain The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
-	  * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
-	  * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
+	  * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+	  * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+	  * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions.
+	  * @param {ResourceId} params.resourceId The resourceId representing something on the web via a URL
+	  * @returns {Object} A signed JWT that proves you meet the access control conditions for the given resource id.  You may present this to a server for authorization, and the server can verify it using the verifyJwt function.
 	  */
 	  ;
 
@@ -10905,7 +10923,7 @@
 	          var msg = 'Unsigned JWT is not the same from all the nodes.  This means the combined signature will be bad because the nodes signed the wrong things';
 	          console.log(msg);
 	          alert(msg);
-	        } // sort the decryption shares by share index.  this is important when combining the shares.
+	        } // sort the sig shares by share index.  this is important when combining the shares.
 
 
 	        signatureShares.sort(function (a, b) {
@@ -10933,15 +10951,13 @@
 	    }
 	  }
 	  /**
-	   *
-	   *
-	  * Securely save the symmetric encryption key to the LIT nodes.
+	  * Associated access control conditions with a resource on the web.  After calling this function, users may use the getSignedToken function to request a signed JWT from the LIT network.  This JWT proves that the user meets the access control conditions, and is authorized to access the resource you specified in the resourceId parameter of the saveSigningCondition function.
 	  * @param {Object} params
-	  * @param {Array} params.accessControlConditions The access control conditions under which this key will be able to be decrypted
-	  * @param {string} params.chain The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
-	  * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
-	  * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be split up using threshold encryption so that the LIT nodes cannot decrypt a given LIT.
-	  * @returns {Object} An object that gives the status of the operation, denoted via a boolean with the key "success"
+	  * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.
+	  * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+	  * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions
+	  * @param {ResourceId} params.resourceId The resourceId representing something on the web via a URL
+	  * @returns {boolean} Success
 	  */
 	  ;
 
@@ -10975,7 +10991,9 @@
 	            }));
 	          }
 
-	          return Promise.resolve(Promise.all(nodePromises)).then(function () {});
+	          return Promise.resolve(Promise.all(nodePromises)).then(function () {
+	            return true;
+	          });
 	        });
 	      });
 	    } catch (e) {
@@ -10985,10 +11003,10 @@
 	  /**
 	   * Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user meets the access control conditions specified when the data was encrypted.  That access control condition is typically that the user is a holder of the NFT that corresponds to this encrypted data.  This NFT token address and ID was specified when this LIT was created.
 	   * @param {Object} params
-	   * @param {string} params.tokenAddress The token address of the NFT that corresponds to this LIT.  This should be an ERC721 or ERC1155 token.
-	   * @param {string} params.tokenId The token ID of the NFT that corresponds to this LIT
-	  * @param {string} params.chain The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
-	   * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
+	   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain the encryption key, used to decrypt the data.  This could be posession of an NFT, for example.
+	   * @param {string} params.toDecrypt The ciphertext that you wish to decrypt
+	  * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+	   * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
 	   * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
 	  */
 	  ;
@@ -11051,13 +11069,13 @@
 	    }
 	  }
 	  /**
-	  * Securely save the symmetric encryption key to the LIT nodes.
+	  * Securely save the association between access control conditions and something that you wish to decrypt
 	  * @param {Object} params
-	  * @param {Array} params.accessControlConditions The access control conditions under which this key will be able to be decrypted
-	  * @param {string} params.chain The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
-	  * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
-	  * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be split up using threshold encryption so that the LIT nodes cannot decrypt a given LIT.
-	  * @returns {Object} An object that gives the status of the operation, denoted via a boolean with the key "success"
+	  * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.  Save this - you will neeed it to decrypt the content in the future.
+	  * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+	  * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
+	  * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.
+	  * @returns {string} The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
 	  */
 	  ;
 
