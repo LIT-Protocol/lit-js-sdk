@@ -35,11 +35,22 @@ import { hashAccessControlConditions, hashResourceId } from './crypto'
  * @param {number} [config.minNodeCount=8] The minimum number of nodes that must be connected for the LitNodeClient to be ready to use.
  */
 export default class LitNodeClient {
-  constructor (
+  constructor(
     config = {
       alertWhenUnauthorized: true,
-      minNodeCount: 2,
-      bootstrapUrls: ['http://127.0.0.1:7470', 'http://127.0.0.1:7471', 'http://127.0.0.1:7472']
+      minNodeCount: 6,
+      bootstrapUrls: [
+        'https://node2.litgateway.com:7370',
+        'https://node2.litgateway.com:7371',
+        'https://node2.litgateway.com:7372',
+        'https://node2.litgateway.com:7373',
+        'https://node2.litgateway.com:7374',
+        'https://node2.litgateway.com:7375',
+        'https://node2.litgateway.com:7376',
+        'https://node2.litgateway.com:7377',
+        'https://node2.litgateway.com:7378',
+        'https://node2.litgateway.com:7379',
+      ]
     }
   ) {
     this.config = config
@@ -65,7 +76,7 @@ export default class LitNodeClient {
 * @param {string} params.jwt A JWT signed by the LIT network using the BLS12-381 algorithm
 * @returns {boolean} A boolean that represents whether or not the token verifies successfully.  A "true" result indicates that the token was successfully verified.
 */
-  verifyJwt ({ jwt }) {
+  verifyJwt({ jwt }) {
     const pubKey = uint8arrayFromString(this.networkPubKey, 'base16')
     // console.log('pubkey is ', pubKey)
     const jwtParts = jwt.split('.')
@@ -95,7 +106,7 @@ export default class LitNodeClient {
  * @param {ResourceId} params.resourceId The resourceId representing something on the web via a URL
  * @returns {Object} A signed JWT that proves you meet the access control conditions for the given resource id.  You may present this to a server for authorization, and the server can verify it using the verifyJwt function.
 */
-  async getSignedToken ({ accessControlConditions, chain, authSig, resourceId }) {
+  async getSignedToken({ accessControlConditions, chain, authSig, resourceId }) {
     // we need to send jwt params iat (issued at) and exp (expiration)
     // because the nodes may have different wall clock times
     // the nodes will verify that these params are withing a grace period
@@ -149,7 +160,7 @@ export default class LitNodeClient {
   * @param {ResourceId} params.resourceId The resourceId representing something on the web via a URL
   * @returns {boolean} Success
   */
-  async saveSigningCondition ({ accessControlConditions, chain, authSig, resourceId }) {
+  async saveSigningCondition({ accessControlConditions, chain, authSig, resourceId }) {
     console.log('saveSigningCondition')
 
     // hash the resource id
@@ -178,7 +189,7 @@ export default class LitNodeClient {
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
    * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
   */
-  async getEncryptionKey ({ accessControlConditions, toDecrypt, chain, authSig }) {
+  async getEncryptionKey({ accessControlConditions, toDecrypt, chain, authSig }) {
     // ask each node to decrypt the content
     const nodePromises = []
     for (const url of this.connectedNodes) {
@@ -226,7 +237,7 @@ export default class LitNodeClient {
   * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.
   * @returns {string} The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
   */
-  async saveEncryptionKey ({ accessControlConditions, chain, authSig, symmetricKey }) {
+  async saveEncryptionKey({ accessControlConditions, chain, authSig, symmetricKey }) {
     console.log('saveEncryptionKey')
 
     // encrypt with network pubkey
@@ -249,7 +260,7 @@ export default class LitNodeClient {
     return encryptedKey
   }
 
-  async storeSigningConditionWithNode ({ url, key, val, authSig, chain }) {
+  async storeSigningConditionWithNode({ url, key, val, authSig, chain }) {
     console.log('storeSigningConditionWithNode')
     const urlWithPath = `${url}/web/signing/store`
     const data = {
@@ -261,7 +272,7 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
-  async storeEncryptionConditionWithNode ({ url, key, val, authSig, chain }) {
+  async storeEncryptionConditionWithNode({ url, key, val, authSig, chain }) {
     console.log('storeEncryptionConditionWithNode')
     const urlWithPath = `${url}/web/encryption/store`
     const data = {
@@ -273,7 +284,7 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
-  async getSigningShare ({ url, accessControlConditions, resourceId, authSig, chain, iat, exp }) {
+  async getSigningShare({ url, accessControlConditions, resourceId, authSig, chain, iat, exp }) {
     console.log('getSigningShare')
     const urlWithPath = `${url}/web/signing/retrieve`
     const data = {
@@ -287,7 +298,7 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
-  async getDecryptionShare ({ url, accessControlConditions, toDecrypt, authSig, chain }) {
+  async getDecryptionShare({ url, accessControlConditions, toDecrypt, authSig, chain }) {
     console.log('getDecryptionShare')
     const urlWithPath = `${url}/web/encryption/retrieve`
     const data = {
@@ -299,7 +310,7 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
-  async handshakeWithSgx ({ url }) {
+  async handshakeWithSgx({ url }) {
     const urlWithPath = `${url}/web/handshake`
     console.debug(`handshakeWithSgx ${urlWithPath}`)
     const data = {
@@ -308,7 +319,7 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data })
   }
 
-  async sendCommandToNode ({ url, data }) {
+  async sendCommandToNode({ url, data }) {
     console.log(`sendCommandToNode with url ${url} and data`, data)
     return await fetch(url, {
       method: 'POST',
@@ -324,7 +335,7 @@ export default class LitNodeClient {
       })
   }
 
-  async connect () {
+  async connect() {
     // handshake with each node
     for (const url of this.config.bootstrapUrls) {
       this.handshakeWithSgx({ url })
