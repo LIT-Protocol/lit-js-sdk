@@ -21,11 +21,11 @@ The LIT Protocol provides a decentralized way to encrypt and lock content that c
 
 ## State of the network today
 
-Right now, the LIT Protocol is in an alpha state.  It is unaudited and the nodes are not as distributed as they will be when we launch a mainnet.  There are various security improvements to be made, and cryptoeconomic guarantees as a result of staking are not in place yet.  However, we believe it is highly unlikely that any locked or private content would leak or be exposed given that the architecture of the network is inherently secure and private.
+Right now, the LIT Protocol is in an alpha state and the creators are running all the nodes.  It is unaudited and the nodes are not distributed yet.  There are various security improvements to be made, and cryptoeconomic guarantees as a result of staking are not in place yet.  However, we believe it is highly unlikely that any locked or private content would leak or be exposed.  
 
 ## How does the LIT protocol work?
 
-This SDK will encrypt your content, split the key, and upload key fragments to independent LIT Protocol nodes.  When someone wants to access the content, the SDK will send a signed message and a merkle proof that proves that they own the NFT associated with the content.  The LIT nodes will then send down the key fragements and the SDK will combine them and decrypt the content.
+This SDK will encrypt your content, and upload your conditions for decryption to each LIT node.  When someone wants to access the content, the SDK will send a signed message that proves that they own the NFT associated with the content to each LIT node.  The LIT nodes will then send down the decryption shares and the SDK will combine them and decrypt the content.
 
 ## Installation
 
@@ -82,18 +82,48 @@ Once your have your NFT, you can lock and associate content with it on the LIT n
 const { symmetricKey, encryptedZip } = await LitJsSdk.zipAndEncryptString(lockedFileMediaGridHtml)
 ```
 
+Now you need to encrypt the symmetric key, and save it to the LIT nodes.  `litNodeClient` should be an instance of LitNodeClient that has connected to the network via the connect function.
+
+You must also define your access control conditions (the conditions under which someone can decrypt the content).  In the example below, we define a condition that requires the user holds at least 1 ERC1155 token from the 0x3110c39b428221012934A7F617913b095BC1078C contract.
+
+```
+const accessControlConditions = [
+  {
+    contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
+    standardContractType: 'ERC1155',
+    chain,
+    method: 'balanceOf',
+    parameters: [
+      ':userAddress',
+      tokenId.toString()
+    ],
+    returnValueTest: {
+      comparator: '>',
+      value: '0'
+    }
+  }
+]
+
+const encryptedSymmetricKey = await window.litNodeClient.saveEncryptionKey({
+  accessControlConditions,
+  symmetricKey,
+  authSig,
+  chain
+})
+```
+
 We then pass that encrypted content to a function that creates an HTML webpage with an embedded unlock button.
 
 ```
 const htmlString = LitJsSdk.createHtmlLIT({
-  title,
-  htmlBody,
-  css,
-  tokenAddress,
-  tokenId,
-  chain,
-  encryptedZipDataUrl: await fileToDataUrl(encryptedZip)
-})
+    title,
+    htmlBody,
+    css,
+    accessControlConditions,
+    encryptedSymmetricKey,
+    chain,
+    encryptedZipDataUrl: await LitJsSdk.fileToDataUrl(encryptedZip)
+  })
 ```
 
 You'll need to store your LIT somewhere, and we use IPFS via Pinata for this purpose.
@@ -122,19 +152,9 @@ const ipfsCid = uploadRespBody.IpfsHash
 const fileUrl = `https://ipfs.io/ipfs/${ipfsCid}`
 ```
 
-Your LIT is now accessible at the fileUrl variable. Now you need to save the encryption key to the LIT nodes.  `litNodeClient` should be an instance of LitNodeClient that has connected to the network via the connect function.
+Your LIT is now accessible at the fileUrl variable.
 
-```
-await litNodeClient.saveEncryptionKey({
-  tokenAddress,
-  tokenId,
-  symmetricKey,
-  authSig,
-  chain
-})
-```
-
-Finally, you should store your token metadata somewhere, so that your LIT is backwards compatible with existing NFT websites.  We use Firebase for this on MintLIT and if you are using our NFT contracts, you are welcome to use our Firebase instance to store your metadata as well.
+Finally, you should store your token metadata somewhere, so that your LIT is backwards compatible with existing NFT websites.  We use Firebase for this on MintLIT and if you are using our NFT contracts, you are welcome to use our Firebase instance to store your metadata as well.  You can find this createTokenMetadata function in this repo: https://github.com/LIT-Protocol/MintLIT
 
 ```
 await createTokenMetadata({
@@ -168,8 +188,8 @@ Next, obtain the symmetric key from the LIT network.  It's important that you ha
 
 ```
 const symmetricKey = await window.litNodeClient.getEncryptionKey({
-  tokenAddress: window.tokenAddress,
-  tokenId: window.tokenId,
+  accessControlConditions: window.accessControlConditions,
+  toDecrypt: window.encryptedSymmetricKey,
   authSig,
   chain: window.chain
 })
