@@ -12,7 +12,7 @@
     - [Static Content - Minting LITs](#static-content---minting-lits)
     - [Static Content - Unlocking LITs](#static-content---unlocking-lits)
     - [Dynamic Content - Provisoning access to a resource](#dynamic-content---provisoning-access-to-a-resource)
-    - [Dynamic Content - Accessing a resource](#dynamic-content---accessing-a-resource)
+    - [Dynamic Content - Accessing a resource via a JWT](#dynamic-content---accessing-a-resource-via-a-jwt)
   - [API](#api)
   - [Questions or Support](#questions-or-support)
 
@@ -63,7 +63,7 @@ We also provide a web-ready package with all dependencies included at build/inde
 <script onload='litJsSdkLoaded()' src="https://jscdn.litgateway.com/index.web.js"></script>
 ```
 
-You can then use all the sdk functions via LitJsSdk.default for example `LitJsSdk.default.toggleLock()`
+You can then use all the sdk functions via LitJsSdk for example `LitJsSdk.toggleLock()`
 
 Note that if you use a script tag like this, you will likely need to initialize a connection to the LIT Network using something like the below code snippet.  The SDK requires an active connection to the LIT nodes to perform most functions (but, notably, a connection to the LIT nodes is not required if you are just verifying a JWT)
 
@@ -100,7 +100,7 @@ const { symmetricKey, encryptedZip } = await LitJsSdk.zipAndEncryptString(locked
 
 Now you need to encrypt the symmetric key, and save it to the LIT nodes.  `litNodeClient` should be an instance of LitNodeClient that has connected to the network via the connect function.
 
-You must also define your access control conditions (the conditions under which someone can decrypt the content).  In the example below, we define a condition that requires the user holds at least 1 ERC1155 token from the 0x3110c39b428221012934A7F617913b095BC1078C contract.
+You must also define your access control conditions (the conditions under which someone can decrypt the content).  In the example below, we define a condition that requires the user holds at least 1 ERC1155 token with Token ID 9541 from the 0x3110c39b428221012934A7F617913b095BC1078C contract.
 
 ```
 const accessControlConditions = [
@@ -111,7 +111,7 @@ const accessControlConditions = [
     method: 'balanceOf',
     parameters: [
       ':userAddress',
-      tokenId.toString()
+      '9541'
     ],
     returnValueTest: {
       comparator: '>',
@@ -192,12 +192,12 @@ Now, you can send the NFT that corresponds to this LIT to anyone, and they can u
 
 ### Static Content - Unlocking LITs
 
-To unlock a LIT, you must retrieve the encryption key from the server.  This SDK provides a convenience function to do this for you called `toggleLock`.  It will pull down the encryption key, and decrypt content located at `window.encryptedZipDataUrl`, and then load the content into a div with id `mediaGridHolder`.  You may use `toggleLock` or implement parts of it yourself if you have further customizations.  Here's how it works.
+To unlock a LIT, you must retrieve the encryption key shares from the nodes.  This SDK provides a convenience function to do this for you called `toggleLock`.  It will pull down the encryption key shares and combine them into the encryption key itself, and decrypt content located at `window.encryptedZipDataUrl`, and then load the content into a div with id `mediaGridHolder`.  You may use `toggleLock` or implement parts of it yourself if you have further customizations.  Here's how it works:
 
-First, obtain an authSig from the user.  This will ask their metamask to sign a message proving they own the crypto address that presumably owns the NFT.  Pass the chain you're using.  Currently "polygon" and "ethereum" are supported
+First, obtain an authSig from the user.  This will ask their metamask to sign a message proving they own the crypto address that presumably owns the NFT.  Pass the chain you're using.  
 
 ```
-const authSig = await checkAndSignAuthMessage({chain: 'polygon'})
+const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: 'polygon'})
 ```
 
 Next, obtain the symmetric key from the LIT network.  It's important that you have a connected LitNodeClient accessible at window.litNodeClient for this to work.
@@ -217,7 +217,7 @@ Finally, decrypt the content and inject it into the webpage.  We provide a conve
 // convert data url to blob
 const encryptedZipBlob = await (await fetch(window.encryptedZipDataUrl)).blob()
 // decrypt the zip
-const decryptedFiles = await decryptZip(encryptedZipBlob, symmetricKey)
+const decryptedFiles = await LitJsSdk.decryptZip(encryptedZipBlob, symmetricKey)
 // pull out the data url that contains the now-decrypted HTML
 const mediaGridHtmlBody = await decryptedFiles['string.txt'].async('text')
 // load the content into a div so the user can see it
@@ -225,8 +225,86 @@ document.getElementById('mediaGridHolder').innerHTML = mediaGridHtmlBody
 ```
 
 ### Dynamic Content - Provisoning access to a resource
+Use this to put some dynamic content behind an on chain condition (for example, possession of an NFT).  This function will essentially store that condition and the resource that users who meet that condition should be authorized to access.  The resource could be a URL, for example.  The dynamic content server should then verify the JWT provided by the network on every request, which proves that the user meets the on chain condition.
 
-### Dynamic Content - Accessing a resource
+The "saveSigningCondition" function of the LitNodeClient is what you want to use for this, which is documented here: https://lit-protocol.github.io/lit-js-sdk/api_docs_html/index.html#litnodeclientsavesigningcondition
+
+Note that you need an active connection to the Lit Protocol nodes to use this function.  This connection can be made with the following code:
+
+```
+const litNodeClient = new LitJsSdk.LitNodeClient()
+litNodeClient.connect()
+```
+
+Now, you should define you access control conditions.  In the example below, we define a condition that requires the user holds at least 1 ERC1155 token with Token ID 9541 from the 0x3110c39b428221012934A7F617913b095BC1078C contract.
+
+```
+const accessControlConditions = [
+  {
+    contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
+    standardContractType: 'ERC1155',
+    chain,
+    method: 'balanceOf',
+    parameters: [
+      ':userAddress',
+      '9541'
+    ],
+    returnValueTest: {
+      comparator: '>',
+      value: '0'
+    }
+  }
+]
+```
+
+Next, obtain an authSig from the user.  This will ask their metamask to sign a message proving they own the crypto address in their wallet.  Pass the chain you're using.  
+
+```
+const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: 'polygon'})
+```
+
+Next, define the Resource ID of the resource you are granting access to.  This is typically a URL.
+
+```
+const resourceId = {
+  baseUrl: 'https://my-dynamic-content-server.com',
+  path: '/a_path.html'
+}
+```
+
+Finally, you can save all this to the Lit nodes, and then users will be able to request a JWT that grants access to the resource.
+
+```
+await litNodeClient.saveSigningCondition({ accessControlConditions, chain, authSig, resourceId }) 
+```
+
+Make sure that you save the accessControlConditions and resourceId, because the user will have to present them when requesting a JWT that would grant them access.  You will typically want to store them wherever you will auth the user, so wherever your "log in" or "authorize" button would live.
+
+### Dynamic Content - Accessing a resource via a JWT
+
+Obtaining a signed JWT from the Lit network can be done via the getSignedToken function of the LitNodeClient documented here: https://lit-protocol.github.io/lit-js-sdk/api_docs_html/index.html#litnodeclientgetsignedtoken
+
+Note that you need an active connection to the Lit Protocol nodes to use this function.  This connection can be made with the following code:
+
+```
+const litNodeClient = new LitJsSdk.LitNodeClient()
+litNodeClient.connect()
+```
+
+First, obtain an authSig from the user.  This will ask their metamask to sign a message proving they own the crypto address in their wallet.  Pass the chain you're using.  
+
+```
+const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: 'polygon'})
+```
+
+Now, using the accessControlConditions and resourceId you defined when provisoning access to the resource, you can use the getSignedToken function to get the token:
+
+```
+const jwt = await LitJsSdk.getSignedToken({ accessControlConditions, chain, authSig, resourceId })
+```
+
+You can then present this JWT to a server, which can verify it using the verifyJwt function documented here https://lit-protocol.github.io/lit-js-sdk/api_docs_html/index.html#verifyjwt 
+
 
 
 ## API
