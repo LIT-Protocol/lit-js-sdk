@@ -412,6 +412,7 @@ function getStringFromWasm0(ptr, len) {
   return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
 }
 /**
+* @private
 * @returns {number}
 */
 export function get_rng_values_size() {
@@ -420,6 +421,7 @@ export function get_rng_values_size() {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} v
 */
@@ -428,6 +430,7 @@ export function set_rng_value(i, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} v
 */
@@ -436,6 +439,7 @@ export function set_sk_byte(i, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @returns {number}
 */
@@ -445,6 +449,7 @@ export function get_sk_byte(i) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} v
 */
@@ -453,6 +458,7 @@ export function set_pk_byte(i, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @returns {number}
 */
@@ -462,6 +468,7 @@ export function get_pk_byte(i) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} v
 */
@@ -470,6 +477,7 @@ export function set_sig_byte(i, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @returns {number}
 */
@@ -479,6 +487,7 @@ export function get_sig_byte(i) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} v
 */
@@ -487,6 +496,7 @@ export function set_msg_byte(i, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @returns {number}
 */
@@ -496,6 +506,7 @@ export function get_msg_byte(i) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} v
 */
@@ -504,6 +515,7 @@ export function set_ct_byte(i, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @returns {number}
 */
@@ -513,6 +525,7 @@ export function get_ct_byte(i) {
 }
 
 /**
+* @private
 * @returns {number}
 */
 export function get_rng_next_count() {
@@ -521,6 +534,7 @@ export function get_rng_next_count() {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} v
 */
@@ -529,6 +543,7 @@ export function set_poly_byte(i, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @returns {number}
 */
@@ -538,6 +553,7 @@ export function get_poly_byte(i) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} v
 */
@@ -546,6 +562,7 @@ export function set_msk_byte(i, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @returns {number}
 */
@@ -555,6 +572,7 @@ export function get_msk_byte(i) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} v
 */
@@ -563,6 +581,7 @@ export function set_mpk_byte(i, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @returns {number}
 */
@@ -572,6 +591,7 @@ export function get_mpk_byte(i) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} v
 */
@@ -580,6 +600,7 @@ export function set_mc_byte(i, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @returns {number}
 */
@@ -589,6 +610,7 @@ export function get_mc_byte(i) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} v
 */
@@ -597,6 +619,7 @@ export function set_skshare_byte(i, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @returns {number}
 */
@@ -606,6 +629,7 @@ export function get_skshare_byte(i) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} v
 */
@@ -614,6 +638,7 @@ export function set_pkshare_byte(i, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @returns {number}
 */
@@ -623,6 +648,7 @@ export function get_pkshare_byte(i) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} from_node
 * @param {number} to_node
@@ -633,6 +659,7 @@ export function set_bivar_row_byte(i, from_node, to_node, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} from_node
 * @param {number} to_node
@@ -644,6 +671,7 @@ export function get_bivar_row_byte(i, from_node, to_node) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} from_node
 * @param {number} v
@@ -653,6 +681,7 @@ export function set_bivar_commitments_byte(i, from_node, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} from_node
 * @returns {number}
@@ -663,6 +692,7 @@ export function get_bivar_commitments_byte(i, from_node) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} node_index
 * @param {number} v
@@ -672,6 +702,7 @@ export function set_bivar_sks_byte(i, node_index, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} node_index
 * @returns {number}
@@ -682,6 +713,7 @@ export function get_bivar_sks_byte(i, node_index) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} node_index
 * @param {number} v
@@ -691,6 +723,7 @@ export function set_bivar_pks_byte(i, node_index, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} node_index
 * @returns {number}
@@ -701,6 +734,7 @@ export function get_bivar_pks_byte(i, node_index) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} sig_index
 * @param {number} v
@@ -710,6 +744,7 @@ export function set_signature_share_byte(i, sig_index, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} sig_index
 * @returns {number}
@@ -720,6 +755,7 @@ export function get_signature_share_byte(i, sig_index) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} v
 */
@@ -728,6 +764,7 @@ export function set_share_indexes(i, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @returns {number}
 */
@@ -737,6 +774,7 @@ export function get_share_indexes(i) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} share_index
 * @param {number} v
@@ -746,6 +784,7 @@ export function set_decryption_shares_byte(i, share_index, v) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} share_index
 * @returns {number}
@@ -756,12 +795,14 @@ export function get_decryption_shares_byte(i, share_index) {
 }
 
 /**
+* @private
 */
 export function derive_pk_from_sk() {
   wasm.derive_pk_from_sk();
 }
 
 /**
+* @private
 * @param {number} msg_size
 */
 export function sign_msg(msg_size) {
@@ -769,6 +810,7 @@ export function sign_msg(msg_size) {
 }
 
 /**
+* @private
 * @param {number} msg_size
 * @returns {boolean}
 */
@@ -778,6 +820,7 @@ export function verify(msg_size) {
 }
 
 /**
+* @private
 * @param {number} msg_size
 * @returns {number}
 */
@@ -787,6 +830,7 @@ export function encrypt(msg_size) {
 }
 
 /**
+* @private
 * @param {number} ct_size
 * @returns {number}
 */
@@ -796,6 +840,7 @@ export function decrypt(ct_size) {
 }
 
 /**
+* @private
 * @param {number} threshold
 */
 export function generate_poly(threshold) {
@@ -803,6 +848,7 @@ export function generate_poly(threshold) {
 }
 
 /**
+* @private
 * @param {number} poly_size
 * @returns {number}
 */
@@ -812,6 +858,7 @@ export function get_poly_degree(poly_size) {
 }
 
 /**
+* @private
 * @param {number} mc_size
 * @returns {number}
 */
@@ -821,6 +868,7 @@ export function get_mc_degree(mc_size) {
 }
 
 /**
+* @private
 * @param {number} poly_size
 */
 export function derive_master_key(poly_size) {
@@ -828,6 +876,7 @@ export function derive_master_key(poly_size) {
 }
 
 /**
+* @private
 * @param {number} i
 * @param {number} poly_size
 */
@@ -836,6 +885,7 @@ export function derive_key_share(i, poly_size) {
 }
 
 /**
+* @private
 * @param {number} threshold
 * @param {number} total_nodes
 */
@@ -844,6 +894,7 @@ export function generate_bivars(threshold, total_nodes) {
 }
 
 /**
+* @private
 * @param {number} total_signatures
 * @param {number} commitment_size
 */
@@ -852,6 +903,7 @@ export function combine_signature_shares(total_signatures, commitment_size) {
 }
 
 /**
+* @private
 * @param {number} share_index
 * @param {number} ct_size
 * @returns {number}
@@ -862,6 +914,7 @@ export function create_decryption_share(share_index, ct_size) {
 }
 
 /**
+* @private
 * @param {number} total_decryption_shares
 * @param {number} commitment_size
 * @param {number} ct_size

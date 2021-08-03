@@ -7,186 +7,63 @@
     *   [Parameters][3]
 *   [LitNodeClient][4]
     *   [Parameters][5]
-    *   [getEncryptionKey][6]
+    *   [verifyJwt][6]
         *   [Parameters][7]
-    *   [getEncryptionKey][8]
+    *   [getSignedToken][8]
         *   [Parameters][9]
-    *   [saveEncryptionKey][10]
+    *   [saveSigningCondition][10]
         *   [Parameters][11]
-    *   [saveEncryptionKey][12]
+    *   [getEncryptionKey][12]
         *   [Parameters][13]
-    *   [verifyJwt][14]
+    *   [saveEncryptionKey][14]
         *   [Parameters][15]
-    *   [getSignedToken][16]
-        *   [Parameters][17]
-    *   [saveSigningCondition][18]
-        *   [Parameters][19]
-*   [LitNodeClient][20]
+*   [unlockLitWithKey][16]
+    *   [Parameters][17]
+*   [findLITs][18]
+    *   [Parameters][19]
+*   [sendLIT][20]
     *   [Parameters][21]
-    *   [getEncryptionKey][22]
-        *   [Parameters][23]
-    *   [getEncryptionKey][24]
-        *   [Parameters][25]
-    *   [saveEncryptionKey][26]
-        *   [Parameters][27]
-    *   [saveEncryptionKey][28]
-        *   [Parameters][29]
-    *   [verifyJwt][30]
-        *   [Parameters][31]
-    *   [getSignedToken][32]
-        *   [Parameters][33]
-    *   [saveSigningCondition][34]
-        *   [Parameters][35]
-*   [unlockLitWithKey][36]
+*   [createHtmlLIT][22]
+    *   [Parameters][23]
+*   [toggleLock][24]
+*   [injectViewerIFrame][25]
+    *   [Parameters][26]
+*   [Encryption and decryption utilities][27]
+*   [zipAndEncryptString][28]
+    *   [Parameters][29]
+*   [zipAndEncryptFiles][30]
+    *   [Parameters][31]
+*   [encryptZip][32]
+    *   [Parameters][33]
+*   [decryptZip][34]
+    *   [Parameters][35]
+*   [decryptWithSymmetricKey][36]
     *   [Parameters][37]
-*   [findLITs][38]
+*   [encryptWithSymmetricKey][38]
     *   [Parameters][39]
-*   [sendLIT][40]
+*   [encryptWithPubKey][40]
     *   [Parameters][41]
-*   [createHtmlLIT][42]
+*   [decryptWithPrivKey][42]
     *   [Parameters][43]
-*   [toggleLock][44]
-*   [injectViewerIFrame][45]
+*   [Other Utilities][44]
+*   [fileToDataUrl][45]
     *   [Parameters][46]
-*   [Encryption and decryption utilities][47]
-*   [zipAndEncryptString][48]
-    *   [Parameters][49]
-*   [zipAndEncryptFiles][50]
-    *   [Parameters][51]
-*   [encryptZip][52]
-    *   [Parameters][53]
-*   [decryptZip][54]
-    *   [Parameters][55]
-*   [decryptWithSymmetricKey][56]
-    *   [Parameters][57]
-*   [encryptWithSymmetricKey][58]
-    *   [Parameters][59]
-*   [encryptWithPubKey][60]
-    *   [Parameters][61]
-*   [decryptWithPrivKey][62]
-    *   [Parameters][63]
-*   [Other Utilities][64]
-*   [fileToDataUrl][65]
-    *   [Parameters][66]
-*   [checkAndSignAuthMessage][67]
-    *   [Parameters][68]
-*   [Types][69]
-*   [AuthSig][70]
-    *   [Properties][71]
-*   [LITChain][72]
-    *   [Properties][73]
-*   [get_rng_values_size][74]
-*   [set_rng_value][75]
-    *   [Parameters][76]
-*   [set_sk_byte][77]
-    *   [Parameters][78]
-*   [get_sk_byte][79]
-    *   [Parameters][80]
-*   [set_pk_byte][81]
-    *   [Parameters][82]
-*   [get_pk_byte][83]
-    *   [Parameters][84]
-*   [set_sig_byte][85]
-    *   [Parameters][86]
-*   [get_sig_byte][87]
-    *   [Parameters][88]
-*   [set_msg_byte][89]
-    *   [Parameters][90]
-*   [get_msg_byte][91]
-    *   [Parameters][92]
-*   [set_ct_byte][93]
-    *   [Parameters][94]
-*   [get_ct_byte][95]
-    *   [Parameters][96]
-*   [get_rng_next_count][97]
-*   [set_poly_byte][98]
-    *   [Parameters][99]
-*   [get_poly_byte][100]
-    *   [Parameters][101]
-*   [set_msk_byte][102]
-    *   [Parameters][103]
-*   [get_msk_byte][104]
-    *   [Parameters][105]
-*   [set_mpk_byte][106]
-    *   [Parameters][107]
-*   [get_mpk_byte][108]
-    *   [Parameters][109]
-*   [set_mc_byte][110]
-    *   [Parameters][111]
-*   [get_mc_byte][112]
-    *   [Parameters][113]
-*   [set_skshare_byte][114]
-    *   [Parameters][115]
-*   [get_skshare_byte][116]
-    *   [Parameters][117]
-*   [set_pkshare_byte][118]
-    *   [Parameters][119]
-*   [get_pkshare_byte][120]
-    *   [Parameters][121]
-*   [set_bivar_row_byte][122]
-    *   [Parameters][123]
-*   [get_bivar_row_byte][124]
-    *   [Parameters][125]
-*   [set_bivar_commitments_byte][126]
-    *   [Parameters][127]
-*   [get_bivar_commitments_byte][128]
-    *   [Parameters][129]
-*   [set_bivar_sks_byte][130]
-    *   [Parameters][131]
-*   [get_bivar_sks_byte][132]
-    *   [Parameters][133]
-*   [set_bivar_pks_byte][134]
-    *   [Parameters][135]
-*   [get_bivar_pks_byte][136]
-    *   [Parameters][137]
-*   [set_signature_share_byte][138]
-    *   [Parameters][139]
-*   [get_signature_share_byte][140]
-    *   [Parameters][141]
-*   [set_share_indexes][142]
-    *   [Parameters][143]
-*   [get_share_indexes][144]
-    *   [Parameters][145]
-*   [set_decryption_shares_byte][146]
-    *   [Parameters][147]
-*   [get_decryption_shares_byte][148]
-    *   [Parameters][149]
-*   [derive_pk_from_sk][150]
-*   [sign_msg][151]
-    *   [Parameters][152]
-*   [verify][153]
-    *   [Parameters][154]
-*   [encrypt][155]
-    *   [Parameters][156]
-*   [decrypt][157]
-    *   [Parameters][158]
-*   [generate_poly][159]
-    *   [Parameters][160]
-*   [get_poly_degree][161]
-    *   [Parameters][162]
-*   [get_mc_degree][163]
-    *   [Parameters][164]
-*   [derive_master_key][165]
-    *   [Parameters][166]
-*   [derive_key_share][167]
-    *   [Parameters][168]
-*   [generate_bivars][169]
-    *   [Parameters][170]
-*   [combine_signature_shares][171]
-    *   [Parameters][172]
-*   [create_decryption_share][173]
-    *   [Parameters][174]
-*   [combine_decryption_shares][175]
-    *   [Parameters][176]
-*   [LIT_CHAINS][177]
-*   [AccessControlCondition][178]
-    *   [Properties][179]
-*   [ResourceId][180]
-    *   [Properties][181]
+*   [checkAndSignAuthMessage][47]
+    *   [Parameters][48]
+*   [Types][49]
+*   [AuthSig][50]
+    *   [Properties][51]
+*   [LITChain][52]
+    *   [Properties][53]
+*   [LIT_CHAINS][54]
+*   [AccessControlCondition][55]
+    *   [Properties][56]
+*   [ResourceId][57]
+    *   [Properties][58]
 
 ## Welcome
 
-Welcome to the LIT JS SDK API documentation.  To understand how these functions fit together, please view the README in the github repo for this SDK, located at [https://github.com/LIT-Protocol/lit-js-sdk/blob/main/README.md][182]
+Welcome to the LIT JS SDK API documentation.  To understand how these functions fit together, please view the README in the github repo for this SDK, located at [https://github.com/LIT-Protocol/lit-js-sdk/blob/main/README.md][59]
 
 ## mintLIT
 
@@ -194,128 +71,12 @@ This function mints a LIT using our pre-deployed token contracts.  You may our c
 
 ### Parameters
 
-*   `params` **[Object][183]** 
+*   `params` **[Object][60]** 
 
-    *   `params.chain` **[string][184]** The chain to mint on.  "ethereum" and "polygon" are currently supported.
-    *   `params.quantity` **[number][185]** The number of tokens to mint.  Note that these will be fungible, so they will not have serial numbers.
+    *   `params.chain` **[string][61]** The chain to mint on.  "ethereum" and "polygon" are currently supported.
+    *   `params.quantity` **[number][62]** The number of tokens to mint.  Note that these will be fungible, so they will not have serial numbers.
 
-Returns **[Object][183]** The txHash, tokenId, tokenAddress, mintingAddress, and authSig.
-
-## LitNodeClient
-
-A LIT node client.  Connects directly to the LIT nodes to store and retrieve encryption keys.  Only holders of an NFT that corresponds with a LIT may store and retrieve the keys.
-
-### Parameters
-
-*   `config` **[Object][183]**  (optional, default `{alertWhenUnauthorized:true,minNodeCount:6,bootstrapUrls:['/dns4/node1.litgateway.com/tcp/9090/https/p2p-webrtc-direct/p2p/12D3KooWK1KtaAV5rWjbAmZcd62VYSmEz1k81jzr87JAcSS7rKdQ','/dns4/node1.litgateway.com/tcp/9091/https/p2p-webrtc-direct/p2p/QmfLL5EqgyJKrD1oe8ZFGLM7HXGadGuQR9RqEeM1hBVqtP','/dns4/node1.litgateway.com/tcp/9092/https/p2p-webrtc-direct/p2p/Qmeo7u9goqqKA3Fkj7VmT7EkpgtjZK6DaJBWYBGW5czo2A','/dns4/node1.litgateway.com/tcp/9093/https/p2p-webrtc-direct/p2p/QmVVtPgZWPNUmcPf57PWjij1kosrZhbHNgrMwkog1Eyn1H','/dns4/node1.litgateway.com/tcp/9094/https/p2p-webrtc-direct/p2p/QmRae8zUD7vdQjf4cAegtuFX78BfrWmdhdsVaWN9VDVFs9','/dns4/node1.litgateway.com/tcp/9095/https/p2p-webrtc-direct/p2p/QmU7e6JrtVt6PnpShJkdaN9W68eVX9JRxYxo9nVLupUGtG','/dns4/node1.litgateway.com/tcp/9096/https/p2p-webrtc-direct/p2p/QmZK4A6CRL8gcsooCpiWuxkguXJartbGDizjs7f11ALevm','/dns4/node1.litgateway.com/tcp/9097/https/p2p-webrtc-direct/p2p/QmUA9MUPs3eG7vcuQvZzwWEodzdW7xaDFyanpmuwjWEMk1','/dns4/node1.litgateway.com/tcp/9098/https/p2p-webrtc-direct/p2p/QmYJpEuUaojzYhWXShH29xQzXbJoS2YyKyEdkKP77nK1Q4','/dns4/node1.litgateway.com/tcp/9099/https/p2p-webrtc-direct/p2p/QmeJiT66sYz4P9y44W1LaoWjw42AefFxJnagyDCNpJys1w']}`)
-
-    *   `config.alertWhenUnauthorized` **[boolean][186]** Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  If you turn this off, you should create an event listener for the "lit-authFailure" event on the document, and show your own error to the user. (optional, default `true`)
-    *   `config.minNodeCount` **[number][185]** The minimum number of nodes that must be connected for the LitNodeClient to be ready to use. (optional, default `8`)
-
-### getEncryptionKey
-
-Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user is a holder of the NFT that corresponds to this LIT.  This NFT token address and ID was specified when this LIT was created.
-
-#### Parameters
-
-*   `params` **[Object][183]** 
-
-    *   `params.tokenAddress` **[string][184]** The token address of the NFT that corresponds to this LIT.  This should be an ERC721 or ERC1155 token.
-    *   `params.tokenId` **[string][184]** The token ID of the NFT that corresponds to this LIT
-    *   `params.chain` **[string][184]** The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
-    *   `params.authSig` **[AuthSig][187]** The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
-    *   `params.merkleProof`  
-
-Returns **[Object][183]** The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
-
-### getEncryptionKey
-
-Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user meets the access control conditions specified when the data was encrypted.  That access control condition is typically that the user is a holder of the NFT that corresponds to this encrypted data.  This NFT token address and ID was specified when this LIT was created.
-
-#### Parameters
-
-*   `params` **[Object][183]** 
-
-    *   `params.accessControlConditions` **[Array][188]<[AccessControlCondition][189]>** The access control conditions that the user must meet to obtain the encryption key, used to decrypt the data.  This could be posession of an NFT, for example.
-    *   `params.toDecrypt` **[string][184]** The ciphertext that you wish to decrypt
-    *   `params.chain` **[string][184]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-    *   `params.authSig` **[AuthSig][187]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
-
-Returns **[Object][183]** The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
-
-### saveEncryptionKey
-
-Securely save the symmetric encryption key to the LIT nodes.
-
-#### Parameters
-
-*   `params` **[Object][183]** 
-
-    *   `params.tokenAddress` **[string][184]** The token address of the NFT that corresponds to this LIT.  This should be an ERC721 or ERC1155 token.
-    *   `params.tokenId` **[string][184]** The token ID of the NFT that corresponds to this LIT
-    *   `params.chain` **[string][184]** The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
-    *   `params.authSig` **[AuthSig][187]** The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
-    *   `params.symmetricKey` **[string][184]** The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be split up using threshold encryption so that the LIT nodes cannot decrypt a given LIT.
-    *   `params.merkleProof`  
-
-Returns **[Object][183]** An object that gives the status of the operation, denoted via a boolean with the key "success"
-
-### saveEncryptionKey
-
-Securely save the association between access control conditions and something that you wish to decrypt
-
-#### Parameters
-
-*   `params` **[Object][183]** 
-
-    *   `params.accessControlConditions` **[Array][188]<[AccessControlCondition][189]>** The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.  Save this - you will neeed it to decrypt the content in the future.
-    *   `params.chain` **[string][184]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-    *   `params.authSig` **[AuthSig][187]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
-    *   `params.symmetricKey` **[string][184]** The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.
-
-Returns **[string][184]** The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
-
-### verifyJwt
-
-Verify a JWT from the LIT network.  Use this for auth on your server.  For some background, users can define resources (URLs) for authorization via on-chain conditions using the saveSigningCondition function.  Other users can then request a signed JWT proving that their ETH account meets those on-chain conditions using the getSignedToken function.  Then, servers can verify that JWT using this function.  A successful verification proves that the user meets the on-chain conditions defined in the saveSigningCondition step.  For example, the on-chain condition could be posession of a specific NFT.
-
-#### Parameters
-
-*   `params` **[Object][183]** 
-
-    *   `params.jwt` **[string][184]** A JWT signed by the LIT network using the BLS12-381 algorithm
-
-Returns **[boolean][186]** A boolean that represents whether or not the token verifies successfully.  A "true" result indicates that the token was successfully verified.
-
-### getSignedToken
-
-Request a signed JWT from the LIT network.  Before calling this function, you must either create or know of a resource id and access control conditions for the item you wish to gain authorization for.  You can create an access control condition using the saveSigningCondition function.
-
-#### Parameters
-
-*   `params` **[Object][183]** 
-
-    *   `params.accessControlConditions` **[Array][188]<[AccessControlCondition][189]>** The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
-    *   `params.chain` **[string][184]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-    *   `params.authSig` **[AuthSig][187]** The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions.
-    *   `params.resourceId` **[ResourceId][190]** The resourceId representing something on the web via a URL
-
-Returns **[Object][183]** A signed JWT that proves you meet the access control conditions for the given resource id.  You may present this to a server for authorization, and the server can verify it using the verifyJwt function.
-
-### saveSigningCondition
-
-Associated access control conditions with a resource on the web.  After calling this function, users may use the getSignedToken function to request a signed JWT from the LIT network.  This JWT proves that the user meets the access control conditions, and is authorized to access the resource you specified in the resourceId parameter of the saveSigningCondition function.
-
-#### Parameters
-
-*   `params` **[Object][183]** 
-
-    *   `params.accessControlConditions` **[Array][188]<[AccessControlCondition][189]>** The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.
-    *   `params.chain` **[string][184]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-    *   `params.authSig` **[AuthSig][187]** The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions
-    *   `params.resourceId` **[ResourceId][190]** The resourceId representing something on the web via a URL
-
-Returns **[boolean][186]** Success
+Returns **[Object][60]** The txHash, tokenId, tokenAddress, mintingAddress, and authSig.
 
 ## LitNodeClient
 
@@ -323,73 +84,10 @@ A LIT node client.  Connects directly to the LIT nodes to store and retrieve enc
 
 ### Parameters
 
-*   `config` **[Object][183]**  (optional, default `{alertWhenUnauthorized:true,minNodeCount:6,bootstrapUrls:['https://node2.litgateway.com:7370','https://node2.litgateway.com:7371','https://node2.litgateway.com:7372','https://node2.litgateway.com:7373','https://node2.litgateway.com:7374','https://node2.litgateway.com:7375','https://node2.litgateway.com:7376','https://node2.litgateway.com:7377','https://node2.litgateway.com:7378','https://node2.litgateway.com:7379']}`)
+*   `config` **[Object][60]**  (optional, default `{alertWhenUnauthorized:true,minNodeCount:6,bootstrapUrls:['https://node2.litgateway.com:7370','https://node2.litgateway.com:7371','https://node2.litgateway.com:7372','https://node2.litgateway.com:7373','https://node2.litgateway.com:7374','https://node2.litgateway.com:7375','https://node2.litgateway.com:7376','https://node2.litgateway.com:7377','https://node2.litgateway.com:7378','https://node2.litgateway.com:7379']}`)
 
-    *   `config.alertWhenUnauthorized` **[boolean][186]** Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  If you turn this off, you should create an event listener for the "lit-authFailure" event on the document, and show your own error to the user. (optional, default `true`)
-    *   `config.minNodeCount` **[number][185]** The minimum number of nodes that must be connected for the LitNodeClient to be ready to use. (optional, default `8`)
-
-### getEncryptionKey
-
-Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user is a holder of the NFT that corresponds to this LIT.  This NFT token address and ID was specified when this LIT was created.
-
-#### Parameters
-
-*   `params` **[Object][183]** 
-
-    *   `params.tokenAddress` **[string][184]** The token address of the NFT that corresponds to this LIT.  This should be an ERC721 or ERC1155 token.
-    *   `params.tokenId` **[string][184]** The token ID of the NFT that corresponds to this LIT
-    *   `params.chain` **[string][184]** The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
-    *   `params.authSig` **[AuthSig][187]** The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
-    *   `params.merkleProof`  
-
-Returns **[Object][183]** The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
-
-### getEncryptionKey
-
-Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user meets the access control conditions specified when the data was encrypted.  That access control condition is typically that the user is a holder of the NFT that corresponds to this encrypted data.  This NFT token address and ID was specified when this LIT was created.
-
-#### Parameters
-
-*   `params` **[Object][183]** 
-
-    *   `params.accessControlConditions` **[Array][188]<[AccessControlCondition][189]>** The access control conditions that the user must meet to obtain the encryption key, used to decrypt the data.  This could be posession of an NFT, for example.
-    *   `params.toDecrypt` **[string][184]** The ciphertext that you wish to decrypt
-    *   `params.chain` **[string][184]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-    *   `params.authSig` **[AuthSig][187]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
-
-Returns **[Object][183]** The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
-
-### saveEncryptionKey
-
-Securely save the symmetric encryption key to the LIT nodes.
-
-#### Parameters
-
-*   `params` **[Object][183]** 
-
-    *   `params.tokenAddress` **[string][184]** The token address of the NFT that corresponds to this LIT.  This should be an ERC721 or ERC1155 token.
-    *   `params.tokenId` **[string][184]** The token ID of the NFT that corresponds to this LIT
-    *   `params.chain` **[string][184]** The chain that the corresponding NFT lives on.  Currently "polygon" and "ethereum" are supported.
-    *   `params.authSig` **[AuthSig][187]** The authentication signature that proves that the user owns the crypto wallet address that should be an owner of the NFT that corresponds to this LIT.
-    *   `params.symmetricKey` **[string][184]** The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be split up using threshold encryption so that the LIT nodes cannot decrypt a given LIT.
-    *   `params.merkleProof`  
-
-Returns **[Object][183]** An object that gives the status of the operation, denoted via a boolean with the key "success"
-
-### saveEncryptionKey
-
-Securely save the association between access control conditions and something that you wish to decrypt
-
-#### Parameters
-
-*   `params` **[Object][183]** 
-
-    *   `params.accessControlConditions` **[Array][188]<[AccessControlCondition][189]>** The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.  Save this - you will neeed it to decrypt the content in the future.
-    *   `params.chain` **[string][184]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-    *   `params.authSig` **[AuthSig][187]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
-    *   `params.symmetricKey` **[string][184]** The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.
-
-Returns **[string][184]** The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
+    *   `config.alertWhenUnauthorized` **[boolean][63]** Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  If you turn this off, you should create an event listener for the "lit-authFailure" event on the document, and show your own error to the user. (optional, default `true`)
+    *   `config.minNodeCount` **[number][62]** The minimum number of nodes that must be connected for the LitNodeClient to be ready to use. (optional, default `8`)
 
 ### verifyJwt
 
@@ -397,11 +95,11 @@ Verify a JWT from the LIT network.  Use this for auth on your server.  For some 
 
 #### Parameters
 
-*   `params` **[Object][183]** 
+*   `params` **[Object][60]** 
 
-    *   `params.jwt` **[string][184]** A JWT signed by the LIT network using the BLS12-381 algorithm
+    *   `params.jwt` **[string][61]** A JWT signed by the LIT network using the BLS12-381 algorithm
 
-Returns **[boolean][186]** A boolean that represents whether or not the token verifies successfully.  A "true" result indicates that the token was successfully verified.
+Returns **[boolean][63]** A boolean that represents whether or not the token verifies successfully.  A "true" result indicates that the token was successfully verified.
 
 ### getSignedToken
 
@@ -409,14 +107,14 @@ Request a signed JWT from the LIT network.  Before calling this function, you mu
 
 #### Parameters
 
-*   `params` **[Object][183]** 
+*   `params` **[Object][60]** 
 
-    *   `params.accessControlConditions` **[Array][188]<[AccessControlCondition][189]>** The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
-    *   `params.chain` **[string][184]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-    *   `params.authSig` **[AuthSig][187]** The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions.
-    *   `params.resourceId` **[ResourceId][190]** The resourceId representing something on the web via a URL
+    *   `params.accessControlConditions` **[Array][64]<[AccessControlCondition][65]>** The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+    *   `params.chain` **[string][61]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+    *   `params.authSig` **[AuthSig][66]** The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions.
+    *   `params.resourceId` **[ResourceId][67]** The resourceId representing something on the web via a URL
 
-Returns **[Object][183]** A signed JWT that proves you meet the access control conditions for the given resource id.  You may present this to a server for authorization, and the server can verify it using the verifyJwt function.
+Returns **[Object][60]** A signed JWT that proves you meet the access control conditions for the given resource id.  You may present this to a server for authorization, and the server can verify it using the verifyJwt function.
 
 ### saveSigningCondition
 
@@ -424,14 +122,44 @@ Associated access control conditions with a resource on the web.  After calling 
 
 #### Parameters
 
-*   `params` **[Object][183]** 
+*   `params` **[Object][60]** 
 
-    *   `params.accessControlConditions` **[Array][188]<[AccessControlCondition][189]>** The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.
-    *   `params.chain` **[string][184]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-    *   `params.authSig` **[AuthSig][187]** The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions
-    *   `params.resourceId` **[ResourceId][190]** The resourceId representing something on the web via a URL
+    *   `params.accessControlConditions` **[Array][64]<[AccessControlCondition][65]>** The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.
+    *   `params.chain` **[string][61]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+    *   `params.authSig` **[AuthSig][66]** The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions
+    *   `params.resourceId` **[ResourceId][67]** The resourceId representing something on the web via a URL
 
-Returns **[boolean][186]** Success
+Returns **[boolean][63]** Success
+
+### getEncryptionKey
+
+Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user meets the access control conditions specified when the data was encrypted.  That access control condition is typically that the user is a holder of the NFT that corresponds to this encrypted data.  This NFT token address and ID was specified when this LIT was created.
+
+#### Parameters
+
+*   `params` **[Object][60]** 
+
+    *   `params.accessControlConditions` **[Array][64]<[AccessControlCondition][65]>** The access control conditions that the user must meet to obtain the encryption key, used to decrypt the data.  This could be posession of an NFT, for example.
+    *   `params.toDecrypt` **[string][61]** The ciphertext that you wish to decrypt
+    *   `params.chain` **[string][61]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+    *   `params.authSig` **[AuthSig][66]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
+
+Returns **[Object][60]** The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
+
+### saveEncryptionKey
+
+Securely save the association between access control conditions and something that you wish to decrypt
+
+#### Parameters
+
+*   `params` **[Object][60]** 
+
+    *   `params.accessControlConditions` **[Array][64]<[AccessControlCondition][65]>** The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.  Save this - you will neeed it to decrypt the content in the future.
+    *   `params.chain` **[string][61]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+    *   `params.authSig` **[AuthSig][66]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
+    *   `params.symmetricKey` **[string][61]** The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.
+
+Returns **[string][61]** The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
 
 ## unlockLitWithKey
 
@@ -439,11 +167,11 @@ Manually unlock a LIT with a symmetric key.  You can obtain this key by calling 
 
 ### Parameters
 
-*   `params` **[Object][183]** 
+*   `params` **[Object][60]** 
 
-    *   `params.symmetricKey` **[Object][183]** The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
+    *   `params.symmetricKey` **[Object][60]** The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
 
-Returns **[promise][191]** A promise that will resolve when the LIT is unlocked
+Returns **[promise][68]** A promise that will resolve when the LIT is unlocked
 
 ## findLITs
 
@@ -451,12 +179,12 @@ Finds the tokens that the current user owns from the predeployed LIT contracts
 
 ### Parameters
 
-*   `params` **[Object][183]** 
+*   `params` **[Object][60]** 
 
-    *   `params.chain` **[string][184]** The chain that was minted on. "ethereum" and "polygon" are currently supported.
-    *   `params.accountAddress` **[number][185]** The account address to check
+    *   `params.chain` **[string][61]** The chain that was minted on. "ethereum" and "polygon" are currently supported.
+    *   `params.accountAddress` **[number][62]** The account address to check
 
-Returns **[array][188]** The token ids owned by the accountAddress
+Returns **[array][64]** The token ids owned by the accountAddress
 
 ## sendLIT
 
@@ -464,12 +192,12 @@ Send a token to another account
 
 ### Parameters
 
-*   `params` **[Object][183]** 
+*   `params` **[Object][60]** 
 
-    *   `params.tokenMetadata` **[string][184]** The token metadata of the token to be transferred.  Should include tokenId, tokenAddress, and chain
-    *   `params.to` **[number][185]** The account address to send the token to
+    *   `params.tokenMetadata` **[string][61]** The token metadata of the token to be transferred.  Should include tokenId, tokenAddress, and chain
+    *   `params.to` **[number][62]** The account address to send the token to
 
-Returns **[Object][183]** Success or error
+Returns **[Object][60]** Success or error
 
 ## createHtmlLIT
 
@@ -477,26 +205,26 @@ Create a ready-to-go LIT using provided HTML/CSS body and an encrypted zip data 
 
 ### Parameters
 
-*   `params` **[Object][183]** 
+*   `params` **[Object][60]** 
 
-    *   `params.title` **[string][184]** The title that will be used for the title tag in the outputted HTML
-    *   `params.htmlBody` **[number][185]** The HTML body for the locked state of the LIT.  All users will be able to see this HTML.  This HTML must have a button with an id of "unlockButton" which will be automatically set up to decrypt and load the encryptedZipDataUrl
-    *   `params.css` **[string][184]** Any CSS you would like to include in the outputted HTML
-    *   `params.encryptedZipDataUrl` **[number][185]** a data URL of the encrypted zip that contains the locked content that only token holders will be able to view.
-    *   `params.chain` **[string][184]** The chain that the corresponding NFT was minted on.  "ethereum" and "polygon" are currently supported.
-    *   `params.npmPackages` **[Array][188]** An array of strings of NPM package names that should be embedded into this LIT.  These packages will be pulled down via unpkg, converted to data URLs, and embedded in the LIT HTML.  You can include any packages from npmjs.com. (optional, default `[]`)
-    *   `params.tokenAddress` **[string][184]** The token address of the corresponding NFT for this LIT.  ERC721 and ERC 1155 tokens are currently supported.
-    *   `params.tokenId` **[number][185]** The ID of the token of the corresponding NFT for this LIT.  Only holders of this token ID will be able to unlock and decrypt this LIT.
+    *   `params.title` **[string][61]** The title that will be used for the title tag in the outputted HTML
+    *   `params.htmlBody` **[number][62]** The HTML body for the locked state of the LIT.  All users will be able to see this HTML.  This HTML must have a button with an id of "unlockButton" which will be automatically set up to decrypt and load the encryptedZipDataUrl
+    *   `params.css` **[string][61]** Any CSS you would like to include in the outputted HTML
+    *   `params.encryptedZipDataUrl` **[number][62]** a data URL of the encrypted zip that contains the locked content that only token holders will be able to view.
+    *   `params.chain` **[string][61]** The chain that the corresponding NFT was minted on.  "ethereum" and "polygon" are currently supported.
+    *   `params.npmPackages` **[Array][64]** An array of strings of NPM package names that should be embedded into this LIT.  These packages will be pulled down via unpkg, converted to data URLs, and embedded in the LIT HTML.  You can include any packages from npmjs.com. (optional, default `[]`)
+    *   `params.tokenAddress` **[string][61]** The token address of the corresponding NFT for this LIT.  ERC721 and ERC 1155 tokens are currently supported.
+    *   `params.tokenId` **[number][62]** The ID of the token of the corresponding NFT for this LIT.  Only holders of this token ID will be able to unlock and decrypt this LIT.
     *   `params.accessControlConditions`  
     *   `params.encryptedSymmetricKey`  
 
-Returns **[string][184]** The HTML string that is now a LIT.  You can send this HTML around and only token holders will be able to unlock and decrypt the content inside it.  Included in the HTML is this LIT JS SDK itself, the encrypted locked content, an automatic connection to the LIT nodes network, and a handler for a button with id "unlockButton" which will perform the unlock operation when clicked.
+Returns **[string][61]** The HTML string that is now a LIT.  You can send this HTML around and only token holders will be able to unlock and decrypt the content inside it.  Included in the HTML is this LIT JS SDK itself, the encrypted locked content, an automatic connection to the LIT nodes network, and a handler for a button with id "unlockButton" which will perform the unlock operation when clicked.
 
 ## toggleLock
 
 Lock and unlock the encrypted content inside a LIT.  This content is only viewable by holders of the NFT that corresponds to this LIT.  Locked content will be decrypted and placed into the HTML element with id "mediaGridHolder".  The HTML element with the id "lockedHeader" will have it's text automatically changed to LOCKED or UNLOCKED to denote the state of the LIT.  Note that if you're creating a LIT using the createHtmlLIT function, you do not need to use this function, because this function is automatically bound to any button in your HTML with the id "unlockButton".
 
-Returns **[Promise][191]** the promise will resolve when the LIT has been unlocked or an error message has been shown informing the user that they are not authorized to unlock the LIT
+Returns **[Promise][68]** the promise will resolve when the LIT has been unlocked or an error message has been shown informing the user that they are not authorized to unlock the LIT
 
 ## injectViewerIFrame
 
@@ -504,15 +232,15 @@ Inject an iFrame into the current page that will display a LIT.  This function s
 
 ### Parameters
 
-*   `params` **[Object][183]** 
+*   `params` **[Object][60]** 
 
-    *   `params.symmetricKey` **[Object][183]** The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
+    *   `params.symmetricKey` **[Object][60]** The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
     *   `params.destinationId`  
     *   `params.title`  
     *   `params.fileUrl`  
     *   `params.className`  
 
-Returns **[promise][191]** A promise that will resolve when the LIT is unlocked
+Returns **[promise][68]** A promise that will resolve when the LIT is unlocked
 
 ## Encryption and decryption utilities
 
@@ -524,9 +252,9 @@ Zip and encrypt a string.  This is used to encrypt any string that is to be lock
 
 ### Parameters
 
-*   `string` **[string][184]** The string to zip and encrypt
+*   `string` **[string][61]** The string to zip and encrypt
 
-Returns **[Object][183]** The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a single file called "string.txt"
+Returns **[Object][60]** The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a single file called "string.txt"
 
 ## zipAndEncryptFiles
 
@@ -534,9 +262,9 @@ Zip and encrypt multiple files.
 
 ### Parameters
 
-*   `files` **[array][188]** An array of the files you wish to zip and encrypt
+*   `files` **[array][64]** An array of the files you wish to zip and encrypt
 
-Returns **[Object][183]** The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
+Returns **[Object][60]** The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
 
 ## encryptZip
 
@@ -546,7 +274,7 @@ Encrypt a zip file created with JSZip using a new random symmetric key via WebCr
 
 *   `zip` **JSZip** The JSZip instance to encrypt
 
-Returns **[Object][183]** The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.
+Returns **[Object][60]** The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.
 
 ## decryptZip
 
@@ -554,10 +282,10 @@ Decrypt and unzip a zip that was created using encryptZip, zipAndEncryptString, 
 
 ### Parameters
 
-*   `encryptedZipBlob` **[Blob][192]** The encrypted zip as a Blob
-*   `symmKey` **[Object][183]** An object containing the symmetric key used that will be used to decrypt this zip.
+*   `encryptedZipBlob` **[Blob][69]** The encrypted zip as a Blob
+*   `symmKey` **[Object][60]** An object containing the symmetric key used that will be used to decrypt this zip.
 
-Returns **[Array][188]** An array of the decrypted files inside the zip.
+Returns **[Array][64]** An array of the decrypted files inside the zip.
 
 ## decryptWithSymmetricKey
 
@@ -565,10 +293,10 @@ Decrypt an encrypted blob with a symmetric key.  Uses AES-CBC via SubtleCrypto
 
 ### Parameters
 
-*   `encryptedBlob` **[Blob][192]** The encrypted blob that should be decrypted
-*   `symmKey` **[Object][183]** The symmetric key
+*   `encryptedBlob` **[Blob][69]** The encrypted blob that should be decrypted
+*   `symmKey` **[Object][60]** The symmetric key
 
-Returns **[Blob][192]** The decrypted blob
+Returns **[Blob][69]** The decrypted blob
 
 ## encryptWithSymmetricKey
 
@@ -576,10 +304,10 @@ Encrypt a blob with a symmetric key
 
 ### Parameters
 
-*   `symmKey` **[Object][183]** The symmetric key
-*   `data` **[Blob][192]** The blob to encrypt
+*   `symmKey` **[Object][60]** The symmetric key
+*   `data` **[Blob][69]** The blob to encrypt
 
-Returns **[Blob][192]** The encrypted blob
+Returns **[Blob][69]** The encrypted blob
 
 ## encryptWithPubKey
 
@@ -587,11 +315,11 @@ Encrypt a blob with the public key of a receiver
 
 ### Parameters
 
-*   `receiverPublicKey` **[string][184]** The base64 encoded 32 byte public key.  The corresponding private key will be able to decrypt this blob
-*   `data` **[Blob][192]** The blob to encrypt
-*   `version` **[string][184]** The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
+*   `receiverPublicKey` **[string][61]** The base64 encoded 32 byte public key.  The corresponding private key will be able to decrypt this blob
+*   `data` **[Blob][69]** The blob to encrypt
+*   `version` **[string][61]** The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
 
-Returns **[Blob][192]** The encrypted blob
+Returns **[Blob][69]** The encrypted blob
 
 ## decryptWithPrivKey
 
@@ -599,11 +327,11 @@ Decrypt a blob with a private key
 
 ### Parameters
 
-*   `encryptedData` **[Blob][192]** The blob to decrypt
-*   `receiverPrivateKey` **[string][184]** The base64 encoded 32 byte private key.  The corresponding public key was used to encrypt this blob
-*   `version` **[string][184]** The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
+*   `encryptedData` **[Blob][69]** The blob to decrypt
+*   `receiverPrivateKey` **[string][61]** The base64 encoded 32 byte private key.  The corresponding public key was used to encrypt this blob
+*   `version` **[string][61]** The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
 
-Returns **[Blob][192]** The decrypted blob
+Returns **[Blob][69]** The decrypted blob
 
 ## Other Utilities
 
@@ -617,7 +345,7 @@ Convert a file to a data URL, which could then be embedded in a LIT.  A data URL
 
 *   `file` **File** The file to turn into a data url
 
-Returns **[string][184]** The data URL.  This is a string representation that can be used anywhere the original file would be used.
+Returns **[string][61]** The data URL.  This is a string representation that can be used anywhere the original file would be used.
 
 ## checkAndSignAuthMessage
 
@@ -625,11 +353,11 @@ Check for an existing cryptographic authentication signature and create one of i
 
 ### Parameters
 
-*   `params` **[Object][183]** 
+*   `params` **[Object][60]** 
 
-    *   `params.chain` **[string][184]** The chain you want to use.  "polygon" and "ethereum" are currently supported.
+    *   `params.chain` **[string][61]** The chain you want to use.  "polygon" and "ethereum" are currently supported.
 
-Returns **[AuthSig][187]** The AuthSig created or retrieved
+Returns **[AuthSig][66]** The AuthSig created or retrieved
 
 ## Types
 
@@ -637,452 +365,53 @@ Returns **[AuthSig][187]** The AuthSig created or retrieved
 
 ## AuthSig
 
-Type: [Object][183]
+Type: [Object][60]
 
 ### Properties
 
-*   `sig` **[string][184]** The actual hex-encoded signature
-*   `derivedVia` **[string][184]** The method used to derive the signature
-*   `signedMessage` **[string][184]** The message that was signed
-*   `address` **[string][184]** The crypto wallet address that signed the message
+*   `sig` **[string][61]** The actual hex-encoded signature
+*   `derivedVia` **[string][61]** The method used to derive the signature
+*   `signedMessage` **[string][61]** The message that was signed
+*   `address` **[string][61]** The crypto wallet address that signed the message
 
 ## LITChain
 
-Type: [Object][183]
+Type: [Object][60]
 
 ### Properties
 
-*   `contractAddress` **[string][184]** The address of the token contract
-*   `chainId` **[string][184]** The chain ID of the chain that this token contract is deployed on.  Used for EVM chains.
-*   `name` **[string][184]** The human readable name of the chain
-
-## get_rng_values_size
-
-Returns **[number][185]** 
-
-## set_rng_value
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `v` **[number][185]** 
-
-## set_sk_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_sk_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_pk_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_pk_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_sig_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_sig_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_msg_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_msg_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_ct_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_ct_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-
-Returns **[number][185]** 
-
-## get_rng_next_count
-
-Returns **[number][185]** 
-
-## set_poly_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_poly_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_msk_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_msk_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_mpk_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_mpk_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_mc_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_mc_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_skshare_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_skshare_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_pkshare_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_pkshare_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_bivar_row_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `from_node` **[number][185]** 
-*   `to_node` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_bivar_row_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `from_node` **[number][185]** 
-*   `to_node` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_bivar_commitments_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `from_node` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_bivar_commitments_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `from_node` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_bivar_sks_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `node_index` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_bivar_sks_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `node_index` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_bivar_pks_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `node_index` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_bivar_pks_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `node_index` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_signature_share_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `sig_index` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_signature_share_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `sig_index` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_share_indexes
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_share_indexes
-
-### Parameters
-
-*   `i` **[number][185]** 
-
-Returns **[number][185]** 
-
-## set_decryption_shares_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `share_index` **[number][185]** 
-*   `v` **[number][185]** 
-
-## get_decryption_shares_byte
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `share_index` **[number][185]** 
-
-Returns **[number][185]** 
-
-## derive_pk_from_sk
-
-## sign_msg
-
-### Parameters
-
-*   `msg_size` **[number][185]** 
-
-## verify
-
-### Parameters
-
-*   `msg_size` **[number][185]** 
-
-Returns **[boolean][186]** 
-
-## encrypt
-
-### Parameters
-
-*   `msg_size` **[number][185]** 
-
-Returns **[number][185]** 
-
-## decrypt
-
-### Parameters
-
-*   `ct_size` **[number][185]** 
-
-Returns **[number][185]** 
-
-## generate_poly
-
-### Parameters
-
-*   `threshold` **[number][185]** 
-
-## get_poly_degree
-
-### Parameters
-
-*   `poly_size` **[number][185]** 
-
-Returns **[number][185]** 
-
-## get_mc_degree
-
-### Parameters
-
-*   `mc_size` **[number][185]** 
-
-Returns **[number][185]** 
-
-## derive_master_key
-
-### Parameters
-
-*   `poly_size` **[number][185]** 
-
-## derive_key_share
-
-### Parameters
-
-*   `i` **[number][185]** 
-*   `poly_size` **[number][185]** 
-
-## generate_bivars
-
-### Parameters
-
-*   `threshold` **[number][185]** 
-*   `total_nodes` **[number][185]** 
-
-## combine_signature_shares
-
-### Parameters
-
-*   `total_signatures` **[number][185]** 
-*   `commitment_size` **[number][185]** 
-
-## create_decryption_share
-
-### Parameters
-
-*   `share_index` **[number][185]** 
-*   `ct_size` **[number][185]** 
-
-Returns **[number][185]** 
-
-## combine_decryption_shares
-
-### Parameters
-
-*   `total_decryption_shares` **[number][185]** 
-*   `commitment_size` **[number][185]** 
-*   `ct_size` **[number][185]** 
-
-Returns **[number][185]** 
+*   `contractAddress` **[string][61]** The address of the token contract
+*   `chainId` **[string][61]** The chain ID of the chain that this token contract is deployed on.  Used for EVM chains.
+*   `name` **[string][61]** The human readable name of the chain
 
 ## LIT_CHAINS
 
 Pre-deployed token contracts that you may use for minting LITs.  These are ERC1155 contracts that let you mint any quantity of a given token.  Use the chain name as a key in this object.  Currently "polygon" and "ethereum" are supported.
 
-Type: [LITChain][193]
+Type: [LITChain][70]
 
 ## AccessControlCondition
 
-Type: [Object][183]
+Type: [Object][60]
 
 ### Properties
 
-*   `contractAddress` **[string][184]** The address of the contract that will be queried
-*   `chain` **[string][184]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-*   `standardContractType` **[string][184]** If the contract is an ERC20, ERC721, or ERC1155, please put that here
-*   `method` **[string][184]** The smart contract function to call
-*   `parameters` **[Array][188]** The parameters to use when calling the smart contract.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
-*   `returnValueTest` **[Object][183]** An object containing two keys: "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.
+*   `contractAddress` **[string][61]** The address of the contract that will be queried
+*   `chain` **[string][61]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+*   `standardContractType` **[string][61]** If the contract is an ERC20, ERC721, or ERC1155, please put that here
+*   `method` **[string][61]** The smart contract function to call
+*   `parameters` **[Array][64]** The parameters to use when calling the smart contract.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
+*   `returnValueTest` **[Object][60]** An object containing two keys: "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.
 
 ## ResourceId
 
-Type: [Object][183]
+Type: [Object][60]
 
 ### Properties
 
-*   `baseUrl` **[string][184]** The base url of the resource that will be authorized
-*   `path` **[string][184]** The path of the url of the resource that will be authorized
-*   `orgId` **[string][184]** Optional.  The org id that the user would be authorized to belong to.
+*   `baseUrl` **[string][61]** The base url of the resource that will be authorized
+*   `path` **[string][61]** The path of the url of the resource that will be authorized
+*   `orgId` **[string][61]** Optional.  The org id that the user would be authorized to belong to.
 
 [1]: #welcome
 
@@ -1094,378 +423,132 @@ Type: [Object][183]
 
 [5]: #parameters-1
 
-[6]: #getencryptionkey
+[6]: #verifyjwt
 
 [7]: #parameters-2
 
-[8]: #getencryptionkey-1
+[8]: #getsignedtoken
 
 [9]: #parameters-3
 
-[10]: #saveencryptionkey
+[10]: #savesigningcondition
 
 [11]: #parameters-4
 
-[12]: #saveencryptionkey-1
+[12]: #getencryptionkey
 
 [13]: #parameters-5
 
-[14]: #verifyjwt
+[14]: #saveencryptionkey
 
 [15]: #parameters-6
 
-[16]: #getsignedtoken
+[16]: #unlocklitwithkey
 
 [17]: #parameters-7
 
-[18]: #savesigningcondition
+[18]: #findlits
 
 [19]: #parameters-8
 
-[20]: #litnodeclient-1
+[20]: #sendlit
 
 [21]: #parameters-9
 
-[22]: #getencryptionkey-2
+[22]: #createhtmllit
 
 [23]: #parameters-10
 
-[24]: #getencryptionkey-3
+[24]: #togglelock
 
-[25]: #parameters-11
+[25]: #injectvieweriframe
 
-[26]: #saveencryptionkey-2
+[26]: #parameters-11
 
-[27]: #parameters-12
+[27]: #encryption-and-decryption-utilities
 
-[28]: #saveencryptionkey-3
+[28]: #zipandencryptstring
 
-[29]: #parameters-13
+[29]: #parameters-12
 
-[30]: #verifyjwt-1
+[30]: #zipandencryptfiles
 
-[31]: #parameters-14
+[31]: #parameters-13
 
-[32]: #getsignedtoken-1
+[32]: #encryptzip
 
-[33]: #parameters-15
+[33]: #parameters-14
 
-[34]: #savesigningcondition-1
+[34]: #decryptzip
 
-[35]: #parameters-16
+[35]: #parameters-15
 
-[36]: #unlocklitwithkey
+[36]: #decryptwithsymmetrickey
 
-[37]: #parameters-17
+[37]: #parameters-16
 
-[38]: #findlits
+[38]: #encryptwithsymmetrickey
 
-[39]: #parameters-18
+[39]: #parameters-17
 
-[40]: #sendlit
+[40]: #encryptwithpubkey
 
-[41]: #parameters-19
+[41]: #parameters-18
 
-[42]: #createhtmllit
+[42]: #decryptwithprivkey
 
-[43]: #parameters-20
+[43]: #parameters-19
 
-[44]: #togglelock
+[44]: #other-utilities
 
-[45]: #injectvieweriframe
+[45]: #filetodataurl
 
-[46]: #parameters-21
+[46]: #parameters-20
 
-[47]: #encryption-and-decryption-utilities
+[47]: #checkandsignauthmessage
 
-[48]: #zipandencryptstring
+[48]: #parameters-21
 
-[49]: #parameters-22
+[49]: #types
 
-[50]: #zipandencryptfiles
+[50]: #authsig
 
-[51]: #parameters-23
+[51]: #properties
 
-[52]: #encryptzip
+[52]: #litchain
 
-[53]: #parameters-24
+[53]: #properties-1
 
-[54]: #decryptzip
+[54]: #lit_chains
 
-[55]: #parameters-25
+[55]: #accesscontrolcondition
 
-[56]: #decryptwithsymmetrickey
+[56]: #properties-2
 
-[57]: #parameters-26
+[57]: #resourceid
 
-[58]: #encryptwithsymmetrickey
+[58]: #properties-3
 
-[59]: #parameters-27
+[59]: https://github.com/LIT-Protocol/lit-js-sdk/blob/main/README.md
 
-[60]: #encryptwithpubkey
+[60]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
-[61]: #parameters-28
+[61]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
-[62]: #decryptwithprivkey
+[62]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[63]: #parameters-29
+[63]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[64]: #other-utilities
+[64]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
 
-[65]: #filetodataurl
+[65]: #accesscontrolcondition
 
-[66]: #parameters-30
+[66]: #authsig
 
-[67]: #checkandsignauthmessage
+[67]: #resourceid
 
-[68]: #parameters-31
+[68]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
 
-[69]: #types
+[69]: https://developer.mozilla.org/docs/Web/API/Blob
 
-[70]: #authsig
-
-[71]: #properties
-
-[72]: #litchain
-
-[73]: #properties-1
-
-[74]: #get_rng_values_size
-
-[75]: #set_rng_value
-
-[76]: #parameters-32
-
-[77]: #set_sk_byte
-
-[78]: #parameters-33
-
-[79]: #get_sk_byte
-
-[80]: #parameters-34
-
-[81]: #set_pk_byte
-
-[82]: #parameters-35
-
-[83]: #get_pk_byte
-
-[84]: #parameters-36
-
-[85]: #set_sig_byte
-
-[86]: #parameters-37
-
-[87]: #get_sig_byte
-
-[88]: #parameters-38
-
-[89]: #set_msg_byte
-
-[90]: #parameters-39
-
-[91]: #get_msg_byte
-
-[92]: #parameters-40
-
-[93]: #set_ct_byte
-
-[94]: #parameters-41
-
-[95]: #get_ct_byte
-
-[96]: #parameters-42
-
-[97]: #get_rng_next_count
-
-[98]: #set_poly_byte
-
-[99]: #parameters-43
-
-[100]: #get_poly_byte
-
-[101]: #parameters-44
-
-[102]: #set_msk_byte
-
-[103]: #parameters-45
-
-[104]: #get_msk_byte
-
-[105]: #parameters-46
-
-[106]: #set_mpk_byte
-
-[107]: #parameters-47
-
-[108]: #get_mpk_byte
-
-[109]: #parameters-48
-
-[110]: #set_mc_byte
-
-[111]: #parameters-49
-
-[112]: #get_mc_byte
-
-[113]: #parameters-50
-
-[114]: #set_skshare_byte
-
-[115]: #parameters-51
-
-[116]: #get_skshare_byte
-
-[117]: #parameters-52
-
-[118]: #set_pkshare_byte
-
-[119]: #parameters-53
-
-[120]: #get_pkshare_byte
-
-[121]: #parameters-54
-
-[122]: #set_bivar_row_byte
-
-[123]: #parameters-55
-
-[124]: #get_bivar_row_byte
-
-[125]: #parameters-56
-
-[126]: #set_bivar_commitments_byte
-
-[127]: #parameters-57
-
-[128]: #get_bivar_commitments_byte
-
-[129]: #parameters-58
-
-[130]: #set_bivar_sks_byte
-
-[131]: #parameters-59
-
-[132]: #get_bivar_sks_byte
-
-[133]: #parameters-60
-
-[134]: #set_bivar_pks_byte
-
-[135]: #parameters-61
-
-[136]: #get_bivar_pks_byte
-
-[137]: #parameters-62
-
-[138]: #set_signature_share_byte
-
-[139]: #parameters-63
-
-[140]: #get_signature_share_byte
-
-[141]: #parameters-64
-
-[142]: #set_share_indexes
-
-[143]: #parameters-65
-
-[144]: #get_share_indexes
-
-[145]: #parameters-66
-
-[146]: #set_decryption_shares_byte
-
-[147]: #parameters-67
-
-[148]: #get_decryption_shares_byte
-
-[149]: #parameters-68
-
-[150]: #derive_pk_from_sk
-
-[151]: #sign_msg
-
-[152]: #parameters-69
-
-[153]: #verify
-
-[154]: #parameters-70
-
-[155]: #encrypt
-
-[156]: #parameters-71
-
-[157]: #decrypt
-
-[158]: #parameters-72
-
-[159]: #generate_poly
-
-[160]: #parameters-73
-
-[161]: #get_poly_degree
-
-[162]: #parameters-74
-
-[163]: #get_mc_degree
-
-[164]: #parameters-75
-
-[165]: #derive_master_key
-
-[166]: #parameters-76
-
-[167]: #derive_key_share
-
-[168]: #parameters-77
-
-[169]: #generate_bivars
-
-[170]: #parameters-78
-
-[171]: #combine_signature_shares
-
-[172]: #parameters-79
-
-[173]: #create_decryption_share
-
-[174]: #parameters-80
-
-[175]: #combine_decryption_shares
-
-[176]: #parameters-81
-
-[177]: #lit_chains
-
-[178]: #accesscontrolcondition
-
-[179]: #properties-2
-
-[180]: #resourceid
-
-[181]: #properties-3
-
-[182]: https://github.com/LIT-Protocol/lit-js-sdk/blob/main/README.md
-
-[183]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
-
-[184]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
-
-[185]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
-
-[186]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
-
-[187]: #authsig
-
-[188]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
-
-[189]: #accesscontrolcondition
-
-[190]: #resourceid
-
-[191]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
-
-[192]: https://developer.mozilla.org/docs/Web/API/Blob
-
-[193]: #litchain
+[70]: #litchain
