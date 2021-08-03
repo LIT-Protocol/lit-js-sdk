@@ -11,6 +11,7 @@
   - [Using the LIT Protocol](#using-the-lit-protocol)
     - [Static Content - Minting LITs](#static-content---minting-lits)
     - [Static Content - Unlocking LITs](#static-content---unlocking-lits)
+    - [Dynamic Content - Verifying a JWT that was signed by the Lit network](#dynamic-content---verifying-a-jwt-that-was-signed-by-the-lit-network)
     - [Dynamic Content - Provisoning access to a resource](#dynamic-content---provisoning-access-to-a-resource)
     - [Dynamic Content - Accessing a resource via a JWT](#dynamic-content---accessing-a-resource-via-a-jwt)
   - [API](#api)
@@ -222,6 +223,23 @@ const decryptedFiles = await LitJsSdk.decryptZip(encryptedZipBlob, symmetricKey)
 const mediaGridHtmlBody = await decryptedFiles['string.txt'].async('text')
 // load the content into a div so the user can see it
 document.getElementById('mediaGridHolder').innerHTML = mediaGridHtmlBody
+```
+
+### Dynamic Content - Verifying a JWT that was signed by the Lit network
+
+This would typically be done on the server side (nodejs), but should work in the browser too.
+
+First, import the SDK: 
+
+```
+ const LitJsSdk = require('lit-js-sdk')
+```
+
+Now, you must have a JWT to verify.  Usually this comes from the user who is trying to access the resource.  You can try the jwt harcoded in the example below, which may be expired but should at least return a proper header and payload.  In the real world, you should use jwt  presented by the user
+
+```
+const jwt = "eyJhbGciOiJCTFMxMi0zODEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJMSVQiLCJzdWIiOiIweGRiZDM2MGYzMDA5N2ZiNmQ5MzhkY2M4YjdiNjI4NTRiMzYxNjBiNDUiLCJjaGFpbiI6ImZhbnRvbSIsImlhdCI6MTYyODAzMTM1OCwiZXhwIjoxNjI4MDc0NTU4LCJiYXNlVXJsIjoiaHR0cHM6Ly9teS1keW5hbWljLWNvbnRlbnQtc2VydmVyLmNvbSIsInBhdGgiOiIvYV9wYXRoLmh0bWwiLCJvcmdJZCI6IiJ9.lX_aBSgGVYWd2FL6elRHoPJ2nab0IkmmX600cwZPCyK_SazZ-pzBUGDDQ0clthPVAtoS7roHg14xpEJlcSJUZBA7VTlPiDCOrkie_Hmulj765qS44t3kxAYduLhNQ-VN"
+const { verified, header, payload } = LitJsSdk.verifyJwt({jwt})
 ```
 
 ### Dynamic Content - Provisoning access to a resource

@@ -18,6 +18,8 @@ import {
   sendMessageToFrameParent
 } from './frameComms'
 
+import { wasmBlsSdkHelpers } from '../lib/bls-sdk'
+
 import { fileToDataUrl } from './browser'
 import { LIT_CHAINS, NETWORK_PUB_KEY } from '../lib/constants'
 
@@ -351,7 +353,7 @@ export async function unlockLitWithKey({ symmetricKey }) {
 * Verify a JWT from the LIT network.  Use this for auth on your server.  For some background, users can define resources (URLs) for authorization via on-chain conditions using the saveSigningCondition function.  Other users can then request a signed JWT proving that their ETH account meets those on-chain conditions using the getSignedToken function.  Then, servers can verify that JWT using this function.  A successful verification proves that the user meets the on-chain conditions defined in the saveSigningCondition step.  For example, the on-chain condition could be posession of a specific NFT.
 * @param {Object} params
 * @param {string} params.jwt A JWT signed by the LIT network using the BLS12-381 algorithm
-* @returns {boolean} A boolean that represents whether or not the token verifies successfully.  A "true" result indicates that the token was successfully verified.
+* @returns {Object} An object with 3 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.
 */
 export function verifyJwt({ jwt }) {
   const pubKey = uint8arrayFromString(NETWORK_PUB_KEY, 'base16')
@@ -371,5 +373,9 @@ export function verifyJwt({ jwt }) {
   // m is message uint8array
   // function is: function (p, s, m)
 
-  return Boolean(wasmBlsSdkHelpers.verify(pubKey, sig, message))
+  return {
+    verified: Boolean(wasmBlsSdkHelpers.verify(pubKey, sig, message)),
+    header: JSON.parse(uint8arrayToString(uint8arrayFromString(jwtParts[0], 'base64url'))),
+    payload: JSON.parse(uint8arrayToString(uint8arrayFromString(jwtParts[1], 'base64url')))
+  }
 }

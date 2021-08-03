@@ -171,7 +171,7 @@ Verify a JWT from the LIT network.  Use this for auth on your server.  For some 
 
     *   `params.jwt` **[string][61]** A JWT signed by the LIT network using the BLS12-381 algorithm
 
-Returns **[boolean][63]** A boolean that represents whether or not the token verifies successfully.  A "true" result indicates that the token was successfully verified.
+Returns **[Object][60]** An object with 3 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.
 
 ## findLITs
 

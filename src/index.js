@@ -51,6 +51,8 @@ if (typeof window !== 'undefined') {
   } else {
     listenForChildFrameMessages()
   }
+} else {
+  var window = global
 }
 
 initWasmBlsSdk().then((exports) => {
