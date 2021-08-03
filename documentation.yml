@@ -5,23 +5,24 @@ toc:
   - mintLIT
   - LitNodeClient
   - unlockLitWithKey
+  - verifyJwt
   - findLITs
   - sendLIT
   - createHtmlLIT
   - toggleLock
   - injectViewerIFrame
-  - name: Encryption and decryption utilities
+  - name: Static Content - Encryption and decryption utilities
   - zipAndEncryptString
   - zipAndEncryptFiles
   - encryptZip
   - decryptZip
   - decryptWithSymmetricKey
   - encryptWithSymmetricKey
-  - encryptWithPubKey
-  - decryptWithPrivKey
   - name: Other Utilities
   - fileToDataUrl
   - checkAndSignAuthMessage
   - name: Types
+  - AccessControlCondition
+  - ResourceId
   - AuthSig
   - LITChain

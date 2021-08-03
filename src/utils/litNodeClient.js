@@ -71,33 +71,6 @@ export default class LitNodeClient {
   }
 
   /**
-* Verify a JWT from the LIT network.  Use this for auth on your server.  For some background, users can define resources (URLs) for authorization via on-chain conditions using the saveSigningCondition function.  Other users can then request a signed JWT proving that their ETH account meets those on-chain conditions using the getSignedToken function.  Then, servers can verify that JWT using this function.  A successful verification proves that the user meets the on-chain conditions defined in the saveSigningCondition step.  For example, the on-chain condition could be posession of a specific NFT.
-* @param {Object} params
-* @param {string} params.jwt A JWT signed by the LIT network using the BLS12-381 algorithm
-* @returns {boolean} A boolean that represents whether or not the token verifies successfully.  A "true" result indicates that the token was successfully verified.
-*/
-  verifyJwt({ jwt }) {
-    const pubKey = uint8arrayFromString(this.networkPubKey, 'base16')
-    // console.log('pubkey is ', pubKey)
-    const jwtParts = jwt.split('.')
-    const sig = uint8arrayFromString(jwtParts[2], 'base64url')
-    // console.log('sig is ', uint8arrayToString(sig, 'base16'))
-    const unsignedJwt = `${jwtParts[0]}.${jwtParts[1]}`
-    // console.log('unsignedJwt is ', unsignedJwt)
-    const message = uint8arrayFromString(unsignedJwt)
-    // console.log('message is ', message)
-
-    // TODO check for expiration
-
-    // p is public key uint8array
-    // s is signature uint8array
-    // m is message uint8array
-    // function is: function (p, s, m)
-
-    return Boolean(wasmBlsSdkHelpers.verify(pubKey, sig, message))
-  }
-
-  /**
  * Request a signed JWT from the LIT network.  Before calling this function, you must either create or know of a resource id and access control conditions for the item you wish to gain authorization for.  You can create an access control condition using the saveSigningCondition function.
  * @param {Object} params
  * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
@@ -185,7 +158,7 @@ export default class LitNodeClient {
    * @param {Object} params
    * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain the encryption key, used to decrypt the data.  This could be posession of an NFT, for example.
    * @param {string} params.toDecrypt The ciphertext that you wish to decrypt
-  * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+   * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
    * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
   */

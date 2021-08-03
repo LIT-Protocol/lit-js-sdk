@@ -66,3 +66,6 @@ export const LIT_CHAINS = {
     type: 'ERC20'
   }
 }
+
+
+export const NETWORK_PUB_KEY = "9971e835a1fe1a4d78e381eebbe0ddc84fde5119169db816900de796d10187f3c53d65c1202ac083d099a517f34a9b62"

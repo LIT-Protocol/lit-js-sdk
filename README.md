@@ -5,10 +5,14 @@
 - [LIT Protocol JS SDK](#lit-protocol-js-sdk)
   - [State of the network today](#state-of-the-network-today)
   - [How does the LIT protocol work?](#how-does-the-lit-protocol-work)
+    - [Static Content - Encrypting / locking](#static-content---encrypting--locking)
+    - [Dynamic Content - Authorizing access to a resource via JWT](#dynamic-content---authorizing-access-to-a-resource-via-jwt)
   - [Installation](#installation)
   - [Using the LIT Protocol](#using-the-lit-protocol)
-    - [Minting LITs](#minting-lits)
-    - [Unlocking LITs](#unlocking-lits)
+    - [Static Content - Minting LITs](#static-content---minting-lits)
+    - [Static Content - Unlocking LITs](#static-content---unlocking-lits)
+    - [Dynamic Content - Provisoning access to a resource](#dynamic-content---provisoning-access-to-a-resource)
+    - [Dynamic Content - Accessing a resource](#dynamic-content---accessing-a-resource)
   - [API](#api)
   - [Questions or Support](#questions-or-support)
 
@@ -17,7 +21,13 @@
 
 # LIT Protocol JS SDK
 
-The LIT Protocol provides a decentralized way to encrypt and lock content that can be unlocked and decrypted by satisfying some on-chain verifable conditions, such as ownership of an NFT.  Simply put, it enables the creation of locked NFTs that can only be unlocked by owners of that NFT.  LITs are HTML/JS/CSS web pages that can be interactive and dynamic.
+The LIT Protocol is a decentralized access control protocol running on top of Ethereum and other EVM chains.  With LIT, you can do 4 main things: 
+* Encrypt and lock static content behind an on chain condition (for example, posession of an NFT)
+* Decrypt static content that was locked behind an on chain condition
+* Authorize network signatures that provide access to dynamic content (for example, a server or network resource) behind an on chain condition
+* Request a network signed JWT that provisions access and authorization to dynamic content behind an on chain condition. 
+  
+With this functionality, the LIT protocol enables the creation of locked NFTs that can only be unlocked by owners of that NFT.  It also enables provisioning access to a given server or network resource only to NFT owners.  Rather than a simple JPEG, LIT NFTs are HTML/JS/CSS web pages that can be interactive and dynamic.
 
 ## State of the network today
 
@@ -25,7 +35,13 @@ Right now, the LIT Protocol is in an alpha state and the creators are running al
 
 ## How does the LIT protocol work?
 
-This SDK will encrypt your content, and upload your conditions for decryption to each LIT node.  When someone wants to access the content, the SDK will send a signed message that proves that they own the NFT associated with the content to each LIT node.  The LIT nodes will then send down the decryption shares and the SDK will combine them and decrypt the content.
+### Static Content - Encrypting / locking
+
+This SDK will encrypt your content, and upload your conditions for decryption to each LIT node.  When someone wants to access the content, the SDK will request a message signature from the user's wallet that proves that they own the NFT associated with the content to each LIT node.  The LIT nodes will then send down the decryption shares and the SDK will combine them and decrypt the content.
+
+### Dynamic Content - Authorizing access to a resource via JWT
+This SDK has a function to create the authorization conditions for a given resource and store them with the nodes.  When someone requests a network signature because they are trying to access a resource (typically a server that serves some dynamic content), the SDK will request a message signature from the user's wallet that proves that they own the NFT associated with the resource to each LIT node.  The LIT nodes will then send down the signature shares and the SDK will combine them to obtain a signed JWT which can be presented to the resource to authenticate and authorize the user.
+
 
 ## Installation
 
@@ -49,7 +65,7 @@ We also provide a web-ready package with all dependencies included at build/inde
 
 You can then use all the sdk functions via LitJsSdk.default for example `LitJsSdk.default.toggleLock()`
 
-Note that if you use a script tag like this, you will likely need to initialize a connection to the LIT Network using something like this:
+Note that if you use a script tag like this, you will likely need to initialize a connection to the LIT Network using something like the below code snippet.  The SDK requires an active connection to the LIT nodes to perform most functions (but, notably, a connection to the LIT nodes is not required if you are just verifying a JWT)
 
 ```
 function litJsSdkLoaded(){
@@ -61,9 +77,9 @@ function litJsSdkLoaded(){
 
 ## Using the LIT Protocol
 
-An example application can be found here: https://github.com/LIT-Protocol/MintLIT
+An example application that showcases the static content usecases can be found here: https://github.com/LIT-Protocol/MintLIT
 
-### Minting LITs
+### Static Content - Minting LITs
 
 LITs are essentially super-powered NFTs.  To mint a LIT, you should mint (or already own) any ERC721 or ERC1155 NFT that will serve as the access control token for unlocking the LIT.
 
@@ -174,7 +190,7 @@ await createTokenMetadata({
 
 Now, you can send the NFT that corresponds to this LIT to anyone, and they can use the website at fileUrl to unlock and decrypt the content inside it.
 
-### Unlocking LITs
+### Static Content - Unlocking LITs
 
 To unlock a LIT, you must retrieve the encryption key from the server.  This SDK provides a convenience function to do this for you called `toggleLock`.  It will pull down the encryption key, and decrypt content located at `window.encryptedZipDataUrl`, and then load the content into a div with id `mediaGridHolder`.  You may use `toggleLock` or implement parts of it yourself if you have further customizations.  Here's how it works.
 
@@ -207,6 +223,10 @@ const mediaGridHtmlBody = await decryptedFiles['string.txt'].async('text')
 // load the content into a div so the user can see it
 document.getElementById('mediaGridHolder').innerHTML = mediaGridHtmlBody
 ```
+
+### Dynamic Content - Provisoning access to a resource
+
+### Dynamic Content - Accessing a resource
 
 
 ## API

@@ -19,7 +19,7 @@ import {
 } from './frameComms'
 
 import { fileToDataUrl } from './browser'
-import { LIT_CHAINS } from '../lib/constants'
+import { LIT_CHAINS, NETWORK_PUB_KEY } from '../lib/constants'
 
 const PACKAGE_CACHE = {}
 
@@ -345,4 +345,31 @@ export async function unlockLitWithKey({ symmetricKey }) {
   mediaGridHolder.innerHTML = mediaGridHtmlBody
   lockedHeader.innerText = 'UNLOCKED'
   window.locked = false
+}
+
+/**
+* Verify a JWT from the LIT network.  Use this for auth on your server.  For some background, users can define resources (URLs) for authorization via on-chain conditions using the saveSigningCondition function.  Other users can then request a signed JWT proving that their ETH account meets those on-chain conditions using the getSignedToken function.  Then, servers can verify that JWT using this function.  A successful verification proves that the user meets the on-chain conditions defined in the saveSigningCondition step.  For example, the on-chain condition could be posession of a specific NFT.
+* @param {Object} params
+* @param {string} params.jwt A JWT signed by the LIT network using the BLS12-381 algorithm
+* @returns {boolean} A boolean that represents whether or not the token verifies successfully.  A "true" result indicates that the token was successfully verified.
+*/
+export function verifyJwt({ jwt }) {
+  const pubKey = uint8arrayFromString(NETWORK_PUB_KEY, 'base16')
+  // console.log('pubkey is ', pubKey)
+  const jwtParts = jwt.split('.')
+  const sig = uint8arrayFromString(jwtParts[2], 'base64url')
+  // console.log('sig is ', uint8arrayToString(sig, 'base16'))
+  const unsignedJwt = `${jwtParts[0]}.${jwtParts[1]}`
+  // console.log('unsignedJwt is ', unsignedJwt)
+  const message = uint8arrayFromString(unsignedJwt)
+  // console.log('message is ', message)
+
+  // TODO check for expiration
+
+  // p is public key uint8array
+  // s is signature uint8array
+  // m is message uint8array
+  // function is: function (p, s, m)
+
+  return Boolean(wasmBlsSdkHelpers.verify(pubKey, sig, message))
 }

@@ -7,17 +7,17 @@
     *   [Parameters][3]
 *   [LitNodeClient][4]
     *   [Parameters][5]
-    *   [verifyJwt][6]
+    *   [getSignedToken][6]
         *   [Parameters][7]
-    *   [getSignedToken][8]
+    *   [saveSigningCondition][8]
         *   [Parameters][9]
-    *   [saveSigningCondition][10]
+    *   [getEncryptionKey][10]
         *   [Parameters][11]
-    *   [getEncryptionKey][12]
+    *   [saveEncryptionKey][12]
         *   [Parameters][13]
-    *   [saveEncryptionKey][14]
-        *   [Parameters][15]
-*   [unlockLitWithKey][16]
+*   [unlockLitWithKey][14]
+    *   [Parameters][15]
+*   [verifyJwt][16]
     *   [Parameters][17]
 *   [findLITs][18]
     *   [Parameters][19]
@@ -28,7 +28,7 @@
 *   [toggleLock][24]
 *   [injectViewerIFrame][25]
     *   [Parameters][26]
-*   [Encryption and decryption utilities][27]
+*   [Static Content - Encryption and decryption utilities][27]
 *   [zipAndEncryptString][28]
     *   [Parameters][29]
 *   [zipAndEncryptFiles][30]
@@ -41,25 +41,25 @@
     *   [Parameters][37]
 *   [encryptWithSymmetricKey][38]
     *   [Parameters][39]
-*   [encryptWithPubKey][40]
-    *   [Parameters][41]
-*   [decryptWithPrivKey][42]
-    *   [Parameters][43]
-*   [Other Utilities][44]
-*   [fileToDataUrl][45]
-    *   [Parameters][46]
-*   [checkAndSignAuthMessage][47]
-    *   [Parameters][48]
-*   [Types][49]
+*   [Other Utilities][40]
+*   [fileToDataUrl][41]
+    *   [Parameters][42]
+*   [checkAndSignAuthMessage][43]
+    *   [Parameters][44]
+*   [Types][45]
+*   [AccessControlCondition][46]
+    *   [Properties][47]
+*   [ResourceId][48]
+    *   [Properties][49]
 *   [AuthSig][50]
     *   [Properties][51]
 *   [LITChain][52]
     *   [Properties][53]
 *   [LIT_CHAINS][54]
-*   [AccessControlCondition][55]
-    *   [Properties][56]
-*   [ResourceId][57]
-    *   [Properties][58]
+*   [encryptWithPubKey][55]
+    *   [Parameters][56]
+*   [decryptWithPrivKey][57]
+    *   [Parameters][58]
 
 ## Welcome
 
@@ -88,18 +88,6 @@ A LIT node client.  Connects directly to the LIT nodes to store and retrieve enc
 
     *   `config.alertWhenUnauthorized` **[boolean][63]** Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  If you turn this off, you should create an event listener for the "lit-authFailure" event on the document, and show your own error to the user. (optional, default `true`)
     *   `config.minNodeCount` **[number][62]** The minimum number of nodes that must be connected for the LitNodeClient to be ready to use. (optional, default `8`)
-
-### verifyJwt
-
-Verify a JWT from the LIT network.  Use this for auth on your server.  For some background, users can define resources (URLs) for authorization via on-chain conditions using the saveSigningCondition function.  Other users can then request a signed JWT proving that their ETH account meets those on-chain conditions using the getSignedToken function.  Then, servers can verify that JWT using this function.  A successful verification proves that the user meets the on-chain conditions defined in the saveSigningCondition step.  For example, the on-chain condition could be posession of a specific NFT.
-
-#### Parameters
-
-*   `params` **[Object][60]** 
-
-    *   `params.jwt` **[string][61]** A JWT signed by the LIT network using the BLS12-381 algorithm
-
-Returns **[boolean][63]** A boolean that represents whether or not the token verifies successfully.  A "true" result indicates that the token was successfully verified.
 
 ### getSignedToken
 
@@ -173,6 +161,18 @@ Manually unlock a LIT with a symmetric key.  You can obtain this key by calling 
 
 Returns **[promise][68]** A promise that will resolve when the LIT is unlocked
 
+## verifyJwt
+
+Verify a JWT from the LIT network.  Use this for auth on your server.  For some background, users can define resources (URLs) for authorization via on-chain conditions using the saveSigningCondition function.  Other users can then request a signed JWT proving that their ETH account meets those on-chain conditions using the getSignedToken function.  Then, servers can verify that JWT using this function.  A successful verification proves that the user meets the on-chain conditions defined in the saveSigningCondition step.  For example, the on-chain condition could be posession of a specific NFT.
+
+### Parameters
+
+*   `params` **[Object][60]** 
+
+    *   `params.jwt` **[string][61]** A JWT signed by the LIT network using the BLS12-381 algorithm
+
+Returns **[boolean][63]** A boolean that represents whether or not the token verifies successfully.  A "true" result indicates that the token was successfully verified.
+
 ## findLITs
 
 Finds the tokens that the current user owns from the predeployed LIT contracts
@@ -242,7 +242,7 @@ Inject an iFrame into the current page that will display a LIT.  This function s
 
 Returns **[promise][68]** A promise that will resolve when the LIT is unlocked
 
-## Encryption and decryption utilities
+## Static Content - Encryption and decryption utilities
 
 
 
@@ -309,30 +309,6 @@ Encrypt a blob with a symmetric key
 
 Returns **[Blob][69]** The encrypted blob
 
-## encryptWithPubKey
-
-Encrypt a blob with the public key of a receiver
-
-### Parameters
-
-*   `receiverPublicKey` **[string][61]** The base64 encoded 32 byte public key.  The corresponding private key will be able to decrypt this blob
-*   `data` **[Blob][69]** The blob to encrypt
-*   `version` **[string][61]** The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
-
-Returns **[Blob][69]** The encrypted blob
-
-## decryptWithPrivKey
-
-Decrypt a blob with a private key
-
-### Parameters
-
-*   `encryptedData` **[Blob][69]** The blob to decrypt
-*   `receiverPrivateKey` **[string][61]** The base64 encoded 32 byte private key.  The corresponding public key was used to encrypt this blob
-*   `version` **[string][61]** The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
-
-Returns **[Blob][69]** The decrypted blob
-
 ## Other Utilities
 
 
@@ -363,6 +339,29 @@ Returns **[AuthSig][66]** The AuthSig created or retrieved
 
 
 
+## AccessControlCondition
+
+Type: [Object][60]
+
+### Properties
+
+*   `contractAddress` **[string][61]** The address of the contract that will be queried
+*   `chain` **[string][61]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+*   `standardContractType` **[string][61]** If the contract is an ERC20, ERC721, or ERC1155, please put that here
+*   `method` **[string][61]** The smart contract function to call
+*   `parameters` **[Array][64]** The parameters to use when calling the smart contract.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
+*   `returnValueTest` **[Object][60]** An object containing two keys: "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.
+
+## ResourceId
+
+Type: [Object][60]
+
+### Properties
+
+*   `baseUrl` **[string][61]** The base url of the resource that will be authorized
+*   `path` **[string][61]** The path of the url of the resource that will be authorized
+*   `orgId` **[string][61]** Optional.  The org id that the user would be authorized to belong to.
+
 ## AuthSig
 
 Type: [Object][60]
@@ -390,28 +389,29 @@ Pre-deployed token contracts that you may use for minting LITs.  These are ERC11
 
 Type: [LITChain][70]
 
-## AccessControlCondition
+## encryptWithPubKey
 
-Type: [Object][60]
+Encrypt a blob with the public key of a receiver
 
-### Properties
+### Parameters
 
-*   `contractAddress` **[string][61]** The address of the contract that will be queried
-*   `chain` **[string][61]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-*   `standardContractType` **[string][61]** If the contract is an ERC20, ERC721, or ERC1155, please put that here
-*   `method` **[string][61]** The smart contract function to call
-*   `parameters` **[Array][64]** The parameters to use when calling the smart contract.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
-*   `returnValueTest` **[Object][60]** An object containing two keys: "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.
+*   `receiverPublicKey` **[string][61]** The base64 encoded 32 byte public key.  The corresponding private key will be able to decrypt this blob
+*   `data` **[Blob][69]** The blob to encrypt
+*   `version` **[string][61]** The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
 
-## ResourceId
+Returns **[Blob][69]** The encrypted blob
 
-Type: [Object][60]
+## decryptWithPrivKey
 
-### Properties
+Decrypt a blob with a private key
 
-*   `baseUrl` **[string][61]** The base url of the resource that will be authorized
-*   `path` **[string][61]** The path of the url of the resource that will be authorized
-*   `orgId` **[string][61]** Optional.  The org id that the user would be authorized to belong to.
+### Parameters
+
+*   `encryptedData` **[Blob][69]** The blob to decrypt
+*   `receiverPrivateKey` **[string][61]** The base64 encoded 32 byte private key.  The corresponding public key was used to encrypt this blob
+*   `version` **[string][61]** The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
+
+Returns **[Blob][69]** The decrypted blob
 
 [1]: #welcome
 
@@ -423,27 +423,27 @@ Type: [Object][60]
 
 [5]: #parameters-1
 
-[6]: #verifyjwt
+[6]: #getsignedtoken
 
 [7]: #parameters-2
 
-[8]: #getsignedtoken
+[8]: #savesigningcondition
 
 [9]: #parameters-3
 
-[10]: #savesigningcondition
+[10]: #getencryptionkey
 
 [11]: #parameters-4
 
-[12]: #getencryptionkey
+[12]: #saveencryptionkey
 
 [13]: #parameters-5
 
-[14]: #saveencryptionkey
+[14]: #unlocklitwithkey
 
 [15]: #parameters-6
 
-[16]: #unlocklitwithkey
+[16]: #verifyjwt
 
 [17]: #parameters-7
 
@@ -465,7 +465,7 @@ Type: [Object][60]
 
 [26]: #parameters-11
 
-[27]: #encryption-and-decryption-utilities
+[27]: #static-content---encryption-and-decryption-utilities
 
 [28]: #zipandencryptstring
 
@@ -491,43 +491,43 @@ Type: [Object][60]
 
 [39]: #parameters-17
 
-[40]: #encryptwithpubkey
+[40]: #other-utilities
 
-[41]: #parameters-18
+[41]: #filetodataurl
 
-[42]: #decryptwithprivkey
+[42]: #parameters-18
 
-[43]: #parameters-19
+[43]: #checkandsignauthmessage
 
-[44]: #other-utilities
+[44]: #parameters-19
 
-[45]: #filetodataurl
+[45]: #types
 
-[46]: #parameters-20
+[46]: #accesscontrolcondition
 
-[47]: #checkandsignauthmessage
+[47]: #properties
 
-[48]: #parameters-21
+[48]: #resourceid
 
-[49]: #types
+[49]: #properties-1
 
 [50]: #authsig
 
-[51]: #properties
+[51]: #properties-2
 
 [52]: #litchain
 
-[53]: #properties-1
+[53]: #properties-3
 
 [54]: #lit_chains
 
-[55]: #accesscontrolcondition
+[55]: #encryptwithpubkey
 
-[56]: #properties-2
+[56]: #parameters-20
 
-[57]: #resourceid
+[57]: #decryptwithprivkey
 
-[58]: #properties-3
+[58]: #parameters-21
 
 [59]: https://github.com/LIT-Protocol/lit-js-sdk/blob/main/README.md
 

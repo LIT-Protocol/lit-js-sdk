@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset='utf-8'>
-  <title>lit-js-sdk 1.1.21 | Documentation</title>
+  <title>lit-js-sdk 1.1.22 | Documentation</title>
   <meta name='description' content='LIT Javascript SDK'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' rel='stylesheet'>
@@ -15,7 +15,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>lit-js-sdk</h3>
-          <div class='mb1'><code>1.1.21</code></div>
+          <div class='mb1'><code>1.1.22</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -62,12 +62,6 @@
                       <li class='h5'><span>Instance members</span></li>
                       
                       <li><a
-                        href='#litnodeclientverifyjwt'
-                        class='regular pre-open'>
-                        #verifyJwt
-                      </a></li>
-                      
-                      <li><a
                         href='#litnodeclientgetsignedtoken'
                         class='regular pre-open'>
                         #getSignedToken
@@ -104,6 +98,16 @@
                   href='#unlocklitwithkey'
                   class="">
                   unlockLitWithKey
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#verifyjwt'
+                  class="">
+                  verifyJwt
                   
                 </a>
                 
@@ -161,9 +165,9 @@
               
                 
                 <li><a
-                  href='#encryption-and-decryption-utilities'
+                  href='#static-content---encryption-and-decryption-utilities'
                   class="h5 bold black caps">
-                  Encryption and decryption utilities
+                  Static Content - Encryption and decryption utilities
                   
                 </a>
                 
@@ -231,26 +235,6 @@
               
                 
                 <li><a
-                  href='#encryptwithpubkey'
-                  class="">
-                  encryptWithPubKey
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#decryptwithprivkey'
-                  class="">
-                  decryptWithPrivKey
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
                   href='#other-utilities'
                   class="h5 bold black caps">
                   Other Utilities
@@ -291,6 +275,26 @@
               
                 
                 <li><a
+                  href='#accesscontrolcondition'
+                  class="">
+                  AccessControlCondition
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#resourceid'
+                  class="">
+                  ResourceId
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#authsig'
                   class="">
                   AuthSig
@@ -321,9 +325,9 @@
               
                 
                 <li><a
-                  href='#accesscontrolcondition'
+                  href='#encryptwithpubkey'
                   class="">
-                  AccessControlCondition
+                  encryptWithPubKey
                   
                 </a>
                 
@@ -331,9 +335,9 @@
               
                 
                 <li><a
-                  href='#resourceid'
+                  href='#decryptwithprivkey'
                   class="">
-                  ResourceId
+                  decryptWithPrivKey
                   
                 </a>
                 
@@ -563,101 +567,6 @@
   
     <div class='py1 quiet mt1 prose-big'>Instance Members</div>
     <div class="clearfix">
-  
-    <div class='border-bottom' id='litnodeclientverifyjwt'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>verifyJwt(params)</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Verify a JWT from the LIT network.  Use this for auth on your server.  For some background, users can define resources (URLs) for authorization via on-chain conditions using the saveSigningCondition function.  Other users can then request a signed JWT proving that their ETH account meets those on-chain conditions using the getSignedToken function.  Then, servers can verify that JWT using this function.  A successful verification proves that the user meets the on-chain conditions defined in the saveSigningCondition step.  For example, the on-chain condition could be posession of a specific NFT.</p>
-
-    <div class='pre p1 fill-light mt0'>verifyJwt(params: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    
-          </div>
-          
-          <table class='mt1 mb2 fixed-table h5 col-12'>
-            <colgroup>
-              <col width='30%' />
-              <col width='70%' />
-            </colgroup>
-            <thead>
-              <tr class='bold fill-light'>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody class='mt1'>
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.jwt</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  </td>
-  <td class='break-word'><span>A JWT signed by the LIT network using the BLS12-381 algorithm
-</span></td>
-</tr>
-
-
-              
-            </tbody>
-          </table>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>:
-        A boolean that represents whether or not the token verifies successfully.  A "true" result indicates that the token was successfully verified.
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
   
     <div class='border-bottom' id='litnodeclientgetsignedtoken'>
       <div class="clearfix small pointer toggle-sibling">
@@ -1260,6 +1169,102 @@
   
   <div class='clearfix'>
     
+    <h3 class='fl m0' id='verifyjwt'>
+      verifyJwt
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Verify a JWT from the LIT network.  Use this for auth on your server.  For some background, users can define resources (URLs) for authorization via on-chain conditions using the saveSigningCondition function.  Other users can then request a signed JWT proving that their ETH account meets those on-chain conditions using the getSignedToken function.  Then, servers can verify that JWT using this function.  A successful verification proves that the user meets the on-chain conditions defined in the saveSigningCondition step.  For example, the on-chain condition could be posession of a specific NFT.</p>
+
+    <div class='pre p1 fill-light mt0'>verifyJwt(params: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    
+          </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.jwt</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  </td>
+  <td class='break-word'><span>A JWT signed by the LIT network using the BLS12-381 algorithm
+</span></td>
+</tr>
+
+
+              
+            </tbody>
+          </table>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>:
+        A boolean that represents whether or not the token verifies successfully.  A "true" result indicates that the token was successfully verified.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
     <h3 class='fl m0' id='findlits'>
       findLITs
     </h3>
@@ -1830,8 +1835,8 @@
           
             <div class='keyline-top-not py2'><section class='py2 clearfix'>
 
-  <h2 id='encryption-and-decryption-utilities' class='mt0'>
-    Encryption and decryption utilities
+  <h2 id='static-content---encryption-and-decryption-utilities' class='mt0'>
+    Static Content - Encryption and decryption utilities
   </h2>
 
   
@@ -2300,186 +2305,6 @@
           
         
           
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='encryptwithpubkey'>
-      encryptWithPubKey
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Encrypt a blob with the public key of a receiver</p>
-
-    <div class='pre p1 fill-light mt0'>encryptWithPubKey(receiverPublicKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, data: <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>, version: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>receiverPublicKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    The base64 encoded 32 byte public key.  The corresponding private key will be able to decrypt this blob
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>data</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>)</code>
-	    The blob to encrypt
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>version</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></code>:
-        The encrypted blob
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='decryptwithprivkey'>
-      decryptWithPrivKey
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Decrypt a blob with a private key</p>
-
-    <div class='pre p1 fill-light mt0'>decryptWithPrivKey(encryptedData: <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>, receiverPrivateKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, version: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>encryptedData</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>)</code>
-	    The blob to decrypt
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>receiverPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    The base64 encoded 32 byte private key.  The corresponding public key was used to encrypt this blob
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>version</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></code>:
-        The decrypted blob
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
             <div class='keyline-top-not py2'><section class='py2 clearfix'>
 
   <h2 id='other-utilities' class='mt0'>
@@ -2671,6 +2496,187 @@
     
   
 </section></div>
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='accesscontrolcondition'>
+      AccessControlCondition
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>AccessControlCondition</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>contractAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The address of the contract that will be queried
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>chain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>standardContractType</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : If the contract is an ERC20, ERC721, or ERC1155, please put that here
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>method</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The smart contract function to call
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>parameters</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>)</code>
+          : The parameters to use when calling the smart contract.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>returnValueTest</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+          : An object containing two keys: "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='resourceid'>
+      ResourceId
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>ResourceId</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>baseUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The base url of the resource that will be authorized
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The path of the url of the resource that will be authorized
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>orgId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : Optional.  The org id that the user would be authorized to belong to.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
           
         
           
@@ -2901,21 +2907,17 @@
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='accesscontrolcondition'>
-      AccessControlCondition
+    <h3 class='fl m0' id='encryptwithpubkey'>
+      encryptWithPubKey
     </h3>
     
     
   </div>
   
 
-  
-    <div class='pre p1 fill-light mt0'>AccessControlCondition</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
+  <p>Encrypt a blob with the public key of a receiver</p>
+
+    <div class='pre p1 fill-light mt0'>encryptWithPubKey(receiverPublicKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, data: <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>, version: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></div>
   
   
 
@@ -2927,56 +2929,49 @@
   
 
   
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
       
         <div class='space-bottom0'>
-          <span class='code bold'>contractAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The address of the contract that will be queried
+          <div>
+            <span class='code bold'>receiverPublicKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The base64 encoded 32 byte public key.  The corresponding private key will be able to decrypt this blob
 
+          </div>
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>chain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+          <div>
+            <span class='code bold'>data</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>)</code>
+	    The blob to encrypt
 
+          </div>
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>standardContractType</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : If the contract is an ERC20, ERC721, or ERC1155, please put that here
+          <div>
+            <span class='code bold'>version</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
 
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>method</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The smart contract function to call
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>parameters</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>)</code>
-          : The parameters to use when calling the smart contract.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>returnValueTest</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-          : An object containing two keys: "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.
-
+          </div>
           
         </div>
       
     </div>
   
 
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></code>:
+        The encrypted blob
+
+      
+    
   
 
   
@@ -3002,21 +2997,17 @@
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='resourceid'>
-      ResourceId
+    <h3 class='fl m0' id='decryptwithprivkey'>
+      decryptWithPrivKey
     </h3>
     
     
   </div>
   
 
-  
-    <div class='pre p1 fill-light mt0'>ResourceId</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
+  <p>Decrypt a blob with a private key</p>
+
+    <div class='pre p1 fill-light mt0'>decryptWithPrivKey(encryptedData: <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>, receiverPrivateKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, version: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></div>
   
   
 
@@ -3028,35 +3019,49 @@
   
 
   
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
       
         <div class='space-bottom0'>
-          <span class='code bold'>baseUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The base url of the resource that will be authorized
+          <div>
+            <span class='code bold'>encryptedData</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>)</code>
+	    The blob to decrypt
 
+          </div>
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The path of the url of the resource that will be authorized
+          <div>
+            <span class='code bold'>receiverPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The base64 encoded 32 byte private key.  The corresponding public key was used to encrypt this blob
 
+          </div>
           
         </div>
       
         <div class='space-bottom0'>
-          <span class='code bold'>orgId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : Optional.  The org id that the user would be authorized to belong to.
+          <div>
+            <span class='code bold'>version</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
 
+          </div>
           
         </div>
       
     </div>
   
 
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></code>:
+        The decrypted blob
+
+      
+    
   
 
   

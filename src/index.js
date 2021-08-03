@@ -7,7 +7,8 @@ import {
   decryptZip,
   createHtmlLIT,
   toggleLock,
-  unlockLitWithKey
+  unlockLitWithKey,
+  verifyJwt
 } from './utils/lit'
 
 import {
@@ -77,7 +78,8 @@ const functions = {
   unlockLitWithKey,
   injectViewerIFrame,
   printError,
-  canonicalAccessControlConditionFormatter
+  canonicalAccessControlConditionFormatter,
+  verifyJwt
 }
 
 export default functions
