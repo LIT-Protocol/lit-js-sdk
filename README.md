@@ -268,7 +268,8 @@ Next, define the Resource ID of the resource you are granting access to.  This i
 ```
 const resourceId = {
   baseUrl: 'https://my-dynamic-content-server.com',
-  path: '/a_path.html'
+  path: '/a_path.html',
+  orgId: ""
 }
 ```
 
@@ -300,7 +301,7 @@ const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: 'polygon'})
 Now, using the accessControlConditions and resourceId you defined when provisoning access to the resource, you can use the getSignedToken function to get the token:
 
 ```
-const jwt = await LitJsSdk.getSignedToken({ accessControlConditions, chain, authSig, resourceId })
+const jwt = await litNodeClient.getSignedToken({ accessControlConditions, chain, authSig, resourceId })
 ```
 
 You can then present this JWT to a server, which can verify it using the verifyJwt function documented here https://lit-protocol.github.io/lit-js-sdk/api_docs_html/index.html#verifyjwt 
