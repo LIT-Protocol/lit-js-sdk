@@ -322,6 +322,10 @@ export async function toggleLock() {
       chain: window.chain
     })
 
+    if (!symmetricKey) {
+      return // something went wrong, maybe user is unauthorized
+    }
+
     await unlockLitWithKey({ symmetricKey })
   } else {
     mediaGridHolder.innerHTML = window.publicContent

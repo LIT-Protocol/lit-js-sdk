@@ -186,6 +186,12 @@ export default class LitNodeClient {
     }
     const decryptionShares = await Promise.all(nodePromises)
     console.log('decryptionShares', decryptionShares)
+    const goodShares = decryptionShares.filter(d => d.decryptionShare !== "")
+    if (goodShares.length < this.config.minNodeCount) {
+      console.log(`majority of shares are bad. goodShares is ${JSON.stringify(goodShares)}`)
+      alert("You are not authorized to unlock this content")
+      return null;
+    }
 
     // sort the decryption shares by share index.  this is important when combining the shares.
     decryptionShares.sort((a, b) => a.shareIndex - b.shareIndex)
