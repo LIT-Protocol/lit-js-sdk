@@ -310,7 +310,14 @@ export async function toggleLock() {
     if (window.useLitPostMessageProxy) {
       // instead of asking the network for the key part, ask the parent frame
       // the parentframe will then call unlockLit() with the encryption key
-      sendMessageToFrameParent({ command: 'getEncryptionKey', target: 'LitNodeClient', params: { tokenAddress: window.tokenAddress, tokenId: window.tokenId, chain: window.chain, authSig } })
+      sendMessageToFrameParent({
+        command: 'getEncryptionKey', target: 'LitNodeClient', params: {
+          accessControlConditions: window.accessControlConditions,
+          toDecrypt: window.encryptedSymmetricKey,
+          authSig,
+          chain: window.chain
+        }
+      })
       return
     }
 
