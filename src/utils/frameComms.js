@@ -72,6 +72,7 @@ export const listenForFrameParentMessages = async () => {
       const { response, respondingToCommand } = event.data
       if (response === 'LIT_ACK') {
         window.useLitPostMessageProxy = true
+        document.dispatchEvent(new Event('lit-ready'))
         return
       }
       if (respondingToCommand === 'getEncryptionKey') {
