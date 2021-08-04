@@ -52,10 +52,11 @@ if (typeof window !== 'undefined') {
     listenForChildFrameMessages()
   }
 } else {
-  var window = global
+  global.window = {}
 }
 
 initWasmBlsSdk().then((exports) => {
+  // console.log('wtf, window? ', typeof window !== 'undefined')
   window.wasmExports = exports
 })
 
@@ -84,4 +85,4 @@ const functions = {
   verifyJwt
 }
 
-export default functions
+module.exports = functions

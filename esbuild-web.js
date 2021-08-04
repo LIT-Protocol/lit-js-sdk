@@ -7,7 +7,5 @@ build({
   outfile: 'build/index.web.js',
   sourceRoot: './',
   globalName: 'LitJsSdk',
-  define: {
-    global: 'window'
-  }
+
 })

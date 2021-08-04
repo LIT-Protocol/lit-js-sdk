@@ -70,7 +70,7 @@ Note that if you use a script tag like this, you will likely need to initialize 
 
 ```
 function litJsSdkLoaded(){
-   var litNodeClient = new LitJsSdk.default.LitNodeClient()
+  var litNodeClient = new LitJsSdk.LitNodeClient()
   litNodeClient.connect()
   window.litNodeClient = litNodeClient
 }

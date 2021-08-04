@@ -256,14 +256,14 @@ export async function createHtmlLIT({
         }
       })
     </script>
-    <script onload='LitJsSdk.default.litJsSdkLoadedInALIT()' src="https://jscdn.litgateway.com/index.web.js"></script>
+    <script onload='LitJsSdk.litJsSdkLoadedInALIT()' src="https://jscdn.litgateway.com/index.web.js"></script>
   </head>
   <body>
     <div id="root">${htmlBody}</div>
     <script>
       var unlockButton = document.getElementById('unlockButton')
       unlockButton.onclick = function() {
-        LitJsSdk.default.toggleLock()
+        LitJsSdk.toggleLock()
       }
       unlockButton.disabled = true
     </script>
