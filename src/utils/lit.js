@@ -229,6 +229,11 @@ export async function createHtmlLIT({
 <html>
   <head>
     <title>${title}</title>
+    <style>
+      html, body, #root {
+        height: 100%;
+      }
+    </style>
     <style id="jss-server-side">${css}</style>
     ${scriptTags}
     <script>

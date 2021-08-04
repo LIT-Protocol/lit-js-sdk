@@ -136,6 +136,11 @@ contract LIT is ERC1155, ContextMixin, NativeMetaTransaction {
 <html>
   <head>
     <title>${e}</title>
+    <style>
+      html, body, #root {
+        height: 100%;
+      }
+    </style>
     <style id="jss-server-side">${r}</style>
     ${v}
     <script>
