@@ -242,6 +242,8 @@ const jwt = "eyJhbGciOiJCTFMxMi0zODEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJMSVQiLCJzdWIi
 const { verified, header, payload } = LitJsSdk.verifyJwt({jwt})
 ```
 
+The "verified" variable is a boolean that indicates whether or not the signature verified properly.  Note: YOU MUST CHECK THE PAYLOAD AGAINST THE CONTENT YOU ARE PROTECTING.  This means you need to look at "payload.baseUrl" which should match the hostname of the server, and you must also look at "payload.path" which should match the path being accessed.  If these do not match what you're expecting, you should reject the request.
+
 ### Dynamic Content - Provisoning access to a resource
 Use this to put some dynamic content behind an on chain condition (for example, possession of an NFT).  This function will essentially store that condition and the resource that users who meet that condition should be authorized to access.  The resource could be a URL, for example.  The dynamic content server should then verify the JWT provided by the network on every request, which proves that the user meets the on chain condition.
 
