@@ -5,7 +5,12 @@ import naclUtil from 'tweetnacl-util'
 
 import { mostCommonString } from '../lib/utils'
 import { wasmBlsSdkHelpers } from '../lib/bls-sdk'
-import { hashAccessControlConditions, hashResourceId } from './crypto'
+import {
+  hashAccessControlConditions,
+  hashResourceId,
+  canonicalAccessControlConditionFormatter,
+  canonicalResourceIdFormatter
+} from './crypto'
 
 /**
  * @typedef {Object} AccessControlCondition
@@ -87,10 +92,21 @@ export default class LitNodeClient {
     const iat = Math.floor(now / 1000)
     const exp = iat + (12 * 60 * 60) // 12 hours in seconds
 
+    const formattedAccessControlConditions = accessControlConditions.map(c => canonicalAccessControlConditionFormatter(c))
+    const formattedResourceId = canonicalResourceIdFormatter(resourceId)
+
     // ask each node to sign the content
     const nodePromises = []
     for (const url of this.connectedNodes) {
-      nodePromises.push(this.getSigningShare({ url, accessControlConditions, resourceId, authSig, chain, iat, exp }))
+      nodePromises.push(this.getSigningShare({
+        url,
+        accessControlConditions: formattedAccessControlConditions,
+        resourceId: formattedResourceId,
+        authSig,
+        chain,
+        iat,
+        exp
+      }))
     }
     const signatureShares = await Promise.all(nodePromises)
     console.log('signatureShares', signatureShares)
