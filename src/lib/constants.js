@@ -14,18 +14,17 @@
 */
 export const LIT_CHAINS = {
   polygon: {
-    contractAddress: '0xb9A323711528D0c5a70df790929f4739f1cDd7fD',
+    contractAddress: '0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88',
     chainId: 137,
     name: 'Polygon',
     symbol: 'MATIC',
     decimals: 18,
-    rpcUrls: ['https://floral-rough-flower.matic.quiknode.pro/a17b25f97cc396bb2b6aaf85a005f579bf93dc73/'],
+    rpcUrls: ['https://rpc-mainnet.maticvigil.com/v1/96bf5fa6e03d272fbd09de48d03927b95633726c'],
     blockExplorerUrls: ['https://explorer.matic.network'],
-    type: 'ERC1155',
-    websocketUrl: 'wss://floral-rough-flower.matic.quiknode.pro/a17b25f97cc396bb2b6aaf85a005f579bf93dc73/'
+    type: 'ERC1155'
   },
   fantom: {
-    contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
+    contractAddress: '0x5bD3Fe8Ab542f0AaBF7552FAAf376Fd8Aa9b3869',
     chainId: 250,
     name: 'Fantom',
     symbol: 'FTM',
@@ -36,7 +35,7 @@ export const LIT_CHAINS = {
     websocketUrl: 'wss://wsapi.fantom.network'
   },
   xdai: {
-    contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
+    contractAddress: '0xDFc2Fd83dFfD0Dafb216F412aB3B18f2777406aF',
     chainId: 100,
     name: 'xDai',
     symbol: 'xDai',
@@ -47,7 +46,7 @@ export const LIT_CHAINS = {
     websocketUrl: 'wss://wsapi.fantom.network'
   },
   ethereum: {
-    contractAddress: '0x55485885e82E25446DEC314Ccb810Bda06B9e01B',
+    contractAddress: '0xA54F7579fFb3F98bd8649fF02813F575f9b3d353',
     chainId: 1,
     name: 'Ethereum',
     symbol: 'ETH',

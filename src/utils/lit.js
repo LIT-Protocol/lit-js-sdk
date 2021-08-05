@@ -243,6 +243,7 @@ export async function createHtmlLIT({
       var encryptedSymmetricKey = "${uint8arrayToString(encryptedSymmetricKey, 'base16')}"
       var locked = true
       var useLitPostMessageProxy = false
+      var sandboxed = false
 
       document.addEventListener('lit-ready', function(){
         var unlockButton = document.getElementById('unlockButton')
@@ -268,7 +269,14 @@ export async function createHtmlLIT({
     <script>
       var unlockButton = document.getElementById('unlockButton')
       unlockButton.onclick = function() {
-        LitJsSdk.toggleLock()
+        if (window.sandboxed) {
+          var loadingText = document.getElementById('loadingText')
+          if (loadingText){
+            loadingText.innerText = 'Could not unlock because OpenSea does not allow wallet access.  Click the arrow icon "View on Lit Protocol" in the top right to open this in a new window.'
+          }
+        } else {
+          LitJsSdk.toggleLock()
+        }
       }
       unlockButton.disabled = true
     </script>
