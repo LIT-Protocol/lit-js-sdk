@@ -273,6 +273,7 @@ export async function createHtmlLIT({
           var loadingText = document.getElementById('loadingText')
           if (loadingText){
             loadingText.innerText = 'Could not unlock because OpenSea does not allow wallet access.  Click the arrow icon "View on Lit Protocol" in the top right to open this in a new window.'
+            loadingText.style = 'color: rgba(255,100,100,1);'
           }
         } else {
           LitJsSdk.toggleLock()

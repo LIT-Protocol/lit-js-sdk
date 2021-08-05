@@ -3,12 +3,14 @@ import LitNodeClient from './litNodeClient'
 
 export const litJsSdkLoadedInALIT = () => {
   try {
-    sendMessageToFrameParent({ command: 'LIT_SYN' }, '*')
+    window.localStorage.getItem('test')
   } catch (e) {
     console.log('Could not sendMessageToFrameParent from a LIT. This usually means we are stuck in the opensea sandbox.')
     window.sandboxed = true
     document.dispatchEvent(new Event('lit-ready'))
+    return
   }
+  sendMessageToFrameParent({ command: 'LIT_SYN' }, '*')
   setTimeout(function () {
     if (!window.useLitPostMessageProxy) {
       console.log('inside lit - no parent frame lit node connection.  connecting ourselves.')
