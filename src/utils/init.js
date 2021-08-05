@@ -7,7 +7,9 @@ export const litJsSdkLoadedInALIT = () => {
   } catch (e) {
     console.log('Could not sendMessageToFrameParent from a LIT. This usually means we are stuck in the opensea sandbox.')
     window.sandboxed = true
-    document.dispatchEvent(new Event('lit-ready'))
+    setTimeout(function () {
+      document.dispatchEvent(new Event('lit-ready'))
+    }, 1000)
     return
   }
   sendMessageToFrameParent({ command: 'LIT_SYN' }, '*')
