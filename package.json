@@ -11,7 +11,8 @@
     "buildWebWithParcel": "parcel build --global LitJsSdk -d build --out-file index.web.js --public-url ./ src/index.js",
     "cdnDeploy": "yarn build; yarn buildWeb",
     "buildWeb": "node esbuild-web.js",
-    "esbuildPackage": "node esbuild-package.js"
+    "esbuildPackage": "node esbuild-package.js",
+    "test": "node --experimental-specifier-resolution=node tests/provisioningAndSigning.js"
   },
   "repository": {
     "type": "git",
@@ -39,6 +40,7 @@
     "@metamask/detect-provider": "^1.2.0",
     "buffer": "^6.0.3",
     "jszip": "^3.6.0",
+    "node-fetch-polyfill": "^2.0.6",
     "pako": "^2.0.3",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",

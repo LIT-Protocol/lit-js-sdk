@@ -102,26 +102,34 @@ export async function checkAndSignAuthMessage({ chain }) {
   const selectedChainId = '0x' + selectedChain.chainId.toString('16')
   console.debug(`checkAndSignAuthMessage with chainId ${chainId} and chain set to ${chain} and selectedChain is `, selectedChain)
   if (chainId !== selectedChainId) {
-    // the metamask chain switching thing does not work on mainnet
-    if (selectedChain.chainId !== 1) {
-      const data = [{
-        chainId: selectedChainId,
-        chainName: selectedChain.name,
-        nativeCurrency:
-        {
-          name: selectedChain.name,
-          symbol: selectedChain.symbol,
-          decimals: selectedChain.decimals
-        },
-        rpcUrls: selectedChain.rpcUrls,
-        blockExplorerUrls: selectedChain.blockExplorerUrls
-      }]
-      const res = await web3.request({ method: 'wallet_addEthereumChain', params: data }).catch()
-      if (res) {
-        console.log(res)
+    try {
+      await ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: selectedChainId }],
+      });
+    } catch (switchError) {
+      // This error code indicates that the chain has not been added to MetaMask.
+      if (switchError.code === 4902) {
+        try {
+          const data = [{
+            chainId: selectedChainId,
+            chainName: selectedChain.name,
+            nativeCurrency:
+            {
+              name: selectedChain.name,
+              symbol: selectedChain.symbol,
+              decimals: selectedChain.decimals
+            },
+            rpcUrls: selectedChain.rpcUrls,
+            blockExplorerUrls: selectedChain.blockExplorerUrls
+          }]
+          await web3.request({ method: 'wallet_addEthereumChain', params: data })
+        } catch (addError) {
+          // handle "add" error
+          throw addError;
+        }
       }
-    } else {
-      return { errorCode: 'wrong_chain' }
+      throw switchError
     }
   }
   let authSig = localStorage.getItem('lit-auth-signature')

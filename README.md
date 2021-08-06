@@ -326,10 +326,123 @@ const jwt = await litNodeClient.getSignedToken({ accessControlConditions, chain,
 
 You can then present this JWT to a server, which can verify it using the verifyJwt function documented here https://lit-protocol.github.io/lit-js-sdk/api_docs_html/index.html#verifyjwt 
 
+## Examples of access control conditions
+
+### Must posess at least one ERC1155 token with a given token id
+In this example, the token contract's address is 0x3110c39b428221012934A7F617913b095BC1078C and the token id we are checking for is 9541.
+
+```
+const accessControlConditions = [
+  {
+    contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
+    standardContractType: 'ERC1155',
+    chain,
+    method: 'balanceOf',
+    parameters: [
+      ':userAddress',
+      '9541'
+    ],
+    returnValueTest: {
+      comparator: '>',
+      value: '0'
+    }
+  }
+]
+```
+
+### Must posess a specific ERC721 token (NFT)
+In this example, the token contract's address is 0x3110c39b428221012934A7F617913b095BC1078C and the token id we are checking for is 9541.
+
+```
+const accessControlConditions = [
+  {
+    contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
+    standardContractType: 'ERC721',
+    chain,
+    method: 'ownerOf',
+    parameters: [
+      '9541'
+    ],
+    returnValueTest: {
+      comparator: '=',
+      value: ':userAddress'
+    }
+  }
+]
+```
+
+### Must posess any token in an ERC721 collection (NFT Collection)
+In this example, the token contract's address is 0x3110c39b428221012934A7F617913b095BC1078C.
+
+```
+const accessControlConditions = [
+  {
+    contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
+    standardContractType: 'ERC721',
+    chain,
+    method: 'balanceOf',
+    parameters: [
+      ':userAddress'
+    ],
+    returnValueTest: {
+      comparator: '>',
+      value: '0'
+    }
+  }
+]
+```
+
+### Must posess at least one ERC20 token
+In this example, the token contract's address is 0x3110c39b428221012934A7F617913b095BC1078C.
+
+```
+const accessControlConditions = [
+  {
+    contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
+    standardContractType: 'ERC20',
+    chain,
+    method: 'balanceOf',
+    parameters: [
+      ':userAddress'
+    ],
+    returnValueTest: {
+      comparator: '>',
+      value: '0'
+    }
+  }
+]
+```
+
+### Must posess at least 0.00001 ETH
+In this example, we are checking the ETH balance of the user's address and making sure it's above 0.00001 ETH.  Note that the return value is in Wei, so we specified 0.00001 ETH as 10000000000000 Wei.
+
+```
+const accessControlConditions = [
+  {
+    contractAddress: '',
+    standardContractType: '',
+    chain,
+    method: 'eth_getBalance',
+    parameters: [
+      ':userAddress',
+      'latest'
+    ],
+    returnValueTest: {
+      comparator: '>=',
+      value: '10000000000000'
+    }
+  }
+]
+```
 
 
 ## API
 You can find API documentation at https://lit-protocol.github.io/lit-js-sdk/api_docs_html/index.html
+
+## Tests
+Currently we have manual tests that you can run in the browser in manual_tests.html.  To run these, set up a HTTP server in the build folder.  We use python for this with the built in SimpleHTTPServer module by running "python2 -m SimpleHTTPServer" and then going to "http://localhost:8000/manual_tests.html" in a browser.
+
+There is also an attempt at automated tests in the tests folder but running it with nodejs does not work because this project is bundled.  An attempt at bundling the tests as well is in esbuild-tests.js which should work someday, but the project depends on fetch and I gave up when trying to inject fetch into esbuild.
 
 ## Questions or Support
 

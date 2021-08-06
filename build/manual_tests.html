@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <title>
+    Manual Tests
+  </title>
+
+  <script onload="LitJsSdk.litJsSdkLoadedInALIT()" src="/index.web.js"></script>
+  <script>
+    var chain = 'polygon'
+
+    var authSig = JSON.parse("{\"sig\":\"0x18a173d68d2f78cc5c13da0dfe36eec2a293285bee6d42547b9577bf26cdc985660ed3dddc4e75d422366cac07e8a9fc77669b10373bef9c7b8e4280252dfddf1b\",\"derivedVia\":\"web3.eth.personal.sign\",\"signedMessage\":\"I am creating an account to use LITs at 2021-08-04T20:14:04.918Z\",\"address\":\"0xdbd360f30097fb6d938dcc8b7b62854b36160b45\"}")
+
+    var randomPath = () => "/" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+    var testProvisoningAndSigning = async ({ accessControlConditions, testName }) => {
+      document.getElementById('status').innerText = `Testing ${testName}...`
+
+      let resourceId = {
+        baseUrl: 'https://my-dynamic-content-server.com',
+        path: randomPath(),
+        orgId: ""
+      }
+
+      await litNodeClient.saveSigningCondition({
+        accessControlConditions,
+        chain,
+        authSig,
+        resourceId
+      })
+
+
+      let jwt = await litNodeClient.getSignedToken({
+        accessControlConditions,
+        chain,
+        authSig,
+        resourceId
+      })
+
+      console.log(jwt)
+      if (jwt) {
+        document.getElementById('status').innerText = `${testName}: Success`
+      } else {
+        document.getElementById('status').innerText = `${testName}: Failure`
+      }
+    }
+
+    // Actual tests are below here
+    var ERC1155 = async () => {
+      var accessControlConditions = [
+        {
+          contractAddress: '0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88',
+          standardContractType: 'ERC1155',
+          chain,
+          method: 'balanceOf',
+          parameters: [
+            ':userAddress',
+            '8'
+          ],
+          returnValueTest: {
+            comparator: '>',
+            value: '0'
+          }
+        }
+      ]
+      await testProvisoningAndSigning({
+        accessControlConditions,
+        testName: "ERC1155"
+      })
+    }
+
+    var ERC721NFT = async () => {
+      var accessControlConditions = [
+        {
+          contractAddress: '0x319ba3aab86e04a37053e984bd411b2c63bf229e',
+          standardContractType: 'ERC721',
+          chain,
+          method: 'ownerOf',
+          parameters: [
+            '5954'
+          ],
+          returnValueTest: {
+            comparator: '=',
+            value: ':userAddress'
+          }
+        }
+      ]
+      await testProvisoningAndSigning({
+        accessControlConditions,
+        testName: "ERC721NFT"
+      })
+    }
+
+  </script>
+</head>
+
+<body>
+  <h1>Manual tests</h1>
+  <br />
+  <br />
+  <button onclick="ERC1155()">ERC1155</button>
+  <br />
+  <br />
+  <button onclick="ERC721NFT()">ERC721NFT</button>
+
+  <br />
+  <br />
+  <h2 id="status"></h2>
+
+</body>
+
+</html>

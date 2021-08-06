@@ -110,6 +110,12 @@ export default class LitNodeClient {
     }
     const signatureShares = await Promise.all(nodePromises)
     console.log('signatureShares', signatureShares)
+    const goodShares = signatureShares.filter(d => d.signatureShare !== "")
+    if (goodShares.length < this.config.minNodeCount) {
+      console.log(`majority of shares are bad. goodShares is ${JSON.stringify(goodShares)}`)
+      alert("You are not authorized to receive a signature to grant access to this content")
+      return null;
+    }
 
     // sanity check
     if (!signatureShares.every((val, i, arr) => val.unsignedJwt === arr[0].unsignedJwt)) {

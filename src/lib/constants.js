@@ -32,7 +32,6 @@ export const LIT_CHAINS = {
     rpcUrls: ['https://rpcapi.fantom.network'],
     blockExplorerUrls: ['https://ftmscan.com'],
     type: 'ERC1155',
-    websocketUrl: 'wss://wsapi.fantom.network'
   },
   xdai: {
     contractAddress: '0xDFc2Fd83dFfD0Dafb216F412aB3B18f2777406aF',
@@ -43,7 +42,6 @@ export const LIT_CHAINS = {
     rpcUrls: ['https://rpc.xdaichain.com'],
     blockExplorerUrls: [' https://blockscout.com/xdai/mainnet'],
     type: 'ERC1155',
-    websocketUrl: 'wss://wsapi.fantom.network'
   },
   ethereum: {
     contractAddress: '0xA54F7579fFb3F98bd8649fF02813F575f9b3d353',
@@ -52,7 +50,8 @@ export const LIT_CHAINS = {
     symbol: 'ETH',
     decimals: 18,
     type: 'ERC1155',
-    websocketUrl: 'wss://mainnet.infura.io/ws/v3/ddf1ca3700f34497bca2bf03607fde38'
+    rpcUrls: ['https://mainnet.infura.io/v3/cd614bfa5c2f4703b7ab0ec0547d9f81'],
+    blockExplorerUrls: ['https://etherscan.io']
   },
   kovan: {
     contractAddress: '0xA9b2180C2A479Ba9b263878C4d81AE4e0E717846',
