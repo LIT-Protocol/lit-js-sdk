@@ -351,17 +351,17 @@ const accessControlConditions = [
 ```
 
 ### Must posess a specific ERC721 token (NFT)
-In this example, the token contract's address is 0x3110c39b428221012934A7F617913b095BC1078C and the token id we are checking for is 9541.
+In this example, the token contract's address is 0x319ba3aab86e04a37053e984bd411b2c63bf229e and the token id we are checking for is 9541.
 
 ```
 const accessControlConditions = [
   {
-    contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
+    contractAddress: '0x319ba3aab86e04a37053e984bd411b2c63bf229e',
     standardContractType: 'ERC721',
     chain,
     method: 'ownerOf',
     parameters: [
-      '9541'
+      '5954'
     ],
     returnValueTest: {
       comparator: '=',
@@ -372,12 +372,12 @@ const accessControlConditions = [
 ```
 
 ### Must posess any token in an ERC721 collection (NFT Collection)
-In this example, the token contract's address is 0x3110c39b428221012934A7F617913b095BC1078C.
+In this example, the token contract's address is 0x319ba3aab86e04a37053e984bd411b2c63bf229e.
 
 ```
 const accessControlConditions = [
   {
-    contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
+    contractAddress: '0x319ba3aab86e04a37053e984bd411b2c63bf229e',
     standardContractType: 'ERC721',
     chain,
     method: 'balanceOf',
@@ -398,7 +398,7 @@ In this example, the token contract's address is 0x3110c39b428221012934A7F617913
 ```
 const accessControlConditions = [
   {
-    contractAddress: '0x3110c39b428221012934A7F617913b095BC1078C',
+    contractAddress: '0xc0ad7861fe8848002a3d9530999dd29f6b6cae75',
     standardContractType: 'ERC20',
     chain,
     method: 'balanceOf',
