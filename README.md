@@ -14,7 +14,14 @@
     - [Dynamic Content - Verifying a JWT that was signed by the Lit network](#dynamic-content---verifying-a-jwt-that-was-signed-by-the-lit-network)
     - [Dynamic Content - Provisoning access to a resource](#dynamic-content---provisoning-access-to-a-resource)
     - [Dynamic Content - Accessing a resource via a JWT](#dynamic-content---accessing-a-resource-via-a-jwt)
+  - [Examples of access control conditions](#examples-of-access-control-conditions)
+    - [Must posess at least one ERC1155 token with a given token id](#must-posess-at-least-one-erc1155-token-with-a-given-token-id)
+    - [Must posess a specific ERC721 token (NFT)](#must-posess-a-specific-erc721-token-nft)
+    - [Must posess any token in an ERC721 collection (NFT Collection)](#must-posess-any-token-in-an-erc721-collection-nft-collection)
+    - [Must posess at least one ERC20 token](#must-posess-at-least-one-erc20-token)
+    - [Must posess at least 0.00001 ETH](#must-posess-at-least-000001-eth)
   - [API](#api)
+  - [Tests](#tests)
   - [Questions or Support](#questions-or-support)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -240,6 +247,10 @@ Now, you must have a JWT to verify.  Usually this comes from the user who is try
 ```
 const jwt = "eyJhbGciOiJCTFMxMi0zODEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJMSVQiLCJzdWIiOiIweGRiZDM2MGYzMDA5N2ZiNmQ5MzhkY2M4YjdiNjI4NTRiMzYxNjBiNDUiLCJjaGFpbiI6ImZhbnRvbSIsImlhdCI6MTYyODAzMTM1OCwiZXhwIjoxNjI4MDc0NTU4LCJiYXNlVXJsIjoiaHR0cHM6Ly9teS1keW5hbWljLWNvbnRlbnQtc2VydmVyLmNvbSIsInBhdGgiOiIvYV9wYXRoLmh0bWwiLCJvcmdJZCI6IiJ9.lX_aBSgGVYWd2FL6elRHoPJ2nab0IkmmX600cwZPCyK_SazZ-pzBUGDDQ0clthPVAtoS7roHg14xpEJlcSJUZBA7VTlPiDCOrkie_Hmulj765qS44t3kxAYduLhNQ-VN"
 const { verified, header, payload } = LitJsSdk.verifyJwt({jwt})
+if (payload.baseUrl !== "this-website.com" || payload.path !== "/path-you-expected" || payload.orgId !== "") {
+  // Reject this request!
+  return false
+}
 ```
 
 The "verified" variable is a boolean that indicates whether or not the signature verified properly.  Note: YOU MUST CHECK THE PAYLOAD AGAINST THE CONTENT YOU ARE PROTECTING.  This means you need to look at "payload.baseUrl" which should match the hostname of the server, and you must also look at "payload.path" which should match the path being accessed.  If these do not match what you're expecting, you should reject the request.
@@ -287,7 +298,7 @@ Next, define the Resource ID of the resource you are granting access to.  This i
 
 ```
 const resourceId = {
-  baseUrl: 'https://my-dynamic-content-server.com',
+  baseUrl: 'my-dynamic-content-server.com',
   path: '/a_path.html',
   orgId: ""
 }
