@@ -9,7 +9,7 @@ import {
   toggleLock,
   unlockLitWithKey,
   verifyJwt,
-  metadataForObject
+  encryptFileAndZipWithMetadata
 } from './utils/lit'
 
 import {
@@ -84,7 +84,7 @@ const functions = {
   printError,
   canonicalAccessControlConditionFormatter,
   verifyJwt,
-  metadataForObject
+  encryptFileAndZipWithMetadata
 }
 
 module.exports = functions

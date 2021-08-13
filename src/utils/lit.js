@@ -103,7 +103,7 @@ export async function decryptZip(encryptedZipBlob, symmKey) {
 export async function encryptZip(zip) {
   const zipBlob = await zip.generateAsync({ type: 'blob' })
   const zipBlobArrayBuffer = await zipBlob.arrayBuffer()
-  console.log('blob', zipBlob)
+  // console.log('blob', zipBlob)
 
   const symmKey = await generateSymmetricKey()
   const encryptedZipBlob = await encryptWithSymmetricKey(
@@ -165,6 +165,55 @@ export async function encryptZip(zip) {
     symmetricKey: exportedSymmKey,
     encryptedZip: encryptedZipBlob
   }
+}
+
+/**
+ * Encrypt a single file, save the key to the Lit network, and then zip it up with the metadata.
+ * @param {Object} params
+ * @param {Object} params.authSig The authSig of the user.  Returned via the checkAndSignAuthMessage function
+ * @param {Array.<AccessControlCondition>} params.accessControlConditions The array of access control conditions to under which the content can be decrypted
+ * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+ * @param {File} params.file The file you wish to encrypt
+ * @param {LitNodeClient} params.litNodeClient An instance of LitNodeClient that is already connected
+ * @returns {Blob} A zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network
+ */
+export async function encryptFileAndZipWithMetadata({ authSig, accessControlConditions, chain, file, litNodeClient }) {
+
+  const symmetricKey = await generateSymmetricKey()
+  const exportedSymmKey = new Uint8Array(await crypto.subtle.exportKey('raw', symmetricKey))
+  console.log('exportedSymmKey in hex', uint8arrayToString(exportedSymmKey, 'base16'))
+
+  const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
+    accessControlConditions,
+    symmetricKey: exportedSymmKey,
+    authSig,
+    chain
+  })
+  console.log('encryption key saved to Lit', encryptedSymmetricKey)
+
+  // encrypt the file
+  var fileAsArrayBuffer = await file.arrayBuffer();
+  const encryptedZipBlob = await encryptWithSymmetricKey(
+    symmetricKey,
+    fileAsArrayBuffer
+  )
+
+  const zip = new JSZip()
+  const metadata = metadataForFile({
+    name: file.name,
+    type: file.type,
+    size: file.size,
+    encryptedSymmetricKey,
+    accessControlConditions,
+    chain
+  })
+
+  zip.file('lit_protocol_metadata.json', JSON.stringify(metadata))
+  zip.folder('encryptedAssets').file(file.name, encryptedZipBlob)
+
+  const zipBlob = await zip.generateAsync({ type: 'blob' })
+
+  return zipBlob
 }
 
 async function getNpmPackage(packageName) {
@@ -414,10 +463,12 @@ export function verifyJwt({ jwt }) {
 * @param {Uint8Array} params.encryptedSymmetricKey The encrypted symmetric key that was returned by the LitNodeClient.saveEncryptionKey function
 * @returns {Object} An object with 3 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.
 */
-export function metadataForObject({ objectUrl, accessControlConditions, chain, encryptedSymmetricKey }) {
+function metadataForFile({ name, type, size, accessControlConditions, chain, encryptedSymmetricKey }) {
   const formattedAccessControlConditions = accessControlConditions.map(c => canonicalAccessControlConditionFormatter(c))
   return {
-    objectUrl,
+    name,
+    type,
+    size,
     accessControlConditions: formattedAccessControlConditions,
     chain,
     encryptedSymmetricKey: uint8arrayToString(encryptedSymmetricKey, 'base16')
