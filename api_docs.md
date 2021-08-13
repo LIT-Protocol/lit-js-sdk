@@ -67,7 +67,7 @@ Welcome to the LIT JS SDK API documentation.  To understand how these functions 
 
 ## mintLIT
 
-This function mints a LIT using our pre-deployed token contracts.  You may our contracts, or you may supply your own.  Our contracts are ERC1155 tokens on Polygon and Ethereum.  Using these contracts is the easiest way to get started.
+This function mints a LIT using our pre-deployed token contracts.  You may use our contracts, or you may supply your own.  Our contracts are ERC1155 tokens on Polygon and Ethereum.  Using these contracts is the easiest way to get started.
 
 ### Parameters
 

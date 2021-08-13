@@ -291,7 +291,7 @@ export async function signMessage({ body }) {
 // }
 
 /**
- * This function mints a LIT using our pre-deployed token contracts.  You may our contracts, or you may supply your own.  Our contracts are ERC1155 tokens on Polygon and Ethereum.  Using these contracts is the easiest way to get started.
+ * This function mints a LIT using our pre-deployed token contracts.  You may use our contracts, or you may supply your own.  Our contracts are ERC1155 tokens on Polygon and Ethereum.  Using these contracts is the easiest way to get started.
  * @param {Object} params
  * @param {string} params.chain The chain to mint on.  "ethereum" and "polygon" are currently supported.
  * @param {number} params.quantity The number of tokens to mint.  Note that these will be fungible, so they will not have serial numbers.
