@@ -8,7 +8,8 @@ import {
   createHtmlLIT,
   toggleLock,
   unlockLitWithKey,
-  verifyJwt
+  verifyJwt,
+  metadataForObject
 } from './utils/lit'
 
 import {
@@ -82,7 +83,8 @@ const functions = {
   injectViewerIFrame,
   printError,
   canonicalAccessControlConditionFormatter,
-  verifyJwt
+  verifyJwt,
+  metadataForObject
 }
 
 module.exports = functions

@@ -236,10 +236,22 @@ export default class LitNodeClient {
   * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
   * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
   * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.
-  * @returns {string} The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
+  * @returns {Uint8Array} The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
   */
   async saveEncryptionKey({ accessControlConditions, chain, authSig, symmetricKey }) {
-    console.log('saveEncryptionKey')
+    console.log('LitNodeClient.saveEncryptionKey')
+    if (!symmetricKey || symmetricKey == '') {
+      throw new Error("symmetricKey is blank")
+    }
+    if (!chain) {
+      throw new Error('chain is blank')
+    }
+    if (!accessControlConditions || accessControlConditions.length == 0) {
+      throw new Error('accessControlConditions is blank')
+    }
+    if (!authSig) {
+      throw new Error('authSig is blank')
+    }
 
     // encrypt with network pubkey
     const encryptedKey = wasmBlsSdkHelpers.encrypt(uint8arrayFromString(this.subnetPubKey, 'base16'), symmetricKey)

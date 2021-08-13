@@ -404,3 +404,22 @@ export function verifyJwt({ jwt }) {
     payload: JSON.parse(uint8arrayToString(uint8arrayFromString(jwtParts[1], 'base64url')))
   }
 }
+
+/**
+* Get all the metadata needed to decrypt something in the future.  If you're encrypting files with Lit and storing them in IPFS or Arweave, then this function will provide you with a properly formatted metadata object that you should save alongside the files.
+* @param {Object} params
+* @param {string} params.objectUrl The url to the object, like an IPFS or Arweave url.
+* @param {Array} params.accessControlConditions The array of access control conditions defined for the object
+* @param {string} params.chain The blockchain on which the access control conditions should be checked
+* @param {Uint8Array} params.encryptedSymmetricKey The encrypted symmetric key that was returned by the LitNodeClient.saveEncryptionKey function
+* @returns {Object} An object with 3 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.
+*/
+export function metadataForObject({ objectUrl, accessControlConditions, chain, encryptedSymmetricKey }) {
+  const formattedAccessControlConditions = accessControlConditions.map(c => canonicalAccessControlConditionFormatter(c))
+  return {
+    objectUrl,
+    accessControlConditions: formattedAccessControlConditions,
+    chain,
+    encryptedSymmetricKey: uint8arrayToString(encryptedSymmetricKey, 'base16')
+  }
+}
