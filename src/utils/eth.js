@@ -10,7 +10,7 @@ import nacl from 'tweetnacl'
 import LIT from '../abis/LIT.json'
 import { LIT_CHAINS } from '../lib/constants'
 
-const AUTH_SIGNATURE_BODY = 'I am creating an account to use LITs at {{timestamp}}'
+const AUTH_SIGNATURE_BODY = 'I am creating an account to use Lit Protocol at {{timestamp}}'
 
 function chainHexIdToChainName(chainHexId) {
   for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
