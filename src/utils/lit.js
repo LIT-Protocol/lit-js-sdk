@@ -175,9 +175,10 @@ export async function encryptZip(zip) {
  * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
  * @param {File} params.file The file you wish to encrypt
  * @param {LitNodeClient} params.litNodeClient An instance of LitNodeClient that is already connected
+ * @param {string} params.readme An optional readme text that will be inserted into readme.txt in the final zip file.  This is useful in case someone comes across this zip file and wants to know how to decrypt it.  This file could contain instructions and a URL to use to decrypt the file.
  * @returns {Blob} A zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network
  */
-export async function encryptFileAndZipWithMetadata({ authSig, accessControlConditions, chain, file, litNodeClient }) {
+export async function encryptFileAndZipWithMetadata({ authSig, accessControlConditions, chain, file, litNodeClient, readme }) {
 
   const symmetricKey = await generateSymmetricKey()
   const exportedSymmKey = new Uint8Array(await crypto.subtle.exportKey('raw', symmetricKey))
@@ -209,11 +210,48 @@ export async function encryptFileAndZipWithMetadata({ authSig, accessControlCond
   })
 
   zip.file('lit_protocol_metadata.json', JSON.stringify(metadata))
+  if (readme) {
+    zip.file('readme.txt', readme)
+  }
   zip.folder('encryptedAssets').file(file.name, encryptedZipBlob)
 
   const zipBlob = await zip.generateAsync({ type: 'blob' })
 
   return zipBlob
+}
+
+/**
+ * Given a zip file with metadata inside it, unzip, load the metadata, and return the decrypted file and the metadata.  This zip file would have been created with the encryptFileAndZipWithMetadata function.
+ * @param {Object} params
+ * @param {Object} params.authSig The authSig of the user.  Returned via the checkAndSignAuthMessage function
+ * @param {File} params.file The zip file with metadata inside it and the encrypted asset
+ * @param {LitNodeClient} params.litNodeClient An instance of LitNodeClient that is already connected
+ * @returns {Object} An object that contains decryptedFile and metadata properties.  The decryptedFile is an ArrayBuffer that is ready to use, and metadata is an object that contains all the properties of the file like it's name and size and type.
+ */
+export async function decryptZipFileWithMetadata({ authSig, file, litNodeClient }) {
+
+  const zip = await JSZip.loadAsync(file)
+  const metadata = JSON.parse(await zip.file("lit_protocol_metadata.json").async("string"));
+  console.log('zip metadata', metadata)
+
+  const symmKey = await litNodeClient.getEncryptionKey({
+    accessControlConditions: metadata.accessControlConditions,
+    toDecrypt: metadata.encryptedSymmetricKey,
+    chain: metadata.chain,
+    authSig
+  })
+  const importedSymmKey = await importSymmetricKey(symmKey)
+
+  // console.log('symmetricKey', importedSymmKey)
+
+  const encryptedFile = await zip.folder('encryptedAssets').file(metadata.name).async('blob')
+  // console.log('encryptedFile', encryptedFile)
+
+  const decryptedFile = await decryptWithSymmetricKey(encryptedFile, importedSymmKey)
+
+  // console.log('decryptedFile', decryptedFile)
+
+  return { decryptedFile, metadata }
 }
 
 async function getNpmPackage(packageName) {

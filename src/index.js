@@ -9,7 +9,8 @@ import {
   toggleLock,
   unlockLitWithKey,
   verifyJwt,
-  encryptFileAndZipWithMetadata
+  encryptFileAndZipWithMetadata,
+  decryptZipFileWithMetadata
 } from './utils/lit'
 
 import {
@@ -23,12 +24,14 @@ import {
 import {
   decryptWithPrivKey,
   encryptWithPubKey,
-  canonicalAccessControlConditionFormatter
+  canonicalAccessControlConditionFormatter,
+  hashAccessControlConditions
 } from './utils/crypto'
 
 import {
   fileToDataUrl,
-  injectViewerIFrame
+  injectViewerIFrame,
+  downloadFile
 } from './utils/browser'
 
 import { LIT_CHAINS } from './lib/constants'
@@ -84,7 +87,10 @@ const functions = {
   printError,
   canonicalAccessControlConditionFormatter,
   verifyJwt,
-  encryptFileAndZipWithMetadata
+  encryptFileAndZipWithMetadata,
+  hashAccessControlConditions,
+  decryptZipFileWithMetadata,
+  downloadFile
 }
 
 module.exports = functions
