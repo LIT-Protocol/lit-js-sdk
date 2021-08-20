@@ -20,6 +20,7 @@
     - [Must posess any token in an ERC721 collection (NFT Collection)](#must-posess-any-token-in-an-erc721-collection-nft-collection)
     - [Must posess at least one ERC20 token](#must-posess-at-least-one-erc20-token)
     - [Must posess at least 0.00001 ETH](#must-posess-at-least-000001-eth)
+    - [Must be a member of a DAO (MolochDAOv2.1, also supports DAOHaus)](#must-be-a-member-of-a-dao-molochdaov21-also-supports-daohaus)
   - [API](#api)
   - [Tests](#tests)
   - [Questions or Support](#questions-or-support)
@@ -441,6 +442,28 @@ const accessControlConditions = [
     returnValueTest: {
       comparator: '>=',
       value: '10000000000000'
+    }
+  }
+]
+```
+
+
+### Must be a member of a DAO (MolochDAOv2.1, also supports DAOHaus)
+In this example, we are checking that the user is a member of a MolochDAOv2.1.  DAOHaus DAOs are also MolochDAOv2.1 and therefore are also supported.  This checks that the user is a member of the DAO and also that they are not jailed.  This example checks the DAO contract at 0x50D8EB685a9F262B13F28958aBc9670F06F819d9 on the xDai chain.
+
+```
+const accessControlConditions = [
+  {
+    contractAddress: '0x50D8EB685a9F262B13F28958aBc9670F06F819d9',
+    standardContractType: 'MolochDAOv2.1',
+    chain,
+    method: 'members',
+    parameters: [
+      ':userAddress',
+    ],
+    returnValueTest: {
+      comparator: '==',
+      value: 'true'
     }
   }
 ]
