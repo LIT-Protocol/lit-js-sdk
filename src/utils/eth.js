@@ -1,8 +1,8 @@
 import { Contract } from '@ethersproject/contracts'
 import { verifyMessage } from '@ethersproject/wallet'
 import { Web3Provider } from '@ethersproject/providers'
-
-import detectEthereumProvider from '@metamask/detect-provider'
+import Web3Modal from "web3modal";
+import WalletConnectProvider from "@walletconnect/web3-provider";
 
 import naclUtil from 'tweetnacl-util'
 import nacl from 'tweetnacl'
@@ -27,13 +27,30 @@ export async function connectWeb3() {
     throw new Error({ errorCode: 'no_wallet', message: 'No web3 wallet was found' })
   }
 
-  const provider = await detectEthereumProvider()
+  const providerOptions = {
+    walletconnect: {
+      package: WalletConnectProvider, // required
+      options: {
+        infuraId: "cd614bfa5c2f4703b7ab0ec0547d9f81" // required
+      }
+    }
+  };
+
+  const web3Modal = new Web3Modal({
+    cacheProvider: true, // optional
+    providerOptions // required
+  });
+
+  const provider = await web3Modal.connect();
+  const web3 = new Web3Provider(provider)
+
+  // const provider = await detectEthereumProvider()
 
   // trigger metamask popup
-  const accounts = await provider.request({ method: 'eth_requestAccounts' })
+  const accounts = await web3.listAccounts()
   const account = accounts[0].toLowerCase()
 
-  return { web3: provider, account }
+  return { web3, account }
 }
 
 // taken from the excellent repo https://github.com/zmitton/eth-proof
@@ -97,13 +114,13 @@ export async function connectWeb3() {
  */
 export async function checkAndSignAuthMessage({ chain }) {
   const { web3, account } = await connectWeb3()
-  const chainId = await web3.request({ method: 'eth_chainId', params: [] })
+  const { chainId } = await web3.getNetwork()
   const selectedChain = LIT_CHAINS[chain]
   const selectedChainId = '0x' + selectedChain.chainId.toString('16')
   console.debug(`checkAndSignAuthMessage with chainId ${chainId} and chain set to ${chain} and selectedChain is `, selectedChain)
-  if (chainId !== selectedChainId) {
+  if (chainId !== selectedChain) {
     try {
-      await ethereum.request({
+      await web3.provider.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: selectedChainId }],
       });
@@ -123,7 +140,7 @@ export async function checkAndSignAuthMessage({ chain }) {
             rpcUrls: selectedChain.rpcUrls,
             blockExplorerUrls: selectedChain.blockExplorerUrls
           }]
-          await web3.request({ method: 'wallet_addEthereumChain', params: data })
+          await web3.provider.request({ method: 'wallet_addEthereumChain', params: data })
         } catch (addError) {
           // handle "add" error
           throw addError;
@@ -177,7 +194,8 @@ export async function signMessage({ body }) {
   const { web3, account } = await connectWeb3()
 
   console.log('signing with ', account)
-  const signature = await web3.request({ method: 'personal_sign', params: [account, body] })
+  const signature = await web3.getSigner().signMessage(body)
+  //.request({ method: 'personal_sign', params: [account, body] })
   const address = verifyMessage(body, signature).toLowerCase()
 
   console.log('Signature: ', signature)
@@ -306,7 +324,7 @@ export async function mintLIT({ chain, quantity }) {
     }
     const { web3, account } = await connectWeb3()
     const tokenAddress = LIT_CHAINS[chain].contractAddress
-    const contract = new Contract(tokenAddress, LIT.abi, new Web3Provider(web3).getSigner())
+    const contract = new Contract(tokenAddress, LIT.abi, web3.getSigner())
     console.log('sending to chain...')
     const tx = await contract.mint(quantity)
     console.log('sent to chain.  waiting to be mined...')
@@ -345,10 +363,12 @@ export async function findLITs() {
 
   try {
     const { web3, account } = await connectWeb3()
-    const chainHexId = await web3.request({ method: 'eth_chainId', params: [] })
+    const { chainId } = await web3.getNetwork()
+    const chainHexId = '0x' + chainId.toString('16')
+    // const chainHexId = await web3.request({ method: 'eth_chainId', params: [] })
     const chain = chainHexIdToChainName(chainHexId)
     const tokenAddress = LIT_CHAINS[chain].contractAddress
-    const contract = new Contract(tokenAddress, LIT.abi, new Web3Provider(web3).getSigner())
+    const contract = new Contract(tokenAddress, LIT.abi, new web3.getSigner())
     console.log('getting maxTokenid')
     const maxTokenId = await contract.tokenIds()
     const accounts = []
@@ -388,7 +408,7 @@ export async function sendLIT({ tokenMetadata, to }) {
   try {
     const { web3, account } = await connectWeb3()
     const { tokenAddress, tokenId, chain } = tokenMetadata
-    const contract = new Contract(tokenAddress, LIT.abi, new Web3Provider(web3).getSigner())
+    const contract = new Contract(tokenAddress, LIT.abi, web3.getSigner())
     console.log('transferring')
     const maxTokenId = await contract.safeTransferFrom(account, to, tokenId, 1, [])
     console.log('sent to chain')
