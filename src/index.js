@@ -18,7 +18,8 @@ import {
   mintLIT,
   checkAndSignAuthMessage,
   findLITs,
-  sendLIT
+  sendLIT,
+  decimalPlaces
 } from './utils/eth'
 
 import {
@@ -90,7 +91,8 @@ const functions = {
   encryptFileAndZipWithMetadata,
   hashAccessControlConditions,
   decryptZipFileWithMetadata,
-  downloadFile
+  downloadFile,
+  decimalPlaces
 }
 
 module.exports = functions

@@ -8,6 +8,7 @@ import naclUtil from 'tweetnacl-util'
 import nacl from 'tweetnacl'
 
 import LIT from '../abis/LIT.json'
+import ERC20 from '../abis/ERC20.json'
 import { LIT_CHAINS } from '../lib/constants'
 
 const AUTH_SIGNATURE_BODY = 'I am creating an account to use Lit Protocol at {{timestamp}}'
@@ -424,4 +425,17 @@ export async function sendLIT({ tokenMetadata, to }) {
     }
     return { errorCode: 'unknown_error' }
   }
+}
+
+
+/**
+ * Get the number of decimal places in a token
+ * @param {Object} params
+ * @param {string} params.contractAddress The token contract address
+ * @returns {number} The number of decimal places in the token
+ */
+export async function decimalPlaces({ contractAddress }) {
+  const { web3, account } = await connectWeb3()
+  const contract = new Contract(contractAddress, ERC20, web3)
+  return await contract.decimals()
 }

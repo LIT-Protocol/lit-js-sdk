@@ -1,6 +1,7 @@
 import JSZip from 'jszip'
 import uint8arrayFromString from 'uint8arrays/from-string'
 import uint8arrayToString from 'uint8arrays/to-string'
+import { parseEther, parseUnits } from '@ethersproject/units'
 
 import {
   importSymmetricKey,
@@ -11,7 +12,8 @@ import {
 } from './crypto'
 
 import {
-  checkAndSignAuthMessage
+  checkAndSignAuthMessage,
+  decimalPlaces
 } from './eth'
 
 import {
@@ -511,4 +513,45 @@ function metadataForFile({ name, type, size, accessControlConditions, chain, enc
     chain,
     encryptedSymmetricKey: uint8arrayToString(encryptedSymmetricKey, 'base16')
   }
+}
+
+
+function humanizeComparator(comparator) {
+  if (comparator === '>') {
+    return 'more than'
+  } else if (comparator === '>=') {
+    return 'at least'
+  } else if (comparator === '=') {
+    return 'exactly'
+  } else if (comparator === '<') {
+    return 'less than'
+  } else if (comparator === '<=') {
+    return 'at most'
+  }
+}
+
+/**
+* The human readable name for an access control condition
+* @param {Object} params
+* @param {Array} params.accessControlConditions The array of access control conditions that you want to humanize
+* @returns {string} A human readable description of the access control condition
+*/
+export async function humanizeAccessControlConditions({ accessControlConditions }) {
+  return accessControlConditions.map(acc => {
+    if (acc.standardContractType === 'ERC1155' && acc.method === 'balanceOf') {
+      return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${acc.returnValueTest.value} of ${acc.contractAddress} tokens`
+    } else if (acc.standardContractType === 'ERC721' && acc.method === 'ownerOf') {
+      // specific erc721
+      return `Owner of tokenId ${acc.parameters[0]} from ${acc.contractAddress}`
+    } else if (acc.standardContractType === 'ERC721' && acc.method === 'balanceOf') {
+      // any erc721 in collection
+      return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${acc.returnValueTest.value} of ${acc.contractAddress} tokens`
+    } else if (acc.standardContractType === 'ERC20' && acc.method === 'balanceOf') {
+      const decimals = await decimalPlaces({ contractAddress: acc.contractAddress })
+      return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${parseUnits(acc.returnValueTest.value, decimals)} of ${acc.contractAddress} tokens`
+    } else if (acc.standardContractType === '' && acc.method === 'eth_getBalance') {
+      return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${parseEther(acc.returnValueTest.value)} ETH`
+    }
+
+  })
 }

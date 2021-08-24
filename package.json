@@ -36,6 +36,7 @@
   "dependencies": {
     "@ethersproject/contracts": "^5.2.0",
     "@ethersproject/providers": "^5.2.0",
+    "@ethersproject/units": "^5.4.0",
     "@ethersproject/wallet": "^5.2.0",
     "@metamask/detect-provider": "^1.2.0",
     "@walletconnect/web3-provider": "^1.6.2",

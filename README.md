@@ -462,7 +462,7 @@ const accessControlConditions = [
       ':userAddress',
     ],
     returnValueTest: {
-      comparator: '==',
+      comparator: '=',
       value: 'true'
     }
   }
