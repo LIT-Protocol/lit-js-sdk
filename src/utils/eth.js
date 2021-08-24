@@ -1,8 +1,8 @@
 import { Contract } from '@ethersproject/contracts'
 import { verifyMessage } from '@ethersproject/wallet'
 import { Web3Provider } from '@ethersproject/providers'
-import Web3Modal from "web3modal";
-import WalletConnectProvider from "@walletconnect/web3-provider";
+import Web3Modal from "web3modal"
+// import WalletConnectProvider from "@walletconnect/web3-provider";
 
 import naclUtil from 'tweetnacl-util'
 import nacl from 'tweetnacl'
@@ -29,12 +29,12 @@ export async function connectWeb3() {
   }
 
   const providerOptions = {
-    walletconnect: {
-      package: WalletConnectProvider, // required
-      options: {
-        infuraId: "cd614bfa5c2f4703b7ab0ec0547d9f81" // required
-      }
-    }
+    // walletconnect: {
+    //   package: WalletConnectProvider, // required
+    //   options: {
+    //     infuraId: "cd614bfa5c2f4703b7ab0ec0547d9f81" // required
+    //   }
+    // }
   };
 
   const web3Modal = new Web3Modal({

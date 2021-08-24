@@ -7,6 +7,4 @@ build({
   outfile: 'build/index.web.js',
   sourceRoot: './',
   globalName: 'LitJsSdk',
-  external: ['http', 'https', 'os', 'stream'],
-  define: { global: 'window' },
 })
