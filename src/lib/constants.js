@@ -1,18 +1,28 @@
 
 /**
  * @typedef {Object} LITChain
- * @property {string} contractAddress - The address of the token contract
+ * @property {string} contractAddress - The address of the token contract for the optional predeployed ERC1155 contract
  * @property {string} chainId - The chain ID of the chain that this token contract is deployed on.  Used for EVM chains.
  * @property {string} name - The human readable name of the chain
  */
 
 /**
- * Pre-deployed token contracts that you may use for minting LITs.  These are ERC1155 contracts that let you mint any quantity of a given token.  Use the chain name as a key in this object.  Currently "ethereum", "polygon", "fantom", and "xdai" are supported.
+ * Chains supported by the LIT protocol.  Each chain includes an optional pre-deployed token contract that you may use for minting LITs.  These are ERC1155 contracts that let you mint any quantity of a given token.  Use the chain name as a key in this object. 
  * @constant
  * @type {LITChain}
  * @default
 */
 export const LIT_CHAINS = {
+  ethereum: {
+    contractAddress: '0xA54F7579fFb3F98bd8649fF02813F575f9b3d353',
+    chainId: 1,
+    name: 'Ethereum',
+    symbol: 'ETH',
+    decimals: 18,
+    type: 'ERC1155',
+    rpcUrls: ['https://mainnet.infura.io/v3/cd614bfa5c2f4703b7ab0ec0547d9f81'],
+    blockExplorerUrls: ['https://etherscan.io']
+  },
   polygon: {
     contractAddress: '0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88',
     chainId: 137,
@@ -42,16 +52,6 @@ export const LIT_CHAINS = {
     rpcUrls: ['https://rpc.xdaichain.com'],
     blockExplorerUrls: [' https://blockscout.com/xdai/mainnet'],
     type: 'ERC1155',
-  },
-  ethereum: {
-    contractAddress: '0xA54F7579fFb3F98bd8649fF02813F575f9b3d353',
-    chainId: 1,
-    name: 'Ethereum',
-    symbol: 'ETH',
-    decimals: 18,
-    type: 'ERC1155',
-    rpcUrls: ['https://mainnet.infura.io/v3/cd614bfa5c2f4703b7ab0ec0547d9f81'],
-    blockExplorerUrls: ['https://etherscan.io']
   },
   kovan: {
     contractAddress: '0x9dB60Db3Dd9311861D87D33B0463AaD9fB4bb0E6',

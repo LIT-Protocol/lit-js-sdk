@@ -537,7 +537,7 @@ function humanizeComparator(comparator) {
 * @returns {string} A human readable description of the access control condition
 */
 export async function humanizeAccessControlConditions({ accessControlConditions }) {
-  return accessControlConditions.map(acc => {
+  return Promise.all(accessControlConditions.map(async acc => {
     if (acc.standardContractType === 'ERC1155' && acc.method === 'balanceOf') {
       return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${acc.returnValueTest.value} of ${acc.contractAddress} tokens`
     } else if (acc.standardContractType === 'ERC721' && acc.method === 'ownerOf') {
@@ -553,5 +553,5 @@ export async function humanizeAccessControlConditions({ accessControlConditions 
       return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${parseEther(acc.returnValueTest.value)} ETH`
     }
 
-  })
+  }))
 }

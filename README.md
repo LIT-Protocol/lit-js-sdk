@@ -21,6 +21,7 @@
     - [Must posess at least one ERC20 token](#must-posess-at-least-one-erc20-token)
     - [Must posess at least 0.00001 ETH](#must-posess-at-least-000001-eth)
     - [Must be a member of a DAO (MolochDAOv2.1, also supports DAOHaus)](#must-be-a-member-of-a-dao-molochdaov21-also-supports-daohaus)
+    - [Must be a subscriber to a creator on creaton.io](#must-be-a-subscriber-to-a-creator-on-creatonio)
   - [API](#api)
   - [Tests](#tests)
   - [Questions or Support](#questions-or-support)
