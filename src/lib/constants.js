@@ -54,16 +54,55 @@ export const LIT_CHAINS = {
     blockExplorerUrls: ['https://etherscan.io']
   },
   kovan: {
-    contractAddress: '0xA9b2180C2A479Ba9b263878C4d81AE4e0E717846',
+    contractAddress: '0x9dB60Db3Dd9311861D87D33B0463AaD9fB4bb0E6',
     chainId: 42,
-    name: 'Ethereum',
+    name: 'Kovan',
     symbol: 'ETH',
     decimals: 18,
     rpcUrls: ['https://kovan.infura.io/v3/ddf1ca3700f34497bca2bf03607fde38'],
     blockExplorerUrls: ['https://kovan.etherscan.io'],
-    type: 'ERC20'
+    type: 'ERC1155'
+  },
+  mumbai: {
+    contractAddress: '0xc716950e5DEae248160109F562e1C9bF8E0CA25B',
+    chainId: 80001,
+    name: 'Mumbai',
+    symbol: 'MATIC',
+    decimals: 18,
+    rpcUrls: ['https://rpc-mumbai.maticvigil.com/v1/96bf5fa6e03d272fbd09de48d03927b95633726c'],
+    blockExplorerUrls: ['https://mumbai.polygonscan.com'],
+    type: 'ERC1155'
+  },
+  goerli: {
+    contractAddress: '0xc716950e5DEae248160109F562e1C9bF8E0CA25B',
+    chainId: 5,
+    name: 'Goerli',
+    symbol: 'ETH',
+    decimals: 18,
+    rpcUrls: ['https://goerli.infura.io/v3/96dffb3d8c084dec952c61bd6230af34'],
+    blockExplorerUrls: ['https://goerli.etherscan.io'],
+    type: 'ERC1155'
+  },
+  ropsten: {
+    contractAddress: '0x61544f0AE85f8fed6Eb315c406644eb58e15A1E7',
+    chainId: 3,
+    name: 'Ropsten',
+    symbol: 'ETH',
+    decimals: 18,
+    rpcUrls: ['https://ropsten.infura.io/v3/96dffb3d8c084dec952c61bd6230af34'],
+    blockExplorerUrls: ['https://ropsten.etherscan.io'],
+    type: 'ERC1155'
+  },
+  rinkeby: {
+    contractAddress: '0xc716950e5deae248160109f562e1c9bf8e0ca25b',
+    chainId: 4,
+    name: 'Rinkeby',
+    symbol: 'ETH',
+    decimals: 18,
+    rpcUrls: ['https://rinkeby.infura.io/v3/96dffb3d8c084dec952c61bd6230af34'],
+    blockExplorerUrls: ['https://rinkeby.etherscan.io'],
+    type: 'ERC1155'
   }
 }
-
 
 export const NETWORK_PUB_KEY = "9971e835a1fe1a4d78e381eebbe0ddc84fde5119169db816900de796d10187f3c53d65c1202ac083d099a517f34a9b62"

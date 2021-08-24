@@ -469,6 +469,27 @@ const accessControlConditions = [
 ]
 ```
 
+### Must be a subscriber to a creator on creaton.io
+In this example, we are checking that the user is a subscriber to a creator on creaton.io.  This example checks the Creator contract at 0x50D8EB685a9F262B13F28958aBc9670F06F819d9 on the Mumbai chain.
+
+```
+const accessControlConditions = [
+  {
+    contractAddress: '0x77c0612bb672a52c60c7a71b898853570bd2bbbb',
+    standardContractType: 'Creaton',
+    chain,
+    method: 'subscribers',
+    parameters: [
+      ':userAddress',
+    ],
+    returnValueTest: {
+      comparator: '=',
+      value: 'true'
+    }
+  }
+]
+```
+
 
 ## API
 You can find API documentation at https://lit-protocol.github.io/lit-js-sdk/api_docs_html/index.html
