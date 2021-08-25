@@ -406,6 +406,8 @@ Type: [Object][74]
 *   `baseUrl` **[string][75]** The base url of the resource that will be authorized
 *   `path` **[string][75]** The path of the url of the resource that will be authorized
 *   `orgId` **[string][75]** Optional.  The org id that the user would be authorized to belong to.
+*   `role` **[string][75]** Optional.  The role that the user would be authorized to have.
+*   `extraData` **[string][75]** Optional.  Any extra data you may want to store.  You may store stringified JSON in here, for example.
 
 ## AuthSig
 
@@ -486,7 +488,7 @@ Returns **[number][76]** The number of decimal places in the token
 
 ## lookupNameServiceAddress
 
-Lookup an eth address from a given ENS or UNS name
+Lookup an eth address from a given ENS name
 
 ### Parameters
 

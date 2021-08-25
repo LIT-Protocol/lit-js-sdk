@@ -31,6 +31,8 @@ import {
  * @property {string} baseUrl - The base url of the resource that will be authorized
  * @property {string} path - The path of the url of the resource that will be authorized
  * @property {string} orgId - Optional.  The org id that the user would be authorized to belong to.
+ * @property {string} role - Optional.  The role that the user would be authorized to have.
+ * @property {string} extraData - Optional.  Any extra data you may want to store.  You may store stringified JSON in here, for example.
  */
 
 /**

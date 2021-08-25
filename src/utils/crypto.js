@@ -14,7 +14,9 @@ export function canonicalResourceIdFormatter(resId) {
   return {
     baseUrl: resId.baseUrl,
     path: resId.path,
-    orgId: resId.orgId
+    orgId: resId.orgId,
+    role: resId.role,
+    extraData: resId.extraData
   }
 }
 
