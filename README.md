@@ -250,7 +250,7 @@ Now, you must have a JWT to verify.  Usually this comes from the user who is try
 ```
 const jwt = "eyJhbGciOiJCTFMxMi0zODEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJMSVQiLCJzdWIiOiIweGRiZDM2MGYzMDA5N2ZiNmQ5MzhkY2M4YjdiNjI4NTRiMzYxNjBiNDUiLCJjaGFpbiI6ImZhbnRvbSIsImlhdCI6MTYyODAzMTM1OCwiZXhwIjoxNjI4MDc0NTU4LCJiYXNlVXJsIjoiaHR0cHM6Ly9teS1keW5hbWljLWNvbnRlbnQtc2VydmVyLmNvbSIsInBhdGgiOiIvYV9wYXRoLmh0bWwiLCJvcmdJZCI6IiJ9.lX_aBSgGVYWd2FL6elRHoPJ2nab0IkmmX600cwZPCyK_SazZ-pzBUGDDQ0clthPVAtoS7roHg14xpEJlcSJUZBA7VTlPiDCOrkie_Hmulj765qS44t3kxAYduLhNQ-VN"
 const { verified, header, payload } = LitJsSdk.verifyJwt({jwt})
-if (payload.baseUrl !== "this-website.com" || payload.path !== "/path-you-expected" || payload.orgId !== "") {
+if (payload.baseUrl !== "this-website.com" || payload.path !== "/path-you-expected" || payload.orgId !== "" || payload.role !== "" || payload.extraData !== "") {
   // Reject this request!
   return false
 }
@@ -303,7 +303,9 @@ Next, define the Resource ID of the resource you are granting access to.  This i
 const resourceId = {
   baseUrl: 'my-dynamic-content-server.com',
   path: '/a_path.html',
-  orgId: ""
+  orgId: "",
+  role: "",
+  extraData: ""
 }
 ```
 
