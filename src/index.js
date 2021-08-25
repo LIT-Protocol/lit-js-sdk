@@ -10,7 +10,8 @@ import {
   unlockLitWithKey,
   verifyJwt,
   encryptFileAndZipWithMetadata,
-  decryptZipFileWithMetadata
+  decryptZipFileWithMetadata,
+  humanizeAccessControlConditions
 } from './utils/lit'
 
 import {
@@ -19,7 +20,8 @@ import {
   checkAndSignAuthMessage,
   findLITs,
   sendLIT,
-  decimalPlaces
+  decimalPlaces,
+  lookupNameServiceAddress
 } from './utils/eth'
 
 import {
@@ -92,7 +94,9 @@ const functions = {
   hashAccessControlConditions,
   decryptZipFileWithMetadata,
   downloadFile,
-  decimalPlaces
+  decimalPlaces,
+  humanizeAccessControlConditions,
+  lookupNameServiceAddress
 }
 
 module.exports = functions

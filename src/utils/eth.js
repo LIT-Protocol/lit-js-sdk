@@ -1,6 +1,7 @@
 import { Contract } from '@ethersproject/contracts'
 import { verifyMessage } from '@ethersproject/wallet'
 import { Web3Provider } from '@ethersproject/providers'
+import { namehash } from '@ethersproject/hash'
 import Web3Modal from "web3modal"
 // import WalletConnectProvider from "@walletconnect/web3-provider";
 
@@ -438,4 +439,92 @@ export async function decimalPlaces({ contractAddress }) {
   const { web3, account } = await connectWeb3()
   const contract = new Contract(contractAddress, ERC20, web3)
   return await contract.decimals()
+}
+
+/**
+ * Lookup an eth address from a given ENS or UNS name
+ * @param {Object} params
+ * @param {string} params.chain The chain on which to resolve the name
+ * @param {string} params.name The name to resolve
+ * @returns {string} The resolved eth address
+ */
+export async function lookupNameServiceAddress({ chain, name }) {
+  const { web3, account } = await connectWeb3()
+  await checkAndSignAuthMessage({ chain }) // this will switch them to the correct chain
+
+  const parts = name.split('.')
+  const tld = parts[parts.length - 1].toLowerCase()
+  if (tld === 'eth') {
+    var address = await web3.resolveName(name);
+    return address
+  } else if (tld === 'crypto') {
+    const proxyReaderAddress = "0xfEe4D4F0aDFF8D84c12170306507554bC7045878";
+    // Partial ABI, just for the getMany function.
+    const proxyReaderAbi = [
+      "function getMany(string[] calldata keys, uint256 tokenId) external view returns (string[] memory)",
+    ];
+    const proxyReaderContract = new ethers.Contract(
+      proxyReaderAddress,
+      proxyReaderAbi,
+      web3
+    );
+
+    const domain = name;
+    const tokenId = namehash(domain);
+    const keys = ["crypto.ETH.address"];
+
+    const values = await proxyReaderContract.getMany(keys, tokenId);
+    console.log(values);
+  } else {
+    var address = '0x049aba7510f45BA5b64ea9E658E342F904DB358D';
+    var abi = [
+      {
+        constant: true,
+        inputs: [
+          {
+            internalType: 'string[]',
+            name: 'keys',
+            type: 'string[]',
+          },
+          {
+            internalType: 'uint256',
+            name: 'tokenId',
+            type: 'uint256',
+          },
+        ],
+        name: 'getData',
+        outputs: [
+          {
+            internalType: 'address',
+            name: 'resolver',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
+            name: 'owner',
+            type: 'address',
+          },
+          {
+            internalType: 'string[]',
+            name: 'values',
+            type: 'string[]',
+          },
+        ],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+      }
+    ];
+    var contract = new ethers.Contract(address, abi, web3);
+    async function fetchContractData(keys, tokenId) {
+      return contract.getData(keys, tokenId);
+    }
+    const tokenId = namehash(name);
+    const interestedKeys = [
+      "crypto.ETH.address",
+    ];
+    const data = await fetchContractData(interestedKeys, tokenId)
+    console.log({ resolver: data.resolver, owner: data.owner, values: data[2] });
+  }
+
 }

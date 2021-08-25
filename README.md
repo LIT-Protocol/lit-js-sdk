@@ -22,6 +22,7 @@
     - [Must posess at least 0.00001 ETH](#must-posess-at-least-000001-eth)
     - [Must be a member of a DAO (MolochDAOv2.1, also supports DAOHaus)](#must-be-a-member-of-a-dao-molochdaov21-also-supports-daohaus)
     - [Must be a subscriber to a creator on creaton.io](#must-be-a-subscriber-to-a-creator-on-creatonio)
+    - [A specific wallet address](#a-specific-wallet-address)
   - [API](#api)
   - [Tests](#tests)
   - [Questions or Support](#questions-or-support)
@@ -491,6 +492,26 @@ const accessControlConditions = [
 ]
 ```
 
+### A specific wallet address
+In this example, we are checking that the user is in posession of a specific wallet address 0x50e2dac5e78B5905CB09495547452cEE64426db2
+
+```
+const accessControlConditions = [
+  {
+    contractAddress: '',
+    standardContractType: '',
+    chain,
+    method: '',
+    parameters: [
+      ':userAddress',
+    ],
+    returnValueTest: {
+      comparator: '=',
+      value: '0x50e2dac5e78B5905CB09495547452cEE64426db2'
+    }
+  }
+]
+```
 
 ## API
 You can find API documentation at https://lit-protocol.github.io/lit-js-sdk/api_docs_html/index.html
