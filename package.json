@@ -1,6 +1,6 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.1.47",
+  "version": "1.1.48",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
   "main": "build/index.js",
@@ -40,6 +40,7 @@
     "@ethersproject/units": "^5.4.0",
     "@ethersproject/wallet": "^5.2.0",
     "@metamask/detect-provider": "^1.2.0",
+    "@unstoppabledomains/resolution": "^5.0.1",
     "@walletconnect/web3-provider": "^1.6.3",
     "buffer": "^6.0.3",
     "jszip": "^3.6.0",
