@@ -7,7 +7,7 @@
   "scripts": {
     "start": "microbundle watch",
     "startNoCompressUseThisIfYouGetATerserErrorMaximumCallStackSizeExceeded": "microbundle watch --no-compress ",
-    "build": "microbundle build",
+    "build": "microbundle build -o build/index.js -f cjs",
     "buildWebWithParcel": "parcel build --global LitJsSdk -d build --out-file index.web.js --public-url ./ src/index.js",
     "cdnDeploy": "yarn build; yarn buildWeb",
     "buildWeb": "node esbuild-web.js",

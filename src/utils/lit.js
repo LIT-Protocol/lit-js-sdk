@@ -117,7 +117,7 @@ export async function encryptZip(zip) {
   // saveAs(encryptedZipBlob, 'encrypted.bin')
 
   const exportedSymmKey = new Uint8Array(await crypto.subtle.exportKey('raw', symmKey))
-  console.log('exportedSymmKey in hex', uint8arrayToString(exportedSymmKey, 'base16'))
+  // console.log('exportedSymmKey in hex', uint8arrayToString(exportedSymmKey, 'base16'))
 
   // encrypt the symmetric key with the
   // public key derived from the eth wallet
@@ -184,7 +184,7 @@ export async function encryptFileAndZipWithMetadata({ authSig, accessControlCond
 
   const symmetricKey = await generateSymmetricKey()
   const exportedSymmKey = new Uint8Array(await crypto.subtle.exportKey('raw', symmetricKey))
-  console.log('exportedSymmKey in hex', uint8arrayToString(exportedSymmKey, 'base16'))
+  // console.log('exportedSymmKey in hex', uint8arrayToString(exportedSymmKey, 'base16'))
 
   const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
     accessControlConditions,
@@ -192,7 +192,7 @@ export async function encryptFileAndZipWithMetadata({ authSig, accessControlCond
     authSig,
     chain
   })
-  console.log('encryption key saved to Lit', encryptedSymmetricKey)
+  console.log('encrypted key saved to Lit', encryptedSymmetricKey)
 
   // encrypt the file
   var fileAsArrayBuffer = await file.arrayBuffer();
@@ -219,7 +219,7 @@ export async function encryptFileAndZipWithMetadata({ authSig, accessControlCond
 
   const zipBlob = await zip.generateAsync({ type: 'blob' })
 
-  return zipBlob
+  return { zipBlob, encryptedSymmetricKey }
 }
 
 /**
@@ -255,6 +255,7 @@ export async function decryptZipFileWithMetadata({ authSig, file, litNodeClient 
 
   return { decryptedFile, metadata }
 }
+
 
 async function getNpmPackage(packageName) {
   // console.log('getting npm package: ' + packageName)
