@@ -5,7 +5,7 @@
   "source": "src/index.js",
   "main": "build/index.js",
   "scripts": {
-    "start": "microbundle watch",
+    "start": "microbundle watch -o build/index.js -f cjs",
     "startNoCompressUseThisIfYouGetATerserErrorMaximumCallStackSizeExceeded": "microbundle watch --no-compress ",
     "build": "microbundle build -o build/index.js -f cjs",
     "buildWebWithParcel": "parcel build --global LitJsSdk -d build --out-file index.web.js --public-url ./ src/index.js",

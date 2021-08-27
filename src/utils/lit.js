@@ -1,7 +1,7 @@
 import JSZip from 'jszip'
 import uint8arrayFromString from 'uint8arrays/from-string'
 import uint8arrayToString from 'uint8arrays/to-string'
-import { parseEther, parseUnits } from '@ethersproject/units'
+import { formatEther, formatUnits } from '@ethersproject/units'
 
 import {
   importSymmetricKey,
@@ -178,7 +178,7 @@ export async function encryptZip(zip) {
  * @param {File} params.file The file you wish to encrypt
  * @param {LitNodeClient} params.litNodeClient An instance of LitNodeClient that is already connected
  * @param {string} params.readme An optional readme text that will be inserted into readme.txt in the final zip file.  This is useful in case someone comes across this zip file and wants to know how to decrypt it.  This file could contain instructions and a URL to use to decrypt the file.
- * @returns {Blob} A zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network
+ * @returns {Object} An object with 2 keys: zipBlob and encryptedSymmetricKey.  zipBlob is a zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network.  encryptedSymmetricKey is the symmetric key needed to decrypt the content, encrypted with the Lit network public key.  You may wish to store encryptedSymmetricKey in your own database to support quicker re-encryption operations when adding additional access control conditions in the future, but this is entirely optional, and this key is already stored inside the zipBlob.
  */
 export async function encryptFileAndZipWithMetadata({ authSig, accessControlConditions, chain, file, litNodeClient, readme }) {
 
@@ -537,7 +537,7 @@ function humanizeComparator(comparator) {
 * @param {Array} params.accessControlConditions The array of access control conditions that you want to humanize
 * @returns {string} A human readable description of the access control condition
 */
-export async function humanizeAccessControlConditions({ accessControlConditions }) {
+export async function humanizeAccessControlConditions({ accessControlConditions, tokenList }) {
   return Promise.all(accessControlConditions.map(async acc => {
     if (acc.standardContractType === 'ERC1155' && acc.method === 'balanceOf') {
       return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${acc.returnValueTest.value} of ${acc.contractAddress} tokens`
@@ -548,10 +548,17 @@ export async function humanizeAccessControlConditions({ accessControlConditions 
       // any erc721 in collection
       return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${acc.returnValueTest.value} of ${acc.contractAddress} tokens`
     } else if (acc.standardContractType === 'ERC20' && acc.method === 'balanceOf') {
-      const decimals = await decimalPlaces({ contractAddress: acc.contractAddress })
-      return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${parseUnits(acc.returnValueTest.value, decimals)} of ${acc.contractAddress} tokens`
+      const tokenFromList = tokenList.find(t => t.address === acc.contractAddress)
+      let decimals, name
+      if (tokenFromList) {
+        decimals = tokenFromList.decimals
+        name = tokenFromList.symbol
+      } else {
+        decimals = await decimalPlaces({ contractAddress: acc.contractAddress })
+      }
+      return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${formatUnits(acc.returnValueTest.value, decimals)} of ${name || acc.contractAddress} tokens`
     } else if (acc.standardContractType === '' && acc.method === 'eth_getBalance') {
-      return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${parseEther(acc.returnValueTest.value)} ETH`
+      return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${formatEther(acc.returnValueTest.value)} ETH`
     }
 
   }))
