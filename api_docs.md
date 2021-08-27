@@ -295,7 +295,7 @@ Encrypt a single file, save the key to the Lit network, and then zip it up with 
     *   `params.litNodeClient` **[LitNodeClient][84]** An instance of LitNodeClient that is already connected
     *   `params.readme` **[string][75]** An optional readme text that will be inserted into readme.txt in the final zip file.  This is useful in case someone comes across this zip file and wants to know how to decrypt it.  This file could contain instructions and a URL to use to decrypt the file.
 
-Returns **[Blob][85]** A zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network
+Returns **[Object][74]** An object with 2 keys: zipBlob and encryptedSymmetricKey.  zipBlob is a zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network.  encryptedSymmetricKey is the symmetric key needed to decrypt the content, encrypted with the Lit network public key.  You may wish to store encryptedSymmetricKey in your own database to support quicker re-encryption operations when adding additional access control conditions in the future, but this is entirely optional, and this key is already stored inside the zipBlob.
 
 ## decryptZipFileWithMetadata
 
@@ -526,6 +526,7 @@ The human readable name for an access control condition
 *   `params` **[Object][74]** 
 
     *   `params.accessControlConditions` **[Array][78]** The array of access control conditions that you want to humanize
+    *   `params.tokenList`  
 
 Returns **[string][75]** A human readable description of the access control condition
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset='utf-8'>
-  <title>lit-js-sdk 1.1.48 | Documentation</title>
+  <title>lit-js-sdk 1.1.49 | Documentation</title>
   <meta name='description' content='LIT Javascript SDK'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' rel='stylesheet'>
@@ -15,7 +15,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>lit-js-sdk</h3>
-          <div class='mb1'><code>1.1.48</code></div>
+          <div class='mb1'><code>1.1.49</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -2075,7 +2075,7 @@
 
   <p>Encrypt a single file, save the key to the Lit network, and then zip it up with the metadata.</p>
 
-    <div class='pre p1 fill-light mt0'>encryptFileAndZipWithMetadata(params: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></div>
+    <div class='pre p1 fill-light mt0'>encryptFileAndZipWithMetadata(params: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
   
   
 
@@ -2176,8 +2176,8 @@
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a></code>:
-        A zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+        An object with 2 keys: zipBlob and encryptedSymmetricKey.  zipBlob is a zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network.  encryptedSymmetricKey is the symmetric key needed to decrypt the content, encrypted with the Lit network public key.  You may wish to store encryptedSymmetricKey in your own database to support quicker re-encryption operations when adding additional access control conditions in the future, but this is entirely optional, and this key is already stored inside the zipBlob.
 
       
     
@@ -3937,6 +3937,14 @@
   </td>
   <td class='break-word'><span>The array of access control conditions that you want to humanize
 </span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.tokenList</span> <code class='quiet'>any</code>
+  </td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
