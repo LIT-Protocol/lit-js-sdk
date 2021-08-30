@@ -39,11 +39,12 @@ import {
  * A LIT node client.  Connects directly to the LIT nodes to store and retrieve encryption keys and signing requests.  Only holders of an NFT that corresponds with a LIT may store and retrieve the keys.
  * @param {Object} config
  * @param {boolean} [config.alertWhenUnauthorized=true] Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  If you turn this off, you should create an event listener for the "lit-authFailure" event on the document, and show your own error to the user.
- * @param {number} [config.minNodeCount=8] The minimum number of nodes that must be connected for the LitNodeClient to be ready to use.
+ * @param {number} [config.minNodeCount=6] The minimum number of nodes that must be connected for the LitNodeClient to be ready to use.
  */
 export default class LitNodeClient {
-  constructor(
-    config = {
+  constructor(config) {
+    console.log('config passed in is ', config)
+    this.config = {
       alertWhenUnauthorized: true,
       minNodeCount: 6,
       bootstrapUrls: [
@@ -57,10 +58,11 @@ export default class LitNodeClient {
         'https://node2.litgateway.com:7377',
         'https://node2.litgateway.com:7378',
         'https://node2.litgateway.com:7379',
-      ]
+      ],
+      ...config
     }
-  ) {
-    this.config = config
+    console.log('this.config is', this.config)
+
     this.connectedNodes = new Set()
     this.serverKeys = {}
     this.ready = false
@@ -115,8 +117,15 @@ export default class LitNodeClient {
     const goodShares = signatureShares.filter(d => d.signatureShare !== "")
     if (goodShares.length < this.config.minNodeCount) {
       console.log(`majority of shares are bad. goodShares is ${JSON.stringify(goodShares)}`)
-      alert("You are not authorized to receive a signature to grant access to this content")
-      return null;
+      if (this.config.alertWhenUnauthorized) {
+        alert("You are not authorized to receive a signature to grant access to this content")
+      }
+
+      throw {
+        name: 'Unauthorized',
+        message: 'You are not authorized to recieve a signature on this item',
+        code: 'not_authorized'
+      }
     }
 
     // sanity check
@@ -197,8 +206,14 @@ export default class LitNodeClient {
     const goodShares = decryptionShares.filter(d => d.decryptionShare !== "")
     if (goodShares.length < this.config.minNodeCount) {
       console.log(`majority of shares are bad. goodShares is ${JSON.stringify(goodShares)}`)
-      alert("You are not authorized to unlock this content")
-      return null;
+      if (this.config.alertWhenUnauthorized) {
+        alert("You are not authorized to unlock this content")
+      }
+      throw {
+        name: 'Unauthorized',
+        message: 'You are not authorized to unlock this item',
+        code: 'not_authorized'
+      }
     }
 
     // sort the decryption shares by share index.  this is important when combining the shares.

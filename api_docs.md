@@ -98,10 +98,10 @@ A LIT node client.  Connects directly to the LIT nodes to store and retrieve enc
 
 ### Parameters
 
-*   `config` **[Object][74]**  (optional, default `{alertWhenUnauthorized:true,minNodeCount:6,bootstrapUrls:['https://node2.litgateway.com:7370','https://node2.litgateway.com:7371','https://node2.litgateway.com:7372','https://node2.litgateway.com:7373','https://node2.litgateway.com:7374','https://node2.litgateway.com:7375','https://node2.litgateway.com:7376','https://node2.litgateway.com:7377','https://node2.litgateway.com:7378','https://node2.litgateway.com:7379']}`)
+*   `config` **[Object][74]** 
 
     *   `config.alertWhenUnauthorized` **[boolean][77]** Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  If you turn this off, you should create an event listener for the "lit-authFailure" event on the document, and show your own error to the user. (optional, default `true`)
-    *   `config.minNodeCount` **[number][76]** The minimum number of nodes that must be connected for the LitNodeClient to be ready to use. (optional, default `8`)
+    *   `config.minNodeCount` **[number][76]** The minimum number of nodes that must be connected for the LitNodeClient to be ready to use. (optional, default `6`)
 
 ### getSignedToken
 
@@ -308,6 +308,7 @@ Given a zip file with metadata inside it, unzip, load the metadata, and return t
     *   `params.authSig` **[Object][74]** The authSig of the user.  Returned via the checkAndSignAuthMessage function
     *   `params.file` **File** The zip file with metadata inside it and the encrypted asset
     *   `params.litNodeClient` **[LitNodeClient][84]** An instance of LitNodeClient that is already connected
+    *   `params.additionalAccessControlConditions`  
 
 Returns **[Object][74]** An object that contains decryptedFile and metadata properties.  The decryptedFile is an ArrayBuffer that is ready to use, and metadata is an object that contains all the properties of the file like it's name and size and type.
 

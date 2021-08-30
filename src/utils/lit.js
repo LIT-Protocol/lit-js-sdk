@@ -230,18 +230,59 @@ export async function encryptFileAndZipWithMetadata({ authSig, accessControlCond
  * @param {LitNodeClient} params.litNodeClient An instance of LitNodeClient that is already connected
  * @returns {Object} An object that contains decryptedFile and metadata properties.  The decryptedFile is an ArrayBuffer that is ready to use, and metadata is an object that contains all the properties of the file like it's name and size and type.
  */
-export async function decryptZipFileWithMetadata({ authSig, file, litNodeClient }) {
+export async function decryptZipFileWithMetadata({ authSig, file, litNodeClient, additionalAccessControlConditions }) {
 
   const zip = await JSZip.loadAsync(file)
   const metadata = JSON.parse(await zip.file("lit_protocol_metadata.json").async("string"));
   console.log('zip metadata', metadata)
 
-  const symmKey = await litNodeClient.getEncryptionKey({
-    accessControlConditions: metadata.accessControlConditions,
-    toDecrypt: metadata.encryptedSymmetricKey,
-    chain: metadata.chain,
-    authSig
-  })
+  let symmKey
+  try {
+    symmKey = await litNodeClient.getEncryptionKey({
+      accessControlConditions: metadata.accessControlConditions,
+      toDecrypt: metadata.encryptedSymmetricKey,
+      chain: metadata.chain,
+      authSig
+    })
+  } catch (e) {
+    if (e.code === 'not_authorized') {
+      // try more additionalAccessControlConditions
+      if (!additionalAccessControlConditions) {
+        throw e
+      }
+      console.log('trying additionalAccessControlConditions')
+
+      for (let i = 0; i < additionalAccessControlConditions.length; i++) {
+        const accessControlConditions = additionalAccessControlConditions[i].accessControlConditions
+        console.log('trying additional condition', accessControlConditions)
+        try {
+          symmKey = await litNodeClient.getEncryptionKey({
+            accessControlConditions: accessControlConditions,
+            toDecrypt: additionalAccessControlConditions[i].encryptedSymmetricKey,
+            chain: metadata.chain,
+            authSig
+          })
+
+          // // okay we got the additional symmkey, now we need to decrypt the symmkey and then use it to decrypt the original symmkey
+          // const importedAdditionalSymmKey = await importSymmetricKey(symmKey)
+          // symmKey = await decryptWithSymmetricKey(additionalAccessControlConditions[i].encryptedSymmetricKey, importedAdditionalSymmKey)
+
+          break; // it worked, we can leave the loop and stop checking additional access control conditions
+        } catch (e) {
+          // swallow not_authorized because we are gonna try some more accessControlConditions
+          if (e.code !== 'not_authorized') {
+            throw e
+          }
+        }
+      }
+      if (!symmKey) {
+        // we tried all the access control conditions and none worked
+        throw e
+      }
+
+
+    }
+  }
   const importedSymmKey = await importSymmetricKey(symmKey)
 
   // console.log('symmetricKey', importedSymmKey)

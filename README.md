@@ -23,6 +23,8 @@
     - [Must be a member of a DAO (MolochDAOv2.1, also supports DAOHaus)](#must-be-a-member-of-a-dao-molochdaov21-also-supports-daohaus)
     - [Must be a subscriber to a creator on creaton.io](#must-be-a-subscriber-to-a-creator-on-creatonio)
     - [A specific wallet address](#a-specific-wallet-address)
+  - [Error Handling](#error-handling)
+    - [Not Authorized](#not-authorized)
   - [API](#api)
   - [Tests](#tests)
   - [Questions or Support](#questions-or-support)
@@ -514,6 +516,14 @@ const accessControlConditions = [
   }
 ]
 ```
+
+## Error Handling
+
+Errors are thrown as exceptions when something has gone wrong.  Errors are objects with a message, name, and code.  Possible codes are documented below.
+
+### Not Authorized
+* Code: not_authorized
+* Reason: Thrown when the user does not have access to decrypt or is unauthorized to receive a JWT for an item.
 
 ## API
 You can find API documentation at https://lit-protocol.github.io/lit-js-sdk/api_docs_html/index.html
