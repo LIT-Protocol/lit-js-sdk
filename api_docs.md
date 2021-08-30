@@ -100,7 +100,7 @@ A LIT node client.  Connects directly to the LIT nodes to store and retrieve enc
 
 *   `config` **[Object][74]** 
 
-    *   `config.alertWhenUnauthorized` **[boolean][77]** Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  If you turn this off, you should create an event listener for the "lit-authFailure" event on the document, and show your own error to the user. (optional, default `true`)
+    *   `config.alertWhenUnauthorized` **[boolean][77]** Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  An exception will also be thrown regardless of this option. (optional, default `true`)
     *   `config.minNodeCount` **[number][76]** The minimum number of nodes that must be connected for the LitNodeClient to be ready to use. (optional, default `6`)
 
 ### getSignedToken
