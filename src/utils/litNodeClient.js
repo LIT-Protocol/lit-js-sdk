@@ -59,7 +59,9 @@ export default class LitNodeClient {
         'https://node2.litgateway.com:7378',
         'https://node2.litgateway.com:7379',
       ],
-      ...config
+    }
+    if (config) {
+      this.config = { ...config }
     }
     console.log('this.config is', this.config)
 
