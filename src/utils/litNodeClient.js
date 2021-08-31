@@ -79,7 +79,7 @@ export default class LitNodeClient {
       }
       this.config = { ...configOverride }
     }
-    console.log('config after init'), this.config
+    console.log('config after init', this.config)
   }
 
   /**
