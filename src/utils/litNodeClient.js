@@ -63,7 +63,6 @@ export default class LitNodeClient {
     if (config) {
       this.config = { ...config }
     }
-    console.log('this.config is', this.config)
 
     this.connectedNodes = new Set()
     this.serverKeys = {}
@@ -76,10 +75,9 @@ export default class LitNodeClient {
       let configOverride = window.localStorage.getItem('LitNodeClientConfig')
       if (configOverride) {
         configOverride = JSON.parse(configOverride)
+        this.config = { ...configOverride }
       }
-      this.config = { ...configOverride }
     }
-    console.log('config after init', this.config)
   }
 
   /**
