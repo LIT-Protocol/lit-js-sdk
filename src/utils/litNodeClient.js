@@ -77,8 +77,9 @@ export default class LitNodeClient {
       if (configOverride) {
         configOverride = JSON.parse(configOverride)
       }
-      this.config = { ...config, ...configOverride }
+      this.config = { ...configOverride }
     }
+    console.log('config after init'), this.config
   }
 
   /**
