@@ -1,8 +1,6 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
-
 - [LIT Protocol JS SDK](#lit-protocol-js-sdk)
   - [State of the network today](#state-of-the-network-today)
   - [How does the LIT protocol work?](#how-does-the-lit-protocol-work)
@@ -24,8 +22,10 @@
     - [Must be a member of a DAO (MolochDAOv2.1, also supports DAOHaus)](#must-be-a-member-of-a-dao-molochdaov21-also-supports-daohaus)
     - [Must be a subscriber to a creator on creaton.io](#must-be-a-subscriber-to-a-creator-on-creatonio)
     - [A specific wallet address](#a-specific-wallet-address)
-  - [Error Handling](#error-handling)
+  - [SDK Error Handling](#sdk-error-handling)
     - [Not Authorized](#not-authorized)
+  - [Wallet Error Handling](#wallet-error-handling)
+    - [Brave](#brave)
   - [API](#api)
   - [Tests](#tests)
   - [Questions or Support](#questions-or-support)
