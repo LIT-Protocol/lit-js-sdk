@@ -1,16 +1,15 @@
+import uint8arrayFromString from "uint8arrays/from-string";
+import uint8arrayToString from "uint8arrays/to-string";
+import naclUtil from "tweetnacl-util";
 
-import uint8arrayFromString from 'uint8arrays/from-string'
-import uint8arrayToString from 'uint8arrays/to-string'
-import naclUtil from 'tweetnacl-util'
-
-import { mostCommonString } from '../lib/utils'
-import { wasmBlsSdkHelpers } from '../lib/bls-sdk'
+import { mostCommonString } from "../lib/utils";
+import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import {
   hashAccessControlConditions,
   hashResourceId,
   canonicalAccessControlConditionFormatter,
-  canonicalResourceIdFormatter
-} from './crypto'
+  canonicalResourceIdFormatter,
+} from "./crypto";
 
 /**
  * @typedef {Object} AccessControlCondition
@@ -43,148 +42,197 @@ import {
  */
 export default class LitNodeClient {
   constructor(config) {
-    console.log('config passed in is ', config)
+    console.log("config passed in is ", config);
     this.config = {
       alertWhenUnauthorized: true,
       minNodeCount: 6,
       bootstrapUrls: [
-        'https://node2.litgateway.com:7370',
-        'https://node2.litgateway.com:7371',
-        'https://node2.litgateway.com:7372',
-        'https://node2.litgateway.com:7373',
-        'https://node2.litgateway.com:7374',
-        'https://node2.litgateway.com:7375',
-        'https://node2.litgateway.com:7376',
-        'https://node2.litgateway.com:7377',
-        'https://node2.litgateway.com:7378',
-        'https://node2.litgateway.com:7379',
+        "https://node2.litgateway.com:7370",
+        "https://node2.litgateway.com:7371",
+        "https://node2.litgateway.com:7372",
+        "https://node2.litgateway.com:7373",
+        "https://node2.litgateway.com:7374",
+        "https://node2.litgateway.com:7375",
+        "https://node2.litgateway.com:7376",
+        "https://node2.litgateway.com:7377",
+        "https://node2.litgateway.com:7378",
+        "https://node2.litgateway.com:7379",
       ],
-    }
+    };
     if (config) {
-      this.config = { ...config }
+      this.config = { ...this.config, ...config };
     }
 
-    this.connectedNodes = new Set()
-    this.serverKeys = {}
-    this.ready = false
-    this.subnetPubKey = null
-    this.networkPubKey = null
-    this.networkPubKeySet = null
+    this.connectedNodes = new Set();
+    this.serverKeys = {};
+    this.ready = false;
+    this.subnetPubKey = null;
+    this.networkPubKey = null;
+    this.networkPubKeySet = null;
 
-    if (typeof window !== 'undefined' && window && window.localStorage) {
-      let configOverride = window.localStorage.getItem('LitNodeClientConfig')
+    if (typeof window !== "undefined" && window && window.localStorage) {
+      let configOverride = window.localStorage.getItem("LitNodeClientConfig");
       if (configOverride) {
-        configOverride = JSON.parse(configOverride)
-        this.config = { ...configOverride }
+        configOverride = JSON.parse(configOverride);
+        this.config = { ...configOverride };
       }
     }
   }
 
   /**
- * Request a signed JWT from the LIT network.  Before calling this function, you must either create or know of a resource id and access control conditions for the item you wish to gain authorization for.  You can create an access control condition using the saveSigningCondition function.
- * @param {Object} params
- * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
-* @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
- * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions.
- * @param {ResourceId} params.resourceId The resourceId representing something on the web via a URL
- * @returns {Object} A signed JWT that proves you meet the access control conditions for the given resource id.  You may present this to a server for authorization, and the server can verify it using the verifyJwt function.
-*/
-  async getSignedToken({ accessControlConditions, chain, authSig, resourceId }) {
+   * Request a signed JWT from the LIT network.  Before calling this function, you must either create or know of a resource id and access control conditions for the item you wish to gain authorization for.  You can create an access control condition using the saveSigningCondition function.
+   * @param {Object} params
+   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+   * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+   * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions.
+   * @param {ResourceId} params.resourceId The resourceId representing something on the web via a URL
+   * @returns {Object} A signed JWT that proves you meet the access control conditions for the given resource id.  You may present this to a server for authorization, and the server can verify it using the verifyJwt function.
+   */
+  async getSignedToken({
+    accessControlConditions,
+    chain,
+    authSig,
+    resourceId,
+  }) {
     // we need to send jwt params iat (issued at) and exp (expiration)
     // because the nodes may have different wall clock times
     // the nodes will verify that these params are withing a grace period
-    const now = Date.now()
-    const iat = Math.floor(now / 1000)
-    const exp = iat + (12 * 60 * 60) // 12 hours in seconds
+    const now = Date.now();
+    const iat = Math.floor(now / 1000);
+    const exp = iat + 12 * 60 * 60; // 12 hours in seconds
 
-    const formattedAccessControlConditions = accessControlConditions.map(c => canonicalAccessControlConditionFormatter(c))
-    const formattedResourceId = canonicalResourceIdFormatter(resourceId)
+    const formattedAccessControlConditions = accessControlConditions.map((c) =>
+      canonicalAccessControlConditionFormatter(c)
+    );
+    const formattedResourceId = canonicalResourceIdFormatter(resourceId);
 
     // ask each node to sign the content
-    const nodePromises = []
+    const nodePromises = [];
     for (const url of this.connectedNodes) {
-      nodePromises.push(this.getSigningShare({
-        url,
-        accessControlConditions: formattedAccessControlConditions,
-        resourceId: formattedResourceId,
-        authSig,
-        chain,
-        iat,
-        exp
-      }))
+      nodePromises.push(
+        this.getSigningShare({
+          url,
+          accessControlConditions: formattedAccessControlConditions,
+          resourceId: formattedResourceId,
+          authSig,
+          chain,
+          iat,
+          exp,
+        })
+      );
     }
-    const signatureShares = await Promise.all(nodePromises)
-    console.log('signatureShares', signatureShares)
-    const goodShares = signatureShares.filter(d => d.signatureShare !== "")
+    const signatureShares = await Promise.all(nodePromises);
+    console.log("signatureShares", signatureShares);
+    const goodShares = signatureShares.filter((d) => d.signatureShare !== "");
     if (goodShares.length < this.config.minNodeCount) {
-      console.log(`majority of shares are bad. goodShares is ${JSON.stringify(goodShares)}`)
+      console.log(
+        `majority of shares are bad. goodShares is ${JSON.stringify(
+          goodShares
+        )}`
+      );
       if (this.config.alertWhenUnauthorized) {
-        alert("You are not authorized to receive a signature to grant access to this content")
+        alert(
+          "You are not authorized to receive a signature to grant access to this content"
+        );
       }
 
       throw {
-        name: 'Unauthorized',
-        message: 'You are not authorized to recieve a signature on this item',
-        code: 'not_authorized'
-      }
+        name: "Unauthorized",
+        message: "You are not authorized to recieve a signature on this item",
+        code: "not_authorized",
+      };
     }
 
     // sanity check
-    if (!signatureShares.every((val, i, arr) => val.unsignedJwt === arr[0].unsignedJwt)) {
-      const msg = 'Unsigned JWT is not the same from all the nodes.  This means the combined signature will be bad because the nodes signed the wrong things'
-      console.log(msg)
-      alert(msg)
+    if (
+      !signatureShares.every(
+        (val, i, arr) => val.unsignedJwt === arr[0].unsignedJwt
+      )
+    ) {
+      const msg =
+        "Unsigned JWT is not the same from all the nodes.  This means the combined signature will be bad because the nodes signed the wrong things";
+      console.log(msg);
+      alert(msg);
     }
 
     // sort the sig shares by share index.  this is important when combining the shares.
-    signatureShares.sort((a, b) => a.shareIndex - b.shareIndex)
+    signatureShares.sort((a, b) => a.shareIndex - b.shareIndex);
 
     // combine the signature shares
 
-    const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, 'base16')
+    const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, "base16");
 
-    const sigShares = signatureShares.map(s => ({
+    const sigShares = signatureShares.map((s) => ({
       shareHex: s.signatureShare,
-      shareIndex: s.shareIndex
-    }))
-    const signature = wasmBlsSdkHelpers.combine_signatures(pkSetAsBytes, sigShares)
-    console.log('signature is ', uint8arrayToString(signature, 'base16'))
+      shareIndex: s.shareIndex,
+    }));
+    const signature = wasmBlsSdkHelpers.combine_signatures(
+      pkSetAsBytes,
+      sigShares
+    );
+    console.log("signature is ", uint8arrayToString(signature, "base16"));
 
-    const unsignedJwt = mostCommonString(signatureShares.map(s => s.unsignedJwt))
+    const unsignedJwt = mostCommonString(
+      signatureShares.map((s) => s.unsignedJwt)
+    );
 
     // convert the sig to base64 and append to the jwt
-    const finalJwt = `${unsignedJwt}.${uint8arrayToString(signature, 'base64url')}`
+    const finalJwt = `${unsignedJwt}.${uint8arrayToString(
+      signature,
+      "base64url"
+    )}`;
 
-    return finalJwt
+    return finalJwt;
   }
 
   /**
-  * Associated access control conditions with a resource on the web.  After calling this function, users may use the getSignedToken function to request a signed JWT from the LIT network.  This JWT proves that the user meets the access control conditions, and is authorized to access the resource you specified in the resourceId parameter of the saveSigningCondition function.
-  * @param {Object} params
-  * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.
-  * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-  * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions
-  * @param {ResourceId} params.resourceId The resourceId representing something on the web via a URL
-  * @returns {boolean} Success
-  */
-  async saveSigningCondition({ accessControlConditions, chain, authSig, resourceId }) {
-    console.log('saveSigningCondition')
+   * Associated access control conditions with a resource on the web.  After calling this function, users may use the getSignedToken function to request a signed JWT from the LIT network.  This JWT proves that the user meets the access control conditions, and is authorized to access the resource you specified in the resourceId parameter of the saveSigningCondition function.
+   * @param {Object} params
+   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.
+   * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+   * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions
+   * @param {ResourceId} params.resourceId The resourceId representing something on the web via a URL
+   * @returns {boolean} Success
+   */
+  async saveSigningCondition({
+    accessControlConditions,
+    chain,
+    authSig,
+    resourceId,
+  }) {
+    console.log("saveSigningCondition");
 
     // hash the resource id
-    const hashOfResourceId = await hashResourceId(resourceId)
-    const hashOfResourceIdStr = uint8arrayToString(new Uint8Array(hashOfResourceId), 'base16')
+    const hashOfResourceId = await hashResourceId(resourceId);
+    const hashOfResourceIdStr = uint8arrayToString(
+      new Uint8Array(hashOfResourceId),
+      "base16"
+    );
 
     // hash the access control conditions
-    const hashOfConditions = await hashAccessControlConditions(accessControlConditions)
-    const hashOfConditionsStr = uint8arrayToString(new Uint8Array(hashOfConditions), 'base16')
+    const hashOfConditions = await hashAccessControlConditions(
+      accessControlConditions
+    );
+    const hashOfConditionsStr = uint8arrayToString(
+      new Uint8Array(hashOfConditions),
+      "base16"
+    );
     // create access control conditions on lit nodes
-    const nodePromises = []
+    const nodePromises = [];
     for (const url of this.connectedNodes) {
-      nodePromises.push(this.storeSigningConditionWithNode({ url, key: hashOfResourceIdStr, val: hashOfConditionsStr, authSig, chain }))
+      nodePromises.push(
+        this.storeSigningConditionWithNode({
+          url,
+          key: hashOfResourceIdStr,
+          val: hashOfConditionsStr,
+          authSig,
+          chain,
+        })
+      );
     }
-    await Promise.all(nodePromises)
+    await Promise.all(nodePromises);
 
-    return true
+    return true;
   }
 
   /**
@@ -195,205 +243,278 @@ export default class LitNodeClient {
    * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
    * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
-  */
-  async getEncryptionKey({ accessControlConditions, toDecrypt, chain, authSig }) {
+   */
+  async getEncryptionKey({
+    accessControlConditions,
+    toDecrypt,
+    chain,
+    authSig,
+  }) {
     // ask each node to decrypt the content
-    const nodePromises = []
+    const nodePromises = [];
     for (const url of this.connectedNodes) {
-      nodePromises.push(this.getDecryptionShare({ url, accessControlConditions, toDecrypt, authSig, chain }))
+      nodePromises.push(
+        this.getDecryptionShare({
+          url,
+          accessControlConditions,
+          toDecrypt,
+          authSig,
+          chain,
+        })
+      );
     }
-    const decryptionShares = await Promise.all(nodePromises)
-    console.log('decryptionShares', decryptionShares)
-    const goodShares = decryptionShares.filter(d => d.decryptionShare !== "")
+    const decryptionShares = await Promise.all(nodePromises);
+    console.log("decryptionShares", decryptionShares);
+    const goodShares = decryptionShares.filter((d) => d.decryptionShare !== "");
     if (goodShares.length < this.config.minNodeCount) {
-      console.log(`majority of shares are bad. goodShares is ${JSON.stringify(goodShares)}`)
+      console.log(
+        `majority of shares are bad. goodShares is ${JSON.stringify(
+          goodShares
+        )}`
+      );
       if (this.config.alertWhenUnauthorized) {
-        alert("You are not authorized to unlock this content")
+        alert("You are not authorized to unlock this content");
       }
       throw {
-        name: 'Unauthorized',
-        message: 'You are not authorized to unlock this item',
-        code: 'not_authorized'
-      }
+        name: "Unauthorized",
+        message: "You are not authorized to unlock this item",
+        code: "not_authorized",
+      };
     }
 
     // sort the decryption shares by share index.  this is important when combining the shares.
-    decryptionShares.sort((a, b) => a.shareIndex - b.shareIndex)
+    decryptionShares.sort((a, b) => a.shareIndex - b.shareIndex);
 
     // combine the decryption shares
 
     // set decryption shares bytes in wasm
     decryptionShares.forEach((s, idx) => {
-      wasmExports.set_share_indexes(idx, s.shareIndex)
-      const shareAsBytes = uint8arrayFromString(s.decryptionShare, 'base16')
+      wasmExports.set_share_indexes(idx, s.shareIndex);
+      const shareAsBytes = uint8arrayFromString(s.decryptionShare, "base16");
       for (let i = 0; i < shareAsBytes.length; i++) {
-        wasmExports.set_decryption_shares_byte(i, idx, shareAsBytes[i])
+        wasmExports.set_decryption_shares_byte(i, idx, shareAsBytes[i]);
       }
-    })
+    });
 
     // set the public key set bytes in wasm
-    const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, 'base16')
-    wasmBlsSdkHelpers.set_mc_bytes(pkSetAsBytes)
+    const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, "base16");
+    wasmBlsSdkHelpers.set_mc_bytes(pkSetAsBytes);
 
     // set the ciphertext bytes
-    const ciphertextAsBytes = uint8arrayFromString(toDecrypt, 'base16')
+    const ciphertextAsBytes = uint8arrayFromString(toDecrypt, "base16");
     for (let i = 0; i < ciphertextAsBytes.length; i++) {
-      wasmExports.set_ct_byte(i, ciphertextAsBytes[i])
+      wasmExports.set_ct_byte(i, ciphertextAsBytes[i]);
     }
 
-    const decrypted = wasmBlsSdkHelpers.combine_decryption_shares(decryptionShares.length, pkSetAsBytes.length, ciphertextAsBytes.length)
+    const decrypted = wasmBlsSdkHelpers.combine_decryption_shares(
+      decryptionShares.length,
+      pkSetAsBytes.length,
+      ciphertextAsBytes.length
+    );
     // console.log('decrypted is ', uint8arrayToString(decrypted, 'base16'))
 
-    return decrypted
+    return decrypted;
   }
 
   /**
-  * Securely save the association between access control conditions and something that you wish to decrypt
-  * @param {Object} params
-  * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.  Save this - you will neeed it to decrypt the content in the future.
-  * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-  * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
-  * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.
-  * @returns {Uint8Array} The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
-  */
-  async saveEncryptionKey({ accessControlConditions, chain, authSig, symmetricKey }) {
-    console.log('LitNodeClient.saveEncryptionKey')
-    if (!symmetricKey || symmetricKey == '') {
-      throw new Error("symmetricKey is blank")
+   * Securely save the association between access control conditions and something that you wish to decrypt
+   * @param {Object} params
+   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.  Save this - you will neeed it to decrypt the content in the future.
+   * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+   * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
+   * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.
+   * @returns {Uint8Array} The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
+   */
+  async saveEncryptionKey({
+    accessControlConditions,
+    chain,
+    authSig,
+    symmetricKey,
+  }) {
+    console.log("LitNodeClient.saveEncryptionKey");
+    if (!symmetricKey || symmetricKey == "") {
+      throw new Error("symmetricKey is blank");
     }
     if (!chain) {
-      throw new Error('chain is blank')
+      throw new Error("chain is blank");
     }
     if (!accessControlConditions || accessControlConditions.length == 0) {
-      throw new Error('accessControlConditions is blank')
+      throw new Error("accessControlConditions is blank");
     }
     if (!authSig) {
-      throw new Error('authSig is blank')
+      throw new Error("authSig is blank");
     }
 
     // encrypt with network pubkey
-    const encryptedKey = wasmBlsSdkHelpers.encrypt(uint8arrayFromString(this.subnetPubKey, 'base16'), symmetricKey)
-    console.log('symmetric key encrypted with LIT network key: ', uint8arrayToString(encryptedKey, 'base16'))
+    const encryptedKey = wasmBlsSdkHelpers.encrypt(
+      uint8arrayFromString(this.subnetPubKey, "base16"),
+      symmetricKey
+    );
+    console.log(
+      "symmetric key encrypted with LIT network key: ",
+      uint8arrayToString(encryptedKey, "base16")
+    );
     // hash the encrypted pubkey
-    const hashOfKey = await crypto.subtle.digest('SHA-256', encryptedKey)
-    const hashOfKeyStr = uint8arrayToString(new Uint8Array(hashOfKey), 'base16')
+    const hashOfKey = await crypto.subtle.digest("SHA-256", encryptedKey);
+    const hashOfKeyStr = uint8arrayToString(
+      new Uint8Array(hashOfKey),
+      "base16"
+    );
 
     // hash the access control conditions
-    const hashOfConditions = await hashAccessControlConditions(accessControlConditions)
-    const hashOfConditionsStr = uint8arrayToString(new Uint8Array(hashOfConditions), 'base16')
+    const hashOfConditions = await hashAccessControlConditions(
+      accessControlConditions
+    );
+    const hashOfConditionsStr = uint8arrayToString(
+      new Uint8Array(hashOfConditions),
+      "base16"
+    );
     // create access control conditions on lit nodes
-    const nodePromises = []
+    const nodePromises = [];
     for (const url of this.connectedNodes) {
-      nodePromises.push(this.storeEncryptionConditionWithNode({ url, key: hashOfKeyStr, val: hashOfConditionsStr, authSig, chain }))
+      nodePromises.push(
+        this.storeEncryptionConditionWithNode({
+          url,
+          key: hashOfKeyStr,
+          val: hashOfConditionsStr,
+          authSig,
+          chain,
+        })
+      );
     }
-    await Promise.all(nodePromises)
+    await Promise.all(nodePromises);
 
-    return encryptedKey
+    return encryptedKey;
   }
 
   async storeSigningConditionWithNode({ url, key, val, authSig, chain }) {
-    console.log('storeSigningConditionWithNode')
-    const urlWithPath = `${url}/web/signing/store`
+    console.log("storeSigningConditionWithNode");
+    const urlWithPath = `${url}/web/signing/store`;
     const data = {
       key,
       val,
       authSig,
-      chain
-    }
-    return await this.sendCommandToNode({ url: urlWithPath, data })
+      chain,
+    };
+    return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
   async storeEncryptionConditionWithNode({ url, key, val, authSig, chain }) {
-    console.log('storeEncryptionConditionWithNode')
-    const urlWithPath = `${url}/web/encryption/store`
+    console.log("storeEncryptionConditionWithNode");
+    const urlWithPath = `${url}/web/encryption/store`;
     const data = {
       key,
       val,
       authSig,
-      chain
-    }
-    return await this.sendCommandToNode({ url: urlWithPath, data })
+      chain,
+    };
+    return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
-  async getSigningShare({ url, accessControlConditions, resourceId, authSig, chain, iat, exp }) {
-    console.log('getSigningShare')
-    const urlWithPath = `${url}/web/signing/retrieve`
+  async getSigningShare({
+    url,
+    accessControlConditions,
+    resourceId,
+    authSig,
+    chain,
+    iat,
+    exp,
+  }) {
+    console.log("getSigningShare");
+    const urlWithPath = `${url}/web/signing/retrieve`;
     const data = {
       accessControlConditions,
       resourceId,
       authSig,
       chain,
       iat,
-      exp
-    }
-    return await this.sendCommandToNode({ url: urlWithPath, data })
+      exp,
+    };
+    return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
-  async getDecryptionShare({ url, accessControlConditions, toDecrypt, authSig, chain }) {
-    console.log('getDecryptionShare')
-    const urlWithPath = `${url}/web/encryption/retrieve`
+  async getDecryptionShare({
+    url,
+    accessControlConditions,
+    toDecrypt,
+    authSig,
+    chain,
+  }) {
+    console.log("getDecryptionShare");
+    const urlWithPath = `${url}/web/encryption/retrieve`;
     const data = {
       accessControlConditions,
       toDecrypt,
       authSig,
-      chain
-    }
-    return await this.sendCommandToNode({ url: urlWithPath, data })
+      chain,
+    };
+    return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
   async handshakeWithSgx({ url }) {
-    const urlWithPath = `${url}/web/handshake`
-    console.debug(`handshakeWithSgx ${urlWithPath}`)
+    const urlWithPath = `${url}/web/handshake`;
+    console.debug(`handshakeWithSgx ${urlWithPath}`);
     const data = {
-      clientPublicKey: 'test'
-    }
-    return await this.sendCommandToNode({ url: urlWithPath, data })
+      clientPublicKey: "test",
+    };
+    return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
   async sendCommandToNode({ url, data }) {
-    console.log(`sendCommandToNode with url ${url} and data`, data)
+    console.log(`sendCommandToNode with url ${url} and data`, data);
     return await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Success:', data)
-        return data
-      })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        return data;
+      });
   }
 
   async connect() {
     // handshake with each node
     for (const url of this.config.bootstrapUrls) {
-      this.handshakeWithSgx({ url })
-        .then(resp => {
-          this.connectedNodes.add(url)
-          this.serverKeys[url] = {
-            serverPubKey: resp.serverPublicKey,
-            subnetPubKey: resp.subnetPublicKey,
-            networkPubKey: resp.networkPublicKey,
-            networkPubKeySet: resp.networkPublicKeySet
-          }
-        })
+      this.handshakeWithSgx({ url }).then((resp) => {
+        this.connectedNodes.add(url);
+        this.serverKeys[url] = {
+          serverPubKey: resp.serverPublicKey,
+          subnetPubKey: resp.subnetPublicKey,
+          networkPubKey: resp.networkPublicKey,
+          networkPubKeySet: resp.networkPublicKeySet,
+        };
+      });
     }
 
     const interval = window.setInterval(() => {
       if (Object.keys(this.serverKeys).length >= this.config.minNodeCount) {
-        clearInterval(interval)
+        clearInterval(interval);
         // pick the most common public keys for the subnet and network from the bunch, in case some evil node returned a bad key
-        this.subnetPubKey = mostCommonString(Object.values(this.serverKeys).map(keysFromSingleNode => keysFromSingleNode.subnetPubKey))
-        this.networkPubKey = mostCommonString(Object.values(this.serverKeys).map(keysFromSingleNode => keysFromSingleNode.networkPubKey))
-        this.networkPubKeySet = mostCommonString(Object.values(this.serverKeys).map(keysFromSingleNode => keysFromSingleNode.networkPubKeySet))
-        this.ready = true
-        console.debug('lit is ready')
-        document.dispatchEvent(new Event('lit-ready'))
+        this.subnetPubKey = mostCommonString(
+          Object.values(this.serverKeys).map(
+            (keysFromSingleNode) => keysFromSingleNode.subnetPubKey
+          )
+        );
+        this.networkPubKey = mostCommonString(
+          Object.values(this.serverKeys).map(
+            (keysFromSingleNode) => keysFromSingleNode.networkPubKey
+          )
+        );
+        this.networkPubKeySet = mostCommonString(
+          Object.values(this.serverKeys).map(
+            (keysFromSingleNode) => keysFromSingleNode.networkPubKeySet
+          )
+        );
+        this.ready = true;
+        console.debug("lit is ready");
+        document.dispatchEvent(new Event("lit-ready"));
       }
-    }, 500)
+    }, 500);
 
-    window.wasmBlsSdkHelpers = wasmBlsSdkHelpers // for debug
+    window.wasmBlsSdkHelpers = wasmBlsSdkHelpers; // for debug
   }
 }
