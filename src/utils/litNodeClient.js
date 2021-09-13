@@ -161,6 +161,7 @@ export default class LitNodeClient {
     // combine the signature shares
 
     const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, "base16");
+    console.log("pkSetAsBytes", pkSetAsBytes);
 
     const sigShares = signatureShares.map((s) => ({
       shareHex: s.signatureShare,
@@ -170,6 +171,7 @@ export default class LitNodeClient {
       pkSetAsBytes,
       sigShares
     );
+    console.log("raw sig", signature);
     console.log("signature is ", uint8arrayToString(signature, "base16"));
 
     const unsignedJwt = mostCommonString(
