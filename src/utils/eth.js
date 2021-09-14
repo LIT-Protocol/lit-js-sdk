@@ -27,10 +27,11 @@ function chainHexIdToChainName(chainHexId) {
 
 export async function connectWeb3() {
   if (typeof window.ethereum === "undefined") {
-    throw new Error({
-      errorCode: "no_wallet",
-      message: "No web3 wallet was found",
-    });
+    throw new (function () {
+      this.message = "No web3 wallet was found";
+      this.name = "NoWalletException";
+      this.errorCode = "no_wallet";
+    })();
   }
 
   const providerOptions = {

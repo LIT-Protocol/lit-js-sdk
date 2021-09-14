@@ -52,6 +52,8 @@ import {
   inIframe,
 } from "./utils/frameComms";
 
+import { version } from "./version";
+
 if (typeof window !== "undefined") {
   // only run this in browser
   if (inIframe()) {
@@ -99,6 +101,7 @@ const functions = {
   humanizeAccessControlConditions,
   lookupNameServiceAddress,
   getTokenList,
+  version,
 };
 
 module.exports = functions;

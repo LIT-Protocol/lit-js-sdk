@@ -1,6 +1,6 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.1.61",
+  "version": "1.1.63",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
   "main": "build/index.js",
@@ -12,7 +12,8 @@
     "cdnDeploy": "yarn build; yarn buildWeb",
     "buildWeb": "node esbuild-web.js",
     "esbuildPackage": "node esbuild-package.js",
-    "test": "node --experimental-specifier-resolution=node tests/provisioningAndSigning.js"
+    "test": "node --experimental-specifier-resolution=node tests/provisioningAndSigning.js",
+    "versionBump": "node node_modules/semver-bump/index.js ../../package.json; npx genversion -e src/version.js"
   },
   "repository": {
     "type": "git",
@@ -29,8 +30,10 @@
   "license": "GPL-3.0",
   "devDependencies": {
     "esbuild": "^0.12.1",
+    "genversion": "^3.0.1",
     "microbundle": "^0.13.0",
     "parcel": "1.12.3",
+    "semver-bump": "^1.0.0",
     "standard": "^16.0.3"
   },
   "dependencies": {
