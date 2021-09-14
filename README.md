@@ -8,7 +8,9 @@
     - [Dynamic Content - Authorizing access to a resource via JWT](#dynamic-content---authorizing-access-to-a-resource-via-jwt)
   - [Installation](#installation)
   - [Using the LIT Protocol](#using-the-lit-protocol)
-    - [Static Content - Minting LITs](#static-content---minting-lits)
+    - [Example projects and code](#example-projects-and-code)
+    - [Connecting to the network](#connecting-to-the-network)
+    - [Static Content - Minting HTML NFTs](#static-content---minting-html-nfts)
     - [Static Content - Unlocking LITs](#static-content---unlocking-lits)
     - [Dynamic Content - Verifying a JWT that was signed by the Lit network](#dynamic-content---verifying-a-jwt-that-was-signed-by-the-lit-network)
     - [Dynamic Content - Provisoning access to a resource](#dynamic-content---provisoning-access-to-a-resource)
@@ -57,6 +59,10 @@ This SDK will encrypt your content, and upload your conditions for decryption to
 
 This SDK has the ability to create the authorization conditions for a given resource and store them with the LIT nodes. When someone requests a network signature because they are trying to access a resource (typically a server that serves some dynamic content), the SDK will request a message signature from the user's wallet that proves that they own the NFT associated with the resource to each LIT node. The LIT nodes will each verify that the user owns the NFT, sign the JWT to create a signature share, then send down that signature share. The SDK will combine the signature shares to obtain a signed JWT which can be presented to the resource to authenticate and authorize the user.
 
+**Example**
+
+You can find a minimal example project that implements dynamic content authorization here: https://github.com/LIT-Protocol/lit-minimal-jwt-example
+
 ## Installation
 
 Use yarn or npm to add the lit-js-sdk to your product:
@@ -91,11 +97,36 @@ function litJsSdkLoaded(){
 
 ## Using the LIT Protocol
 
-An example application that showcases the static content usecases can be found here: https://github.com/LIT-Protocol/MintLIT
+### Example projects and code
 
-### Static Content - Minting LITs
+- **Static Content** An example that showcases the static content usecases can be found here: https://github.com/LIT-Protocol/MintLIT
 
-LITs are essentially super-powered NFTs. To mint a LIT, you should mint (or already own) any ERC721 or ERC1155 NFT that will serve as the access control token for unlocking the LIT.
+- **Dynamic Content** An example that implements dynamic content authorization can be found here: https://github.com/LIT-Protocol/lit-minimal-jwt-example
+
+### Connecting to the network
+
+For most use cases, you will want an active connection to the Lit Protocol. In web apps, this is typically done on first page load and can be shared between all your pages.
+
+To connect, use the code below. Note that client.connect() will return instantly, but that does not mean your are connected to the network. You must listen for the `lit-ready` event. In the code below, we make the litNodeClient available as a global variable so that it can be used throughout the web app.
+
+```
+const client = new LitJsSdk.LitNodeClient()
+client.connect()
+window.litNodeClient = client
+```
+
+**To listen for the "lit-ready" event which is fired when the network is fully connected:**
+
+```
+document.addEventListener('lit-ready', function (e) {
+  console.log('LIT network is ready')
+  setNetworkLoading(false) // replace this line with your own code that tells your app the network is ready
+}, false)
+```
+
+### Static Content - Minting HTML NFTs
+
+HTML NFTs are essentially super-powered NFTs. To mint an HTML NFT, you should mint (or already own) any ERC721 or ERC1155 NFT that will serve as the access control token for unlocking the NFT. In the past, we called HTML NFTs "LITs" (Locked Interactive Tokens) so if you see a reference in docs or code to "a LIT" that is referring to an HTML NFT.
 
 We provide pre-deployed ERC1155 NFT contracts on Polygon and Ethereum for your use. Usage of these contracts is optional, and you may supply your own if desired. You can find the addresses of these contracts here: https://github.com/LIT-Protocol/lit-js-sdk/blob/main/src/lib/constants.js#L74
 
@@ -241,7 +272,9 @@ document.getElementById('mediaGridHolder').innerHTML = mediaGridHtmlBody
 
 ### Dynamic Content - Verifying a JWT that was signed by the Lit network
 
-This would typically be done on the server side (nodejs), but should work in the browser too.
+**Heads up** You can find a minimal example project that implements dynamic content authorization here: https://github.com/LIT-Protocol/lit-minimal-jwt-example
+
+Verifying a JWT would typically be done on the server side (nodejs), but should work in the browser too.
 
 First, import the SDK:
 
@@ -264,7 +297,9 @@ The "verified" variable is a boolean that indicates whether or not the signature
 
 ### Dynamic Content - Provisoning access to a resource
 
-Use this to put some dynamic content behind an on chain condition (for example, possession of an NFT). This function will essentially store that condition and the resource that users who meet that condition should be authorized to access. The resource could be a URL, for example. The dynamic content server should then verify the JWT provided by the network on every request, which proves that the user meets the on chain condition.
+**Heads up** You can find a minimal example project that implements dynamic content authorization here: https://github.com/LIT-Protocol/lit-minimal-jwt-example
+
+Use dynamic content provisoning to put some dynamic content behind an on chain condition (for example, possession of an NFT). This function will essentially store that condition and the resource that users who meet that condition should be authorized to access. The resource could be a URL, for example. The dynamic content server should then verify the JWT provided by the network on every request, which proves that the user meets the on chain condition.
 
 The "saveSigningCondition" function of the LitNodeClient is what you want to use for this, which is documented here: https://lit-protocol.github.io/lit-js-sdk/api_docs_html/index.html#litnodeclientsavesigningcondition
 
@@ -324,7 +359,11 @@ Make sure that you save the accessControlConditions and resourceId, because the 
 
 ### Dynamic Content - Accessing a resource via a JWT
 
+**Heads up** You can find a minimal example project that implements dynamic content authorization here: https://github.com/LIT-Protocol/lit-minimal-jwt-example
+
 Obtaining a signed JWT from the Lit network can be done via the getSignedToken function of the LitNodeClient documented here: https://lit-protocol.github.io/lit-js-sdk/api_docs_html/index.html#litnodeclientgetsignedtoken
+
+**Important** You must call `litNodeClient.saveSigningCondition` to save a signing condition before you can request a signature and access a resource via a JWT. See the docs above for "Dynamic Content - Provisoning access to a resource" to learn how to do this.
 
 Note that you need an active connection to the Lit Protocol nodes to use this function. This connection can be made with the following code:
 

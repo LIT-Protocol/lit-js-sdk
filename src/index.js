@@ -1,4 +1,4 @@
-import 'regenerator-runtime/runtime'
+import "regenerator-runtime/runtime";
 
 import {
   zipAndEncryptString,
@@ -11,8 +11,9 @@ import {
   verifyJwt,
   encryptFileAndZipWithMetadata,
   decryptZipFileWithMetadata,
-  humanizeAccessControlConditions
-} from './utils/lit'
+  humanizeAccessControlConditions,
+  getTokenList,
+} from "./utils/lit";
 
 import {
   connectWeb3,
@@ -21,51 +22,51 @@ import {
   findLITs,
   sendLIT,
   decimalPlaces,
-  lookupNameServiceAddress
-} from './utils/eth'
+  lookupNameServiceAddress,
+} from "./utils/eth";
 
 import {
   decryptWithPrivKey,
   encryptWithPubKey,
   canonicalAccessControlConditionFormatter,
-  hashAccessControlConditions
-} from './utils/crypto'
+  hashAccessControlConditions,
+} from "./utils/crypto";
 
 import {
   fileToDataUrl,
   injectViewerIFrame,
-  downloadFile
-} from './utils/browser'
+  downloadFile,
+} from "./utils/browser";
 
-import { LIT_CHAINS } from './lib/constants'
-import { printError } from './lib/utils'
-import { initWasmBlsSdk } from './lib/bls-sdk.js'
+import { LIT_CHAINS } from "./lib/constants";
+import { printError } from "./lib/utils";
+import { initWasmBlsSdk } from "./lib/bls-sdk.js";
 
-import LitNodeClient from './utils/litNodeClient'
+import LitNodeClient from "./utils/litNodeClient";
 
-import { litJsSdkLoadedInALIT } from './utils/init'
+import { litJsSdkLoadedInALIT } from "./utils/init";
 
 import {
   listenForChildFrameMessages,
   listenForFrameParentMessages,
-  inIframe
-} from './utils/frameComms'
+  inIframe,
+} from "./utils/frameComms";
 
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   // only run this in browser
   if (inIframe()) {
-    listenForFrameParentMessages()
+    listenForFrameParentMessages();
   } else {
-    listenForChildFrameMessages()
+    listenForChildFrameMessages();
   }
 } else {
-  global.window = {}
+  global.window = {};
 }
 
 initWasmBlsSdk().then((exports) => {
   // console.log('wtf, window? ', typeof window !== 'undefined')
-  window.wasmExports = exports
-})
+  window.wasmExports = exports;
+});
 
 const functions = {
   zipAndEncryptString,
@@ -96,7 +97,8 @@ const functions = {
   downloadFile,
   decimalPlaces,
   humanizeAccessControlConditions,
-  lookupNameServiceAddress
-}
+  lookupNameServiceAddress,
+  getTokenList,
+};
 
-module.exports = functions
+module.exports = functions;
