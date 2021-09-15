@@ -51,7 +51,6 @@
     "pako": "^2.0.4",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
-    "uint8arrays": "^2.1.5",
-    "web3modal": "^1.9.4"
+    "uint8arrays": "^2.1.5"
   }
 }

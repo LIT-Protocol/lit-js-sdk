@@ -1,9 +1,10 @@
 import { Contract } from "@ethersproject/contracts";
 import { verifyMessage } from "@ethersproject/wallet";
 import { Web3Provider } from "@ethersproject/providers";
-import Web3Modal from "web3modal";
+// import Web3Modal from "web3modal";
 // import WalletConnectProvider from "@walletconnect/web3-provider";
 import Resolution from "@unstoppabledomains/resolution";
+import detectEthereumProvider from "@metamask/detect-provider";
 
 import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
@@ -43,15 +44,17 @@ export async function connectWeb3() {
     // }
   };
 
-  const web3Modal = new Web3Modal({
-    cacheProvider: true, // optional
-    providerOptions, // required
-  });
+  // disabled because web3modal uses localstorage and breaks when
+  // used on opensea
+  // const web3Modal = new Web3Modal({
+  //   cacheProvider: true, // optional
+  //   providerOptions, // required
+  // });
+  // const provider = await web3Modal.connect();
+  // const web3 = new Web3Provider(provider);
 
-  const provider = await web3Modal.connect();
+  const provider = await detectEthereumProvider();
   const web3 = new Web3Provider(provider);
-
-  // const provider = await detectEthereumProvider()
 
   // trigger metamask popup
   const accounts = await web3.listAccounts();
