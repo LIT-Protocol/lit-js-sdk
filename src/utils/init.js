@@ -1,27 +1,33 @@
-import { sendMessageToFrameParent } from './frameComms'
-import LitNodeClient from './litNodeClient'
+import { sendMessageToFrameParent } from "./frameComms";
+import LitNodeClient from "./litNodeClient";
 
 export const litJsSdkLoadedInALIT = () => {
   try {
-    window.localStorage.getItem('test')
+    window.localStorage.getItem("test");
   } catch (e) {
-    console.log('Could not sendMessageToFrameParent from a LIT. This usually means we are stuck in the opensea sandbox.')
-    window.sandboxed = true
+    console.log(
+      "Could not use localstorage in a LIT. This usually means we are stuck in the opensea sandbox."
+    );
+    window.sandboxed = true;
     setTimeout(function () {
-      document.dispatchEvent(new Event('lit-ready'))
-    }, 1000)
-    return
+      document.dispatchEvent(new Event("lit-ready"));
+    }, 1000);
+    return;
   }
-  sendMessageToFrameParent({ command: 'LIT_SYN' }, '*')
+  sendMessageToFrameParent({ command: "LIT_SYN" }, "*");
   setTimeout(function () {
     if (!window.useLitPostMessageProxy) {
-      console.log('inside lit - no parent frame lit node connection.  connecting ourselves.')
+      console.log(
+        "inside lit - no parent frame lit node connection.  connecting ourselves."
+      );
       // we're on our own with no parent frame.  initiate our own connection to lit nodes
-      const litNodeClient = new LitNodeClient()
-      litNodeClient.connect()
-      window.litNodeClient = litNodeClient
+      const litNodeClient = new LitNodeClient();
+      litNodeClient.connect();
+      window.litNodeClient = litNodeClient;
     } else {
-      console.log('inside lit - parent frame is connected to lit nodes.  using that.')
+      console.log(
+        "inside lit - parent frame is connected to lit nodes.  using that."
+      );
     }
-  }, 1000)
-}
+  }, 1000);
+};
