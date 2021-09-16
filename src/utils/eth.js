@@ -12,6 +12,7 @@ import nacl from "tweetnacl";
 import LIT from "../abis/LIT.json";
 import ERC20 from "../abis/ERC20.json";
 import { LIT_CHAINS } from "../lib/constants";
+import { throwError } from "../lib/utils";
 
 const AUTH_SIGNATURE_BODY =
   "I am creating an account to use Lit Protocol at {{timestamp}}";
@@ -28,11 +29,11 @@ function chainHexIdToChainName(chainHexId) {
 
 export async function connectWeb3() {
   if (typeof window.ethereum === "undefined") {
-    throw new (function () {
-      this.message = "No web3 wallet was found";
-      this.name = "NoWalletException";
-      this.errorCode = "no_wallet";
-    })();
+    throwError({
+      message: "No web3 wallet was found",
+      name: "NoWalletException",
+      errorCode: "no_wallet",
+    });
   }
 
   const providerOptions = {
@@ -165,10 +166,28 @@ export async function checkAndSignAuthMessage({ chain }) {
           });
         } catch (addError) {
           // handle "add" error
-          throw addError;
+          if (addError.code === -32601) {
+            // metamask code indicating "no such method"
+            throwError({
+              message: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
+              name: "WrongNetworkException",
+              errorCode: "wrong_network",
+            });
+          } else {
+            throw addError;
+          }
         }
       } else {
-        throw switchError;
+        if (switchError.code === -32601) {
+          // metamask code indicating "no such method"
+          throwError({
+            message: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
+            name: "WrongNetworkException",
+            errorCode: "wrong_network",
+          });
+        } else {
+          throw switchError;
+        }
       }
     }
   }

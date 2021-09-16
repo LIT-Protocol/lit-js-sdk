@@ -2,7 +2,7 @@ import uint8arrayFromString from "uint8arrays/from-string";
 import uint8arrayToString from "uint8arrays/to-string";
 import naclUtil from "tweetnacl-util";
 
-import { mostCommonString } from "../lib/utils";
+import { mostCommonString, throwError } from "../lib/utils";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import {
   hashAccessControlConditions,
@@ -136,11 +136,11 @@ export default class LitNodeClient {
         );
       }
 
-      throw {
-        name: "Unauthorized",
-        message: "You are not authorized to recieve a signature on this item",
-        code: "not_authorized",
-      };
+      throwError({
+        message: `You are not authorized to recieve a signature on this item`,
+        name: "UnauthorizedException",
+        errorCode: "not_authorized",
+      });
     }
 
     // sanity check
@@ -277,11 +277,12 @@ export default class LitNodeClient {
       if (this.config.alertWhenUnauthorized) {
         alert("You are not authorized to unlock this content");
       }
-      throw {
-        name: "Unauthorized",
-        message: "You are not authorized to unlock this item",
-        code: "not_authorized",
-      };
+
+      throwError({
+        message: `You are not authorized to unlock this item`,
+        name: "UnauthorizedException",
+        errorCode: "not_authorized",
+      });
     }
 
     // sort the decryption shares by share index.  this is important when combining the shares.

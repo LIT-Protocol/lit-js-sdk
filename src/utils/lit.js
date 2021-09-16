@@ -687,7 +687,7 @@ export async function humanizeAccessControlConditions({
 
 export async function getTokenList() {
   // erc20
-  const erc20Url = "https://t2crtokens.eth.link";
+  const erc20Url = "https://tokens.coingecko.com/uniswap/all.json";
   const erc20Promise = fetch(erc20Url).then((r) => r.json());
 
   // erc721

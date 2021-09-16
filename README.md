@@ -26,8 +26,8 @@
     - [A specific wallet address](#a-specific-wallet-address)
   - [SDK Error Handling](#sdk-error-handling)
     - [Not Authorized](#not-authorized)
+    - [Wrong Network](#wrong-network)
   - [Wallet Error Handling](#wallet-error-handling)
-    - [Brave](#brave)
   - [API](#api)
   - [Tests](#tests)
   - [Questions or Support](#questions-or-support)
@@ -568,20 +568,21 @@ const accessControlConditions = [
 
 ## SDK Error Handling
 
-Errors are thrown as exceptions when something has gone wrong. Errors are objects with a message, name, and code. Possible codes are documented below.
+Errors are thrown as exceptions when something has gone wrong. Errors are objects with a message, name, and errorCode. Possible codes are documented below.
 
 ### Not Authorized
 
-- Code: not_authorized
+- errorCode: not_authorized
 - Reason: Thrown when the user does not have access to decrypt or is unauthorized to receive a JWT for an item.
+
+### Wrong Network
+
+- errorCode: wrong_network
+- Reason: The user is on the wrong network. For example, this may mean the user has ethereum selected in their wallet but they were trying to use polygon for the current operation.
 
 ## Wallet Error Handling
 
-Metamask and other wallets throw errors themselves. For example, if you attempt to use a chain on Lit that is different from the one selected in metamask, the Lit Js SDK will attempt to use the `wallet_switchEthereumChain` and `wallet_addEthereumChain` functions to switch the user's network.
-
-### Brave
-
-Brave does not support the `wallet_switchEthereumChain` function described above, and will throw an error with `error.code` -32601. You should handle this and tell the user in your UI to switch their chain on their wallet to the one they selected in your UI.
+Metamask and other wallets throw errors themselves. The format for those exceptions can be found here: https://docs.metamask.io/guide/ethereum-provider.html#errors
 
 ## API
 
