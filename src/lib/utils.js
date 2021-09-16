@@ -18,5 +18,6 @@ export const throwError = ({ message, name, errorCode }) => {
     this.message = message;
     this.name = name;
     this.errorCode = errorCode;
+    this.code = errorCode;
   })();
 };
