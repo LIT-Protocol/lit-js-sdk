@@ -256,7 +256,7 @@ export async function decryptZipFileWithMetadata({
       authSig,
     });
   } catch (e) {
-    if (e.code === "not_authorized") {
+    if (e.errorCode === "not_authorized") {
       // try more additionalAccessControlConditions
       if (!additionalAccessControlConditions) {
         throw e;
@@ -283,7 +283,7 @@ export async function decryptZipFileWithMetadata({
           break; // it worked, we can leave the loop and stop checking additional access control conditions
         } catch (e) {
           // swallow not_authorized because we are gonna try some more accessControlConditions
-          if (e.code !== "not_authorized") {
+          if (e.errorCode !== "not_authorized") {
             throw e;
           }
         }
