@@ -58,6 +58,8 @@ export async function connectWeb3() {
   const web3 = new Web3Provider(provider);
 
   // trigger metamask popup
+  await provider.enable();
+
   // const accounts = await web3.listAccounts();
   const accounts = await provider.request({
     method: "eth_requestAccounts",
