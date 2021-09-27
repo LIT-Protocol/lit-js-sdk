@@ -625,8 +625,12 @@ function humanizeComparator(comparator) {
 export async function humanizeAccessControlConditions({
   accessControlConditions,
   tokenList,
+  myWalletAddress,
 }) {
-  console.log("humanizing access control conditions", accessControlConditions);
+  console.log("humanizing access control conditions");
+  console.log("myWalletAddress", myWalletAddress);
+  console.log("accessControlConditions", accessControlConditions);
+
   return Promise.all(
     accessControlConditions.map(async (acc) => {
       if (
@@ -679,7 +683,15 @@ export async function humanizeAccessControlConditions({
           acc.returnValueTest.comparator
         )} ${formatEther(acc.returnValueTest.value)} ETH`;
       } else if (acc.standardContractType === "" && acc.method === "") {
-        return `Controls wallet with address ${acc.returnValueTest.value}`;
+        if (
+          myWalletAddress &&
+          acc.returnValueTest.value.toLowerCase() ===
+            myWalletAddress.toLowerCase()
+        ) {
+          return `Controls your wallet (${myWalletAddress})`;
+        } else {
+          return `Controls wallet with address ${acc.returnValueTest.value}`;
+        }
       }
     })
   );
