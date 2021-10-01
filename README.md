@@ -103,6 +103,8 @@ function litJsSdkLoaded(){
 
 - **Dynamic Content** An example that implements dynamic content authorization can be found here: https://github.com/LIT-Protocol/lit-minimal-jwt-example
 
+- **Dynamic Content via a React app** An example that shows how to protect an entire React app with a LIT JWT https://github.com/LIT-Protocol/lit-locked-react-app-minimal-example
+
 ### Connecting to the network
 
 For most use cases, you will want an active connection to the Lit Protocol. In web apps, this is typically done on first page load and can be shared between all your pages.

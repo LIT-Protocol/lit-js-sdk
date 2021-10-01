@@ -528,6 +528,7 @@ The human readable name for an access control condition
 
     *   `params.accessControlConditions` **[Array][78]** The array of access control conditions that you want to humanize
     *   `params.tokenList`  
+    *   `params.myWalletAddress`  
 
 Returns **[string][75]** A human readable description of the access control condition
 
