@@ -10,6 +10,7 @@
   - [Using the LIT Protocol](#using-the-lit-protocol)
     - [Example projects and code](#example-projects-and-code)
     - [Connecting to the network](#connecting-to-the-network)
+    - [Static Content - Storing any static content and manually storing the metadata](#static-content---storing-any-static-content-and-manually-storing-the-metadata)
     - [Static Content - Minting HTML NFTs](#static-content---minting-html-nfts)
     - [Static Content - Unlocking LITs](#static-content---unlocking-lits)
     - [Dynamic Content - Verifying a JWT that was signed by the Lit network](#dynamic-content---verifying-a-jwt-that-was-signed-by-the-lit-network)
@@ -125,6 +126,57 @@ document.addEventListener('lit-ready', function (e) {
   setNetworkLoading(false) // replace this line with your own code that tells your app the network is ready
 }, false)
 ```
+
+### Static Content - Storing any static content and manually storing the metadata
+
+You can use Lit to encrypt and store any static content. You have to store the content yourself, but Lit will store who is allowed to decrypt it and enforce this.
+
+First, obtain an authSig from the user. This will ask their metamask to sign a message proving they own their crypto address. Pass the chain you're using.
+
+```
+const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: 'ethereum'})
+```
+
+Next, pass the thing you want to encrypt. To encrypt a string, use the code below.
+
+```
+const { encryptedZip, symmetricKey } = await LitJsSdk.zipAndEncryptString(aStringThatYouWishToEncrypt);
+```
+
+Next, define the access control conditions where a user will be allowed to decrypt.
+
+```
+const accessControlConditions = [
+  {
+    contractAddress: '',
+    standardContractType: '',
+    chain: 'ethereum',
+    method: 'eth_getBalance',
+    parameters: [
+      ':userAddress',
+      'latest'
+    ],
+    returnValueTest: {
+      comparator: '>=',
+      value: '10000000000000'
+    }
+  }
+]
+```
+
+Now, you can save the encryption key with the access control condition, which tells the Lit protocol that users that meet this access control condition should be able to decrypt.
+
+```
+const encryptedSymmetricKey = await window.litNodeClient.saveEncryptionKey({
+  accessControlConditions,
+  symmetricKey,
+  authSig,
+  chain,
+});
+
+```
+
+You now need to save the `accessControlConditions`, `encryptedSymmetricKey`, and the `encryptedZip`. You will present the `accessControlConditions` and `encryptedSymmetricKey` to obtain the decrypted symmetric key, which you can then use to decrypt the zip.
 
 ### Static Content - Minting HTML NFTs
 
