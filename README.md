@@ -11,6 +11,7 @@
     - [Example projects and code](#example-projects-and-code)
     - [Connecting to the network](#connecting-to-the-network)
     - [Static Content - Storing any static content and manually storing the metadata](#static-content---storing-any-static-content-and-manually-storing-the-metadata)
+    - [Static Content - Decrypting any static content](#static-content---decrypting-any-static-content)
     - [Static Content - Minting HTML NFTs](#static-content---minting-html-nfts)
     - [Static Content - Unlocking LITs](#static-content---unlocking-lits)
     - [Dynamic Content - Verifying a JWT that was signed by the Lit network](#dynamic-content---verifying-a-jwt-that-was-signed-by-the-lit-network)
@@ -177,6 +178,40 @@ const encryptedSymmetricKey = await window.litNodeClient.saveEncryptionKey({
 ```
 
 You now need to save the `accessControlConditions`, `encryptedSymmetricKey`, and the `encryptedZip`. You will present the `accessControlConditions` and `encryptedSymmetricKey` to obtain the decrypted symmetric key, which you can then use to decrypt the zip.
+
+### Static Content - Decrypting any static content
+
+If you followed the instructions above for "Static Content - Storing any static content and manually storing the metadata" then you should follow these instructions to decrypt the data you stored.
+
+Make sure you have `accessControlConditions`, `encryptedSymmetricKey`, and the `encryptedZip` variables you created when you stored the content.
+
+There are 2 steps - you must obtain the decrypted symmetric key from the Lit protocol, and then you must decrypt the zip file using it.
+
+First, obtain an authSig from the user. This will ask their metamask to sign a message proving they own their crypto address. Pass the chain you're using.
+
+```
+const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: 'ethereum'})
+```
+
+To obtain the decrypted symmetric key, use the code below:
+
+```
+const symmKey = window.litNodeClient.getEncryptionKey({
+  accessControlConditions,
+  toDecrypt: encryptedSymmetricKey,
+  chain,
+  authSig
+})
+```
+
+Now, decrypt the zip:
+
+```
+const decryptedFiles = await decryptZip(encryptedZipBlob, symmetricKey);
+const decryptedString = await decryptedFiles["string.txt"].async("text");
+```
+
+Now, your cleartext is located in the `decryptedString` variable.
 
 ### Static Content - Minting HTML NFTs
 
