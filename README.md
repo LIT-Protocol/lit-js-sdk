@@ -21,6 +21,7 @@
     - [Must posess at least one ERC1155 token with a given token id](#must-posess-at-least-one-erc1155-token-with-a-given-token-id)
     - [Must posess a specific ERC721 token (NFT)](#must-posess-a-specific-erc721-token-nft)
     - [Must posess any token in an ERC721 collection (NFT Collection)](#must-posess-any-token-in-an-erc721-collection-nft-collection)
+    - [Must posess a POAP with a specific name](#must-posess-a-poap-with-a-specific-name)
     - [Must posess at least one ERC20 token](#must-posess-at-least-one-erc20-token)
     - [Must posess at least 0.00001 ETH](#must-posess-at-least-000001-eth)
     - [Must be a member of a DAO (MolochDAOv2.1, also supports DAOHaus)](#must-be-a-member-of-a-dao-molochdaov21-also-supports-daohaus)
@@ -542,6 +543,46 @@ const accessControlConditions = [
     }
   }
 ]
+```
+
+### Must posess a POAP with a specific name
+
+This is an integration with https://poap.xyz
+
+It checks that a user holds a specific POAP. Enter the POAP name in the final returnValueTest value. In this example the POAP is "Burning Man 2021".
+
+This actually performs two checks, so there are two access control conditions tested. The first checks that the user holds at least 1 POAP, but it could be from any POAP event. The second checks that the name of any of the user's POAPs is a match to the returnValueTest value.
+
+You may use "contains" or "=" for the final returnValueTest comparator. For example, if there are POAPs issued every year for Burning Man, with names in the format of "Burning Man 2021" and "Burning Man 2022" but you just want to check that the user holds any Burning Man POAP, you could use "contains" "Burning Man" and all Burning Man POAPs would pass the test. If you wanted to check for a specific year like 2021, you could use "=" "Burning Man 2021"
+
+Note that most POAPs live on the xDai chain so this example uses it.
+
+```
+const chain = "xdai";
+var accessControlConditions = [
+  {
+    contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+    standardContractType: "ERC721",
+    chain,
+    method: "balanceOf",
+    parameters: [":userAddress"],
+    returnValueTest: {
+      comparator: ">",
+      value: "0",
+    },
+  },
+  {
+    contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+    standardContractType: "POAP",
+    chain,
+    method: "tokenURI",
+    parameters: [],
+    returnValueTest: {
+      comparator: "contains",
+      value: "Burning Man 2021",
+    },
+  },
+];
 ```
 
 ### Must posess at least one ERC20 token
