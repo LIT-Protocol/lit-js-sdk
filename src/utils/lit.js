@@ -613,6 +613,8 @@ function humanizeComparator(comparator) {
     return "less than";
   } else if (comparator === "<=") {
     return "at most";
+  } else if (comparator === "contains") {
+    return "contains";
   }
 }
 
@@ -646,6 +648,21 @@ export async function humanizeAccessControlConditions({
       ) {
         // specific erc721
         return `Owner of tokenId ${acc.parameters[0]} from ${acc.contractAddress}`;
+      } else if (
+        acc.standardContractType === "ERC721" &&
+        acc.method === "balanceOf" &&
+        acc.contractAddress === "0x22C1f6050E56d2876009903609a2cC3fEf83B415" &&
+        acc.returnValueTest.comparator === ">" &&
+        acc.returnValueTest.value === "0"
+      ) {
+        // for POAP main contract where the user owns at least 1 poap
+        return `Owns any POAP`;
+      } else if (
+        acc.standardContractType === "POAP" &&
+        acc.method === "tokenURI"
+      ) {
+        // owns a POAP
+        return `Owner of a ${acc.returnValueTest.value} POAP`;
       } else if (
         acc.standardContractType === "ERC721" &&
         acc.method === "balanceOf"
