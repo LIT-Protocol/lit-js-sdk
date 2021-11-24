@@ -215,11 +215,47 @@
           testName: "ETH",
         });
       };
+
+      var ETHEmptyWallet = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain,
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "ETH (Empty Wallet)",
+        });
+      };
+
+      document.addEventListener(
+        "lit-ready",
+        function (e) {
+          console.log("LIT network is ready");
+          document.getElementById("networkStatus").innerText =
+            "Success!  Connected to Lit Protocol Network";
+        },
+        false
+      );
     </script>
   </head>
 
   <body>
     <h1>Manual tests</h1>
+    <br />
+    <br />
+    <div id="networkStatus">Connecting to Lit Protocol Network...</div>
+    <br />
+    <br />
+    <button onclick="ETHEmptyWallet()">ETH (Empty Wallet)</button>
     <br />
     <br />
     <button onclick="ERC1155()">ERC1155</button>
