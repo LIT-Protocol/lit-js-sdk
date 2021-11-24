@@ -650,6 +650,16 @@ export async function humanizeAccessControlConditions({
           acc.returnValueTest.value
         } of ${acc.contractAddress} tokens`;
       } else if (
+        acc.standardContractType === "ERC1155" &&
+        acc.method === "balanceOfBatch"
+      ) {
+        // erc1155 owns an amount of specific tokens from a batch of token ids
+        return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${
+          acc.returnValueTest.value
+        } of ${acc.contractAddress} tokens with token id ${acc.parameters[1]
+          .split(",")
+          .join(" or ")}`;
+      } else if (
         acc.standardContractType === "ERC721" &&
         acc.method === "ownerOf"
       ) {
@@ -682,9 +692,12 @@ export async function humanizeAccessControlConditions({
         acc.standardContractType === "ERC20" &&
         acc.method === "balanceOf"
       ) {
-        const tokenFromList = tokenList.find(
-          (t) => t.address === acc.contractAddress
-        );
+        let tokenFromList;
+        if (tokenList) {
+          tokenFromList = tokenList.find(
+            (t) => t.address === acc.contractAddress
+          );
+        }
         let decimals, name;
         if (tokenFromList) {
           decimals = tokenFromList.decimals;
@@ -694,6 +707,7 @@ export async function humanizeAccessControlConditions({
             contractAddress: acc.contractAddress,
           });
         }
+        console.log("decimals", decimals);
         return `Owns ${humanizeComparator(
           acc.returnValueTest.comparator
         )} ${formatUnits(acc.returnValueTest.value, decimals)} of ${

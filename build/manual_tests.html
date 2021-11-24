@@ -22,6 +22,11 @@
         testName,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { accessControlConditions }
+        )}`;
 
         var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
 
@@ -240,5 +245,7 @@
     <br />
     <br />
     <h2 id="status"></h2>
+    <br />
+    <p id="humanized"></p>
   </body>
 </html>
