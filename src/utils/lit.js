@@ -636,9 +636,16 @@ export async function humanizeAccessControlConditions({
   return Promise.all(
     accessControlConditions.map(async (acc) => {
       if (
+        acc.standardContractType === "MolochDAOv2.1" &&
+        acc.method === "members"
+      ) {
+        // erc1155 owns an amount of specific tokens
+        return `Is a member of the DAO at ${acc.contractAddress}`;
+      } else if (
         acc.standardContractType === "ERC1155" &&
         acc.method === "balanceOf"
       ) {
+        // erc1155 owns an amount of specific tokens
         return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${
           acc.returnValueTest.value
         } of ${acc.contractAddress} tokens`;

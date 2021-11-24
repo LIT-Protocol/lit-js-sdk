@@ -76,6 +76,26 @@
         });
       };
 
+      var ERC1155Batch = async () => {
+        var accessControlConditions = [
+          {
+            contractAddress: "0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88",
+            standardContractType: "ERC1155",
+            chain,
+            method: "balanceOfBatch",
+            parameters: [":userAddress,:userAddress,:userAddress", "8,9,34"],
+            returnValueTest: {
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "ERC1155Batch",
+        });
+      };
+
       var ERC721NFT = async () => {
         var accessControlConditions = [
           {
@@ -198,6 +218,9 @@
     <br />
     <br />
     <button onclick="ERC1155()">ERC1155</button>
+    <br />
+    <br />
+    <button onclick="ERC1155Batch()">ERC1155Batch</button>
     <br />
     <br />
     <button onclick="ERC721NFT()">ERC721NFT</button>

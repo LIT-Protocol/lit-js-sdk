@@ -19,6 +19,7 @@
     - [Dynamic Content - Accessing a resource via a JWT](#dynamic-content---accessing-a-resource-via-a-jwt)
   - [Examples of access control conditions](#examples-of-access-control-conditions)
     - [Must posess at least one ERC1155 token with a given token id](#must-posess-at-least-one-erc1155-token-with-a-given-token-id)
+    - [Must posess at least one ERC1155 token from a batch of token ids](#must-posess-at-least-one-erc1155-token-from-a-batch-of-token-ids)
     - [Must posess a specific ERC721 token (NFT)](#must-posess-a-specific-erc721-token-nft)
     - [Must posess any token in an ERC721 collection (NFT Collection)](#must-posess-any-token-in-an-erc721-collection-nft-collection)
     - [Must posess a POAP with a specific name](#must-posess-a-poap-with-a-specific-name)
@@ -492,6 +493,29 @@ const accessControlConditions = [
     parameters: [
       ':userAddress',
       '9541'
+    ],
+    returnValueTest: {
+      comparator: '>',
+      value: '0'
+    }
+  }
+]
+```
+
+### Must posess at least one ERC1155 token from a batch of token ids
+
+In this example, the token contract's address is 0x10daa9f4c0f985430fde4959adb2c791ef2ccf83 and the token ids we are checking for are either 1, 2, 10003, or 10004.
+
+```
+const accessControlConditions = [
+  {
+    contractAddress: '0x10daa9f4c0f985430fde4959adb2c791ef2ccf83',
+    standardContractType: 'ERC1155',
+    chain,
+    method: 'balanceOfBatch',
+    parameters: [
+      ':userAddress,:userAddress,:userAddress,:userAddress',
+      '1,2,10003,10004'
     ],
     returnValueTest: {
       comparator: '>',
