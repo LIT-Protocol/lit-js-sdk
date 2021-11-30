@@ -79,6 +79,93 @@ export default class LitNodeClient {
     }
   }
 
+  async getSignedChainDataToken({ callRequests, chain }) {
+    // we need to send jwt params iat (issued at) and exp (expiration)
+    // because the nodes may have different wall clock times
+    // the nodes will verify that these params are withing a grace period
+    const now = Date.now();
+    const iat = Math.floor(now / 1000);
+    const exp = iat + 12 * 60 * 60; // 12 hours in seconds
+
+    // ask each node to sign the content
+    const nodePromises = [];
+    for (const url of this.connectedNodes) {
+      nodePromises.push(
+        this.getChainDataSigningShare({
+          url,
+          callRequests,
+          chain,
+          iat,
+          exp,
+        })
+      );
+    }
+    const signatureShares = await Promise.all(nodePromises);
+    console.log("signatureShares", signatureShares);
+    const goodShares = signatureShares.filter((d) => d.signatureShare !== "");
+    if (goodShares.length < this.config.minNodeCount) {
+      console.log(
+        `majority of shares are bad. goodShares is ${JSON.stringify(
+          goodShares
+        )}`
+      );
+      if (this.config.alertWhenUnauthorized) {
+        alert(
+          "You are not authorized to receive a signature to grant access to this content"
+        );
+      }
+
+      throwError({
+        message: `You are not authorized to recieve a signature on this item`,
+        name: "UnauthorizedException",
+        errorCode: "not_authorized",
+      });
+    }
+
+    // sanity check
+    if (
+      !signatureShares.every(
+        (val, i, arr) => val.unsignedJwt === arr[0].unsignedJwt
+      )
+    ) {
+      const msg =
+        "Unsigned JWT is not the same from all the nodes.  This means the combined signature will be bad because the nodes signed the wrong things";
+      console.log(msg);
+      alert(msg);
+    }
+
+    // sort the sig shares by share index.  this is important when combining the shares.
+    signatureShares.sort((a, b) => a.shareIndex - b.shareIndex);
+
+    // combine the signature shares
+
+    const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, "base16");
+    console.log("pkSetAsBytes", pkSetAsBytes);
+
+    const sigShares = signatureShares.map((s) => ({
+      shareHex: s.signatureShare,
+      shareIndex: s.shareIndex,
+    }));
+    const signature = wasmBlsSdkHelpers.combine_signatures(
+      pkSetAsBytes,
+      sigShares
+    );
+    console.log("raw sig", signature);
+    console.log("signature is ", uint8arrayToString(signature, "base16"));
+
+    const unsignedJwt = mostCommonString(
+      signatureShares.map((s) => s.unsignedJwt)
+    );
+
+    // convert the sig to base64 and append to the jwt
+    const finalJwt = `${unsignedJwt}.${uint8arrayToString(
+      signature,
+      "base64url"
+    )}`;
+
+    return finalJwt;
+  }
+
   /**
    * Request a signed JWT from the LIT network.  Before calling this function, you must either create or know of a resource id and access control conditions for the item you wish to gain authorization for.  You can create an access control condition using the saveSigningCondition function.
    * @param {Object} params
@@ -410,6 +497,18 @@ export default class LitNodeClient {
       val,
       authSig,
       chain,
+    };
+    return await this.sendCommandToNode({ url: urlWithPath, data });
+  }
+
+  async getChainDataSigningShare({ url, callRequests, chain, iat, exp }) {
+    console.log("getChainDataSigningShare");
+    const urlWithPath = `${url}/web/signing/sign_chain_data`;
+    const data = {
+      callRequests,
+      chain,
+      iat,
+      exp,
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
