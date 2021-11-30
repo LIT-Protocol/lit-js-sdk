@@ -23,6 +23,8 @@ import {
   sendLIT,
   decimalPlaces,
   lookupNameServiceAddress,
+  encodeCallData,
+  decodeCallResult,
 } from "./utils/eth";
 
 import {
@@ -102,6 +104,8 @@ const functions = {
   lookupNameServiceAddress,
   getTokenList,
   version,
+  encodeCallData,
+  decodeCallResult,
 };
 
 module.exports = functions;

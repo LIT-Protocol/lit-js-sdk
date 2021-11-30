@@ -35,6 +35,13 @@ import {
  */
 
 /**
+ * @typedef {Object} CallRequest
+ * @property {string} to - The address of the contract that will be queried
+ * @property {string} from - Optional.  The address calling the function.
+ * @property {string} data - Hex encoded data to send to the contract.
+ */
+
+/**
  * A LIT node client.  Connects directly to the LIT nodes to store and retrieve encryption keys and signing requests.  Only holders of an NFT that corresponds with a LIT may store and retrieve the keys.
  * @param {Object} config
  * @param {boolean} [config.alertWhenUnauthorized=true] Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  An exception will also be thrown regardless of this option.
@@ -79,6 +86,13 @@ export default class LitNodeClient {
     }
   }
 
+  /**
+   * Request a signed JWT of any solidity function call from the LIT network.  There are no prerequisites for this function.  You should use this function if you need to transmit information across chains, or from a blockchain to a centralized DB or server.  The signature of the returned JWT verifies that the response is genuine.
+   * @param {Object} params
+   * @param {Array.<CallRequest>} params.callRequests The call requests to make.  The responses will be signed and returned.
+   * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+   * @returns {Object} A signed JWT that proves the response to the function call is genuine. You may present this to a smart contract, or a server for authorization, and it can be verified using the verifyJwt function.
+   */
   async getSignedChainDataToken({ callRequests, chain }) {
     // we need to send jwt params iat (issued at) and exp (expiration)
     // because the nodes may have different wall clock times

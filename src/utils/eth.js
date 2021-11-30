@@ -1,4 +1,5 @@
 import { Contract } from "@ethersproject/contracts";
+import { Interface } from "@ethersproject/abi";
 import { verifyMessage } from "@ethersproject/wallet";
 import { Web3Provider } from "@ethersproject/providers";
 // import Web3Modal from "web3modal";
@@ -25,6 +26,18 @@ function chainHexIdToChainName(chainHexId) {
       return chainName;
     }
   }
+}
+
+export function encodeCallData({ abi, functionName, functionParams }) {
+  const iface = new ethers.utils.Interface(abi);
+  const callData = iface.encodeFunctionData(functionName, functionParams);
+  return callData;
+}
+
+export function decodeCallResult({ abi, functionName, data }) {
+  const iface = new ethers.utils.Interface(abi);
+  const decoded = iface.decodeFunctionResult(functionName, data);
+  return decoded;
 }
 
 export async function connectWeb3() {
