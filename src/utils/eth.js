@@ -1,9 +1,11 @@
 import { Contract } from "@ethersproject/contracts";
 import { Interface } from "@ethersproject/abi";
 import { verifyMessage } from "@ethersproject/wallet";
-import { Web3Provider } from "@ethersproject/providers";
-// import Web3Modal from "web3modal";
-// import WalletConnectProvider from "@walletconnect/web3-provider";
+import { Web3Provider, JsonRpcSigner } from "@ethersproject/providers";
+import { toUtf8Bytes } from "@ethersproject/strings";
+import { hexlify } from "@ethersproject/bytes";
+import Web3Modal from "web3modal";
+import WalletConnectProvider from "@walletconnect/web3-provider";
 import Resolution from "@unstoppabledomains/resolution";
 import detectEthereumProvider from "@metamask/detect-provider";
 
@@ -49,38 +51,63 @@ export async function connectWeb3() {
     });
   }
 
+  const rpcUrls = {};
+  // need to make it look like this:
+  // rpc: {
+  //   1: "https://mainnet.mycustomnode.com",
+  //   3: "https://ropsten.mycustomnode.com",
+  //   100: "https://dai.poa.network",
+  //   // ...
+  // },
+
+  for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
+    const chainName = Object.keys(LIT_CHAINS)[i];
+    const chainId = LIT_CHAINS[chainName].chainId;
+    const rpcUrl = LIT_CHAINS[chainName].rpcUrls[0];
+    rpcUrls[chainId] = rpcUrl;
+  }
+
   const providerOptions = {
-    // walletconnect: {
-    //   package: WalletConnectProvider, // required
-    //   options: {
-    //     infuraId: "cd614bfa5c2f4703b7ab0ec0547d9f81" // required
-    //   }
-    // }
+    walletconnect: {
+      package: WalletConnectProvider, // required
+      options: {
+        // infuraId: "cd614bfa5c2f4703b7ab0ec0547d9f81",
+        rpc: rpcUrls,
+      },
+    },
   };
 
   // disabled because web3modal uses localstorage and breaks when
   // used on opensea
-  // const web3Modal = new Web3Modal({
-  //   cacheProvider: true, // optional
-  //   providerOptions, // required
-  // });
-  // const provider = await web3Modal.connect();
-  // const web3 = new Web3Provider(provider);
-
-  const provider = await detectEthereumProvider();
+  const web3Modal = new Web3Modal({
+    cacheProvider: true, // optional
+    providerOptions, // required
+  });
+  const provider = await web3Modal.connect();
   const web3 = new Web3Provider(provider);
+
+  // const provider = await detectEthereumProvider();
+  // const web3 = new Web3Provider(provider);
 
   // trigger metamask popup
   await provider.enable();
 
-  // const accounts = await web3.listAccounts();
-  const accounts = await provider.request({
-    method: "eth_requestAccounts",
-    params: [],
-  });
+  const accounts = await web3.listAccounts();
+  // const accounts = await provider.request({
+  //   method: "eth_requestAccounts",
+  //   params: [],
+  // });
   const account = accounts[0].toLowerCase();
 
   return { web3, account };
+}
+
+export async function disconnectWeb3() {
+  const web3Modal = new Web3Modal({
+    cacheProvider: true, // optional
+  });
+  web3Modal.clearCachedProvider();
+  localStorage.removeItem("walletconnect");
 }
 
 // taken from the excellent repo https://github.com/zmitton/eth-proof
@@ -257,7 +284,8 @@ export async function signMessage({ body }) {
   const { web3, account } = await connectWeb3();
 
   console.log("signing with ", account);
-  const signature = await web3.getSigner().signMessage(body);
+  // const signature = await web3.getSigner().signMessage(body);
+  const signature = await signMessageAsync(web3.getSigner(), account, body);
   //.request({ method: 'personal_sign', params: [account, body] })
   const address = verifyMessage(body, signature).toLowerCase();
 
@@ -275,6 +303,28 @@ export async function signMessage({ body }) {
 
   return { signature, address };
 }
+
+// wrapper around signMessage that tries personal_sign first.  this is to fix a
+// bug with walletconnect where just using signMessage was failing
+const signMessageAsync = async (signer, address, message) => {
+  const messageBytes = toUtf8Bytes(message);
+  if (signer instanceof JsonRpcSigner) {
+    try {
+      const signature = await signer.provider.send("personal_sign", [
+        hexlify(messageBytes),
+        address.toLowerCase(),
+      ]);
+      return signature;
+    } catch (e) {
+      if (e.message.includes("personal_sign")) {
+        return await signer.signMessage(messageBytes);
+      }
+      throw e;
+    }
+  } else {
+    return await signer.signMessage(messageBytes);
+  }
+};
 
 // export async function decryptWithWeb3PrivateKey (encryptedData) {
 //   const { web3, account } = await connectWeb3()
