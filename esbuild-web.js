@@ -11,4 +11,5 @@ build({
   globalName: "LitJsSdk",
   plugins: [nodeBuiltIns()],
   define: { global: "window" },
+  inject: ["./polyfills.js"],
 });

@@ -356,6 +356,17 @@
         }
       };
 
+      var logout = async () => {
+        const testName = "Logout";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+
+        LitJsSdk.disconnectWeb3();
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Success - Logged out`;
+      };
+
       document.addEventListener(
         "lit-ready",
         function (e) {
@@ -400,6 +411,9 @@
     <br />
     <br />
     <button onclick="SignChainData()">Sign Chain Data</button>
+    <br />
+    <br />
+    <button onclick="logout()">Logout</button>
     <br />
     <br />
     <h2 id="status"></h2>
