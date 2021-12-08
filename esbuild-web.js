@@ -10,4 +10,5 @@ build({
   sourceRoot: "./",
   globalName: "LitJsSdk",
   plugins: [nodeBuiltIns()],
+  define: { global: "window" },
 });
