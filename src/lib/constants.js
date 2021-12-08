@@ -28,9 +28,7 @@ export const LIT_CHAINS = {
     name: "Polygon",
     symbol: "MATIC",
     decimals: 18,
-    rpcUrls: [
-      "https://rpc-mainnet.maticvigil.com/v1/96bf5fa6e03d272fbd09de48d03927b95633726c",
-    ],
+    rpcUrls: ["https://polygon-rpc.com"],
     blockExplorerUrls: ["https://explorer.matic.network"],
     type: "ERC1155",
   },

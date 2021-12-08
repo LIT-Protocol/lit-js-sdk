@@ -17,6 +17,7 @@ import {
 
 import {
   connectWeb3,
+  disconnectWeb3,
   mintLIT,
   checkAndSignAuthMessage,
   findLITs,
@@ -78,6 +79,7 @@ const functions = {
   encryptZip,
   decryptZip,
   connectWeb3,
+  disconnectWeb3,
   checkAndSignAuthMessage,
   createHtmlLIT,
   mintLIT,

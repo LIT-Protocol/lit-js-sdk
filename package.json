@@ -30,6 +30,7 @@
   "license": "GPL-3.0",
   "devDependencies": {
     "esbuild": "^0.12.1",
+    "esbuild-node-builtins": "^0.1.0",
     "genversion": "^3.0.1",
     "microbundle": "^0.13.0",
     "parcel": "1.12.3",
@@ -38,20 +39,23 @@
   },
   "dependencies": {
     "@ethersproject/abi": "^5.5.0",
+    "@ethersproject/bytes": "^5.5.0",
     "@ethersproject/contracts": "^5.2.0",
     "@ethersproject/hash": "^5.4.0",
     "@ethersproject/providers": "^5.2.0",
+    "@ethersproject/strings": "^5.5.0",
     "@ethersproject/units": "^5.4.0",
     "@ethersproject/wallet": "^5.2.0",
     "@metamask/detect-provider": "^1.2.0",
     "@unstoppabledomains/resolution": "^5.0.1",
-    "@walletconnect/web3-provider": "^1.6.3",
+    "@walletconnect/web3-provider": "^1.6.6",
     "buffer": "^6.0.3",
     "jszip": "^3.6.0",
     "node-fetch-polyfill": "^2.0.6",
     "pako": "^2.0.4",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
-    "uint8arrays": "^2.1.5"
+    "uint8arrays": "^2.1.5",
+    "web3modal": "^1.9.4"
   }
 }
