@@ -51,43 +51,43 @@ export async function connectWeb3() {
     });
   }
 
-  const rpcUrls = {};
-  // need to make it look like this:
-  // rpc: {
-  //   1: "https://mainnet.mycustomnode.com",
-  //   3: "https://ropsten.mycustomnode.com",
-  //   100: "https://dai.poa.network",
-  //   // ...
-  // },
+  // const rpcUrls = {};
+  // // need to make it look like this:
+  // // rpc: {
+  // //   1: "https://mainnet.mycustomnode.com",
+  // //   3: "https://ropsten.mycustomnode.com",
+  // //   100: "https://dai.poa.network",
+  // //   // ...
+  // // },
 
-  for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
-    const chainName = Object.keys(LIT_CHAINS)[i];
-    const chainId = LIT_CHAINS[chainName].chainId;
-    const rpcUrl = LIT_CHAINS[chainName].rpcUrls[0];
-    rpcUrls[chainId] = rpcUrl;
-  }
+  // for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
+  //   const chainName = Object.keys(LIT_CHAINS)[i];
+  //   const chainId = LIT_CHAINS[chainName].chainId;
+  //   const rpcUrl = LIT_CHAINS[chainName].rpcUrls[0];
+  //   rpcUrls[chainId] = rpcUrl;
+  // }
 
-  const providerOptions = {
-    walletconnect: {
-      package: WalletConnectProvider, // required
-      options: {
-        // infuraId: "cd614bfa5c2f4703b7ab0ec0547d9f81",
-        rpc: rpcUrls,
-      },
-    },
-  };
+  // const providerOptions = {
+  //   walletconnect: {
+  //     package: WalletConnectProvider, // required
+  //     options: {
+  //       // infuraId: "cd614bfa5c2f4703b7ab0ec0547d9f81",
+  //       rpc: rpcUrls,
+  //     },
+  //   },
+  // };
 
-  // disabled because web3modal uses localstorage and breaks when
-  // used on opensea
-  const web3Modal = new Web3Modal({
-    cacheProvider: true, // optional
-    providerOptions, // required
-  });
-  const provider = await web3Modal.connect();
-  const web3 = new Web3Provider(provider);
-
-  // const provider = await detectEthereumProvider();
+  // // disabled because web3modal uses localstorage and breaks when
+  // // used on opensea
+  // const web3Modal = new Web3Modal({
+  //   cacheProvider: true, // optional
+  //   providerOptions, // required
+  // });
+  // const provider = await web3Modal.connect();
   // const web3 = new Web3Provider(provider);
+
+  const provider = await detectEthereumProvider();
+  const web3 = new Web3Provider(provider);
 
   // trigger metamask popup
   await provider.enable();
