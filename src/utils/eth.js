@@ -92,11 +92,11 @@ export async function connectWeb3() {
   // trigger metamask popup
   await provider.enable();
 
-  const accounts = await web3.listAccounts();
-  // const accounts = await provider.request({
-  //   method: "eth_requestAccounts",
-  //   params: [],
-  // });
+  // const accounts = await web3.listAccounts();
+  const accounts = await provider.request({
+    method: "eth_requestAccounts",
+    params: [],
+  });
   const account = accounts[0].toLowerCase();
 
   return { web3, account };
