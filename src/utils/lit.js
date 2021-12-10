@@ -544,15 +544,16 @@ export async function unlockLitWithKey({ symmetricKey }) {
  * @returns {Object} An object with 4 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.  "signature": A uint8array that represents the raw  signature of the JWT.
  */
 export function verifyJwt({ jwt }) {
+  console.log("verifyJwt", jwt);
   const pubKey = uint8arrayFromString(NETWORK_PUB_KEY, "base16");
-  // console.log('pubkey is ', pubKey)
+  console.log("pubkey is ", pubKey);
   const jwtParts = jwt.split(".");
   const sig = uint8arrayFromString(jwtParts[2], "base64url");
-  // console.log('sig is ', uint8arrayToString(sig, 'base16'))
+  console.log("sig is ", uint8arrayToString(sig, "base16"));
   const unsignedJwt = `${jwtParts[0]}.${jwtParts[1]}`;
-  // console.log('unsignedJwt is ', unsignedJwt)
+  console.log("unsignedJwt is ", unsignedJwt);
   const message = uint8arrayFromString(unsignedJwt);
-  // console.log('message is ', message)
+  console.log("message is ", message);
 
   // TODO check for expiration
 
