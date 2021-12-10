@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset='utf-8'>
-  <title>lit-js-sdk 1.1.86 | Documentation</title>
+  <title>lit-js-sdk 1.1.90 | Documentation</title>
   <meta name='description' content='LIT Javascript SDK'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' rel='stylesheet'>
@@ -15,7 +15,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>lit-js-sdk</h3>
-          <div class='mb1'><code>1.1.86</code></div>
+          <div class='mb1'><code>1.1.90</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -1061,7 +1061,7 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.toDecrypt</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span>The ciphertext that you wish to decrypt
+  <td class='break-word'><span>The ciphertext that you wish to decrypt encoded as a hex string
 </span></td>
 </tr>
 
@@ -1201,7 +1201,7 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.symmetricKey</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span>The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.
+  <td class='break-word'><span>The symmetric encryption key that was used to encrypt the locked content inside the LIT as a Uint8Array.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.
 </span></td>
 </tr>
 

@@ -159,7 +159,7 @@ Retrieve the symmetric encryption key from the LIT nodes.  Note that this will o
 *   `params` **[Object][78]** 
 
     *   `params.accessControlConditions` **[Array][82]<[AccessControlCondition][84]>** The access control conditions that the user must meet to obtain the encryption key, used to decrypt the data.  This could be posession of an NFT, for example.
-    *   `params.toDecrypt` **[string][79]** The ciphertext that you wish to decrypt
+    *   `params.toDecrypt` **[string][79]** The ciphertext that you wish to decrypt encoded as a hex string
     *   `params.chain` **[string][79]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
     *   `params.authSig` **[AuthSig][85]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
 
@@ -176,7 +176,7 @@ Securely save the association between access control conditions and something th
     *   `params.accessControlConditions` **[Array][82]<[AccessControlCondition][84]>** The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.  Save this - you will neeed it to decrypt the content in the future.
     *   `params.chain` **[string][79]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
     *   `params.authSig` **[AuthSig][85]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
-    *   `params.symmetricKey` **[string][79]** The symmetric encryption key that was used to encrypt the locked content inside the LIT.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.
+    *   `params.symmetricKey` **[string][79]** The symmetric encryption key that was used to encrypt the locked content inside the LIT as a Uint8Array.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.
 
 Returns **[Uint8Array][87]** The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
 
