@@ -373,11 +373,10 @@ export const wasmBlsSdkHelpers = new (function () {
     } catch (e) {
       console.log("error verifying sig:");
       console.log(e);
-      console.log("e.stack: ", e.stack);
       isWasming = false;
     }
     isWasming = false;
-    return Uint8Array.from(verified);
+    return verified;
   };
 
   this.set_rng_values = function () {

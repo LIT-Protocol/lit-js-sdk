@@ -71,6 +71,7 @@ if (typeof window !== "undefined") {
 initWasmBlsSdk().then((exports) => {
   // console.log('wtf, window? ', typeof window !== 'undefined')
   window.wasmExports = exports;
+  console.log("wasmExports loaded");
 });
 
 const functions = {

@@ -545,15 +545,24 @@ export async function unlockLitWithKey({ symmetricKey }) {
  */
 export function verifyJwt({ jwt }) {
   console.log("verifyJwt", jwt);
+  // verify that the wasm was loaded
+  if (!window.wasmExports) {
+    console.log("wasmExports is not loaded.");
+    // initWasmBlsSdk().then((exports) => {
+    //   // console.log('wtf, window? ', typeof window !== 'undefined')
+    //   window.wasmExports = exports;
+    // });
+  }
+
   const pubKey = uint8arrayFromString(NETWORK_PUB_KEY, "base16");
-  console.log("pubkey is ", pubKey);
+  // console.log("pubkey is ", pubKey);
   const jwtParts = jwt.split(".");
   const sig = uint8arrayFromString(jwtParts[2], "base64url");
-  console.log("sig is ", uint8arrayToString(sig, "base16"));
+  // console.log("sig is ", uint8arrayToString(sig, "base16"));
   const unsignedJwt = `${jwtParts[0]}.${jwtParts[1]}`;
-  console.log("unsignedJwt is ", unsignedJwt);
+  // console.log("unsignedJwt is ", unsignedJwt);
   const message = uint8arrayFromString(unsignedJwt);
-  console.log("message is ", message);
+  // console.log("message is ", message);
 
   // TODO check for expiration
 
@@ -562,8 +571,10 @@ export function verifyJwt({ jwt }) {
   // m is message uint8array
   // function is: function (p, s, m)
 
+  const verified = Boolean(wasmBlsSdkHelpers.verify(pubKey, sig, message));
+
   return {
-    verified: Boolean(wasmBlsSdkHelpers.verify(pubKey, sig, message)),
+    verified,
     header: JSON.parse(
       uint8arrayToString(uint8arrayFromString(jwtParts[0], "base64url"))
     ),
