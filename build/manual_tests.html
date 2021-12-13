@@ -364,6 +364,53 @@
         }
       };
 
+      var SendBadRequestToNodes = async () => {
+        const testName = "SendBadRequestToNodes";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        document.getElementById("humanized").innerText = "";
+
+        const chain = "ethereum";
+
+        var accessControlConditions = [
+          {
+            contractAddress: "0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88",
+            standardContractType: "ERC1155",
+            chain,
+            method: "balanceOf",
+            parameters: [":userAddress", "8"],
+            returnValueTest: {
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+
+        var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
+
+        let resourceId = {
+          baseUrl: "my-dynamic-content-server.com",
+          path: randomPath(),
+          orgId: "",
+          role: "",
+          extraData: "",
+        };
+
+        try {
+          await litNodeClient.saveSigningCondition({
+            accessControlConditions,
+            //chain, // intentionally exclude this to cause an error parsing the JSON
+            authSig,
+            resourceId,
+          });
+        } catch (e) {
+          console.log("error", e);
+          document.getElementById(
+            "status"
+          ).innerText = `${testName}: Success (an error occured).  Check the Network tab of the inspector for more details.`;
+          return;
+        }
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -419,6 +466,11 @@
     <br />
     <br />
     <button onclick="SignChainData()">Sign Chain Data</button>
+    <br />
+    <br />
+    <button onclick="SendBadRequestToNodes()">
+      Send a bad request to the nodes
+    </button>
     <br />
     <br />
     <button onclick="logout()">Logout</button>
