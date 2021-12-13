@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset='utf-8'>
-  <title>lit-js-sdk 1.1.92 | Documentation</title>
+  <title>lit-js-sdk 1.1.94 | Documentation</title>
   <meta name='description' content='LIT Javascript SDK'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' rel='stylesheet'>
@@ -15,7 +15,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>lit-js-sdk</h3>
-          <div class='mb1'><code>1.1.92</code></div>
+          <div class='mb1'><code>1.1.94</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -1909,7 +1909,7 @@
 
   <p>Inject an iFrame into the current page that will display a LIT.  This function safely sandboxes the content in the iFrame so that the LIT cannot see cookies or localStorage of the parent website.</p>
 
-    <div class='pre p1 fill-light mt0'>injectViewerIFrame(params: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">promise</a></div>
+    <div class='pre p1 fill-light mt0'>injectViewerIFrame(params: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
   
   
 
@@ -1944,42 +1944,37 @@
             <tbody class='mt1'>
               
                 <tr>
-  <td class='break-word'><span class='code bold'>params.symmetricKey</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
+  <td class='break-word'><span class='code bold'>params.destinationId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
   </td>
-  <td class='break-word'><span>The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
+  <td class='break-word'><span>The DOM ID of the element to inject the iFrame into
 </span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>params.destinationId</span> <code class='quiet'>any</code>
+  <td class='break-word'><span class='code bold'>params.title</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span></span></td>
+  <td class='break-word'><span>The title of the content being displayed
+</span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>params.title</span> <code class='quiet'>any</code>
+  <td class='break-word'><span class='code bold'>params.fileUrl</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span></span></td>
+  <td class='break-word'><span>The URL of the content that will be shown in the iFrame
+</span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>params.fileUrl</span> <code class='quiet'>any</code>
+  <td class='break-word'><span class='code bold'>params.className</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span></span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.className</span> <code class='quiet'>any</code>
-  </td>
-  <td class='break-word'><span></span></td>
+  <td class='break-word'><span>An optional DOM class name to add to the iFrame for styling
+</span></td>
 </tr>
 
 
@@ -1994,14 +1989,6 @@
 
   
 
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">promise</a></code>:
-        A promise that will resolve when the LIT is unlocked
-
-      
-    
   
 
   

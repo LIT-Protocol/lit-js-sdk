@@ -265,13 +265,10 @@ Inject an iFrame into the current page that will display a LIT.  This function s
 
 *   `params` **[Object][78]** 
 
-    *   `params.symmetricKey` **[Object][78]** The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
-    *   `params.destinationId`  
-    *   `params.title`  
-    *   `params.fileUrl`  
-    *   `params.className`  
-
-Returns **[promise][88]** A promise that will resolve when the LIT is unlocked
+    *   `params.destinationId` **[Object][78]** The DOM ID of the element to inject the iFrame into
+    *   `params.title` **[string][79]** The title of the content being displayed
+    *   `params.fileUrl` **[string][79]** The URL of the content that will be shown in the iFrame
+    *   `params.className` **[string][79]** An optional DOM class name to add to the iFrame for styling
 
 ## Static Content - Encryption and decryption utilities
 
