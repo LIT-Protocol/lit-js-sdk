@@ -51,52 +51,57 @@ export async function connectWeb3() {
     });
   }
 
-  // const rpcUrls = {};
-  // // need to make it look like this:
-  // // rpc: {
-  // //   1: "https://mainnet.mycustomnode.com",
-  // //   3: "https://ropsten.mycustomnode.com",
-  // //   100: "https://dai.poa.network",
-  // //   // ...
-  // // },
+  const rpcUrls = {};
+  // need to make it look like this:
+  // rpc: {
+  //   1: "https://mainnet.mycustomnode.com",
+  //   3: "https://ropsten.mycustomnode.com",
+  //   100: "https://dai.poa.network",
+  //   // ...
+  // },
 
-  // for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
-  //   const chainName = Object.keys(LIT_CHAINS)[i];
-  //   const chainId = LIT_CHAINS[chainName].chainId;
-  //   const rpcUrl = LIT_CHAINS[chainName].rpcUrls[0];
-  //   rpcUrls[chainId] = rpcUrl;
-  // }
+  for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
+    const chainName = Object.keys(LIT_CHAINS)[i];
+    const chainId = LIT_CHAINS[chainName].chainId;
+    const rpcUrl = LIT_CHAINS[chainName].rpcUrls[0];
+    rpcUrls[chainId] = rpcUrl;
+  }
 
-  // const providerOptions = {
-  //   walletconnect: {
-  //     package: WalletConnectProvider, // required
-  //     options: {
-  //       // infuraId: "cd614bfa5c2f4703b7ab0ec0547d9f81",
-  //       rpc: rpcUrls,
-  //     },
-  //   },
-  // };
+  const providerOptions = {
+    walletconnect: {
+      package: WalletConnectProvider, // required
+      options: {
+        // infuraId: "cd614bfa5c2f4703b7ab0ec0547d9f81",
+        rpc: rpcUrls,
+      },
+    },
+  };
 
-  // // disabled because web3modal uses localstorage and breaks when
-  // // used on opensea
-  // const web3Modal = new Web3Modal({
-  //   cacheProvider: true, // optional
-  //   providerOptions, // required
-  // });
-  // const provider = await web3Modal.connect();
-  // const web3 = new Web3Provider(provider);
-
-  const provider = await detectEthereumProvider();
+  console.log("getting provider via web3modal");
+  // disabled because web3modal uses localstorage and breaks when
+  // used on opensea
+  const web3Modal = new Web3Modal({
+    cacheProvider: true, // optional
+    providerOptions, // required
+  });
+  const provider = await web3Modal.connect();
+  console.log("got provider", provider);
   const web3 = new Web3Provider(provider);
+  console.log("got web3", web3);
+
+  // const provider = await detectEthereumProvider();
+  // const web3 = new Web3Provider(provider);
 
   // trigger metamask popup
   await provider.enable();
 
-  // const accounts = await web3.listAccounts();
-  const accounts = await provider.request({
-    method: "eth_requestAccounts",
-    params: [],
-  });
+  console.log("listing accounts");
+  const accounts = await web3.listAccounts();
+  // const accounts = await provider.request({
+  //   method: "eth_requestAccounts",
+  //   params: [],
+  // });
+  console.log("accounts", accounts);
   const account = accounts[0].toLowerCase();
 
   return { web3, account };
@@ -181,12 +186,23 @@ export async function checkAndSignAuthMessage({ chain }) {
     selectedChain
   );
   if (chainId !== selectedChain.chainId) {
+    if (web3.provider instanceof WalletConnectProvider) {
+      // this chain switching won't work.  alert the user that they need to switch chains manually
+      throwError({
+        message: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
+        name: "WrongNetworkException",
+        errorCode: "wrong_network",
+      });
+      return;
+    }
     try {
+      console.log("trying to switch to chainId", selectedChainId);
       await web3.provider.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: selectedChainId }],
       });
     } catch (switchError) {
+      console.log("error switching to chainId", switchError);
       // This error code indicates that the chain has not been added to MetaMask.
       if (switchError.code === 4902) {
         try {
@@ -234,18 +250,24 @@ export async function checkAndSignAuthMessage({ chain }) {
       }
     }
   }
+  console.log("checking if sig is in local storage");
   let authSig = localStorage.getItem("lit-auth-signature");
   if (!authSig) {
+    console.log("signing auth message because sig is not in local storage");
     await signAndSaveAuthMessage();
     authSig = localStorage.getItem("lit-auth-signature");
   }
   authSig = JSON.parse(authSig);
   // make sure we are on the right account
   if (account !== authSig.address) {
+    console.log(
+      "signing auth message because account is not the same as the address in the auth sig"
+    );
     await signAndSaveAuthMessage();
     authSig = localStorage.getItem("lit-auth-signature");
     authSig = JSON.parse(authSig);
   }
+  console.log("got auth sig", authSig);
   return authSig;
 }
 
