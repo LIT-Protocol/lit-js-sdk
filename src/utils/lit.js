@@ -25,7 +25,7 @@ const PACKAGE_CACHE = {};
 /**
  * Zip and encrypt a string.  This is used to encrypt any string that is to be locked and included in a LIT.  For example, on MintLIT, we render the HTML/CSS containing the locked files and a grid to view them to a string using ReactDOMServer.renderToString().
  * @param {string} string The string to zip and encrypt
- * @returns {Object} The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a single file called "string.txt"
+ * @returns {Object} The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a single file called "string.txt"
  */
 export async function zipAndEncryptString(string) {
   const zip = new JSZip();
@@ -50,7 +50,7 @@ export async function zipAndEncryptFiles(files) {
 /**
  * Decrypt and unzip a zip that was created using encryptZip, zipAndEncryptString, or zipAndEncryptFiles.
  * @param {Blob} encryptedZipBlob The encrypted zip as a Blob
- * @param {Object} symmKey An object containing the symmetric key used that will be used to decrypt this zip.
+ * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this zip.
  * @returns {Array} An array of the decrypted files inside the zip.
  */
 export async function decryptZip(encryptedZipBlob, symmKey) {
@@ -517,9 +517,9 @@ export async function toggleLock() {
 }
 
 /**
- * Manually unlock a LIT with a symmetric key.  You can obtain this key by calling "checkAndSignAuthMessage" to get an authSig, then calling "getMerkleProof" to get the merkle proof, and then "LitNodeClient.getEncryptionKey" to get the key.  If you want to see an example, check out the implementation of "toggleLock" which does all those operations and then calls this function at the end (unlockLitWithKey)
+ * Manually unlock a LIT with a symmetric key.  You can obtain this key by calling "checkAndSignAuthMessage" to get an authSig, then calling "LitNodeClient.getEncryptionKey" to get the key.  If you want to see an example, check out the implementation of "toggleLock" which does all those operations and then calls this function at the end (unlockLitWithKey)
  * @param {Object} params
- * @param {Object} params.symmetricKey The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
+ * @param {Uint8Array} params.symmetricKey The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
  * @returns {promise} A promise that will resolve when the LIT is unlocked
  */
 export async function unlockLitWithKey({ symmetricKey }) {

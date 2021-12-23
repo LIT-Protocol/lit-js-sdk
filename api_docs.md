@@ -163,7 +163,7 @@ Retrieve the symmetric encryption key from the LIT nodes.  Note that this will o
     *   `params.chain` **[string][79]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
     *   `params.authSig` **[AuthSig][85]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
 
-Returns **[Object][78]** The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
+Returns **[Uint8Array][87]** The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
 
 ### saveEncryptionKey
 
@@ -182,13 +182,13 @@ Returns **[Uint8Array][87]** The symmetricKey parameter that has been encrypted 
 
 ## unlockLitWithKey
 
-Manually unlock a LIT with a symmetric key.  You can obtain this key by calling "checkAndSignAuthMessage" to get an authSig, then calling "getMerkleProof" to get the merkle proof, and then "LitNodeClient.getEncryptionKey" to get the key.  If you want to see an example, check out the implementation of "toggleLock" which does all those operations and then calls this function at the end (unlockLitWithKey)
+Manually unlock a LIT with a symmetric key.  You can obtain this key by calling "checkAndSignAuthMessage" to get an authSig, then calling "LitNodeClient.getEncryptionKey" to get the key.  If you want to see an example, check out the implementation of "toggleLock" which does all those operations and then calls this function at the end (unlockLitWithKey)
 
 ### Parameters
 
 *   `params` **[Object][78]** 
 
-    *   `params.symmetricKey` **[Object][78]** The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
+    *   `params.symmetricKey` **[Uint8Array][87]** The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
 
 Returns **[promise][88]** A promise that will resolve when the LIT is unlocked
 
@@ -282,7 +282,7 @@ Zip and encrypt a string.  This is used to encrypt any string that is to be lock
 
 *   `string` **[string][79]** The string to zip and encrypt
 
-Returns **[Object][78]** The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a single file called "string.txt"
+Returns **[Object][78]** The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a single file called "string.txt"
 
 ## zipAndEncryptFiles
 
@@ -343,7 +343,7 @@ Decrypt and unzip a zip that was created using encryptZip, zipAndEncryptString, 
 ### Parameters
 
 *   `encryptedZipBlob` **[Blob][90]** The encrypted zip as a Blob
-*   `symmKey` **[Object][78]** An object containing the symmetric key used that will be used to decrypt this zip.
+*   `symmKey` **[Uint8Array][87]** The symmetric key used that will be used to decrypt this zip.
 
 Returns **[Array][82]** An array of the decrypted files inside the zip.
 

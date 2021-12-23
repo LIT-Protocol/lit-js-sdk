@@ -345,7 +345,7 @@ export default class LitNodeClient {
    * @param {string} params.toDecrypt The ciphertext that you wish to decrypt encoded as a hex string
    * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
-   * @returns {Object} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
+   * @returns {Uint8Array} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
    */
   async getEncryptionKey({
     accessControlConditions,
