@@ -254,7 +254,7 @@ export async function checkAndSignAuthMessage({ chain }) {
   let authSig = localStorage.getItem("lit-auth-signature");
   if (!authSig) {
     console.log("signing auth message because sig is not in local storage");
-    await signAndSaveAuthMessage();
+    await signAndSaveAuthMessage({ web3, account });
     authSig = localStorage.getItem("lit-auth-signature");
   }
   authSig = JSON.parse(authSig);
@@ -263,7 +263,7 @@ export async function checkAndSignAuthMessage({ chain }) {
     console.log(
       "signing auth message because account is not the same as the address in the auth sig"
     );
-    await signAndSaveAuthMessage();
+    await signAndSaveAuthMessage({ web3, account });
     authSig = localStorage.getItem("lit-auth-signature");
     authSig = JSON.parse(authSig);
   }
@@ -271,10 +271,10 @@ export async function checkAndSignAuthMessage({ chain }) {
   return authSig;
 }
 
-export async function signAndSaveAuthMessage() {
+export async function signAndSaveAuthMessage({ web3, account }) {
   const now = new Date().toISOString();
   const body = AUTH_SIGNATURE_BODY.replace("{{timestamp}}", now);
-  const signedResult = await signMessage({ body });
+  const signedResult = await signMessage({ body, web3, account });
   localStorage.setItem(
     "lit-auth-signature",
     JSON.stringify({
@@ -303,9 +303,15 @@ export async function signAndSaveAuthMessage() {
  * @property {string} signedMessage - The message that was signed
  * @property {string} address - The crypto wallet address that signed the message
  */
-export async function signMessage({ body }) {
-  const { web3, account } = await connectWeb3();
+export async function signMessage({ body, web3, account }) {
+  if (!web3 || !account) {
+    let resp = await connectWeb3();
+    web3 = resp.web3;
+    account = resp.account;
+  }
 
+  console.log("pausing...");
+  await new Promise((resolve) => setTimeout(resolve, 500));
   console.log("signing with ", account);
   // const signature = await web3.getSigner().signMessage(body);
   const signature = await signMessageAsync(web3.getSigner(), account, body);
