@@ -29,9 +29,9 @@ import {
  * @typedef {Object} ResourceId
  * @property {string} baseUrl - The base url of the resource that will be authorized
  * @property {string} path - The path of the url of the resource that will be authorized
- * @property {string} orgId - Optional.  The org id that the user would be authorized to belong to.
- * @property {string} role - Optional.  The role that the user would be authorized to have.
- * @property {string} extraData - Optional.  Any extra data you may want to store.  You may store stringified JSON in here, for example.
+ * @property {string} orgId - The org id that the user would be authorized to belong to.  The orgId key must be present but it may contain an empty string if you don't need to store anything in it.
+ * @property {string} role - The role that the user would be authorized to have.  The role key must be present but it may contain an empty string if you don't need to store anything in it.
+ * @property {string} extraData - Any extra data you may want to store.  You may store stringified JSON in here, for example.  The extraData key must be present but it may contain an empty string if you don't need to store anything in it.
  */
 
 /**

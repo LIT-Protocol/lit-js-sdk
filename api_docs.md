@@ -420,9 +420,9 @@ Type: [Object][78]
 
 *   `baseUrl` **[string][79]** The base url of the resource that will be authorized
 *   `path` **[string][79]** The path of the url of the resource that will be authorized
-*   `orgId` **[string][79]** Optional.  The org id that the user would be authorized to belong to.
-*   `role` **[string][79]** Optional.  The role that the user would be authorized to have.
-*   `extraData` **[string][79]** Optional.  Any extra data you may want to store.  You may store stringified JSON in here, for example.
+*   `orgId` **[string][79]** The org id that the user would be authorized to belong to.  The orgId key must be present but it may contain an empty string if you don't need to store anything in it.
+*   `role` **[string][79]** The role that the user would be authorized to have.  The role key must be present but it may contain an empty string if you don't need to store anything in it.
+*   `extraData` **[string][79]** Any extra data you may want to store.  You may store stringified JSON in here, for example.  The extraData key must be present but it may contain an empty string if you don't need to store anything in it.
 
 ## AuthSig
 
