@@ -592,6 +592,10 @@ export default class LitNodeClient {
       });
   }
 
+  /**
+   * Connect to the LIT nodes.
+   * @returns {Promise} A promise that resolves when the nodes are connected.
+   */
   connect() {
     // handshake with each node
     for (const url of this.config.bootstrapUrls) {
