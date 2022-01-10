@@ -6,12 +6,12 @@
   "main": "build/index.js",
   "browser": "build/index.web.js",
   "scripts": {
-    "start": "concurrently \"nodemon -i build esbuild-package.js\" \"nodemon -i build esbuild-web.js\" \"serve -p 3050 build\" \"sleep 3; open http://localhost:3050/manual_tests.html\"",
+    "start": "concurrently \"microbundle watch -o build/index.js -f cjs\" \"nodemon -i build esbuild-nodejs.js\" \"nodemon -i build esbuild-web.js\" \"serve -p 3050 build\" \"sleep 3; open http://localhost:3050/manual_tests.html\"",
     "startNoCompressUseThisIfYouGetATerserErrorMaximumCallStackSizeExceeded": "microbundle watch --no-compress ",
     "buildWithMicrobundle": "microbundle build -o build/index.js -f cjs",
     "buildWebWithParcel": "parcel build --global LitJsSdk -d build --out-file index.web.js --public-url ./ src/index.js",
     "cdnDeploy": "yarn build; yarn buildWeb",
-    "build": "node esbuild-package.js",
+    "build": "microbundle build -o build/index.js -f cjs",
     "buildWeb": "node esbuild-web.js",
     "esbuildPackage": "node esbuild-package.js",
     "test": "node --experimental-specifier-resolution=node tests/provisioningAndSigning.js",
@@ -53,12 +53,14 @@
     "@unstoppabledomains/resolution": "^5.0.1",
     "@walletconnect/web3-provider": "^1.6.6",
     "buffer": "^6.0.3",
+    "bufferutil": "^4.0.6",
     "jszip": "^3.6.0",
     "lit-web3modal": "^1.9.5",
     "node-fetch-polyfill": "^2.0.6",
     "pako": "^2.0.4",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
-    "uint8arrays": "^2.1.5"
+    "uint8arrays": "^2.1.5",
+    "utf-8-validate": "^5.0.8"
   }
 }
