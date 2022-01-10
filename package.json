@@ -1,11 +1,12 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.1.99",
+  "version": "1.1.100",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
   "main": "build/index.js",
+  "browser": "build/index.web.js",
   "scripts": {
-    "start": "concurrently \"microbundle watch -o build/index.js -f cjs\" \"nodemon -i build esbuild-web.js\" \"serve -p 3050 build\" \"sleep 3; open http://localhost:3050/manual_tests.html\"",
+    "start": "concurrently \"nodemon -i build esbuild-package.js\" \"nodemon -i build esbuild-web.js\" \"serve -p 3050 build\" \"sleep 3; open http://localhost:3050/manual_tests.html\"",
     "startNoCompressUseThisIfYouGetATerserErrorMaximumCallStackSizeExceeded": "microbundle watch --no-compress ",
     "build": "microbundle build -o build/index.js -f cjs",
     "buildWebWithParcel": "parcel build --global LitJsSdk -d build --out-file index.web.js --public-url ./ src/index.js",

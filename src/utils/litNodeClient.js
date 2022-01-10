@@ -592,7 +592,7 @@ export default class LitNodeClient {
       });
   }
 
-  async connect() {
+  connect() {
     // handshake with each node
     for (const url of this.config.bootstrapUrls) {
       this.handshakeWithSgx({ url }).then((resp) => {
@@ -606,31 +606,35 @@ export default class LitNodeClient {
       });
     }
 
-    const interval = window.setInterval(() => {
-      if (Object.keys(this.serverKeys).length >= this.config.minNodeCount) {
-        clearInterval(interval);
-        // pick the most common public keys for the subnet and network from the bunch, in case some evil node returned a bad key
-        this.subnetPubKey = mostCommonString(
-          Object.values(this.serverKeys).map(
-            (keysFromSingleNode) => keysFromSingleNode.subnetPubKey
-          )
-        );
-        this.networkPubKey = mostCommonString(
-          Object.values(this.serverKeys).map(
-            (keysFromSingleNode) => keysFromSingleNode.networkPubKey
-          )
-        );
-        this.networkPubKeySet = mostCommonString(
-          Object.values(this.serverKeys).map(
-            (keysFromSingleNode) => keysFromSingleNode.networkPubKeySet
-          )
-        );
-        this.ready = true;
-        console.debug("lit is ready");
-        document.dispatchEvent(new Event("lit-ready"));
-      }
-    }, 500);
+    return new Promise((resolve) => {
+      const interval = setInterval(() => {
+        if (Object.keys(this.serverKeys).length >= this.config.minNodeCount) {
+          clearInterval(interval);
+          // pick the most common public keys for the subnet and network from the bunch, in case some evil node returned a bad key
+          this.subnetPubKey = mostCommonString(
+            Object.values(this.serverKeys).map(
+              (keysFromSingleNode) => keysFromSingleNode.subnetPubKey
+            )
+          );
+          this.networkPubKey = mostCommonString(
+            Object.values(this.serverKeys).map(
+              (keysFromSingleNode) => keysFromSingleNode.networkPubKey
+            )
+          );
+          this.networkPubKeySet = mostCommonString(
+            Object.values(this.serverKeys).map(
+              (keysFromSingleNode) => keysFromSingleNode.networkPubKeySet
+            )
+          );
+          this.ready = true;
+          console.debug("lit is ready");
+          if (typeof document !== "undefined") {
+            document.dispatchEvent(new Event("lit-ready"));
+          }
 
-    window.wasmBlsSdkHelpers = wasmBlsSdkHelpers; // for debug
+          resolve();
+        }
+      }, 500);
+    });
   }
 }

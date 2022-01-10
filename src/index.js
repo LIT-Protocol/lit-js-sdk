@@ -1,5 +1,23 @@
 import "regenerator-runtime/runtime";
 
+// add window global on nodejs
+import {
+  listenForChildFrameMessages,
+  listenForFrameParentMessages,
+  inIframe,
+} from "./utils/frameComms";
+
+if (typeof window !== "undefined") {
+  // only run this in browser
+  if (inIframe()) {
+    listenForFrameParentMessages();
+  } else {
+    listenForChildFrameMessages();
+  }
+} else {
+  globalThis.window = {};
+}
+
 import {
   zipAndEncryptString,
   zipAndEncryptFiles,
@@ -49,27 +67,9 @@ import LitNodeClient from "./utils/litNodeClient";
 
 import { litJsSdkLoadedInALIT } from "./utils/init";
 
-import {
-  listenForChildFrameMessages,
-  listenForFrameParentMessages,
-  inIframe,
-} from "./utils/frameComms";
-
 import { version } from "./version";
 
-if (typeof window !== "undefined") {
-  // only run this in browser
-  if (inIframe()) {
-    listenForFrameParentMessages();
-  } else {
-    listenForChildFrameMessages();
-  }
-} else {
-  global.window = {};
-}
-
 initWasmBlsSdk().then((exports) => {
-  // console.log('wtf, window? ', typeof window !== 'undefined')
   window.wasmExports = exports;
   console.log("wasmExports loaded");
 });
