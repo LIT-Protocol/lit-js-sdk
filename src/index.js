@@ -14,9 +14,10 @@ if (typeof window !== "undefined") {
   } else {
     listenForChildFrameMessages();
   }
-} else {
-  globalThis.window = {};
 }
+
+import uint8arrayFromString from "uint8arrays/from-string";
+import uint8arrayToString from "uint8arrays/to-string";
 
 import {
   zipAndEncryptString,
@@ -70,7 +71,7 @@ import { litJsSdkLoadedInALIT } from "./utils/init";
 import { version } from "./version";
 
 initWasmBlsSdk().then((exports) => {
-  window.wasmExports = exports;
+  globalThis.wasmExports = exports;
   console.log("wasmExports loaded");
 });
 
@@ -109,6 +110,8 @@ const functions = {
   version,
   encodeCallData,
   decodeCallResult,
+  uint8arrayFromString,
+  uint8arrayToString,
 };
 
 module.exports = functions;

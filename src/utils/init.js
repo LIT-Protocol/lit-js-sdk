@@ -10,7 +10,9 @@ export const litJsSdkLoadedInALIT = () => {
     );
     window.sandboxed = true;
     setTimeout(function () {
-      document.dispatchEvent(new Event("lit-ready"));
+      if (typeof document !== "undefined") {
+        document.dispatchEvent(new Event("lit-ready"));
+      }
     }, 1000);
     return;
   }
