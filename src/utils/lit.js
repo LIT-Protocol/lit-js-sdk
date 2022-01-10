@@ -546,7 +546,7 @@ export async function unlockLitWithKey({ symmetricKey }) {
 export function verifyJwt({ jwt }) {
   console.log("verifyJwt", jwt);
   // verify that the wasm was loaded
-  if (!window.wasmExports) {
+  if (!globalThis.wasmExports) {
     console.log("wasmExports is not loaded.");
     // initWasmBlsSdk().then((exports) => {
     //   // console.log('wtf, window? ', typeof window !== 'undefined')
