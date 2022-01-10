@@ -48,6 +48,7 @@
     "@ethersproject/units": "^5.4.0",
     "@ethersproject/wallet": "^5.2.0",
     "@metamask/detect-provider": "^1.2.0",
+    "@peculiar/webcrypto": "^1.2.3",
     "@unstoppabledomains/resolution": "^5.0.1",
     "@walletconnect/web3-provider": "^1.6.6",
     "buffer": "^6.0.3",
