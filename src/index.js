@@ -20,6 +20,8 @@ import uint8arrayFromString from "uint8arrays/from-string";
 import uint8arrayToString from "uint8arrays/to-string";
 
 import {
+  encryptString,
+  decryptString,
   zipAndEncryptString,
   zipAndEncryptFiles,
   encryptZip,
@@ -76,6 +78,8 @@ initWasmBlsSdk().then((exports) => {
 });
 
 const functions = {
+  encryptString,
+  decryptString,
   zipAndEncryptString,
   zipAndEncryptFiles,
   encryptZip,

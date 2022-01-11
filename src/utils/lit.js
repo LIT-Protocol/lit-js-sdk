@@ -23,9 +23,51 @@ import { LIT_CHAINS, NETWORK_PUB_KEY } from "../lib/constants";
 const PACKAGE_CACHE = {};
 
 /**
- * Zip and encrypt a string.  This is used to encrypt any string that is to be locked and included in a LIT.  For example, on MintLIT, we render the HTML/CSS containing the locked files and a grid to view them to a string using ReactDOMServer.renderToString().
+ * Encrypt a string.  This is used to encrypt any string that is to be locked via the Lit Protocol.
+ * @param {string} string The string to encrypt
+ * @returns {Promise<Object>} A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
+ */
+export async function encryptString(str) {
+  const encodedString = uint8arrayFromString(str, "utf8");
+
+  const symmKey = await generateSymmetricKey();
+  const encryptedString = await encryptWithSymmetricKey(
+    symmKey,
+    encodedString.buffer
+  );
+
+  const exportedSymmKey = new Uint8Array(
+    await crypto.subtle.exportKey("raw", symmKey)
+  );
+
+  return {
+    symmetricKey: exportedSymmKey,
+    encryptedString,
+  };
+}
+
+/**
+ * Decrypt a string that was encrypted with the encryptString function.
+ * @param {Blob} encryptedStringBlob The encrypted string as a Blob
+ * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this.
+ * @returns {Promise<string>} A promise containing the decrypted string
+ */
+export async function decryptString(encryptedStringBlob, symmKey) {
+  // import the decrypted symm key
+  const importedSymmKey = await importSymmetricKey(symmKey);
+
+  const decryptedStringArrayBuffer = await decryptWithSymmetricKey(
+    encryptedStringBlob,
+    importedSymmKey
+  );
+
+  return uint8arrayToString(new Uint8Array(decryptedStringArrayBuffer), "utf8");
+}
+
+/**
+ * Zip and encrypt a string.  This is used to encrypt any string that is to be locked via the Lit Protocol.
  * @param {string} string The string to zip and encrypt
- * @returns {Object} The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a single file called "string.txt"
+ * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a single file called "string.txt"
  */
 export async function zipAndEncryptString(string) {
   const zip = new JSZip();
@@ -36,7 +78,7 @@ export async function zipAndEncryptString(string) {
 /**
  * Zip and encrypt multiple files.
  * @param {array} files An array of the files you wish to zip and encrypt
- * @returns {Object} The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
+ * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
  */
 export async function zipAndEncryptFiles(files) {
   // let's zip em
@@ -51,7 +93,7 @@ export async function zipAndEncryptFiles(files) {
  * Decrypt and unzip a zip that was created using encryptZip, zipAndEncryptString, or zipAndEncryptFiles.
  * @param {Blob} encryptedZipBlob The encrypted zip as a Blob
  * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this zip.
- * @returns {Array} An array of the decrypted files inside the zip.
+ * @returns {Promise<Array>} A promise containing an array of the decrypted files inside the zip.
  */
 export async function decryptZip(encryptedZipBlob, symmKey) {
   // const keypair = await checkAndDeriveKeypair()
@@ -95,7 +137,7 @@ export async function decryptZip(encryptedZipBlob, symmKey) {
 /**
  * Encrypt a zip file created with JSZip using a new random symmetric key via WebCrypto.
  * @param {JSZip} zip The JSZip instance to encrypt
- * @returns {Object} The encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.
+ * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.
  */
 export async function encryptZip(zip) {
   const zipBlob = await zip.generateAsync({ type: "blob" });
@@ -175,7 +217,7 @@ export async function encryptZip(zip) {
  * @param {File} params.file The file you wish to encrypt
  * @param {LitNodeClient} params.litNodeClient An instance of LitNodeClient that is already connected
  * @param {string} params.readme An optional readme text that will be inserted into readme.txt in the final zip file.  This is useful in case someone comes across this zip file and wants to know how to decrypt it.  This file could contain instructions and a URL to use to decrypt the file.
- * @returns {Object} An object with 3 keys: zipBlob, encryptedSymmetricKey, and symmetricKey.  zipBlob is a zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network.  encryptedSymmetricKey is the symmetric key needed to decrypt the content, encrypted with the Lit network public key.  You may wish to store encryptedSymmetricKey in your own database to support quicker re-encryption operations when adding additional access control conditions in the future, but this is entirely optional, and this key is already stored inside the zipBlob.  symmetricKey is the raw symmetric key used to encrypt the files.  DO NOT STORE IT.  It is provided in case you wish to create additional "OR" access control conditions for the same file.
+ * @returns {Promise<Object>} A promise containing an object with 3 keys: zipBlob, encryptedSymmetricKey, and symmetricKey.  zipBlob is a zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network.  encryptedSymmetricKey is the symmetric key needed to decrypt the content, encrypted with the Lit network public key.  You may wish to store encryptedSymmetricKey in your own database to support quicker re-encryption operations when adding additional access control conditions in the future, but this is entirely optional, and this key is already stored inside the zipBlob.  symmetricKey is the raw symmetric key used to encrypt the files.  DO NOT STORE IT.  It is provided in case you wish to create additional "OR" access control conditions for the same file.
  */
 export async function encryptFileAndZipWithMetadata({
   authSig,
@@ -233,7 +275,7 @@ export async function encryptFileAndZipWithMetadata({
  * @param {Object} params.authSig The authSig of the user.  Returned via the checkAndSignAuthMessage function
  * @param {File} params.file The zip file with metadata inside it and the encrypted asset
  * @param {LitNodeClient} params.litNodeClient An instance of LitNodeClient that is already connected
- * @returns {Object} An object that contains decryptedFile and metadata properties.  The decryptedFile is an ArrayBuffer that is ready to use, and metadata is an object that contains all the properties of the file like it's name and size and type.
+ * @returns {Promise<Object>} A promise containing an object that contains decryptedFile and metadata properties.  The decryptedFile is an ArrayBuffer that is ready to use, and metadata is an object that contains all the properties of the file like it's name and size and type.
  */
 export async function decryptZipFileWithMetadata({
   authSig,
@@ -345,7 +387,7 @@ async function getNpmPackage(packageName) {
  * @param {number} params.tokenId The ID of the token of the corresponding NFT for this LIT.  Only holders of this token ID will be able to unlock and decrypt this LIT.
  * @param {string} params.chain The chain that the corresponding NFT was minted on.  "ethereum" and "polygon" are currently supported.
  * @param {Array} [params.npmPackages=[]] An array of strings of NPM package names that should be embedded into this LIT.  These packages will be pulled down via unpkg, converted to data URLs, and embedded in the LIT HTML.  You can include any packages from npmjs.com.
- * @returns {string} The HTML string that is now a LIT.  You can send this HTML around and only token holders will be able to unlock and decrypt the content inside it.  Included in the HTML is this LIT JS SDK itself, the encrypted locked content, an automatic connection to the LIT nodes network, and a handler for a button with id "unlockButton" which will perform the unlock operation when clicked.
+ * @returns {Promise<string>} A promise containing the HTML string that is now a LIT.  You can send this HTML around and only token holders will be able to unlock and decrypt the content inside it.  Included in the HTML is this LIT JS SDK itself, the encrypted locked content, an automatic connection to the LIT nodes network, and a handler for a button with id "unlockButton" which will perform the unlock operation when clicked.
  */
 export async function createHtmlLIT({
   title,
@@ -635,7 +677,7 @@ function humanizeComparator(comparator) {
  * The human readable name for an access control condition
  * @param {Object} params
  * @param {Array} params.accessControlConditions The array of access control conditions that you want to humanize
- * @returns {string} A human readable description of the access control condition
+ * @returns {Promise<string>} A promise containing a human readable description of the access control conditions
  */
 export async function humanizeAccessControlConditions({
   accessControlConditions,
