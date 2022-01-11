@@ -12,6 +12,8 @@ toc:
   - toggleLock
   - injectViewerIFrame
   - name: Static Content - Encryption and decryption utilities
+  - encryptString
+  - decryptString
   - zipAndEncryptString
   - zipAndEncryptFiles
   - encryptFileAndZipWithMetadata

@@ -32,50 +32,50 @@
 *   [injectViewerIFrame][28]
     *   [Parameters][29]
 *   [Static Content - Encryption and decryption utilities][30]
-*   [zipAndEncryptString][31]
+*   [encryptString][31]
     *   [Parameters][32]
-*   [zipAndEncryptFiles][33]
+*   [decryptString][33]
     *   [Parameters][34]
-*   [encryptFileAndZipWithMetadata][35]
+*   [zipAndEncryptString][35]
     *   [Parameters][36]
-*   [decryptZipFileWithMetadata][37]
+*   [zipAndEncryptFiles][37]
     *   [Parameters][38]
-*   [encryptZip][39]
+*   [encryptFileAndZipWithMetadata][39]
     *   [Parameters][40]
-*   [decryptZip][41]
+*   [decryptZipFileWithMetadata][41]
     *   [Parameters][42]
-*   [decryptWithSymmetricKey][43]
+*   [encryptZip][43]
     *   [Parameters][44]
-*   [encryptWithSymmetricKey][45]
+*   [decryptZip][45]
     *   [Parameters][46]
-*   [Other Utilities][47]
-*   [fileToDataUrl][48]
-    *   [Parameters][49]
-*   [checkAndSignAuthMessage][50]
-    *   [Parameters][51]
-*   [Types][52]
-*   [AccessControlCondition][53]
-    *   [Properties][54]
-*   [ResourceId][55]
-    *   [Properties][56]
-*   [AuthSig][57]
+*   [decryptWithSymmetricKey][47]
+    *   [Parameters][48]
+*   [encryptWithSymmetricKey][49]
+    *   [Parameters][50]
+*   [Other Utilities][51]
+*   [fileToDataUrl][52]
+    *   [Parameters][53]
+*   [checkAndSignAuthMessage][54]
+    *   [Parameters][55]
+*   [Types][56]
+*   [AccessControlCondition][57]
     *   [Properties][58]
-*   [LITChain][59]
+*   [ResourceId][59]
     *   [Properties][60]
-*   [LIT_CHAINS][61]
-*   [downloadFile][62]
-    *   [Parameters][63]
-*   [encryptWithPubKey][64]
-    *   [Parameters][65]
-*   [decryptWithPrivKey][66]
+*   [AuthSig][61]
+    *   [Properties][62]
+*   [LITChain][63]
+    *   [Properties][64]
+*   [LIT_CHAINS][65]
+*   [downloadFile][66]
     *   [Parameters][67]
-*   [decimalPlaces][68]
+*   [encryptWithPubKey][68]
     *   [Parameters][69]
-*   [lookupNameServiceAddress][70]
+*   [decryptWithPrivKey][70]
     *   [Parameters][71]
-*   [encryptString][72]
+*   [decimalPlaces][72]
     *   [Parameters][73]
-*   [decryptString][74]
+*   [lookupNameServiceAddress][74]
     *   [Parameters][75]
 *   [metadataForFile][76]
     *   [Parameters][77]
@@ -285,6 +285,28 @@ Inject an iFrame into the current page that will display a LIT.  This function s
 
 
 
+## encryptString
+
+Encrypt a string.  This is used to encrypt any string that is to be locked via the Lit Protocol.
+
+### Parameters
+
+*   `str`  
+*   `string` **[string][84]** The string to encrypt
+
+Returns **[Promise][93]<[Object][83]>** A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
+
+## decryptString
+
+Decrypt a string that was encrypted with the encryptString function.
+
+### Parameters
+
+*   `encryptedStringBlob` **[Blob][94]** The encrypted string as a Blob
+*   `symmKey` **[Uint8Array][92]** The symmetric key used that will be used to decrypt this.
+
+Returns **[Promise][93]<[string][84]>** A promise containing the decrypted string
+
 ## zipAndEncryptString
 
 Zip and encrypt a string.  This is used to encrypt any string that is to be locked via the Lit Protocol.
@@ -317,7 +339,7 @@ Encrypt a single file, save the key to the Lit network, and then zip it up with 
     *   `params.accessControlConditions` **[Array][87]<[AccessControlCondition][89]>** The array of access control conditions to under which the content can be decrypted
     *   `params.chain` **[string][84]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
     *   `params.file` **File** The file you wish to encrypt
-    *   `params.litNodeClient` **[LitNodeClient][94]** An instance of LitNodeClient that is already connected
+    *   `params.litNodeClient` **[LitNodeClient][95]** An instance of LitNodeClient that is already connected
     *   `params.readme` **[string][84]** An optional readme text that will be inserted into readme.txt in the final zip file.  This is useful in case someone comes across this zip file and wants to know how to decrypt it.  This file could contain instructions and a URL to use to decrypt the file.
 
 Returns **[Promise][93]<[Object][83]>** A promise containing an object with 3 keys: zipBlob, encryptedSymmetricKey, and symmetricKey.  zipBlob is a zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network.  encryptedSymmetricKey is the symmetric key needed to decrypt the content, encrypted with the Lit network public key.  You may wish to store encryptedSymmetricKey in your own database to support quicker re-encryption operations when adding additional access control conditions in the future, but this is entirely optional, and this key is already stored inside the zipBlob.  symmetricKey is the raw symmetric key used to encrypt the files.  DO NOT STORE IT.  It is provided in case you wish to create additional "OR" access control conditions for the same file.
@@ -332,7 +354,7 @@ Given a zip file with metadata inside it, unzip, load the metadata, and return t
 
     *   `params.authSig` **[Object][83]** The authSig of the user.  Returned via the checkAndSignAuthMessage function
     *   `params.file` **File** The zip file with metadata inside it and the encrypted asset
-    *   `params.litNodeClient` **[LitNodeClient][94]** An instance of LitNodeClient that is already connected
+    *   `params.litNodeClient` **[LitNodeClient][95]** An instance of LitNodeClient that is already connected
     *   `params.additionalAccessControlConditions`  
 
 Returns **[Promise][93]<[Object][83]>** A promise containing an object that contains decryptedFile and metadata properties.  The decryptedFile is an ArrayBuffer that is ready to use, and metadata is an object that contains all the properties of the file like it's name and size and type.
@@ -353,7 +375,7 @@ Decrypt and unzip a zip that was created using encryptZip, zipAndEncryptString, 
 
 ### Parameters
 
-*   `encryptedZipBlob` **[Blob][95]** The encrypted zip as a Blob
+*   `encryptedZipBlob` **[Blob][94]** The encrypted zip as a Blob
 *   `symmKey` **[Uint8Array][92]** The symmetric key used that will be used to decrypt this zip.
 
 Returns **[Promise][93]<[Array][87]>** A promise containing an array of the decrypted files inside the zip.
@@ -364,10 +386,10 @@ Decrypt an encrypted blob with a symmetric key.  Uses AES-CBC via SubtleCrypto
 
 ### Parameters
 
-*   `encryptedBlob` **[Blob][95]** The encrypted blob that should be decrypted
+*   `encryptedBlob` **[Blob][94]** The encrypted blob that should be decrypted
 *   `symmKey` **[Object][83]** The symmetric key
 
-Returns **[Blob][95]** The decrypted blob
+Returns **[Blob][94]** The decrypted blob
 
 ## encryptWithSymmetricKey
 
@@ -376,9 +398,9 @@ Encrypt a blob with a symmetric key
 ### Parameters
 
 *   `symmKey` **[Object][83]** The symmetric key
-*   `data` **[Blob][95]** The blob to encrypt
+*   `data` **[Blob][94]** The blob to encrypt
 
-Returns **[Blob][95]** The encrypted blob
+Returns **[Blob][94]** The encrypted blob
 
 ## Other Utilities
 
@@ -483,10 +505,10 @@ Encrypt a blob with the public key of a receiver
 ### Parameters
 
 *   `receiverPublicKey` **[string][84]** The base64 encoded 32 byte public key.  The corresponding private key will be able to decrypt this blob
-*   `data` **[Blob][95]** The blob to encrypt
+*   `data` **[Blob][94]** The blob to encrypt
 *   `version` **[string][84]** The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
 
-Returns **[Blob][95]** The encrypted blob
+Returns **[Blob][94]** The encrypted blob
 
 ## decryptWithPrivKey
 
@@ -494,11 +516,11 @@ Decrypt a blob with a private key
 
 ### Parameters
 
-*   `encryptedData` **[Blob][95]** The blob to decrypt
+*   `encryptedData` **[Blob][94]** The blob to decrypt
 *   `receiverPrivateKey` **[string][84]** The base64 encoded 32 byte private key.  The corresponding public key was used to encrypt this blob
 *   `version` **[string][84]** The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
 
-Returns **[Blob][95]** The decrypted blob
+Returns **[Blob][94]** The decrypted blob
 
 ## decimalPlaces
 
@@ -524,28 +546,6 @@ Lookup an eth address from a given ENS name
     *   `params.name` **[string][84]** The name to resolve
 
 Returns **[string][84]** The resolved eth address
-
-## encryptString
-
-Encrypt a string.  This is used to encrypt any string that is to be locked via the Lit Protocol.
-
-### Parameters
-
-*   `str`  
-*   `string` **[string][84]** The string to encrypt
-
-Returns **[Promise][93]<[Object][83]>** A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
-
-## decryptString
-
-Decrypt a string that was encrypted with the encryptString function.
-
-### Parameters
-
-*   `encryptedStringBlob` **[Blob][95]** The encrypted string as a Blob
-*   `symmKey` **[Uint8Array][92]** The symmetric key used that will be used to decrypt this.
-
-Returns **[Promise][93]<[string][84]>** A promise containing the decrypted string
 
 ## metadataForFile
 
@@ -649,93 +649,93 @@ Type: [Object][83]
 
 [30]: #static-content---encryption-and-decryption-utilities
 
-[31]: #zipandencryptstring
+[31]: #encryptstring
 
 [32]: #parameters-13
 
-[33]: #zipandencryptfiles
+[33]: #decryptstring
 
 [34]: #parameters-14
 
-[35]: #encryptfileandzipwithmetadata
+[35]: #zipandencryptstring
 
 [36]: #parameters-15
 
-[37]: #decryptzipfilewithmetadata
+[37]: #zipandencryptfiles
 
 [38]: #parameters-16
 
-[39]: #encryptzip
+[39]: #encryptfileandzipwithmetadata
 
 [40]: #parameters-17
 
-[41]: #decryptzip
+[41]: #decryptzipfilewithmetadata
 
 [42]: #parameters-18
 
-[43]: #decryptwithsymmetrickey
+[43]: #encryptzip
 
 [44]: #parameters-19
 
-[45]: #encryptwithsymmetrickey
+[45]: #decryptzip
 
 [46]: #parameters-20
 
-[47]: #other-utilities
+[47]: #decryptwithsymmetrickey
 
-[48]: #filetodataurl
+[48]: #parameters-21
 
-[49]: #parameters-21
+[49]: #encryptwithsymmetrickey
 
-[50]: #checkandsignauthmessage
+[50]: #parameters-22
 
-[51]: #parameters-22
+[51]: #other-utilities
 
-[52]: #types
+[52]: #filetodataurl
 
-[53]: #accesscontrolcondition
+[53]: #parameters-23
 
-[54]: #properties
+[54]: #checkandsignauthmessage
 
-[55]: #resourceid
+[55]: #parameters-24
 
-[56]: #properties-1
+[56]: #types
 
-[57]: #authsig
+[57]: #accesscontrolcondition
 
-[58]: #properties-2
+[58]: #properties
 
-[59]: #litchain
+[59]: #resourceid
 
-[60]: #properties-3
+[60]: #properties-1
 
-[61]: #lit_chains
+[61]: #authsig
 
-[62]: #downloadfile
+[62]: #properties-2
 
-[63]: #parameters-23
+[63]: #litchain
 
-[64]: #encryptwithpubkey
+[64]: #properties-3
 
-[65]: #parameters-24
+[65]: #lit_chains
 
-[66]: #decryptwithprivkey
+[66]: #downloadfile
 
 [67]: #parameters-25
 
-[68]: #decimalplaces
+[68]: #encryptwithpubkey
 
 [69]: #parameters-26
 
-[70]: #lookupnameserviceaddress
+[70]: #decryptwithprivkey
 
 [71]: #parameters-27
 
-[72]: #encryptstring
+[72]: #decimalplaces
 
 [73]: #parameters-28
 
-[74]: #decryptstring
+[74]: #lookupnameserviceaddress
 
 [75]: #parameters-29
 
@@ -775,8 +775,8 @@ Type: [Object][83]
 
 [93]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
 
-[94]: #litnodeclient
+[94]: https://developer.mozilla.org/docs/Web/API/Blob
 
-[95]: https://developer.mozilla.org/docs/Web/API/Blob
+[95]: #litnodeclient
 
 [96]: #litchain
