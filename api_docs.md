@@ -292,8 +292,7 @@ Encrypt a string.  This is used to encrypt any string that is to be locked via t
 
 ### Parameters
 
-*   `str`  
-*   `string` **[string][85]** The string to encrypt
+*   `str` **[string][85]** The string to encrypt
 
 Returns **[Promise][94]<[Object][84]>** A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
 

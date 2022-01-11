@@ -24,7 +24,7 @@ const PACKAGE_CACHE = {};
 
 /**
  * Encrypt a string.  This is used to encrypt any string that is to be locked via the Lit Protocol.
- * @param {string} string The string to encrypt
+ * @param {string} str The string to encrypt
  * @returns {Promise<Object>} A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
  */
 export async function encryptString(str) {
