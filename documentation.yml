@@ -25,6 +25,7 @@ toc:
   - name: Other Utilities
   - fileToDataUrl
   - checkAndSignAuthMessage
+  - signAndSaveAuthMessage
   - name: Types
   - AccessControlCondition
   - ResourceId
