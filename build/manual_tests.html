@@ -412,7 +412,7 @@
       };
 
       var EncryptDecrypt = async () => {
-        const testName = "SendBadRequestToNodes";
+        const testName = "EncryptDecrypt";
         document.getElementById("status").innerText = `Testing ${testName}...`;
         document.getElementById("humanized").innerText = "";
         const authSig = await LitJsSdk.checkAndSignAuthMessage({
@@ -443,6 +443,79 @@
         });
 
         console.log("encrypted symmetric key", encryptedSymmetricKey);
+
+        const retrievedSymmKey = await litNodeClient.getEncryptionKey({
+          accessControlConditions,
+          toDecrypt: LitJsSdk.uint8arrayToString(
+            encryptedSymmetricKey,
+            "base16"
+          ),
+          chain,
+          authSig,
+        });
+
+        const decryptedFiles = await LitJsSdk.decryptZip(
+          encryptedZip,
+          retrievedSymmKey
+        );
+        const decryptedString = await decryptedFiles["string.txt"].async(
+          "text"
+        );
+        console.log("decrypted string", decryptedString);
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Success.  Decrypted string is: ${decryptedString}`;
+      };
+
+      var EncryptDecryptAGroup = async () => {
+        const testName = "EncryptDecryptAGroup";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        document.getElementById("humanized").innerText = "";
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+        });
+        const accessControlConditionGroup = {
+          and: [
+            // holds some eth
+            {
+              contractAddress: "",
+              standardContractType: "",
+              chain,
+              method: "eth_getBalance",
+              parameters: [":userAddress", "latest"],
+              returnValueTest: {
+                comparator: ">=",
+                value: "10000000000000",
+              },
+            },
+            // erc 1155 posession
+            {
+              contractAddress: "0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88",
+              standardContractType: "ERC1155",
+              chain,
+              method: "balanceOf",
+              parameters: [":userAddress", "8"],
+              returnValueTest: {
+                comparator: ">",
+                value: "0",
+              },
+            },
+          ],
+        };
+
+        const { encryptedZip, symmetricKey } =
+          await LitJsSdk.zipAndEncryptString("this is a secret message");
+
+        const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
+          accessControlConditionGroup,
+          symmetricKey,
+          authSig,
+          chain,
+        });
+
+        console.log("encrypted symmetric key", encryptedSymmetricKey);
+        return;
 
         const retrievedSymmKey = await litNodeClient.getEncryptionKey({
           accessControlConditions,
@@ -531,6 +604,11 @@
     <br />
     <br />
     <button onclick="EncryptDecrypt()">Encrypt then Decrypt</button>
+    <br />
+    <br />
+    <button onclick="EncryptDecryptAGroup()">
+      Encrypt then Decrypt a group of conditions
+    </button>
     <br />
     <br />
     <button onclick="logout()">Logout</button>

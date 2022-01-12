@@ -466,9 +466,20 @@ export default class LitNodeClient {
     );
 
     // hash the access control conditions
-    const hashOfConditions = await hashAccessControlConditions(
-      accessControlConditions
-    );
+    let hashOfConditions = null;
+    if (accessControlConditions) {
+      hashOfConditions = await hashAccessControlConditions(
+        accessControlConditions
+      );
+    } else if (accessControlConditionGroup) {
+      hashOfConditions = await hashAccessControlConditionGroup(
+        accessControlConditionGroup
+      );
+    } else {
+      console.log(
+        "Error, you must pass in either accessControlConditions or accessControlConditionGroup"
+      );
+    }
     const hashOfConditionsStr = uint8arrayToString(
       new Uint8Array(hashOfConditions),
       "base16"
