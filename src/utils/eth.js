@@ -271,6 +271,13 @@ export async function checkAndSignAuthMessage({ chain }) {
   return authSig;
 }
 
+/**
+ * Sign the auth message with the user's wallet, and store it in localStorage.  Called by checkAndSignAuthMessage if the user does not have a signature stored.
+ * @param {Object} params
+ * @param {Web3Provider} params.web3 An ethers.js Web3Provider instance
+ * @param {string} params.account The account to sign the message with
+ * @returns {AuthSig} The AuthSig created or retrieved
+ */
 export async function signAndSaveAuthMessage({ web3, account }) {
   const now = new Date().toISOString();
   const body = AUTH_SIGNATURE_BODY.replace("{{timestamp}}", now);
