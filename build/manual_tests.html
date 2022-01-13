@@ -475,21 +475,22 @@
         const authSig = await LitJsSdk.checkAndSignAuthMessage({
           chain,
         });
-        const accessControlConditionGroup = {
-          and: [
-            // holds some eth
-            {
-              contractAddress: "",
-              standardContractType: "",
-              chain,
-              method: "eth_getBalance",
-              parameters: [":userAddress", "latest"],
-              returnValueTest: {
-                comparator: ">=",
-                value: "10000000000000",
-              },
+        const accessControlConditions = [
+          // holds some eth
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain,
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
             },
-            // erc 1155 posession
+          },
+          { operator: "and" },
+          [
+            // erc 1155 possession
             {
               contractAddress: "0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88",
               standardContractType: "ERC1155",
@@ -501,14 +502,27 @@
                 value: "0",
               },
             },
+            { operator: "or" },
+            // erc721 posession
+            {
+              contractAddress: "0x319ba3aab86e04a37053e984bd411b2c63bf229e",
+              standardContractType: "ERC721",
+              chain,
+              method: "ownerOf",
+              parameters: ["5954"],
+              returnValueTest: {
+                comparator: "=",
+                value: ":userAddress",
+              },
+            },
           ],
-        };
+        ];
 
         const { encryptedZip, symmetricKey } =
           await LitJsSdk.zipAndEncryptString("this is a secret message");
 
         const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
-          accessControlConditionGroup,
+          accessControlConditions,
           symmetricKey,
           authSig,
           chain,

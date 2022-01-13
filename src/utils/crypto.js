@@ -1,6 +1,7 @@
 import nacl from "tweetnacl";
 import naclUtil from "tweetnacl-util";
 import uint8arrayFromString from "uint8arrays/from-string";
+import { throwError } from "../lib/utils";
 
 const SYMM_KEY_ALGO_PARAMS = {
   name: "AES-CBC",
@@ -40,14 +41,32 @@ export function canonicalAccessControlConditionFormatter(cond) {
   }
   */
 
-  return {
-    contractAddress: cond.contractAddress,
-    chain: cond.chain,
-    standardContractType: cond.standardContractType,
-    method: cond.method,
-    parameters: cond.parameters,
-    returnValueTest: cond.returnValueTest,
-  };
+  if (Array.isArray(cond)) {
+    return cond.map((c) => canonicalAccessControlConditionFormatter(c));
+  }
+
+  if ("operator" in cond) {
+    return {
+      operator: cond.operator,
+    };
+  }
+
+  if ("returnValueTest" in cond) {
+    return {
+      contractAddress: cond.contractAddress,
+      chain: cond.chain,
+      standardContractType: cond.standardContractType,
+      method: cond.method,
+      parameters: cond.parameters,
+      returnValueTest: cond.returnValueTest,
+    };
+  }
+
+  throwError({
+    message: `You passed an invalid access control condition: ${cond}`,
+    name: "InvalidAccessControlCondition",
+    errorCode: "invalid_access_control_condition",
+  });
 }
 
 export function hashAccessControlConditions(accessControlConditions) {
