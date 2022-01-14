@@ -228,6 +228,38 @@
         });
       };
 
+      var ETHPlusERC721 = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain,
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+          { operator: "and" },
+          {
+            contractAddress: "0x319ba3aab86e04a37053e984bd411b2c63bf229e",
+            standardContractType: "ERC721",
+            chain,
+            method: "ownerOf",
+            parameters: ["5954"],
+            returnValueTest: {
+              comparator: "=",
+              value: ":userAddress",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "ETHPlusERC721",
+        });
+      };
+
       var ETHEmptyWallet = async () => {
         const accessControlConditions = [
           {
@@ -529,7 +561,6 @@
         });
 
         console.log("encrypted symmetric key", encryptedSymmetricKey);
-        return;
 
         const retrievedSymmKey = await litNodeClient.getEncryptionKey({
           accessControlConditions,
@@ -609,6 +640,11 @@
     <button onclick="ETH()">ETH</button>
     <br />
     <br />
+    <button onclick="ETHPlusERC721()">
+      ETH + ERC721 (boolean group signing)
+    </button>
+    <br />
+    <br />
     <button onclick="SignChainData()">Sign Chain Data</button>
     <br />
     <br />
@@ -621,7 +657,7 @@
     <br />
     <br />
     <button onclick="EncryptDecryptAGroup()">
-      Encrypt then Decrypt a group of conditions
+      Encrypt then Decrypt a boolean group of conditions
     </button>
     <br />
     <br />
