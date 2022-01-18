@@ -687,9 +687,54 @@ export async function humanizeAccessControlConditions({
   console.log("humanizing access control conditions");
   console.log("myWalletAddress", myWalletAddress);
   console.log("accessControlConditions", accessControlConditions);
+  let fixedConditions = accessControlConditions;
 
-  return Promise.all(
-    accessControlConditions.map(async (acc) => {
+  // inject and operator if needed
+  // this is done because before we supported operators,
+  // we let users specify an entire array of conditions
+  // that would be "AND"ed together.  this injects those ANDs
+  if (accessControlConditions.length > 1) {
+    let containsOperator = false;
+    for (let i = 0; i < accessControlConditions.length; i++) {
+      if (accessControlConditions[i].operator) {
+        containsOperator = true;
+      }
+    }
+    if (!containsOperator) {
+      fixedConditions = [];
+
+      // insert ANDs between conditions
+      for (let i = 0; i < accessControlConditions.length; i++) {
+        fixedConditions.push(accessControlConditions[i]);
+        if (i < accessControlConditions.length - 1) {
+          fixedConditions.push({
+            operator: "and",
+          });
+        }
+      }
+    }
+  }
+
+  const promises = await Promise.all(
+    fixedConditions.map(async (acc) => {
+      if (Array.isArray(acc)) {
+        // this is a group.  recurse.
+        const group = await humanizeAccessControlConditions({
+          accessControlConditions: acc,
+          tokenList,
+          myWalletAddress,
+        });
+        return `( ${group} )`;
+      }
+
+      if (acc.operator) {
+        if (acc.operator.toLowerCase() === "and") {
+          return " and ";
+        } else if (acc.operator.toLowerCase() === "or") {
+          return " or ";
+        }
+      }
+
       if (
         acc.standardContractType === "MolochDAOv2.1" &&
         acc.method === "members"
@@ -788,6 +833,7 @@ export async function humanizeAccessControlConditions({
       }
     })
   );
+  return promises.join("");
 }
 
 export async function getTokenList() {

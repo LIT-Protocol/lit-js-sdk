@@ -446,7 +446,6 @@
       var EncryptDecrypt = async () => {
         const testName = "EncryptDecrypt";
         document.getElementById("status").innerText = `Testing ${testName}...`;
-        document.getElementById("humanized").innerText = "";
         const authSig = await LitJsSdk.checkAndSignAuthMessage({
           chain,
         });
@@ -463,6 +462,12 @@
             },
           },
         ];
+
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { accessControlConditions }
+        )}`;
 
         const { encryptedZip, symmetricKey } =
           await LitJsSdk.zipAndEncryptString("this is a secret message");
@@ -503,7 +508,7 @@
       var EncryptDecryptAGroup = async () => {
         const testName = "EncryptDecryptAGroup";
         document.getElementById("status").innerText = `Testing ${testName}...`;
-        document.getElementById("humanized").innerText = "";
+
         const authSig = await LitJsSdk.checkAndSignAuthMessage({
           chain,
         });
@@ -549,6 +554,12 @@
             },
           ],
         ];
+
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { accessControlConditions }
+        )}`;
 
         const { encryptedZip, symmetricKey } =
           await LitJsSdk.zipAndEncryptString("this is a secret message");
