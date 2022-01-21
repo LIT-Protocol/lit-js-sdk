@@ -300,6 +300,26 @@
         });
       };
 
+      var ProofOfHumanity = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "0xC5E9dDebb09Cd64DfaCab4011A0D5cEDaf7c9BDb",
+            standardContractType: "ProofOfHumanity",
+            chain: "ethereum",
+            method: "isRegistered",
+            parameters: [":userAddress"],
+            returnValueTest: {
+              comparator: "=",
+              value: "true",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "Proof of Humanity",
+        });
+      };
+
       var SignChainData = async () => {
         const testName = "SignChainData";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -666,6 +686,9 @@
     <br />
     <br />
     <button onclick="ERC20()">ERC20</button>
+    <br />
+    <br />
+    <button onclick="ProofOfHumanity()">Proof of humanity</button>
     <br />
     <br />
     <button onclick="ETH()">ETH</button>
