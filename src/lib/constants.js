@@ -62,6 +62,16 @@ export const LIT_CHAINS = {
     blockExplorerUrls: [" https://bscscan.com/"],
     type: "ERC1155",
   },
+  arbitrum: {
+    contractAddress: "0xc716950e5DEae248160109F562e1C9bF8E0CA25B",
+    chainId: 42161,
+    name: "Arbitrum",
+    symbol: "AETH",
+    decimals: 18,
+    type: "ERC1155",
+    rpcUrls: ["https://arb1.arbitrum.io/rpc"],
+    blockExplorerUrls: ["https://arbiscan.io/"],
+  },
   kovan: {
     contractAddress: "0x9dB60Db3Dd9311861D87D33B0463AaD9fB4bb0E6",
     chainId: 42,
