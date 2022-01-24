@@ -72,6 +72,16 @@ export const LIT_CHAINS = {
     rpcUrls: ["https://arb1.arbitrum.io/rpc"],
     blockExplorerUrls: ["https://arbiscan.io/"],
   },
+  harmony: {
+    contractAddress: "0xBB118507E802D17ECDD4343797066dDc13Cde7C6",
+    chainId: 1666600000,
+    name: "Harmony",
+    symbol: "ONE",
+    decimals: 18,
+    type: "ERC1155",
+    rpcUrls: ["https://api.harmony.one"],
+    blockExplorerUrls: ["https://explorer.harmony.one/"],
+  },
   kovan: {
     contractAddress: "0x9dB60Db3Dd9311861D87D33B0463AaD9fB4bb0E6",
     chainId: 42,
