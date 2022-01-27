@@ -155,6 +155,7 @@ Associated access control conditions with a resource on the web.  After calling 
     *   `params.chain` **[string][87]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
     *   `params.authSig` **[AuthSig][93]** The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions
     *   `params.resourceId` **[ResourceId][94]** The resourceId representing something on the web via a URL
+    *   `params.permanant`   (optional, default `1`)
 
 Returns **[boolean][89]** Success
 
@@ -184,7 +185,9 @@ Securely save the association between access control conditions and something th
     *   `params.accessControlConditions` **[Array][90]<[AccessControlCondition][92]>** The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.  Save this - you will neeed it to decrypt the content in the future.
     *   `params.chain` **[string][87]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
     *   `params.authSig` **[AuthSig][93]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
-    *   `params.symmetricKey` **[string][87]** The symmetric encryption key that was used to encrypt the locked content inside the LIT as a Uint8Array.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.
+    *   `params.symmetricKey` **[string][87]** The symmetric encryption key that was used to encrypt the locked content inside the LIT as a Uint8Array.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.  You must pass either symmetricKey or encryptedSymmetricKey.
+    *   `params.encryptedSymmetricKey` **[Uint8Array][95]** The encrypted symmetric key of the item you with to update.  You must pass either symmetricKey or encryptedSymmetricKey.
+    *   `params.permanant`   (optional, default `1`)
 
 Returns **[Uint8Array][95]** The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
 
