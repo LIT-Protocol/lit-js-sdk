@@ -233,7 +233,7 @@
           {
             contractAddress: "",
             standardContractType: "",
-            chain,
+            chain: "arbitrum",
             method: "eth_getBalance",
             parameters: [":userAddress", "latest"],
             returnValueTest: {
@@ -245,6 +245,26 @@
         await testProvisoningAndSigning({
           accessControlConditions,
           testName: "ETHOnArbitrum",
+        });
+      };
+
+      var ETHOnEth = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "ethereum",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "ETHOnEth",
         });
       };
 
@@ -545,6 +565,282 @@
         ).innerText = `${testName}: Success.  Decrypted string is: ${decryptedString}`;
       };
 
+      var EncryptDecryptWithAnUpdate = async () => {
+        const testName = "EncryptDecryptWithAnUpdate";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+        });
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain,
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "100000000000000000000000", // 100000 eth (or matic, really)
+            },
+          },
+        ];
+
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { accessControlConditions }
+        )}`;
+
+        const { encryptedZip, symmetricKey } =
+          await LitJsSdk.zipAndEncryptString("this is a secret message");
+
+        const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
+          accessControlConditions,
+          symmetricKey,
+          authSig,
+          chain,
+          permanant: 0,
+        });
+
+        console.log("encrypted symmetric key", encryptedSymmetricKey);
+
+        let retrievedSymmKey;
+        try {
+          retrievedSymmKey = await litNodeClient.getEncryptionKey({
+            accessControlConditions,
+            toDecrypt: LitJsSdk.uint8arrayToString(
+              encryptedSymmetricKey,
+              "base16"
+            ),
+            chain,
+            authSig,
+          });
+        } catch (e) {
+          console.log("error getting symmetric key - this is expected", e);
+          console.log("trying to update the condition");
+          const newAccessControlConditions = [
+            {
+              contractAddress: "",
+              standardContractType: "",
+              chain,
+              method: "eth_getBalance",
+              parameters: [":userAddress", "latest"],
+              returnValueTest: {
+                comparator: ">=",
+                value: "10000000000000",
+              },
+            },
+          ];
+
+          const newEncryptedSymmetricKey =
+            await litNodeClient.saveEncryptionKey({
+              accessControlConditions: newAccessControlConditions,
+              encryptedSymmetricKey,
+              authSig,
+              chain,
+              permanant: 0,
+            });
+          console.log("updated the condition");
+
+          retrievedSymmKey = await litNodeClient.getEncryptionKey({
+            accessControlConditions: newAccessControlConditions,
+            toDecrypt: LitJsSdk.uint8arrayToString(
+              encryptedSymmetricKey,
+              "base16"
+            ),
+            chain,
+            authSig,
+          });
+        }
+
+        const decryptedFiles = await LitJsSdk.decryptZip(
+          encryptedZip,
+          retrievedSymmKey
+        );
+        const decryptedString = await decryptedFiles["string.txt"].async(
+          "text"
+        );
+        console.log("decrypted string", decryptedString);
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Success.  Decrypted string is: ${decryptedString}`;
+      };
+
+      var EncryptDecryptWithAnUnauthorizedUpdate = async () => {
+        const testName = "EncryptDecryptWithAnUnauthorizedUpdate";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+        });
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain,
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "100000000000000000000000", // 100000 eth (or matic, really)
+            },
+          },
+        ];
+
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { accessControlConditions }
+        )}`;
+
+        const { encryptedZip, symmetricKey } =
+          await LitJsSdk.zipAndEncryptString("this is a secret message");
+
+        const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
+          accessControlConditions,
+          symmetricKey,
+          authSig,
+          chain,
+          permanant: 0,
+        });
+
+        console.log("encrypted symmetric key", encryptedSymmetricKey);
+
+        try {
+          console.log(
+            "trying to update the condition with an unauthorized address"
+          );
+          const newAccessControlConditions = [
+            {
+              contractAddress: "",
+              standardContractType: "",
+              chain,
+              method: "eth_getBalance",
+              parameters: [":userAddress", "latest"],
+              returnValueTest: {
+                comparator: ">=",
+                value: "10000000000000",
+              },
+            },
+          ];
+
+          let unauthorizedAuthSig = {
+            sig: "0x2229236873d413f301c1afb7650959dee9f9a984c7421c9a44e41009940a5e410925d03374ddaf51590c7899253f30d589f1d7fec694f15829c8157c24f999f81c",
+            derivedVia: "web3.eth.personal.sign",
+            signedMessage:
+              "I am creating an account to use Lit Protocol at 2022-01-27T02:07:14.289Z",
+            address: "0xb962537314b11c6bcd6d9ff63feb048a9e91e7ae",
+          };
+
+          const newEncryptedSymmetricKey =
+            await litNodeClient.saveEncryptionKey({
+              accessControlConditions: newAccessControlConditions,
+              encryptedSymmetricKey,
+              authSig: unauthorizedAuthSig,
+              chain,
+              permanant: 0,
+            });
+          console.log("updated the condition");
+        } catch (e) {
+          console.log("error getting symmetric key - this is expected", e);
+          if (e.errorCode === "storage_error") {
+            document.getElementById(
+              "status"
+            ).innerText = `${testName}: Success.  We were unable to update.`;
+          } else {
+            document.getElementById(
+              "status"
+            ).innerText = `${testName}: Failure.  When we tried to update with an unauthorized acct, we got an error that isn't a storage error`;
+          }
+          return;
+        }
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Failure.  We updated a condition we shouldn't been able to!  OMG FIX THIS`;
+      };
+
+      var EncryptDecryptPermanantCondition = async () => {
+        const testName = "EncryptDecryptWithAnUnauthorizedUpdate";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+        });
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain,
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "100000000000000000000000", // 100000 eth (or matic, really)
+            },
+          },
+        ];
+
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { accessControlConditions }
+        )}`;
+
+        const { encryptedZip, symmetricKey } =
+          await LitJsSdk.zipAndEncryptString("this is a secret message");
+
+        const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
+          accessControlConditions,
+          symmetricKey,
+          authSig,
+          chain,
+        });
+
+        console.log("encrypted symmetric key", encryptedSymmetricKey);
+
+        try {
+          console.log("trying to update the permanant condition");
+          const newAccessControlConditions = [
+            {
+              contractAddress: "",
+              standardContractType: "",
+              chain,
+              method: "eth_getBalance",
+              parameters: [":userAddress", "latest"],
+              returnValueTest: {
+                comparator: ">=",
+                value: "10000000000000",
+              },
+            },
+          ];
+
+          const newEncryptedSymmetricKey =
+            await litNodeClient.saveEncryptionKey({
+              accessControlConditions: newAccessControlConditions,
+              encryptedSymmetricKey,
+              authSig,
+              chain,
+            });
+          console.log("updated the condition");
+        } catch (e) {
+          console.log("error getting symmetric key - this is expected", e);
+          if (e.errorCode === "storage_error") {
+            document.getElementById(
+              "status"
+            ).innerText = `${testName}: Success.  We were unable to update.`;
+          } else {
+            document.getElementById(
+              "status"
+            ).innerText = `${testName}: Failure.  When we tried to update with an unauthorized acct, we got an error that isn't a storage error`;
+          }
+          return;
+        }
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Failure.  We updated a condition we shouldn't been able to!  OMG FIX THIS`;
+      };
+
       var EncryptDecryptAGroup = async () => {
         const testName = "EncryptDecryptAGroup";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -637,6 +933,295 @@
         ).innerText = `${testName}: Success.  Decrypted string is: ${decryptedString}`;
       };
 
+      var EthSignWithAnUpdate = async () => {
+        const testName = "EthSignWithAnUpdate";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+        });
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain,
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "100000000000000000000000", // 100000 eth (or matic, really)
+            },
+          },
+        ];
+
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { accessControlConditions }
+        )}`;
+
+        let resourceId = {
+          baseUrl: "my-dynamic-content-server.com",
+          path: randomPath(),
+          orgId: "",
+          role: "",
+          extraData: "",
+        };
+
+        await litNodeClient.saveSigningCondition({
+          accessControlConditions,
+          chain,
+          authSig,
+          resourceId,
+          permanant: 0,
+        });
+
+        // uncomment this to break the jwt, to test an invalid jwt
+        // jwt = jwt.replace(/.$/, "3");
+
+        const newAccessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain,
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+
+        let jwt;
+        try {
+          jwt = await litNodeClient.getSignedToken({
+            accessControlConditions,
+            chain,
+            authSig,
+            resourceId,
+            permanant: 0,
+          });
+          console.log("jwt", jwt);
+        } catch (e) {
+          console.log("error getting symmetric key - this is expected", e);
+          console.log("trying to update the condition");
+
+          const saved = await litNodeClient.saveSigningCondition({
+            accessControlConditions: newAccessControlConditions,
+            chain,
+            authSig,
+            resourceId,
+          });
+          console.log("updated the condition");
+        }
+
+        jwt = await litNodeClient.getSignedToken({
+          accessControlConditions: newAccessControlConditions,
+          chain,
+          authSig,
+          resourceId,
+        });
+
+        const { verified, header, payload } = LitJsSdk.verifyJwt({ jwt });
+        console.log("verified", verified);
+        console.log("header", header);
+        console.log("payload", payload);
+
+        if (jwt && verified) {
+          document.getElementById("status").innerText = `${testName}: Success`;
+        } else {
+          document.getElementById("status").innerText = `${testName}: Failure`;
+        }
+      };
+
+      var EthSignWithAnUnauthorizedUpdate = async () => {
+        const testName = "EthSignWithAnUnauthorizedUpdate";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+        });
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain,
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "100000000000000000000000", // 100000 eth (or matic, really)
+            },
+          },
+        ];
+
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { accessControlConditions }
+        )}`;
+
+        let resourceId = {
+          baseUrl: "my-dynamic-content-server.com",
+          path: randomPath(),
+          orgId: "",
+          role: "",
+          extraData: "",
+        };
+
+        await litNodeClient.saveSigningCondition({
+          accessControlConditions,
+          chain,
+          authSig,
+          resourceId,
+          permanant: 0,
+        });
+
+        // uncomment this to break the jwt, to test an invalid jwt
+        // jwt = jwt.replace(/.$/, "3");
+
+        const newAccessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain,
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+
+        let jwt;
+        try {
+          let unauthorizedAuthSig = {
+            sig: "0x2229236873d413f301c1afb7650959dee9f9a984c7421c9a44e41009940a5e410925d03374ddaf51590c7899253f30d589f1d7fec694f15829c8157c24f999f81c",
+            derivedVia: "web3.eth.personal.sign",
+            signedMessage:
+              "I am creating an account to use Lit Protocol at 2022-01-27T02:07:14.289Z",
+            address: "0xb962537314b11c6bcd6d9ff63feb048a9e91e7ae",
+          };
+
+          console.log("trying to update the condition");
+
+          const newEncryptedSymmetricKey =
+            await litNodeClient.saveSigningCondition({
+              accessControlConditions: newAccessControlConditions,
+              chain,
+              authSig: unauthorizedAuthSig,
+              resourceId,
+            });
+          console.log("updated the condition");
+        } catch (e) {
+          console.log("error updating the condition - this is expected", e);
+          if (e.errorCode === "storage_error") {
+            document.getElementById(
+              "status"
+            ).innerText = `${testName}: Success.  We were unable to update.`;
+          } else {
+            document.getElementById(
+              "status"
+            ).innerText = `${testName}: Failure.  When we tried to update with an unauthorized acct, we got an error that isn't a storage error`;
+          }
+          return;
+        }
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Failure.  We updated a condition we shouldn't been able to!  OMG FIX THIS`;
+      };
+
+      var EthSignPermanantCondition = async () => {
+        const testName = "EthSignPermanantCondition";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+        });
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain,
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "100000000000000000000000", // 100000 eth (or matic, really)
+            },
+          },
+        ];
+
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { accessControlConditions }
+        )}`;
+
+        let resourceId = {
+          baseUrl: "my-dynamic-content-server.com",
+          path: randomPath(),
+          orgId: "",
+          role: "",
+          extraData: "",
+        };
+
+        await litNodeClient.saveSigningCondition({
+          accessControlConditions,
+          chain,
+          authSig,
+          resourceId,
+          permanant: 1,
+        });
+
+        // uncomment this to break the jwt, to test an invalid jwt
+        // jwt = jwt.replace(/.$/, "3");
+
+        const newAccessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain,
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+
+        let jwt;
+        try {
+          console.log("trying to update the permanant condition");
+
+          const newEncryptedSymmetricKey =
+            await litNodeClient.saveSigningCondition({
+              accessControlConditions: newAccessControlConditions,
+              chain,
+              authSig,
+              resourceId,
+            });
+          console.log("updated the condition");
+        } catch (e) {
+          console.log("error updating the condition - this is expected", e);
+          if (e.errorCode === "storage_error") {
+            document.getElementById(
+              "status"
+            ).innerText = `${testName}: Success.  We were unable to update.`;
+          } else {
+            document.getElementById(
+              "status"
+            ).innerText = `${testName}: Failure.  When we tried to update with an unauthorized acct, we got an error that isn't a storage error`;
+          }
+          return;
+        }
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Failure.  We updated a condition we shouldn't been able to!  OMG FIX THIS`;
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -697,6 +1282,9 @@
     <button onclick="ETHOnArbitrum()">ETHOnArbitrum</button>
     <br />
     <br />
+    <button onclick="ETHOnEth()">ETHOnEth</button>
+    <br />
+    <br />
     <button onclick="ETHPlusERC721()">
       ETH + ERC721 (boolean group signing)
     </button>
@@ -713,11 +1301,46 @@
     <button onclick="EncryptDecrypt()">Encrypt then Decrypt</button>
     <br />
     <br />
+    <button onclick="EncryptDecryptWithAnUpdate()">
+      Encrypt, set the conditions, update the conditions, then Decrypt
+    </button>
+    <br />
+    <br />
+    <button onclick="EncryptDecryptWithAnUnauthorizedUpdate()">
+      Encrypt, set the conditions, then try to update the conditions with an
+      unauthorized account
+    </button>
+    <br />
+    <br />
+    <button onclick="EncryptDecryptPermanantCondition()">
+      Encrypt, set the conditions as permanant, then try to update the
+      conditions
+    </button>
+    <br />
+    <br />
     <button onclick="EncryptDecryptAGroup()">
       Encrypt then Decrypt a boolean group of conditions
     </button>
     <br />
     <br />
+    <button onclick="EthSignWithAnUpdate()">
+      JWT request - Set the conditions, update the conditions, then get JWT
+    </button>
+    <br />
+    <br />
+    <button onclick="EthSignWithAnUnauthorizedUpdate()">
+      JWT request - Set the conditions, then try to update the conditions with
+      an unauthorized account
+    </button>
+    <br />
+    <br />
+    <button onclick="EthSignPermanantCondition()">
+      JWT request - Set the conditions as permanant, then try to update the
+      conditions
+    </button>
+    <br />
+    <br />
+
     <button onclick="logout()">Logout</button>
     <br />
     <br />

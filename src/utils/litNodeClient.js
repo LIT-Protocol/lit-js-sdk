@@ -302,6 +302,7 @@ export default class LitNodeClient {
     chain,
     authSig,
     resourceId,
+    permanant = 1,
   }) {
     console.log("saveSigningCondition");
 
@@ -330,10 +331,21 @@ export default class LitNodeClient {
           val: hashOfConditionsStr,
           authSig,
           chain,
+          permanant,
         })
       );
     }
-    await Promise.all(nodePromises);
+
+    const responses = await Promise.all(nodePromises);
+    const errors = responses.filter((r) => r.error !== "");
+
+    if (errors.length >= this.connectedNodes.size - this.config.minNodeCount) {
+      throwError({
+        message: errors[0].error,
+        name: "StorageError",
+        errorCode: "storage_error",
+      });
+    }
 
     return true;
   }
@@ -434,10 +446,17 @@ export default class LitNodeClient {
     chain,
     authSig,
     symmetricKey,
+    encryptedSymmetricKey,
+    permanant = 1,
   }) {
     console.log("LitNodeClient.saveEncryptionKey");
-    if (!symmetricKey || symmetricKey == "") {
-      throw new Error("symmetricKey is blank");
+    if (
+      (!symmetricKey || symmetricKey == "") &&
+      (!encryptedSymmetricKey || encryptedSymmetricKey == "")
+    ) {
+      throw new Error(
+        "symmetricKey and encryptedSymmetricKey are blank.  You must pass one or the other"
+      );
     }
     if (!chain) {
       throw new Error("chain is blank");
@@ -450,14 +469,19 @@ export default class LitNodeClient {
     }
 
     // encrypt with network pubkey
-    const encryptedKey = wasmBlsSdkHelpers.encrypt(
-      uint8arrayFromString(this.subnetPubKey, "base16"),
-      symmetricKey
-    );
-    console.log(
-      "symmetric key encrypted with LIT network key: ",
-      uint8arrayToString(encryptedKey, "base16")
-    );
+    let encryptedKey;
+    if (encryptedSymmetricKey) {
+      encryptedKey = encryptedSymmetricKey;
+    } else {
+      encryptedKey = wasmBlsSdkHelpers.encrypt(
+        uint8arrayFromString(this.subnetPubKey, "base16"),
+        symmetricKey
+      );
+      console.log(
+        "symmetric key encrypted with LIT network key: ",
+        uint8arrayToString(encryptedKey, "base16")
+      );
+    }
     // hash the encrypted pubkey
     const hashOfKey = await crypto.subtle.digest("SHA-256", encryptedKey);
     const hashOfKeyStr = uint8arrayToString(
@@ -494,15 +518,32 @@ export default class LitNodeClient {
           val: hashOfConditionsStr,
           authSig,
           chain,
+          permanant,
         })
       );
     }
-    await Promise.all(nodePromises);
+    const responses = await Promise.all(nodePromises);
+    const errors = responses.filter((r) => r.error !== "");
+
+    if (errors.length >= this.connectedNodes.size - this.config.minNodeCount) {
+      throwError({
+        message: errors[0].error,
+        name: "StorageError",
+        errorCode: "storage_error",
+      });
+    }
 
     return encryptedKey;
   }
 
-  async storeSigningConditionWithNode({ url, key, val, authSig, chain }) {
+  async storeSigningConditionWithNode({
+    url,
+    key,
+    val,
+    authSig,
+    chain,
+    permanant,
+  }) {
     console.log("storeSigningConditionWithNode");
     const urlWithPath = `${url}/web/signing/store`;
     const data = {
@@ -510,11 +551,19 @@ export default class LitNodeClient {
       val,
       authSig,
       chain,
+      permanant,
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
-  async storeEncryptionConditionWithNode({ url, key, val, authSig, chain }) {
+  async storeEncryptionConditionWithNode({
+    url,
+    key,
+    val,
+    authSig,
+    chain,
+    permanant,
+  }) {
     console.log("storeEncryptionConditionWithNode");
     const urlWithPath = `${url}/web/encryption/store`;
     const data = {
@@ -522,6 +571,7 @@ export default class LitNodeClient {
       val,
       authSig,
       chain,
+      permanant,
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
