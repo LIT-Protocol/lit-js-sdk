@@ -599,7 +599,7 @@
           symmetricKey,
           authSig,
           chain,
-          permanant: 0,
+          permanant: false,
         });
 
         console.log("encrypted symmetric key", encryptedSymmetricKey);
@@ -638,7 +638,7 @@
               encryptedSymmetricKey,
               authSig,
               chain,
-              permanant: 0,
+              permanant: false,
             });
           console.log("updated the condition");
 
@@ -701,7 +701,7 @@
           symmetricKey,
           authSig,
           chain,
-          permanant: 0,
+          permanant: false,
         });
 
         console.log("encrypted symmetric key", encryptedSymmetricKey);
@@ -738,7 +738,7 @@
               encryptedSymmetricKey,
               authSig: unauthorizedAuthSig,
               chain,
-              permanant: 0,
+              permanant: false,
             });
           console.log("updated the condition");
         } catch (e) {
@@ -761,7 +761,7 @@
       };
 
       var EncryptDecryptPermanantCondition = async () => {
-        const testName = "EncryptDecryptWithAnUnauthorizedUpdate";
+        const testName = "EncryptDecryptPermanantCondition";
         document.getElementById("status").innerText = `Testing ${testName}...`;
         const authSig = await LitJsSdk.checkAndSignAuthMessage({
           chain,
@@ -794,6 +794,7 @@
           symmetricKey,
           authSig,
           chain,
+          permanant: true,
         });
 
         console.log("encrypted symmetric key", encryptedSymmetricKey);
@@ -972,7 +973,7 @@
           chain,
           authSig,
           resourceId,
-          permanant: 0,
+          permanant: false,
         });
 
         // uncomment this to break the jwt, to test an invalid jwt
@@ -999,7 +1000,7 @@
             chain,
             authSig,
             resourceId,
-            permanant: 0,
+            permanant: false,
           });
           console.log("jwt", jwt);
         } catch (e) {
@@ -1073,7 +1074,7 @@
           chain,
           authSig,
           resourceId,
-          permanant: 0,
+          permanant: false,
         });
 
         // uncomment this to break the jwt, to test an invalid jwt
@@ -1171,7 +1172,7 @@
           chain,
           authSig,
           resourceId,
-          permanant: 1,
+          permanant: true,
         });
 
         // uncomment this to break the jwt, to test an invalid jwt

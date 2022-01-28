@@ -302,7 +302,7 @@ export default class LitNodeClient {
     chain,
     authSig,
     resourceId,
-    permanant = 1,
+    permanant = true,
   }) {
     console.log("saveSigningCondition");
 
@@ -331,7 +331,7 @@ export default class LitNodeClient {
           val: hashOfConditionsStr,
           authSig,
           chain,
-          permanant,
+          permanant: permanant ? 1 : 0,
         })
       );
     }
@@ -448,7 +448,7 @@ export default class LitNodeClient {
     authSig,
     symmetricKey,
     encryptedSymmetricKey,
-    permanant = 1,
+    permanant = true,
   }) {
     console.log("LitNodeClient.saveEncryptionKey");
     if (
@@ -519,7 +519,7 @@ export default class LitNodeClient {
           val: hashOfConditionsStr,
           authSig,
           chain,
-          permanant,
+          permanant: permanant ? 1 : 0,
         })
       );
     }

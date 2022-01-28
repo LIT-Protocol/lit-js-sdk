@@ -19,7 +19,7 @@ export const LIT_CHAINS = {
     symbol: "ETH",
     decimals: 18,
     type: "ERC1155",
-    rpcUrls: ["https://mainnet.infura.io/v3/cd614bfa5c2f4703b7ab0ec0547d9f81"],
+    rpcUrls: ["https://api.mycryptoapi.com/eth"],
     blockExplorerUrls: ["https://etherscan.io"],
   },
   polygon: {
