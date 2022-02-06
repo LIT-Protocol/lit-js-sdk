@@ -1,6 +1,6 @@
 import uint8arrayFromString from "uint8arrays/from-string";
 import uint8arrayToString from "uint8arrays/to-string";
-import naclUtil from "tweetnacl-util";
+//import naclUtil from "tweetnacl-util";
 
 import { mostCommonString, throwError } from "../lib/utils";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
@@ -537,6 +537,49 @@ export default class LitNodeClient {
     return encryptedKey;
   }
 
+
+  /**
+   * Signs a message with Lit threshold ECDSA algorithms. 
+   * @param {Object} params
+   * @param {string} params.message The message to be signed - note this message is not currently converted to a digest!!!!!
+   * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+   * @returns {Object}.  JSON structure with signed message, signature & public key.
+   */
+  async signWithEcdsa({
+    message,
+    chain,
+  }) {
+    // ask each node to decrypt the content
+    const nodePromises = [];
+    for (const url of this.connectedNodes) {
+      nodePromises.push(
+        this.signECDSA({       
+          url,   
+          message,
+          chain,
+          iat : 0,
+          exp: 0
+        })
+      );
+    }
+
+    try
+    {  /// currently doing threshold signing p - (t+1) parties will throw an error - deal with this!
+      const signed_ecdsa_messages = await Promise.all(nodePromises);
+    }
+    catch (e)
+    {
+      console.log("Error - signed_ecdsa_messages ");
+
+        const signed_ecdsa_message = nodePromises[0];
+        return signed_ecdsa_message;
+
+    }   
+    return throwError("some other error?");
+
+  }
+
+
   async storeSigningConditionWithNode({
     url,
     key,
@@ -653,6 +696,26 @@ export default class LitNodeClient {
         return data;
       });
   }
+
+
+  async signECDSA({
+    url,
+    message,
+    chain,
+    iat,
+    exp,
+  }) {
+    console.log("sign_message_ecdsa");
+    const urlWithPath = `${url}/web/signing/sign_message_ecdsa`;
+    const data = {    
+      message,
+      chain,
+      iat,
+      exp,
+    };
+    return await this.sendCommandToNode({ url: urlWithPath, data });
+  }
+
 
   /**
    * Connect to the LIT nodes.

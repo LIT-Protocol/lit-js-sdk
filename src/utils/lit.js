@@ -118,7 +118,7 @@ export async function decryptZip(encryptedZipBlob, symmKey) {
   );
 
   // unpack the zip
-  const zip = new JSZip();
+  const zip = new JSZip();ƒ
   const unzipped = await zip.loadAsync(decryptedZipArrayBuffer);
 
   // load the files into data urls with the metadata attached

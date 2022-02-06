@@ -13,7 +13,33 @@
       type="application/javascript"
     ></script>
     <script>
-      var chain = "polygon";
+    
+      var chain = "truffle";
+
+      function SetLocalData  ()
+      {
+
+        var localData = 
+       {
+           "minNodeCount": 6,
+            "bootstrapUrls": [
+              "http://localhost:7470",
+              "http://localhost:7471",
+              "http://localhost:7472",
+              "http://localhost:7473",
+              "http://localhost:7474",
+              "http://localhost:7475",
+              "http://localhost:7476",
+              "http://localhost:7477",
+              "http://localhost:7478",
+              "http://localhost:7479"
+            ]
+        }; 
+
+        window.localStorage.setItem("LitNodeClientConfig",JSON.stringify(localData));
+
+
+      }
 
       //var authSig = JSON.parse("{\"sig\":\"0x18a173d68d2f78cc5c13da0dfe36eec2a293285bee6d42547b9577bf26cdc985660ed3dddc4e75d422366cac07e8a9fc77669b10373bef9c7b8e4280252dfddf1b\",\"derivedVia\":\"web3.eth.personal.sign\",\"signedMessage\":\"I am creating an account to use LITs at 2021-08-04T20:14:04.918Z\",\"address\":\"0xdbd360f30097fb6d938dcc8b7b62854b36160b45\"}")
 
@@ -76,7 +102,7 @@
       var ERC1155 = async () => {
         var accessControlConditions = [
           {
-            contractAddress: "0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88",
+            contractAddress: "0xe4eF3a0b63bC2c4cba5bc2D45F06a2c69BA9fbB0",
             standardContractType: "ERC1155",
             chain,
             method: "balanceOf",
@@ -416,7 +442,7 @@
         const callRequests = [{ to: addr, data: callData }];
         console.log("callRequests", callRequests);
 
-        const chain = "ethereum";
+        const chain = "ethereum";ƒ
 
         const jwt = await litNodeClient.getSignedChainDataToken({
           callRequests,
@@ -1222,6 +1248,42 @@
         ).innerText = `${testName}: Failure.  We updated a condition we shouldn't been able to!  OMG FIX THIS`;
       };
 
+
+      ///  ECDSA Test function
+      var EcdsaSignMessage = async () => {
+        const testName = "EcdsaSignMessage";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        
+        try {
+          console.log("start signing message with ECDSA");
+
+          const nodeResponse = await litNodeClient.signWithEcdsa({
+            message: "LitProtocol rocks!", 
+            chain,
+          });
+
+          /// update the error handling
+          console.log("signed message with ECDSA");
+                
+          const vals = JSON.stringify(nodeResponse);
+
+          document.getElementById(
+            "status"
+          ).innerText = `${testName}: Success. Response:  ${vals}`;
+        
+        } catch (e) {
+          console.log("error signing with ECDSA", e);
+           document.getElementById(
+              "status"
+            ).innerText = `${testName}: Failure.  `;
+          return;
+        }
+
+
+      };
+ 
+
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -1245,7 +1307,7 @@
     </script>
   </head>
 
-  <body>
+  <body onload="SetLocalData(); ">
     <h1>Manual tests</h1>
     <br />
     <br />
@@ -1337,6 +1399,11 @@
     <button onclick="EthSignPermanantCondition()">
       JWT request - Set the conditions as permanant, then try to update the
       conditions
+    </button>
+    <br />
+    <br />
+    <button onclick="EcdsaSignMessage()">
+       Test signing the message "LitProtocol Rocks!"
     </button>
     <br />
     <br />

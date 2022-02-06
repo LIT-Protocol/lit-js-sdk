@@ -33,7 +33,7 @@
     "esbuild": "^0.12.1",
     "esbuild-node-builtins": "^0.1.0",
     "genversion": "^3.0.1",
-    "microbundle": "^0.13.0",
+    "microbundle": "^0.13.3",
     "parcel": "1.12.3",
     "semver-bump": "^1.0.0",
     "standard": "^16.0.3"
@@ -56,7 +56,9 @@
     "jszip": "^3.6.0",
     "lit-web3modal": "^1.9.5",
     "node-fetch-polyfill": "^2.0.6",
+    "nodemon": "^2.0.15",
     "pako": "^2.0.4",
+    "serve": "^13.0.2",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
     "uint8arrays": "^2.1.5",

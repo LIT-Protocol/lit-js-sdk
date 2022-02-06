@@ -134,7 +134,17 @@ export const LIT_CHAINS = {
     blockExplorerUrls: ["https://rinkeby.etherscan.io"],
     type: "ERC1155",
   },
-};
+  truffle: {
+    contractAddress: "0xc216950e5deae248160109f562e1c9bf8e0ca25b",
+    chainId: 1337,
+    name: "Truffle",
+    symbol: "ETH",
+    decimals: 18,
+    rpcUrls: ["HTTP://127.0.0.1:7545"],
+    blockExplorerUrls: ["https://rinkeby.etherscan.io"],
+    type: "ERC1155",
+  },
+}; 
 
 export const NETWORK_PUB_KEY =
   "9971e835a1fe1a4d78e381eebbe0ddc84fde5119169db816900de796d10187f3c53d65c1202ac083d099a517f34a9b62";
