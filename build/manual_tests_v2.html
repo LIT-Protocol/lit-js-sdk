@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+    <title>Manual Tests V2</title>
+
+    <script
+      onload="LitJsSdk.litJsSdkLoadedInALIT()"
+      src="/index.web.js"
+    ></script>
+    <script
+      src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+      type="application/javascript"
+    ></script>
+    <script>
+      var chain = "polygon";
+
+      //var authSig = JSON.parse("{\"sig\":\"0x18a173d68d2f78cc5c13da0dfe36eec2a293285bee6d42547b9577bf26cdc985660ed3dddc4e75d422366cac07e8a9fc77669b10373bef9c7b8e4280252dfddf1b\",\"derivedVia\":\"web3.eth.personal.sign\",\"signedMessage\":\"I am creating an account to use LITs at 2021-08-04T20:14:04.918Z\",\"address\":\"0xdbd360f30097fb6d938dcc8b7b62854b36160b45\"}")
+
+      var randomPath = () =>
+        "/" +
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15);
+      var testProvisoningAndSigning = async ({
+        accessControlConditionsV2,
+        testName,
+      }) => {
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        // document.getElementById(
+        //   "humanized"
+        // ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+        //   { accessControlConditionsV2 }
+        // )}`;
+
+        var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
+
+        let resourceId = {
+          baseUrl: "my-dynamic-content-server.com",
+          path: randomPath(),
+          orgId: "",
+          role: "",
+          extraData: "",
+        };
+
+        await litNodeClient.saveSigningCondition({
+          accessControlConditionsV2,
+          chain,
+          authSig,
+          resourceId,
+        });
+
+        let jwt = await litNodeClient.getSignedToken({
+          accessControlConditionsV2,
+          chain,
+          authSig,
+          resourceId,
+        });
+        console.log("jwt", jwt);
+
+        // uncomment this to break the jwt, to test an invalid jwt
+        // jwt = jwt.replace(/.$/, "3");
+
+        const { verified, header, payload } = LitJsSdk.verifyJwt({ jwt });
+        console.log("verified", verified);
+        console.log("header", header);
+        console.log("payload", payload);
+
+        if (jwt && verified) {
+          document.getElementById("status").innerText = `${testName}: Success`;
+        } else {
+          document.getElementById("status").innerText = `${testName}: Failure`;
+        }
+      };
+
+      // Actual tests are below here
+      var MolochDAOShares = async () => {
+        var accessControlConditionsV2 = [
+          {
+            contractAddress: "0xb71a679cfff330591d556c4b9f21c7739ca9590c",
+            standardContractType: "MolochDAOv2.1",
+            chain: "xdai",
+            method: "members",
+            parameters: [":userAddress"],
+            returnValueTest: {
+              key: "shares",
+              comparator: ">=",
+              value: "1",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditionsV2,
+          testName: "MolochDAOShares",
+        });
+      };
+
+      var logout = async () => {
+        const testName = "Logout";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+
+        LitJsSdk.disconnectWeb3();
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Success - Logged out`;
+      };
+
+      document.addEventListener(
+        "lit-ready",
+        function (e) {
+          console.log("LIT network is ready");
+          document.getElementById("networkStatus").innerText =
+            "Success!  Connected to Lit Protocol Network";
+        },
+        false
+      );
+    </script>
+  </head>
+
+  <body>
+    <h1>Manual tests</h1>
+    <br />
+    <br />
+    <div id="networkStatus">Connecting to Lit Protocol Network...</div>
+    <br />
+    <br />
+    <button onclick="MolochDAOShares()">MolochDAOShares</button>
+    <br />
+    <br />
+
+    <button onclick="logout()">Logout</button>
+    <br />
+    <br />
+    <h2 id="status"></h2>
+    <br />
+    <p id="humanized"></p>
+  </body>
+</html>

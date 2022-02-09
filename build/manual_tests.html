@@ -72,28 +72,6 @@
         }
       };
 
-      // Actual tests are below here
-      var MolochDAOShares = async () => {
-        var accessControlConditions = [
-          {
-            contractAddress: "0xb71a679cfff330591d556c4b9f21c7739ca9590c",
-            standardContractType: "MolochDAOv2.1",
-            chain: "xdai",
-            method: "members",
-            parameters: [":userAddress"],
-            returnValueTest: {
-              key: "shares",
-              comparator: ">=",
-              value: "1",
-            },
-          },
-        ];
-        await testProvisoningAndSigning({
-          accessControlConditions,
-          testName: "MolochDAOShares",
-        });
-      };
-
       var ERC1155 = async () => {
         var accessControlConditions = [
           {
@@ -1296,9 +1274,6 @@
     <br />
     <br />
     <button onclick="ProofOfHumanity()">Proof of humanity</button>
-    <br />
-    <br />
-    <button onclick="MolochDAOShares()">MolochDAOShares</button>
     <br />
     <br />
     <button onclick="ETH()">ETH</button>

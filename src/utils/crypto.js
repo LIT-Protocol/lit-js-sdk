@@ -28,6 +28,57 @@ export function hashResourceId(resourceId) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
+export function canonicalAccessControlConditionFormatterV2(cond) {
+  // need to return in the exact format below:
+  /*
+  pub struct JsonAccessControlCondition {
+    pub contract_address: String,
+    pub chain: String,
+    pub standard_contract_type: String,
+    pub method: String,
+    pub parameters: Vec<String>,
+    pub return_value_test: JsonReturnValueTest,
+  }
+  */
+
+  if (Array.isArray(cond)) {
+    return cond.map((c) => canonicalAccessControlConditionFormatterV2(c));
+  }
+
+  if ("operator" in cond) {
+    return {
+      operator: cond.operator,
+    };
+  }
+
+  if ("returnValueTest" in cond) {
+    return {
+      callRequest: cond.callRequest,
+      chain: cond.chain,
+      standardContractType: cond.standardContractType,
+      method: cond.method,
+      parameters: cond.parameters,
+      returnValueTest: cond.returnValueTest,
+    };
+  }
+
+  throwError({
+    message: `You passed an invalid access control condition: ${cond}`,
+    name: "InvalidAccessControlCondition",
+    errorCode: "invalid_access_control_condition",
+  });
+}
+
+export function hashAccessControlConditionsV2(accessControlConditions) {
+  const conds = accessControlConditions.map((c) =>
+    canonicalAccessControlConditionFormatterV2(c)
+  );
+  const toHash = JSON.stringify(conds);
+  const encoder = new TextEncoder();
+  const data = encoder.encode(toHash);
+  return crypto.subtle.digest("SHA-256", data);
+}
+
 export function canonicalAccessControlConditionFormatter(cond) {
   // need to return in the exact format below:
   /*

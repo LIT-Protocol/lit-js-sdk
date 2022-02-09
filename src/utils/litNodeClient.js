@@ -191,6 +191,7 @@ export default class LitNodeClient {
    */
   async getSignedToken({
     accessControlConditions,
+    accessControlConditionsV2,
     chain,
     authSig,
     resourceId,
@@ -202,9 +203,26 @@ export default class LitNodeClient {
     const iat = Math.floor(now / 1000);
     const exp = iat + 12 * 60 * 60; // 12 hours in seconds
 
-    const formattedAccessControlConditions = accessControlConditions.map((c) =>
-      canonicalAccessControlConditionFormatter(c)
-    );
+    let formattedAccessControlConditions;
+    let apiVersion;
+    if (accessControlConditions) {
+      formattedAccessControlConditions = accessControlConditions.map((c) =>
+        canonicalAccessControlConditionFormatter(c)
+      );
+      apiVersion = 1;
+    } else if (accessControlConditionsV2) {
+      formattedAccessControlConditions = accessControlConditions.map((c) =>
+        canonicalAccessControlConditionFormatterV2(c)
+      );
+      apiVersion = 2;
+    } else {
+      throwError({
+        message: `You must provide either accessControlConditions or accessControlConditionsV2`,
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
+    }
+
     const formattedResourceId = canonicalResourceIdFormatter(resourceId);
 
     // ask each node to sign the content
@@ -219,6 +237,7 @@ export default class LitNodeClient {
           chain,
           iat,
           exp,
+          apiVersion,
         })
       );
     }
@@ -300,6 +319,7 @@ export default class LitNodeClient {
    */
   async saveSigningCondition({
     accessControlConditions,
+    accessControlConditionsV2,
     chain,
     authSig,
     resourceId,
@@ -314,10 +334,24 @@ export default class LitNodeClient {
       "base16"
     );
 
+    let hashOfConditions;
     // hash the access control conditions
-    const hashOfConditions = await hashAccessControlConditions(
-      accessControlConditions
-    );
+    if (accessControlConditions) {
+      hashOfConditions = await hashAccessControlConditions(
+        accessControlConditions
+      );
+    } else if (accessControlConditionsV2) {
+      hashOfConditions = await hashAccessControlConditionsV2(
+        accessControlConditionsV2
+      );
+    } else {
+      throwError({
+        message: `You must provide either accessControlConditions or accessControlConditionsV2`,
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
+    }
+
     const hashOfConditionsStr = uint8arrayToString(
       new Uint8Array(hashOfConditions),
       "base16"
@@ -599,9 +633,13 @@ export default class LitNodeClient {
     chain,
     iat,
     exp,
+    apiVersion,
   }) {
     console.log("getSigningShare");
-    const urlWithPath = `${url}/web/signing/retrieve`;
+    let urlWithPath = `${url}/web/signing/retrieve`;
+    if (apiVersion === 2) {
+      urlWithPath = `${url}/v2/web/signing/retrieve`;
+    }
     const data = {
       accessControlConditions,
       resourceId,
