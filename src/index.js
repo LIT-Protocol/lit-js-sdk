@@ -54,7 +54,9 @@ import {
   decryptWithPrivKey,
   encryptWithPubKey,
   canonicalAccessControlConditionFormatter,
+  canonicalAccessControlConditionFormatterV2,
   hashAccessControlConditions,
+  hashAccessControlConditionsV2,
 } from "./utils/crypto";
 
 import {
@@ -104,9 +106,11 @@ const functions = {
   injectViewerIFrame,
   printError,
   canonicalAccessControlConditionFormatter,
+  canonicalAccessControlConditionFormatterV2,
   verifyJwt,
   encryptFileAndZipWithMetadata,
   hashAccessControlConditions,
+  hashAccessControlConditionsV2,
   decryptZipFileWithMetadata,
   downloadFile,
   decimalPlaces,

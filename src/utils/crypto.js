@@ -52,12 +52,38 @@ export function canonicalAccessControlConditionFormatterV2(cond) {
   }
 
   if ("returnValueTest" in cond) {
+    /* abi needs to match:
+      pub name: String,
+    /// Function input.
+    pub inputs: Vec<Param>,
+    /// Function output.
+    pub outputs: Vec<Param>,
+    #[deprecated(note = "The constant attribute was removed in Solidity 0.5.0 and has been \
+          replaced with stateMutability. If parsing a JSON AST created with \
+          this version or later this value will always be false, which may be wrong.")]
+    /// Constant function.
+    #[cfg_attr(feature = "full-serde", serde(default))]
+    pub constant: bool,
+    /// Whether the function reads or modifies blockchain state
+    #[cfg_attr(feature = "full-serde", serde(rename = "stateMutability", default))]
+    pub state_mutability: StateMutability,
+    */
+
+    const { functionAbi } = cond;
+
+    const canonicalAbi = {
+      name: functionAbi.name,
+      inputs: functionAbi.inputs,
+      outputs: functionAbi.outputs,
+      constant: functionAbi.constant,
+      stateMutability: functionAbi.stateMutability,
+    };
     return {
-      callRequest: cond.callRequest,
+      contractAddress: cond.contractAddress,
+      functionName: cond.functionName,
+      functionParams: cond.functionParams,
+      functionAbi: canonicalAbi,
       chain: cond.chain,
-      standardContractType: cond.standardContractType,
-      method: cond.method,
-      parameters: cond.parameters,
       returnValueTest: cond.returnValueTest,
     };
   }

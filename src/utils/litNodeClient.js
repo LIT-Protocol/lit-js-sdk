@@ -6,8 +6,10 @@ import { mostCommonString, throwError } from "../lib/utils";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import {
   hashAccessControlConditions,
+  hashAccessControlConditionsV2,
   hashResourceId,
   canonicalAccessControlConditionFormatter,
+  canonicalAccessControlConditionFormatterV2,
   canonicalResourceIdFormatter,
 } from "./crypto";
 
@@ -211,7 +213,7 @@ export default class LitNodeClient {
       );
       apiVersion = 1;
     } else if (accessControlConditionsV2) {
-      formattedAccessControlConditions = accessControlConditions.map((c) =>
+      formattedAccessControlConditions = accessControlConditionsV2.map((c) =>
         canonicalAccessControlConditionFormatterV2(c)
       );
       apiVersion = 2;
