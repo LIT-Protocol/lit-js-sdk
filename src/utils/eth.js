@@ -589,6 +589,7 @@ export async function sendLIT({ tokenMetadata, to }) {
  * Get the number of decimal places in a token
  * @param {Object} params
  * @param {string} params.contractAddress The token contract address
+ * @param {string} params.chain The chain on which the token is deployed
  * @returns {number} The number of decimal places in the token
  */
 export async function decimalPlaces({ contractAddress, chain }) {
