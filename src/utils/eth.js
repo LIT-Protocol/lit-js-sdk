@@ -591,7 +591,10 @@ export async function sendLIT({ tokenMetadata, to }) {
  * @param {string} params.contractAddress The token contract address
  * @returns {number} The number of decimal places in the token
  */
-export async function decimalPlaces({ contractAddress }) {
+export async function decimalPlaces({ contractAddress, chain }) {
+  if (chain) {
+    await checkAndSignAuthMessage({ chain }); // this will switch them to the correct chain
+  }
   const { web3, account } = await connectWeb3();
   const contract = new Contract(contractAddress, ERC20, web3);
   return await contract.decimals();
@@ -605,8 +608,8 @@ export async function decimalPlaces({ contractAddress }) {
  * @returns {string} The resolved eth address
  */
 export async function lookupNameServiceAddress({ chain, name }) {
-  const { web3, account } = await connectWeb3();
   await checkAndSignAuthMessage({ chain }); // this will switch them to the correct chain
+  const { web3, account } = await connectWeb3();
 
   const parts = name.split(".");
   const tld = parts[parts.length - 1].toLowerCase();
