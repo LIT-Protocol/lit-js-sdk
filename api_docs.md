@@ -553,6 +553,7 @@ Get the number of decimal places in a token
 *   `params` **[Object][86]** 
 
     *   `params.contractAddress` **[string][87]** The token contract address
+    *   `params.chain` **[string][87]** The chain on which the token is deployed
 
 Returns **[number][88]** The number of decimal places in the token
 
