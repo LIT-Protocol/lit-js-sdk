@@ -28,7 +28,7 @@ export function hashResourceId(resourceId) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
-export function canonicalAccessControlConditionFormatterV2(cond) {
+export function canonicalEVMContractConditionFormatter(cond) {
   // need to return in the exact format below:
   /*
   pub struct JsonAccessControlCondition {
@@ -42,7 +42,7 @@ export function canonicalAccessControlConditionFormatterV2(cond) {
   */
 
   if (Array.isArray(cond)) {
-    return cond.map((c) => canonicalAccessControlConditionFormatterV2(c));
+    return cond.map((c) => canonicalEVMContractConditionFormatter(c));
   }
 
   if ("operator" in cond) {
@@ -95,9 +95,9 @@ export function canonicalAccessControlConditionFormatterV2(cond) {
   });
 }
 
-export function hashAccessControlConditionsV2(accessControlConditions) {
+export function hashEVMContractConditions(accessControlConditions) {
   const conds = accessControlConditions.map((c) =>
-    canonicalAccessControlConditionFormatterV2(c)
+    canonicalEVMContractConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
   const encoder = new TextEncoder();

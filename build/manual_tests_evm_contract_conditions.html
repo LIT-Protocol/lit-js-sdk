@@ -22,14 +22,14 @@
         Math.random().toString(36).substring(2, 15) +
         Math.random().toString(36).substring(2, 15);
       var testProvisoningAndSigning = async ({
-        accessControlConditionsV2,
+        evmContractConditions,
         testName,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
         // document.getElementById(
         //   "humanized"
         // ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
-        //   { accessControlConditionsV2 }
+        //   { evmContractConditions }
         // )}`;
 
         var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
@@ -43,14 +43,14 @@
         };
 
         await litNodeClient.saveSigningCondition({
-          accessControlConditionsV2,
+          evmContractConditions,
           chain,
           authSig,
           resourceId,
         });
 
         let jwt = await litNodeClient.getSignedToken({
-          accessControlConditionsV2,
+          evmContractConditions,
           chain,
           authSig,
           resourceId,
@@ -72,23 +72,60 @@
         }
       };
 
+      var testProvisoningEncryptingAndDecrypting = async ({
+        evmContractConditions,
+        testName,
+      }) => {
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+        });
+
+        // document.getElementById(
+        //   "humanized"
+        // ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+        //   { accessControlConditions }
+        // )}`;
+
+        const { encryptedZip, symmetricKey } =
+          await LitJsSdk.zipAndEncryptString("this is a secret message");
+
+        const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
+          evmContractConditions,
+          symmetricKey,
+          authSig,
+          chain,
+        });
+
+        console.log("encrypted symmetric key", encryptedSymmetricKey);
+
+        const retrievedSymmKey = await litNodeClient.getEncryptionKey({
+          evmContractConditions,
+          toDecrypt: LitJsSdk.uint8arrayToString(
+            encryptedSymmetricKey,
+            "base16"
+          ),
+          chain,
+          authSig,
+        });
+
+        const decryptedFiles = await LitJsSdk.decryptZip(
+          encryptedZip,
+          retrievedSymmKey
+        );
+        const decryptedString = await decryptedFiles["string.txt"].async(
+          "text"
+        );
+        console.log("decrypted string", decryptedString);
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Success.  Decrypted string is: ${decryptedString}`;
+      };
+
       // Actual tests are below here
-      var MolochDAOShares = async () => {
-        // var accessControlConditionsV2 = [
-        //   {
-        //     contractAddress: "0xb71a679cfff330591d556c4b9f21c7739ca9590c",
-        //     standardContractType: "MolochDAOv2.1",
-        //     chain: "xdai",
-        //     method: "members",
-        //     parameters: [":userAddress"],
-        //     returnValueTest: {
-        //       key: "shares",
-        //       comparator: ">=",
-        //       value: "1",
-        //     },
-        //   },
-        // ];
-        var accessControlConditionsV2 = [
+      var MolochDAOSharesSigning = async () => {
+        var evmContractConditions = [
           {
             contractAddress: "0xb71a679cfff330591d556c4b9f21c7739ca9590c",
             functionName: "members",
@@ -141,8 +178,67 @@
           },
         ];
         await testProvisoningAndSigning({
-          accessControlConditionsV2,
-          testName: "MolochDAOShares",
+          evmContractConditions,
+          testName: "MolochDAOSharesSigning",
+        });
+      };
+
+      var MolochDAOSharesEncryptDecrypt = async () => {
+        var evmContractConditions = [
+          {
+            contractAddress: "0xb71a679cfff330591d556c4b9f21c7739ca9590c",
+            functionName: "members",
+            functionParams: [":userAddress"],
+            functionAbi: {
+              constant: true,
+              inputs: [
+                {
+                  name: "",
+                  type: "address",
+                },
+              ],
+              name: "members",
+              outputs: [
+                {
+                  name: "delegateKey",
+                  type: "address",
+                },
+                {
+                  name: "shares",
+                  type: "uint256",
+                },
+                {
+                  name: "loot",
+                  type: "uint256",
+                },
+                {
+                  name: "exists",
+                  type: "bool",
+                },
+                {
+                  name: "highestIndexYesVote",
+                  type: "uint256",
+                },
+                {
+                  name: "jailed",
+                  type: "uint256",
+                },
+              ],
+              payable: false,
+              stateMutability: "view",
+              type: "function",
+            },
+            chain: "xdai",
+            returnValueTest: {
+              key: "shares",
+              comparator: ">=",
+              value: "1",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          evmContractConditions,
+          testName: "MolochDAOSharesEncryptDecrypt",
         });
       };
 
@@ -176,7 +272,12 @@
     <div id="networkStatus">Connecting to Lit Protocol Network...</div>
     <br />
     <br />
-    <button onclick="MolochDAOShares()">MolochDAOShares</button>
+    <button onclick="MolochDAOSharesSigning()">MolochDAOSharesSigning</button>
+    <br />
+    <br />
+    <button onclick="MolochDAOSharesEncryptDecrypt()">
+      MolochDAOSharesEncryptDecrypt
+    </button>
     <br />
     <br />
 

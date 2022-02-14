@@ -6,10 +6,10 @@ import { mostCommonString, throwError } from "../lib/utils";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import {
   hashAccessControlConditions,
-  hashAccessControlConditionsV2,
+  hashEVMContractConditions,
   hashResourceId,
   canonicalAccessControlConditionFormatter,
-  canonicalAccessControlConditionFormatterV2,
+  canonicalEVMContractConditionFormatter,
   canonicalResourceIdFormatter,
 } from "./crypto";
 
@@ -193,7 +193,7 @@ export default class LitNodeClient {
    */
   async getSignedToken({
     accessControlConditions,
-    accessControlConditionsV2,
+    evmContractConditions,
     chain,
     authSig,
     resourceId,
@@ -206,20 +206,18 @@ export default class LitNodeClient {
     const exp = iat + 12 * 60 * 60; // 12 hours in seconds
 
     let formattedAccessControlConditions;
-    let apiVersion;
+    let formattedEVMContractConditions;
     if (accessControlConditions) {
       formattedAccessControlConditions = accessControlConditions.map((c) =>
         canonicalAccessControlConditionFormatter(c)
       );
-      apiVersion = 1;
-    } else if (accessControlConditionsV2) {
-      formattedAccessControlConditions = accessControlConditionsV2.map((c) =>
-        canonicalAccessControlConditionFormatterV2(c)
+    } else if (evmContractConditions) {
+      formattedEVMContractConditions = evmContractConditions.map((c) =>
+        canonicalEVMContractConditionFormatter(c)
       );
-      apiVersion = 2;
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or accessControlConditionsV2`,
+        message: `You must provide either accessControlConditions or evmContractConditions`,
         name: "InvalidArgumentException",
         errorCode: "invalid_argument",
       });
@@ -234,12 +232,12 @@ export default class LitNodeClient {
         this.getSigningShare({
           url,
           accessControlConditions: formattedAccessControlConditions,
+          evmContractConditions: formattedEVMContractConditions,
           resourceId: formattedResourceId,
           authSig,
           chain,
           iat,
           exp,
-          apiVersion,
         })
       );
     }
@@ -321,7 +319,7 @@ export default class LitNodeClient {
    */
   async saveSigningCondition({
     accessControlConditions,
-    accessControlConditionsV2,
+    evmContractConditions,
     chain,
     authSig,
     resourceId,
@@ -342,13 +340,11 @@ export default class LitNodeClient {
       hashOfConditions = await hashAccessControlConditions(
         accessControlConditions
       );
-    } else if (accessControlConditionsV2) {
-      hashOfConditions = await hashAccessControlConditionsV2(
-        accessControlConditionsV2
-      );
+    } else if (evmContractConditions) {
+      hashOfConditions = await hashEVMContractConditions(evmContractConditions);
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or accessControlConditionsV2`,
+        message: `You must provide either accessControlConditions or EVMContractConditions`,
         name: "InvalidArgumentException",
         errorCode: "invalid_argument",
       });
@@ -398,6 +394,7 @@ export default class LitNodeClient {
    */
   async getEncryptionKey({
     accessControlConditions,
+    evmContractConditions,
     toDecrypt,
     chain,
     authSig,
@@ -409,6 +406,7 @@ export default class LitNodeClient {
         this.getDecryptionShare({
           url,
           accessControlConditions,
+          evmContractConditions,
           toDecrypt,
           authSig,
           chain,
@@ -482,6 +480,7 @@ export default class LitNodeClient {
    */
   async saveEncryptionKey({
     accessControlConditions,
+    evmContractConditions,
     chain,
     authSig,
     symmetricKey,
@@ -500,8 +499,13 @@ export default class LitNodeClient {
     if (!chain) {
       throw new Error("chain is blank");
     }
-    if (!accessControlConditions || accessControlConditions.length == 0) {
-      throw new Error("accessControlConditions is blank");
+    if (
+      (!accessControlConditions || accessControlConditions.length == 0) &&
+      (!evmContractConditions || evmContractConditions.length == 0)
+    ) {
+      throw new Error(
+        "accessControlConditions and evmContractConditions are blank"
+      );
     }
     if (!authSig) {
       throw new Error("authSig is blank");
@@ -529,24 +533,27 @@ export default class LitNodeClient {
     );
 
     // hash the access control conditions
-    let hashOfConditions = null;
+    let hashOfConditions;
+    // hash the access control conditions
     if (accessControlConditions) {
       hashOfConditions = await hashAccessControlConditions(
         accessControlConditions
       );
-    } else if (accessControlConditionGroup) {
-      hashOfConditions = await hashAccessControlConditionGroup(
-        accessControlConditionGroup
-      );
+    } else if (evmContractConditions) {
+      hashOfConditions = await hashEVMContractConditions(evmContractConditions);
     } else {
-      console.log(
-        "Error, you must pass in either accessControlConditions or accessControlConditionGroup"
-      );
+      throwError({
+        message: `You must provide either accessControlConditions or EVMContractConditions`,
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
     }
+
     const hashOfConditionsStr = uint8arrayToString(
       new Uint8Array(hashOfConditions),
       "base16"
     );
+
     // create access control conditions on lit nodes
     const nodePromises = [];
     for (const url of this.connectedNodes) {
@@ -630,20 +637,18 @@ export default class LitNodeClient {
   async getSigningShare({
     url,
     accessControlConditions,
+    evmContractConditions,
     resourceId,
     authSig,
     chain,
     iat,
     exp,
-    apiVersion,
   }) {
     console.log("getSigningShare");
-    let urlWithPath = `${url}/web/signing/retrieve`;
-    if (apiVersion === 2) {
-      urlWithPath = `${url}/v2/web/signing/retrieve`;
-    }
+    const urlWithPath = `${url}/web/signing/retrieve`;
     const data = {
       accessControlConditions,
+      evmContractConditions,
       resourceId,
       authSig,
       chain,
@@ -656,6 +661,7 @@ export default class LitNodeClient {
   async getDecryptionShare({
     url,
     accessControlConditions,
+    evmContractConditions,
     toDecrypt,
     authSig,
     chain,
@@ -664,6 +670,7 @@ export default class LitNodeClient {
     const urlWithPath = `${url}/web/encryption/retrieve`;
     const data = {
       accessControlConditions,
+      evmContractConditions,
       toDecrypt,
       authSig,
       chain,
