@@ -399,14 +399,32 @@ export default class LitNodeClient {
     chain,
     authSig,
   }) {
+    let formattedAccessControlConditions;
+    let formattedEVMContractConditions;
+    if (accessControlConditions) {
+      formattedAccessControlConditions = accessControlConditions.map((c) =>
+        canonicalAccessControlConditionFormatter(c)
+      );
+    } else if (evmContractConditions) {
+      formattedEVMContractConditions = evmContractConditions.map((c) =>
+        canonicalEVMContractConditionFormatter(c)
+      );
+    } else {
+      throwError({
+        message: `You must provide either accessControlConditions or evmContractConditions`,
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
+    }
+
     // ask each node to decrypt the content
     const nodePromises = [];
     for (const url of this.connectedNodes) {
       nodePromises.push(
         this.getDecryptionShare({
           url,
-          accessControlConditions,
-          evmContractConditions,
+          accessControlConditions: formattedAccessControlConditions,
+          evmContractConditions: formattedEVMContractConditions,
           toDecrypt,
           authSig,
           chain,

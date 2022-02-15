@@ -28,6 +28,13 @@ export function hashResourceId(resourceId) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
+function canonicalAbiParams(params) {
+  return params.map((param) => ({
+    name: param.name,
+    type: param.type,
+  }));
+}
+
 export function canonicalEVMContractConditionFormatter(cond) {
   // need to return in the exact format below:
   /*
@@ -69,22 +76,32 @@ export function canonicalEVMContractConditionFormatter(cond) {
     pub state_mutability: StateMutability,
     */
 
-    const { functionAbi } = cond;
+    const { functionAbi, returnValueTest } = cond;
 
     const canonicalAbi = {
       name: functionAbi.name,
-      inputs: functionAbi.inputs,
-      outputs: functionAbi.outputs,
-      constant: functionAbi.constant,
+      inputs: canonicalAbiParams(functionAbi.inputs),
+      outputs: canonicalAbiParams(functionAbi.outputs),
+      constant:
+        typeof functionAbi.constant === "undefined"
+          ? false
+          : functionAbi.constant,
       stateMutability: functionAbi.stateMutability,
     };
+
+    const canonicalReturnValueTest = {
+      key: returnValueTest.key,
+      comparator: returnValueTest.comparator,
+      value: returnValueTest.value,
+    };
+
     return {
       contractAddress: cond.contractAddress,
       functionName: cond.functionName,
       functionParams: cond.functionParams,
       functionAbi: canonicalAbi,
       chain: cond.chain,
-      returnValueTest: cond.returnValueTest,
+      returnValueTest: canonicalReturnValueTest,
     };
   }
 
@@ -100,6 +117,7 @@ export function hashEVMContractConditions(accessControlConditions) {
     canonicalEVMContractConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
+  console.log("Hashing evm contract conditions: ", toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
   return crypto.subtle.digest("SHA-256", data);
@@ -151,6 +169,7 @@ export function hashAccessControlConditions(accessControlConditions) {
     canonicalAccessControlConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
+  console.log("Hashing access control conditions: ", toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
   return crypto.subtle.digest("SHA-256", data);

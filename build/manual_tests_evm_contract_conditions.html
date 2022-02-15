@@ -242,6 +242,94 @@
         });
       };
 
+      var ERC1155Signing = async () => {
+        var evmContractConditions = [
+          {
+            contractAddress: "0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88",
+            functionName: "balanceOf",
+            functionParams: [":userAddress", "8"],
+            functionAbi: {
+              type: "function",
+              stateMutability: "view",
+              outputs: [
+                {
+                  type: "uint256",
+                  name: "",
+                  internalType: "uint256",
+                },
+              ],
+              name: "balanceOf",
+              inputs: [
+                {
+                  type: "address",
+                  name: "account",
+                  internalType: "address",
+                },
+                {
+                  type: "uint256",
+                  name: "id",
+                  internalType: "uint256",
+                },
+              ],
+            },
+            chain,
+            returnValueTest: {
+              key: "",
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          evmContractConditions,
+          testName: "ERC1155Signing",
+        });
+      };
+
+      var ERC1155EncryptDecrypt = async () => {
+        var evmContractConditions = [
+          {
+            contractAddress: "0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88",
+            functionName: "balanceOf",
+            functionParams: [":userAddress", "8"],
+            functionAbi: {
+              type: "function",
+              stateMutability: "view",
+              outputs: [
+                {
+                  type: "uint256",
+                  name: "",
+                  internalType: "uint256",
+                },
+              ],
+              name: "balanceOf",
+              inputs: [
+                {
+                  type: "address",
+                  name: "account",
+                  internalType: "address",
+                },
+                {
+                  type: "uint256",
+                  name: "id",
+                  internalType: "uint256",
+                },
+              ],
+            },
+            chain,
+            returnValueTest: {
+              key: "",
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          evmContractConditions,
+          testName: "ERC1155EncryptDecrypt",
+        });
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -278,6 +366,13 @@
     <button onclick="MolochDAOSharesEncryptDecrypt()">
       MolochDAOSharesEncryptDecrypt
     </button>
+    <br />
+    <br />
+
+    <button onclick="ERC1155Signing()">ERC1155Signing</button>
+    <br />
+    <br />
+    <button onclick="ERC1155EncryptDecrypt()">ERC1155EncryptDecrypt</button>
     <br />
     <br />
 
