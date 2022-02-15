@@ -389,7 +389,6 @@ export const wasmBlsSdkHelpers = new (function () {
     }
     const RNG_VALUES_SIZE = globalThis.wasmExports.get_rng_values_size();
     const rngValues = new Uint32Array(RNG_VALUES_SIZE);
-    window.crypto.getRandomValues(rngValues);
     for (let i = 0; i < rngValues.length; i++) {
       globalThis.wasmExports.set_rng_value(i, rngValues[i]);
     }
