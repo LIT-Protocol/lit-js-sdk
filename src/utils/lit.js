@@ -739,7 +739,7 @@ export async function humanizeAccessControlConditions({
         acc.standardContractType === "MolochDAOv2.1" &&
         acc.method === "members"
       ) {
-        // erc1155 owns an amount of specific tokens
+        // molochDAOv2.1 membership
         return `Is a member of the DAO at ${acc.contractAddress}`;
       } else if (
         acc.standardContractType === "ERC1155" &&
