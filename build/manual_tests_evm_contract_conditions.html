@@ -330,6 +330,83 @@
         });
       };
 
+      var EncryptDecryptAGroup = async () => {
+        var evmContractConditions = [
+          {
+            contractAddress: "0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88",
+            functionName: "balanceOf",
+            functionParams: [":userAddress", "8"],
+            functionAbi: {
+              type: "function",
+              stateMutability: "view",
+              outputs: [
+                {
+                  type: "uint256",
+                  name: "",
+                  internalType: "uint256",
+                },
+              ],
+              name: "balanceOf",
+              inputs: [
+                {
+                  type: "address",
+                  name: "account",
+                  internalType: "address",
+                },
+                {
+                  type: "uint256",
+                  name: "id",
+                  internalType: "uint256",
+                },
+              ],
+            },
+            chain,
+            returnValueTest: {
+              key: "",
+              comparator: ">",
+              value: "0",
+            },
+          },
+          { operator: "and" },
+          {
+            contractAddress: "0x319ba3aab86e04a37053e984bd411b2c63bf229e",
+            chain,
+            functionName: "ownerOf",
+            functionParams: ["5954"],
+            functionAbi: {
+              constant: true,
+              inputs: [
+                {
+                  internalType: "uint256",
+                  name: "tokenId",
+                  type: "uint256",
+                },
+              ],
+              name: "ownerOf",
+              outputs: [
+                {
+                  internalType: "address",
+                  name: "",
+                  type: "address",
+                },
+              ],
+              payable: false,
+              stateMutability: "view",
+              type: "function",
+            },
+            returnValueTest: {
+              key: "",
+              comparator: "=",
+              value: ":userAddress",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          evmContractConditions,
+          testName: "EncryptDecryptAGroup",
+        });
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -373,6 +450,10 @@
     <br />
     <br />
     <button onclick="ERC1155EncryptDecrypt()">ERC1155EncryptDecrypt</button>
+    <br />
+    <br />
+
+    <button onclick="EncryptDecryptAGroup()">EncryptDecryptAGroup</button>
     <br />
     <br />
 
