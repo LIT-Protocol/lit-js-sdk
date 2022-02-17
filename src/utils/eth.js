@@ -519,7 +519,7 @@ export async function findLITs() {
     // const chainHexId = await web3.request({ method: 'eth_chainId', params: [] })
     const chain = chainHexIdToChainName(chainHexId);
     const tokenAddress = LIT_CHAINS[chain].contractAddress;
-    const contract = new Contract(tokenAddress, LIT.abi, new web3.getSigner());
+    const contract = new Contract(tokenAddress, LIT.abi, web3.getSigner());
     console.log("getting maxTokenid");
     const maxTokenId = await contract.tokenIds();
     const accounts = [];
