@@ -53,6 +53,7 @@
     "@walletconnect/web3-provider": "^1.6.6",
     "buffer": "^6.0.3",
     "bufferutil": "^4.0.6",
+    "cross-blob": "^3.0.1",
     "jszip": "^3.6.0",
     "lit-web3modal": "^1.9.5",
     "node-fetch-polyfill": "^2.0.6",

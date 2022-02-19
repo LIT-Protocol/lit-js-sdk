@@ -1,6 +1,8 @@
 // add fetch polyfill
 import fetch from "node-fetch";
-import { Crypto } from "@peculiar/webcrypto";
+// import { Crypto } from "@peculiar/webcrypto";
+import { webcrypto } from "crypto";
+import Blob from "cross-blob";
 
 if (!globalThis.fetch) {
   globalThis.fetch = fetch;
@@ -10,5 +12,9 @@ if (!globalThis.fetch) {
 }
 
 if (!globalThis.crypto) {
-  globalThis.crypto = new Crypto();
+  globalThis.crypto = webcrypto;
+}
+
+if (!globalThis.Blob) {
+  globalThis.Blob = Blob;
 }
