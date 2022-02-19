@@ -72,6 +72,16 @@ export const LIT_CHAINS = {
     rpcUrls: ["https://arb1.arbitrum.io/rpc"],
     blockExplorerUrls: ["https://arbiscan.io/"],
   },
+  avalanche: {
+    contractAddress: "0xBB118507E802D17ECDD4343797066dDc13Cde7C6",
+    chainId: 43114,
+    name: "Avalanche",
+    symbol: "AVAX",
+    decimals: 18,
+    type: "ERC1155",
+    rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
+    blockExplorerUrls: ["https://snowtrace.io/"],
+  },
   harmony: {
     contractAddress: "0xBB118507E802D17ECDD4343797066dDc13Cde7C6",
     chainId: 1666600000,
