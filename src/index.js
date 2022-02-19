@@ -57,6 +57,8 @@ import {
   canonicalEVMContractConditionFormatter,
   hashAccessControlConditions,
   hashEVMContractConditions,
+  encryptWithSymmetricKey,
+  decryptWithSymmetricKey,
 } from "./utils/crypto";
 
 import {
@@ -94,6 +96,8 @@ const functions = {
   createHtmlLIT,
   mintLIT,
   toggleLock,
+  encryptWithSymmetricKey,
+  decryptWithSymmetricKey,
   LIT_CHAINS,
   LitNodeClient,
   encryptWithPubKey,
