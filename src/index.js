@@ -40,7 +40,7 @@ import {
   connectWeb3,
   disconnectWeb3,
   mintLIT,
-  checkAndSignAuthMessage,
+  //  checkAndSignAuthMessage,
   signAndSaveAuthMessage,
   findLITs,
   sendLIT,
@@ -49,6 +49,8 @@ import {
   encodeCallData,
   decodeCallResult,
 } from "./utils/eth";
+
+import { checkAndSignAuthMessage } from "./utils/sol";
 
 import {
   decryptWithPrivKey,

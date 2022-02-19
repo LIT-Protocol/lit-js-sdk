@@ -17,7 +17,7 @@ import ERC20 from "../abis/ERC20.json";
 import { LIT_CHAINS } from "../lib/constants";
 import { throwError } from "../lib/utils";
 
-const AUTH_SIGNATURE_BODY =
+export const AUTH_SIGNATURE_BODY =
   "I am creating an account to use Lit Protocol at {{timestamp}}";
 
 function chainHexIdToChainName(chainHexId) {
