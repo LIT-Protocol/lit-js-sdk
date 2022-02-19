@@ -1,6 +1,5 @@
 // add fetch polyfill
 import fetch from "node-fetch";
-// import { Crypto } from "@peculiar/webcrypto";
 import { webcrypto } from "crypto";
 import Blob from "cross-blob";
 
