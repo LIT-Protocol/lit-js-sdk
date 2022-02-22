@@ -8,6 +8,6 @@ yarn build
 yarn buildWeb
 yarn buildNode
 
-yarn publish --new-version $VERSION
+yarn publish --new-version $VERSION --access public
 
 echo "Don't forget to git push to get this running on the netlify cdn"

@@ -5,7 +5,7 @@ import { Web3Provider, JsonRpcSigner } from "@ethersproject/providers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { hexlify } from "@ethersproject/bytes";
 import Web3Modal from "web3modal";
-import WalletConnectProvider from "@walletconnect/web3-provider";
+import WalletConnectProvider from "@walletconnect/ethereum-provider";
 import Resolution from "@unstoppabledomains/resolution";
 import detectEthereumProvider from "@metamask/detect-provider";
 
