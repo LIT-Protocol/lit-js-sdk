@@ -144,6 +144,26 @@ export const LIT_CHAINS = {
     blockExplorerUrls: ["https://rinkeby.etherscan.io"],
     type: "ERC1155",
   },
+  cronos: {
+    contractAddress: "",
+    chainId: 25,
+    name: "Cronos",
+    symbol: "CRO",
+    decimals: 18,
+    rpcUrls: ["https://evm-cronos.org"],
+    blockExplorerUrls: ["https://cronos.org/explorer/"],
+    type: "ERC1155",
+  },
+  optimism: {
+    contractAddress: "",
+    chainId: 10,
+    name: "Optimism",
+    symbol: "ETH",
+    decimals: 18,
+    rpcUrls: ["https://mainnet.optimism.io"],
+    blockExplorerUrls: ["https://optimistic.etherscan.io "],
+    type: "ERC1155",
+  },
 };
 
 export const NETWORK_PUB_KEY =
