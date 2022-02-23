@@ -54,12 +54,12 @@
     "bufferutil": "^4.0.6",
     "cross-blob": "^3.0.1",
     "jszip": "^3.6.0",
-    "lit-web3modal": "^1.9.5",
     "node-fetch-polyfill": "^2.0.6",
     "pako": "^2.0.4",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
     "uint8arrays": "^2.1.5",
-    "utf-8-validate": "^5.0.8"
+    "utf-8-validate": "^5.0.8",
+    "web3modal": "^1.9.5"
   }
 }
