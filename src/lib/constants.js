@@ -155,7 +155,7 @@ export const LIT_CHAINS = {
     type: "ERC1155",
   },
   optimism: {
-    contractAddress: "",
+    contractAddress: "0xbF68B4c9aCbed79278465007f20a08Fa045281E0",
     chainId: 10,
     name: "Optimism",
     symbol: "ETH",
