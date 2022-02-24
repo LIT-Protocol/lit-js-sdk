@@ -145,7 +145,7 @@ export const LIT_CHAINS = {
     type: "ERC1155",
   },
   cronos: {
-    contractAddress: "",
+    contractAddress: "0xc716950e5DEae248160109F562e1C9bF8E0CA25B",
     chainId: 25,
     name: "Cronos",
     symbol: "CRO",
