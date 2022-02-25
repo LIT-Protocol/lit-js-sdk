@@ -1,4 +1,7 @@
-import uint8arrayToString from "uint8arrays/to-string";
+import {
+  fromString as uint8arrayFromString,
+  toString as uint8arrayToString,
+} from "uint8arrays";
 
 /**
  * Convert a file to a data URL, which could then be embedded in a LIT.  A data URL is a string representation of a file.

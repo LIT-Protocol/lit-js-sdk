@@ -1,6 +1,9 @@
 import nacl from "tweetnacl";
 import naclUtil from "tweetnacl-util";
-import uint8arrayFromString from "uint8arrays/from-string";
+import {
+  fromString as uint8arrayFromString,
+  toString as uint8arrayToString,
+} from "uint8arrays";
 import { throwError } from "../lib/utils";
 
 const SYMM_KEY_ALGO_PARAMS = {

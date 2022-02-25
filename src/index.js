@@ -16,8 +16,10 @@ if (typeof window !== "undefined") {
   }
 }
 
-import uint8arrayFromString from "uint8arrays/from-string";
-import uint8arrayToString from "uint8arrays/to-string";
+import {
+  fromString as uint8arrayFromString,
+  toString as uint8arrayToString,
+} from "uint8arrays";
 
 import {
   encryptString,
@@ -59,6 +61,8 @@ import {
   canonicalEVMContractConditionFormatter,
   hashAccessControlConditions,
   hashEVMContractConditions,
+  encryptWithSymmetricKey,
+  decryptWithSymmetricKey,
 } from "./utils/crypto";
 
 import {
@@ -96,6 +100,8 @@ const functions = {
   createHtmlLIT,
   mintLIT,
   toggleLock,
+  encryptWithSymmetricKey,
+  decryptWithSymmetricKey,
   LIT_CHAINS,
   LitNodeClient,
   encryptWithPubKey,

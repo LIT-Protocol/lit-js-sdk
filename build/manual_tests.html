@@ -247,6 +247,26 @@
         });
       };
 
+      var ETHOnAvax = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "avalanche",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "ETHOnAvax",
+        });
+      };
+
       var ETHOnEth = async () => {
         const accessControlConditions = [
           {
@@ -1280,6 +1300,9 @@
     <br />
     <br />
     <button onclick="ETHOnArbitrum()">ETHOnArbitrum</button>
+    <br />
+    <br />
+    <button onclick="ETHOnAvax()">ETHOnAvax</button>
     <br />
     <br />
     <button onclick="ETHOnEth()">ETHOnEth</button>

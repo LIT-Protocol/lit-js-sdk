@@ -1,6 +1,8 @@
 import JSZip from "jszip";
-import uint8arrayFromString from "uint8arrays/from-string";
-import uint8arrayToString from "uint8arrays/to-string";
+import {
+  fromString as uint8arrayFromString,
+  toString as uint8arrayToString,
+} from "uint8arrays";
 import { formatEther, formatUnits } from "@ethersproject/units";
 
 import {
@@ -93,7 +95,7 @@ export async function zipAndEncryptFiles(files) {
  * Decrypt and unzip a zip that was created using encryptZip, zipAndEncryptString, or zipAndEncryptFiles.
  * @param {Blob} encryptedZipBlob The encrypted zip as a Blob
  * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this zip.
- * @returns {Promise<Array>} A promise containing an array of the decrypted files inside the zip.
+ * @returns {Promise<Object>} A promise containing a JSZip object indexed by the filenames of the zipped files.  For example, if you have a file called "meow.jpg" in the root of your zip, you could get it from the JSZip object by doing this: const imageBlob = await decryptedZip['meow.jpg'].async('blob')
  */
 export async function decryptZip(encryptedZipBlob, symmKey) {
   // const keypair = await checkAndDeriveKeypair()
