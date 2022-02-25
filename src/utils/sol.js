@@ -1,7 +1,5 @@
 import * as solWeb3 from "@solana/web3.js";
 import { AUTH_SIGNATURE_BODY } from "./eth";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
 import uint8arrayFromString from "uint8arrays/from-string";
 import uint8arrayToString from "uint8arrays/to-string";
 
@@ -42,4 +40,6 @@ export async function checkAndSignAuthMessage({ chain }) {
   localStorage.setItem("lit-auth-sol-signature", JSON.stringify(authSig));
 
   console.log("authSig", authSig);
+
+  return authSig;
 }
