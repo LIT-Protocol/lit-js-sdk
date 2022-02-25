@@ -1,6 +1,8 @@
 import JSZip from "jszip";
-import uint8arrayFromString from "uint8arrays/from-string";
-import uint8arrayToString from "uint8arrays/to-string";
+import {
+  fromString as uint8arrayFromString,
+  toString as uint8arrayToString,
+} from "uint8arrays";
 import { formatEther, formatUnits } from "@ethersproject/units";
 
 import {
