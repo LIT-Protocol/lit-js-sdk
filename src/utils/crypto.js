@@ -11,6 +11,60 @@ const SYMM_KEY_ALGO_PARAMS = {
   length: 256,
 };
 
+export function hashSolRpcConditions(solRpcConditions) {
+  const conds = solRpcConditions.map((c) =>
+    canonicalSolRpcConditionFormatter(c)
+  );
+  const toHash = JSON.stringify(conds);
+  console.log("Hashing sol rpc conditions: ", toHash);
+  const encoder = new TextEncoder();
+  const data = encoder.encode(toHash);
+  return crypto.subtle.digest("SHA-256", data);
+}
+
+export function canonicalSolRpcConditionFormatter(cond) {
+  // need to return in the exact format below:
+  /*
+  pub struct SolRpcCondition {
+      pub method: String,
+      pub params: Vec<String>,
+      pub return_value_test: JsonReturnValueTestV2,
+  }
+  */
+
+  if (Array.isArray(cond)) {
+    return cond.map((c) => canonicalSolRpcConditionFormatter(c));
+  }
+
+  if ("operator" in cond) {
+    return {
+      operator: cond.operator,
+    };
+  }
+
+  if ("returnValueTest" in cond) {
+    const { returnValueTest } = cond;
+
+    const canonicalReturnValueTest = {
+      key: returnValueTest.key,
+      comparator: returnValueTest.comparator,
+      value: returnValueTest.value,
+    };
+
+    return {
+      method: cond.method,
+      params: cond.params,
+      returnValueTest: canonicalReturnValueTest,
+    };
+  }
+
+  throwError({
+    message: `You passed an invalid access control condition: ${cond}`,
+    name: "InvalidAccessControlCondition",
+    errorCode: "invalid_access_control_condition",
+  });
+}
+
 export function canonicalResourceIdFormatter(resId) {
   // need to return in the exact format below:
 

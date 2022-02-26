@@ -9,9 +9,11 @@ import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import {
   hashAccessControlConditions,
   hashEVMContractConditions,
+  hashSolRpcConditions,
   hashResourceId,
   canonicalAccessControlConditionFormatter,
   canonicalEVMContractConditionFormatter,
+  canonicalSolRpcConditionFormatter,
   canonicalResourceIdFormatter,
 } from "./crypto";
 
@@ -203,6 +205,7 @@ export default class LitNodeClient {
   async getSignedToken({
     accessControlConditions,
     evmContractConditions,
+    solRpcConditions,
     chain,
     authSig,
     resourceId,
@@ -216,6 +219,7 @@ export default class LitNodeClient {
 
     let formattedAccessControlConditions;
     let formattedEVMContractConditions;
+    let formattedSolRpcConditions;
     if (accessControlConditions) {
       formattedAccessControlConditions = accessControlConditions.map((c) =>
         canonicalAccessControlConditionFormatter(c)
@@ -224,9 +228,13 @@ export default class LitNodeClient {
       formattedEVMContractConditions = evmContractConditions.map((c) =>
         canonicalEVMContractConditionFormatter(c)
       );
+    } else if (solRpcConditions) {
+      formattedSolRpcConditions = solRpcConditions.map((c) =>
+        canonicalSolRpcConditionFormatter(c)
+      );
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions`,
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
         name: "InvalidArgumentException",
         errorCode: "invalid_argument",
       });
@@ -242,6 +250,7 @@ export default class LitNodeClient {
           url,
           accessControlConditions: formattedAccessControlConditions,
           evmContractConditions: formattedEVMContractConditions,
+          solRpcConditions: formattedSolRpcConditions,
           resourceId: formattedResourceId,
           authSig,
           chain,
@@ -330,6 +339,7 @@ export default class LitNodeClient {
   async saveSigningCondition({
     accessControlConditions,
     evmContractConditions,
+    solRpcConditions,
     chain,
     authSig,
     resourceId,
@@ -352,9 +362,11 @@ export default class LitNodeClient {
       );
     } else if (evmContractConditions) {
       hashOfConditions = await hashEVMContractConditions(evmContractConditions);
+    } else if (solRpcConditions) {
+      hashOfConditions = await hashSolRpcConditions(solRpcConditions);
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or EVMContractConditions`,
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
         name: "InvalidArgumentException",
         errorCode: "invalid_argument",
       });
@@ -406,12 +418,14 @@ export default class LitNodeClient {
   async getEncryptionKey({
     accessControlConditions,
     evmContractConditions,
+    solRpcConditions,
     toDecrypt,
     chain,
     authSig,
   }) {
     let formattedAccessControlConditions;
     let formattedEVMContractConditions;
+    let formattedSolRpcConditions;
     if (accessControlConditions) {
       formattedAccessControlConditions = accessControlConditions.map((c) =>
         canonicalAccessControlConditionFormatter(c)
@@ -420,9 +434,13 @@ export default class LitNodeClient {
       formattedEVMContractConditions = evmContractConditions.map((c) =>
         canonicalEVMContractConditionFormatter(c)
       );
+    } else if (solRpcConditions) {
+      formattedSolRpcConditions = solRpcConditions.map((c) =>
+        canonicalSolRpcConditionFormatter(c)
+      );
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions`,
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
         name: "InvalidArgumentException",
         errorCode: "invalid_argument",
       });
@@ -436,6 +454,7 @@ export default class LitNodeClient {
           url,
           accessControlConditions: formattedAccessControlConditions,
           evmContractConditions: formattedEVMContractConditions,
+          solRpcConditions: formattedSolRpcConditions,
           toDecrypt,
           authSig,
           chain,
@@ -511,6 +530,7 @@ export default class LitNodeClient {
   async saveEncryptionKey({
     accessControlConditions,
     evmContractConditions,
+    solRpcConditions,
     chain,
     authSig,
     symmetricKey,
@@ -531,10 +551,11 @@ export default class LitNodeClient {
     }
     if (
       (!accessControlConditions || accessControlConditions.length == 0) &&
-      (!evmContractConditions || evmContractConditions.length == 0)
+      (!evmContractConditions || evmContractConditions.length == 0) &&
+      (!solRpcConditions || solRpcConditions.length == 0)
     ) {
       throw new Error(
-        "accessControlConditions and evmContractConditions are blank"
+        "accessControlConditions and evmContractConditions and solRpcConditions are blank"
       );
     }
     if (!authSig) {
@@ -571,9 +592,11 @@ export default class LitNodeClient {
       );
     } else if (evmContractConditions) {
       hashOfConditions = await hashEVMContractConditions(evmContractConditions);
+    } else if (solRpcConditions) {
+      hashOfConditions = await hashSolRpcConditions(solRpcConditions);
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or EVMContractConditions`,
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
         name: "InvalidArgumentException",
         errorCode: "invalid_argument",
       });
@@ -668,6 +691,7 @@ export default class LitNodeClient {
     url,
     accessControlConditions,
     evmContractConditions,
+    solRpcConditions,
     resourceId,
     authSig,
     chain,
@@ -679,6 +703,7 @@ export default class LitNodeClient {
     const data = {
       accessControlConditions,
       evmContractConditions,
+      solRpcConditions,
       resourceId,
       authSig,
       chain,
@@ -692,6 +717,7 @@ export default class LitNodeClient {
     url,
     accessControlConditions,
     evmContractConditions,
+    solRpcConditions,
     toDecrypt,
     authSig,
     chain,
@@ -701,6 +727,7 @@ export default class LitNodeClient {
     const data = {
       accessControlConditions,
       evmContractConditions,
+      solRpcConditions,
       toDecrypt,
       authSig,
       chain,

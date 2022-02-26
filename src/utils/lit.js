@@ -13,16 +13,44 @@ import {
   canonicalAccessControlConditionFormatter,
 } from "./crypto";
 
-import { checkAndSignAuthMessage, decimalPlaces } from "./eth";
+import { checkAndSignEVMAuthMessage, decimalPlaces } from "./eth";
+import { checkAndSignSolAuthMessage } from "./sol";
 
 import { sendMessageToFrameParent } from "./frameComms";
 
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 
 import { fileToDataUrl } from "./browser";
-import { LIT_CHAINS, NETWORK_PUB_KEY } from "../lib/constants";
+import { ALL_LIT_CHAINS, NETWORK_PUB_KEY } from "../lib/constants";
 
 const PACKAGE_CACHE = {};
+
+export async function checkAndSignAuthMessage({ chain }) {
+  const chainInfo = ALL_LIT_CHAINS[chain];
+  if (!chainInfo) {
+    throwError({
+      message: `Unsupported chain selected.  Please select one of: ${Object.keys(
+        ALL_LIT_CHAINS
+      )}`,
+      name: "UnsupportedChainException",
+      errorCode: "unsupported_chain",
+    });
+  }
+
+  if (chainInfo.vmType === "EVM") {
+    return checkAndSignEVMAuthMessage({ chain });
+  } else if (chainInfo.vmType === "SVM") {
+    return checkAndSignSolAuthMessage({ chain });
+  } else {
+    throwError({
+      message: `vmType not found for this chain: ${chain}.  This should not happen.  Unsupported chain selected.  Please select one of: ${Object.keys(
+        ALL_LIT_CHAINS
+      )}`,
+      name: "UnsupportedChainException",
+      errorCode: "unsupported_chain",
+    });
+  }
+}
 
 /**
  * Encrypt a string.  This is used to encrypt any string that is to be locked via the Lit Protocol.

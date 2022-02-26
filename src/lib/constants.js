@@ -21,6 +21,7 @@ export const LIT_CHAINS = {
     type: "ERC1155",
     rpcUrls: ["https://api.mycryptoapi.com/eth"],
     blockExplorerUrls: ["https://etherscan.io"],
+    vmType: "EVM",
   },
   polygon: {
     contractAddress: "0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88",
@@ -31,6 +32,7 @@ export const LIT_CHAINS = {
     rpcUrls: ["https://polygon-rpc.com"],
     blockExplorerUrls: ["https://explorer.matic.network"],
     type: "ERC1155",
+    vmType: "EVM",
   },
   fantom: {
     contractAddress: "0x5bD3Fe8Ab542f0AaBF7552FAAf376Fd8Aa9b3869",
@@ -41,6 +43,7 @@ export const LIT_CHAINS = {
     rpcUrls: ["https://rpcapi.fantom.network"],
     blockExplorerUrls: ["https://ftmscan.com"],
     type: "ERC1155",
+    vmType: "EVM",
   },
   xdai: {
     contractAddress: "0xDFc2Fd83dFfD0Dafb216F412aB3B18f2777406aF",
@@ -51,6 +54,7 @@ export const LIT_CHAINS = {
     rpcUrls: ["https://rpc.xdaichain.com"],
     blockExplorerUrls: [" https://blockscout.com/xdai/mainnet"],
     type: "ERC1155",
+    vmType: "EVM",
   },
   bsc: {
     contractAddress: "0xc716950e5DEae248160109F562e1C9bF8E0CA25B",
@@ -61,6 +65,7 @@ export const LIT_CHAINS = {
     rpcUrls: ["https://bsc-dataseed.binance.org/"],
     blockExplorerUrls: [" https://bscscan.com/"],
     type: "ERC1155",
+    vmType: "EVM",
   },
   arbitrum: {
     contractAddress: "0xc716950e5DEae248160109F562e1C9bF8E0CA25B",
@@ -71,6 +76,7 @@ export const LIT_CHAINS = {
     type: "ERC1155",
     rpcUrls: ["https://arb1.arbitrum.io/rpc"],
     blockExplorerUrls: ["https://arbiscan.io/"],
+    vmType: "EVM",
   },
   avalanche: {
     contractAddress: "0xBB118507E802D17ECDD4343797066dDc13Cde7C6",
@@ -81,6 +87,7 @@ export const LIT_CHAINS = {
     type: "ERC1155",
     rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
     blockExplorerUrls: ["https://snowtrace.io/"],
+    vmType: "EVM",
   },
   harmony: {
     contractAddress: "0xBB118507E802D17ECDD4343797066dDc13Cde7C6",
@@ -91,6 +98,7 @@ export const LIT_CHAINS = {
     type: "ERC1155",
     rpcUrls: ["https://api.harmony.one"],
     blockExplorerUrls: ["https://explorer.harmony.one/"],
+    vmType: "EVM",
   },
   kovan: {
     contractAddress: "0x9dB60Db3Dd9311861D87D33B0463AaD9fB4bb0E6",
@@ -101,6 +109,7 @@ export const LIT_CHAINS = {
     rpcUrls: ["https://kovan.infura.io/v3/ddf1ca3700f34497bca2bf03607fde38"],
     blockExplorerUrls: ["https://kovan.etherscan.io"],
     type: "ERC1155",
+    vmType: "EVM",
   },
   mumbai: {
     contractAddress: "0xc716950e5DEae248160109F562e1C9bF8E0CA25B",
@@ -113,6 +122,7 @@ export const LIT_CHAINS = {
     ],
     blockExplorerUrls: ["https://mumbai.polygonscan.com"],
     type: "ERC1155",
+    vmType: "EVM",
   },
   goerli: {
     contractAddress: "0xc716950e5DEae248160109F562e1C9bF8E0CA25B",
@@ -123,6 +133,7 @@ export const LIT_CHAINS = {
     rpcUrls: ["https://goerli.infura.io/v3/96dffb3d8c084dec952c61bd6230af34"],
     blockExplorerUrls: ["https://goerli.etherscan.io"],
     type: "ERC1155",
+    vmType: "EVM",
   },
   ropsten: {
     contractAddress: "0x61544f0AE85f8fed6Eb315c406644eb58e15A1E7",
@@ -133,6 +144,7 @@ export const LIT_CHAINS = {
     rpcUrls: ["https://ropsten.infura.io/v3/96dffb3d8c084dec952c61bd6230af34"],
     blockExplorerUrls: ["https://ropsten.etherscan.io"],
     type: "ERC1155",
+    vmType: "EVM",
   },
   rinkeby: {
     contractAddress: "0xc716950e5deae248160109f562e1c9bf8e0ca25b",
@@ -143,6 +155,7 @@ export const LIT_CHAINS = {
     rpcUrls: ["https://rinkeby.infura.io/v3/96dffb3d8c084dec952c61bd6230af34"],
     blockExplorerUrls: ["https://rinkeby.etherscan.io"],
     type: "ERC1155",
+    vmType: "EVM",
   },
   cronos: {
     contractAddress: "0xc716950e5DEae248160109F562e1C9bF8E0CA25B",
@@ -153,6 +166,7 @@ export const LIT_CHAINS = {
     rpcUrls: ["https://evm-cronos.org"],
     blockExplorerUrls: ["https://cronos.org/explorer/"],
     type: "ERC1155",
+    vmType: "EVM",
   },
   optimism: {
     contractAddress: "0xbF68B4c9aCbed79278465007f20a08Fa045281E0",
@@ -163,7 +177,24 @@ export const LIT_CHAINS = {
     rpcUrls: ["https://mainnet.optimism.io"],
     blockExplorerUrls: ["https://optimistic.etherscan.io "],
     type: "ERC1155",
+    vmType: "EVM",
   },
+};
+
+export const LIT_NON_EVM_CHAINS = {
+  solana: {
+    name: "Solana",
+    symbol: "SOL",
+    decimals: 9,
+    rpcUrls: ["https://api.mainnet-beta.solana.com"],
+    blockExplorerUrls: ["https://explorer.solana.com/"],
+    vmType: "SVM",
+  },
+};
+
+export const ALL_LIT_CHAINS = {
+  ...LIT_CHAINS,
+  ...LIT_NON_EVM_CHAINS,
 };
 
 export const NETWORK_PUB_KEY =

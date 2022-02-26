@@ -175,7 +175,7 @@ export async function disconnectWeb3() {
  * @param {string} params.chain The chain you want to use.  "polygon" and "ethereum" are currently supported.
  * @returns {AuthSig} The AuthSig created or retrieved
  */
-export async function checkAndSignAuthMessage({ chain }) {
+export async function checkAndSignEVMAuthMessage({ chain }) {
   const { web3, account } = await connectWeb3();
   const { chainId } = await web3.getNetwork();
   const selectedChain = LIT_CHAINS[chain];

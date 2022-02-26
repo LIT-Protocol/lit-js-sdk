@@ -36,13 +36,13 @@ import {
   decryptZipFileWithMetadata,
   humanizeAccessControlConditions,
   getTokenList,
+  checkAndSignAuthMessage,
 } from "./utils/lit";
 
 import {
   connectWeb3,
   disconnectWeb3,
   mintLIT,
-  //  checkAndSignAuthMessage,
   signAndSaveAuthMessage,
   findLITs,
   sendLIT,
@@ -51,8 +51,6 @@ import {
   encodeCallData,
   decodeCallResult,
 } from "./utils/eth";
-
-import { checkAndSignAuthMessage } from "./utils/sol";
 
 import {
   decryptWithPrivKey,
