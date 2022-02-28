@@ -50,6 +50,7 @@ import {
   lookupNameServiceAddress,
   encodeCallData,
   decodeCallResult,
+  signMessageAsync,
 } from "./utils/eth";
 
 import {
@@ -128,6 +129,7 @@ const functions = {
   decodeCallResult,
   uint8arrayFromString,
   uint8arrayToString,
+  signMessageAsync,
 };
 
 module.exports = functions;
