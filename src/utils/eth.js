@@ -342,7 +342,7 @@ export async function signMessage({ body, web3, account }) {
 
 // wrapper around signMessage that tries personal_sign first.  this is to fix a
 // bug with walletconnect where just using signMessage was failing
-const signMessageAsync = async (signer, address, message) => {
+export const signMessageAsync = async (signer, address, message) => {
   const messageBytes = toUtf8Bytes(message);
   if (signer instanceof JsonRpcSigner) {
     try {

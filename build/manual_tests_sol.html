@@ -143,7 +143,6 @@
         });
       };
 
-      // Actual tests are below here
       var SolBalanceEncrypt = async () => {
         var solRpcConditions = [
           {
@@ -160,6 +159,106 @@
         await testProvisoningEncryptingAndDecrypting({
           solRpcConditions,
           testName: "SolBalanceEncrypt",
+        });
+      };
+
+      var SolSpecificWalletAddressSigning = async () => {
+        var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
+        var solRpcConditions = [
+          {
+            method: "",
+            params: [":userAddress"],
+            chain,
+            returnValueTest: {
+              key: "",
+              comparator: "=",
+              value: authSig.address,
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          solRpcConditions,
+          testName: "SolSpecificWalletAddressSigning",
+        });
+      };
+
+      var SolSpecificWalletAddressEncrypt = async () => {
+        var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
+        var solRpcConditions = [
+          {
+            method: "",
+            params: [":userAddress"],
+            chain,
+            returnValueTest: {
+              key: "",
+              comparator: "=",
+              value: authSig.address,
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          testName: "SolSpecificWalletAddressEncrypt",
+        });
+      };
+
+      var SolSpecificNftBalanceSigning = async () => {
+        var solRpcConditions = [
+          {
+            method: "getTokenAccountBalance",
+            params: ["E7aAccig7X3X4pSWjf1eqqUJkV3EbzG6DrtyM2gbuuhH"],
+            chain,
+            returnValueTest: {
+              key: "amount",
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          solRpcConditions,
+          testName: "SolSpecificNftBalanceSigning",
+        });
+      };
+
+      var SolSpecificNftBalanceEncrypt = async () => {
+        var solRpcConditions = [
+          {
+            method: "getTokenAccountBalance",
+            params: ["E7aAccig7X3X4pSWjf1eqqUJkV3EbzG6DrtyM2gbuuhH"],
+            chain,
+            returnValueTest: {
+              key: "amount",
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          testName: "SolSpecificNftBalanceEncrypt",
+        });
+      };
+
+      var SolGetTokenAccountsByDelegateEncrypt = async () => {
+        var solRpcConditions = [
+          {
+            method: "getTokenAccountsByDelegate",
+            params: [
+              ":userAddress",
+              { programId: "29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE" },
+            ],
+            chain,
+            returnValueTest: {
+              key: "amount",
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          testName: "SolGetTokenAccountsByDelegateEncrypt",
         });
       };
 
@@ -196,8 +295,35 @@
     <button onclick="SolBalanceSigning()">SolBalanceSigning</button>
     <br />
     <br />
-
     <button onclick="SolBalanceEncrypt()">SolBalanceEncrypt</button>
+    <br />
+    <br />
+
+    <button onclick="SolSpecificWalletAddressSigning()">
+      SolSpecificWalletAddressSigning
+    </button>
+    <br />
+    <br />
+    <button onclick="SolSpecificWalletAddressEncrypt()">
+      SolSpecificWalletAddressEncrypt
+    </button>
+    <br />
+    <br />
+
+    <button onclick="SolSpecificNftBalanceSigning()">
+      SolSpecificNftBalanceSigning
+    </button>
+    <br />
+    <br />
+    <button onclick="SolSpecificNftBalanceEncrypt()">
+      SolSpecificNftBalanceEncrypt
+    </button>
+    <br />
+    <br />
+
+    <button onclick="SolGetTokenAccountsByDelegateEncrypt()">
+      SolGetTokenAccountsByDelegateEncrypt
+    </button>
     <br />
     <br />
 
