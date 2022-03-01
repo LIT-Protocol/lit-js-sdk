@@ -240,17 +240,22 @@
         });
       };
 
-      var SolGetTokenAccountsByDelegateEncrypt = async () => {
+      var SolGetTokenAccountsByOwnerEncrypt = async () => {
         var solRpcConditions = [
           {
-            method: "getTokenAccountsByDelegate",
+            method: "GetTokenAccountsByOwner",
             params: [
               ":userAddress",
-              { programId: "29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE" },
+              {
+                programId: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              },
+              {
+                encoding: "jsonParsed",
+              },
             ],
             chain,
             returnValueTest: {
-              key: "amount",
+              key: '$[?(@.account.data.parsed.info.mint == "29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE")].account.data.parsed.info.tokenAmount.amount',
               comparator: ">",
               value: "0",
             },
@@ -258,7 +263,7 @@
         ];
         await testProvisoningEncryptingAndDecrypting({
           solRpcConditions,
-          testName: "SolGetTokenAccountsByDelegateEncrypt",
+          testName: "SolGetTokenAccountsByOwnerEncrypt",
         });
       };
 
@@ -321,8 +326,8 @@
     <br />
     <br />
 
-    <button onclick="SolGetTokenAccountsByDelegateEncrypt()">
-      SolGetTokenAccountsByDelegateEncrypt
+    <button onclick="SolGetTokenAccountsByOwnerEncrypt()">
+      SolGetTokenAccountsByOwnerEncrypt
     </button>
     <br />
     <br />
