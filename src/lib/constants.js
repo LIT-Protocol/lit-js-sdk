@@ -1,14 +1,25 @@
 /**
  * @typedef {Object} LITChain
- * @property {string} contractAddress - The address of the token contract for the optional predeployed ERC1155 contract
+ * @property {string} vmType - Either EVM for an Ethereum compatible chain or SVM for a Solana compatible chain
+ * @property {string} name - The human readable name of the chain
+ */
+
+/**
+ * @typedef {Object} LITEVMChain
+ * @property {string} contractAddress - The address of the token contract for the optional predeployed ERC1155 contract.  Only present on EVM chains.
  * @property {string} chainId - The chain ID of the chain that this token contract is deployed on.  Used for EVM chains.
  * @property {string} name - The human readable name of the chain
  */
 
 /**
- * Chains supported by the LIT protocol.  Each chain includes an optional pre-deployed token contract that you may use for minting LITs.  These are ERC1155 contracts that let you mint any quantity of a given token.  Use the chain name as a key in this object.
+ * @typedef {Object} LITSVMChain
+ * @property {string} name - The human readable name of the chain
+ */
+
+/**
+ * EVM Chains supported by the LIT protocol.  Each chain includes an optional pre-deployed token contract that you may use for minting LITs.  These are ERC1155 contracts that let you mint any quantity of a given token.  Use the chain name as a key in this object.
  * @constant
- * @type {LITChain}
+ * @type {LITEVMChain}
  * @default
  */
 export const LIT_CHAINS = {
@@ -181,7 +192,13 @@ export const LIT_CHAINS = {
   },
 };
 
-export const LIT_NON_EVM_CHAINS = {
+/**
+ * Solana Chains supported by the LIT protocol.  Use the chain name as a key in this object.
+ * @constant
+ * @type {LITSVMChain}
+ * @default
+ */
+export const LIT_SVM_CHAINS = {
   solana: {
     name: "Solana",
     symbol: "SOL",
@@ -190,11 +207,33 @@ export const LIT_NON_EVM_CHAINS = {
     blockExplorerUrls: ["https://explorer.solana.com/"],
     vmType: "SVM",
   },
+  solanaDevnet: {
+    name: "Solana Devnet",
+    symbol: "SOL",
+    decimals: 9,
+    rpcUrls: ["https://api.devnet.solana.com"],
+    blockExplorerUrls: ["https://explorer.solana.com/"],
+    vmType: "SVM",
+  },
+  solanaTestnet: {
+    name: "Solana Testnet",
+    symbol: "SOL",
+    decimals: 9,
+    rpcUrls: ["https://api.testnet.solana.com"],
+    blockExplorerUrls: ["https://explorer.solana.com/"],
+    vmType: "SVM",
+  },
 };
 
+/**
+ * All Chains supported by the LIT protocol.  Use the chain name as a key in this object.
+ * @constant
+ * @type {LITChain}
+ * @default
+ */
 export const ALL_LIT_CHAINS = {
   ...LIT_CHAINS,
-  ...LIT_NON_EVM_CHAINS,
+  ...LIT_SVM_CHAINS,
 };
 
 export const NETWORK_PUB_KEY =

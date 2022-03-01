@@ -70,7 +70,7 @@ import {
   downloadFile,
 } from "./utils/browser";
 
-import { LIT_CHAINS } from "./lib/constants";
+import { LIT_CHAINS, LIT_SVM_CHAINS, ALL_LIT_CHAINS } from "./lib/constants";
 import { printError } from "./lib/utils";
 import { initWasmBlsSdk } from "./lib/bls-sdk.js";
 
@@ -102,6 +102,8 @@ const functions = {
   encryptWithSymmetricKey,
   decryptWithSymmetricKey,
   LIT_CHAINS,
+  LIT_SVM_CHAINS,
+  ALL_LIT_CHAINS,
   LitNodeClient,
   encryptWithPubKey,
   decryptWithPrivKey,

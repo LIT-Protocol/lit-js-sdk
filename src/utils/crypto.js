@@ -54,6 +54,7 @@ export function canonicalSolRpcConditionFormatter(cond) {
     return {
       method: cond.method,
       params: cond.params,
+      chain: cond.chain,
       returnValueTest: canonicalReturnValueTest,
     };
   }
