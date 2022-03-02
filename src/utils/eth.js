@@ -114,6 +114,7 @@ export async function disconnectWeb3() {
   web3Modal.clearCachedProvider();
   localStorage.removeItem("walletconnect");
   localStorage.removeItem("lit-auth-signature");
+  localStorage.removeItem("lit-auth-sol-signature");
 }
 
 // taken from the excellent repo https://github.com/zmitton/eth-proof

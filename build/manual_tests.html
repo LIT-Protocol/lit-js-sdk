@@ -92,6 +92,29 @@
         });
       };
 
+      var ERC1155WithHexTokenIdOnHarmony = async () => {
+        var accessControlConditions = [
+          {
+            contractAddress: "0x08680d4b01b201ad3de4ab8d074597bc93e55391",
+            standardContractType: "ERC1155",
+            chain: "harmony",
+            method: "balanceOf",
+            parameters: [
+              ":userAddress",
+              "0xdbad33654bda2e12fac56805060289efd2f5f02d",
+            ],
+            returnValueTest: {
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "ERC1155",
+        });
+      };
+
       var ERC1155Batch = async () => {
         var accessControlConditions = [
           {
@@ -1276,6 +1299,11 @@
     <br />
     <br />
     <button onclick="ERC1155()">ERC1155</button>
+    <br />
+    <br />
+    <button onclick="ERC1155WithHexTokenIdOnHarmony()">
+      ERC1155WithHexTokenIdOnHarmony
+    </button>
     <br />
     <br />
     <button onclick="ERC1155Batch()">ERC1155Batch</button>
