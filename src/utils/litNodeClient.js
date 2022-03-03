@@ -270,23 +270,7 @@ export default class LitNodeClient {
     }
     const res = await this.handleNodePromises(nodePromises);
     if (res.success === false) {
-      if (res.error && res.error.errorCode) {
-        if (
-          res.error.errorCode === "not_authorized" &&
-          this.config.alertWhenUnauthorized
-        ) {
-          alert(
-            "You are not authorized to receive a signature to grant access to this content"
-          );
-        }
-        throwError({ ...res.error, name: "NodeError" });
-      } else {
-        throwError({
-          message: `There was an error getting the signing shares from the nodes`,
-          name: "UnknownError",
-          errorCode: "unknown_error",
-        });
-      }
+      this.throwNodeError(res);
       return;
     }
     const signatureShares = res.values;
@@ -403,15 +387,10 @@ export default class LitNodeClient {
       );
     }
 
-    const responses = await Promise.all(nodePromises);
-    const errors = responses.filter((r) => r.error !== "");
-
-    if (errors.length >= this.connectedNodes.size - this.config.minNodeCount) {
-      throwError({
-        message: errors[0].error,
-        name: "StorageError",
-        errorCode: "storage_error",
-      });
+    const res = await this.handleNodePromises(nodePromises);
+    if (res.success === false) {
+      this.throwNodeError(res);
+      return;
     }
 
     return true;
@@ -474,25 +453,13 @@ export default class LitNodeClient {
         })
       );
     }
-    const decryptionShares = await Promise.all(nodePromises);
-    console.log("decryptionShares", decryptionShares);
-    const goodShares = decryptionShares.filter((d) => d.decryptionShare !== "");
-    if (goodShares.length < this.config.minNodeCount) {
-      console.log(
-        `majority of shares are bad. goodShares is ${JSON.stringify(
-          goodShares
-        )}`
-      );
-      if (this.config.alertWhenUnauthorized) {
-        alert("You are not authorized to unlock this content");
-      }
-
-      throwError({
-        message: `You are not authorized to unlock this item`,
-        name: "UnauthorizedException",
-        errorCode: "not_authorized",
-      });
+    const res = await this.handleNodePromises(nodePromises);
+    if (res.success === false) {
+      this.throwNodeError(res);
+      return;
     }
+    const decryptionShares = res.values;
+    console.log("decryptionShares", decryptionShares);
 
     // sort the decryption shares by share index.  this is important when combining the shares.
     decryptionShares.sort((a, b) => a.shareIndex - b.shareIndex);
@@ -635,15 +602,11 @@ export default class LitNodeClient {
         })
       );
     }
-    const responses = await Promise.all(nodePromises);
-    const errors = responses.filter((r) => r.error !== "");
 
-    if (errors.length >= this.connectedNodes.size - this.config.minNodeCount) {
-      throwError({
-        message: errors[0].error,
-        name: "StorageError",
-        errorCode: "storage_error",
-      });
+    const res = await this.handleNodePromises(nodePromises);
+    if (res.success === false) {
+      this.throwNodeError(res);
+      return;
     }
 
     return encryptedKey;
@@ -803,6 +766,24 @@ export default class LitNodeClient {
       success: false,
       error: mostCommonError,
     };
+  }
+
+  throwNodeError(res) {
+    if (res.error && res.error.errorCode) {
+      if (
+        res.error.errorCode === "not_authorized" &&
+        this.config.alertWhenUnauthorized
+      ) {
+        alert("You are not authorized to access to this content");
+      }
+      throwError({ ...res.error, name: "NodeError" });
+    } else {
+      throwError({
+        message: `There was an error getting the signing shares from the nodes`,
+        name: "UnknownError",
+        errorCode: "unknown_error",
+      });
+    }
   }
 
   /**
