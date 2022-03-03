@@ -82,7 +82,7 @@ import { version } from "./version";
 
 initWasmBlsSdk().then((exports) => {
   globalThis.wasmExports = exports;
-  console.log("wasmExports loaded");
+  // console.log("wasmExports loaded");
 });
 
 const functions = {

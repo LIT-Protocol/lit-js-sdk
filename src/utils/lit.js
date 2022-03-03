@@ -4,6 +4,7 @@ import {
   toString as uint8arrayToString,
 } from "uint8arrays";
 import { formatEther, formatUnits } from "@ethersproject/units";
+import { throwError } from "../lib/utils";
 
 import {
   importSymmetricKey,

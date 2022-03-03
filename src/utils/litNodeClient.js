@@ -268,27 +268,29 @@ export default class LitNodeClient {
         })
       );
     }
-    const signatureShares = await Promise.all(nodePromises);
-    console.log("signatureShares", signatureShares);
-    const goodShares = signatureShares.filter((d) => d.signatureShare !== "");
-    if (goodShares.length < this.config.minNodeCount) {
-      console.log(
-        `majority of shares are bad. goodShares is ${JSON.stringify(
-          goodShares
-        )}`
-      );
-      if (this.config.alertWhenUnauthorized) {
-        alert(
-          "You are not authorized to receive a signature to grant access to this content"
-        );
+    const res = await this.handleNodePromises(nodePromises);
+    if (res.success === false) {
+      if (res.error && res.error.errorCode) {
+        if (
+          res.error.errorCode === "not_authorized" &&
+          this.config.alertWhenUnauthorized
+        ) {
+          alert(
+            "You are not authorized to receive a signature to grant access to this content"
+          );
+        }
+        throwError({ ...res.error, name: "NodeError" });
+      } else {
+        throwError({
+          message: `There was an error getting the signing shares from the nodes`,
+          name: "UnknownError",
+          errorCode: "unknown_error",
+        });
       }
-
-      throwError({
-        message: `You are not authorized to recieve a signature on this item`,
-        name: "UnauthorizedException",
-        errorCode: "not_authorized",
-      });
+      return;
     }
+    const signatureShares = res.values;
+    console.log("signatureShares", signatureShares);
 
     // sanity check
     if (
@@ -756,20 +758,51 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
-  async sendCommandToNode({ url, data }) {
+  sendCommandToNode({ url, data }) {
     console.log(`sendCommandToNode with url ${url} and data`, data);
-    return await fetch(url, {
+    return fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-        return data;
-      });
+    }).then(async (response) => {
+      const isJson = response.headers
+        .get("content-type")
+        ?.includes("application/json");
+      const data = isJson ? await response.json() : null;
+
+      if (!response.ok) {
+        // get error message from body or default to response status
+        const error = data || response.status;
+        return Promise.reject(error);
+      }
+
+      return data;
+    });
+  }
+
+  async handleNodePromises(promises) {
+    const responses = await Promise.allSettled(promises);
+    console.log("responses", responses);
+    const successes = responses.filter((r) => r.status === "fulfilled");
+    if (successes.length >= this.config.minNodeCount) {
+      return {
+        success: true,
+        values: successes.map((r) => r.value),
+      };
+    }
+
+    // if we're here, then we did not succeed.  time to handle and report errors.
+    const rejected = responses.filter((r) => r.status === "rejected");
+    const mostCommonError = JSON.parse(
+      mostCommonString(rejected.map((r) => JSON.stringify(r.reason)))
+    );
+    console.log(`most common error: ${JSON.stringify(mostCommonError)}`);
+    return {
+      success: false,
+      error: mostCommonError,
+    };
   }
 
   /**
