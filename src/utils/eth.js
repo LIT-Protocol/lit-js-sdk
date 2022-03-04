@@ -464,7 +464,7 @@ export const signMessageAsync = async (signer, address, message) => {
 export async function mintLIT({ chain, quantity }) {
   console.log(`minting ${quantity} tokens on ${chain}`);
   try {
-    const authSig = await checkAndSignAuthMessage({ chain });
+    const authSig = await checkAndSignEVMAuthMessage({ chain });
     if (authSig.errorCode) {
       return authSig;
     }
@@ -589,7 +589,7 @@ export async function sendLIT({ tokenMetadata, to }) {
  */
 export async function decimalPlaces({ contractAddress, chain }) {
   if (chain) {
-    await checkAndSignAuthMessage({ chain }); // this will switch them to the correct chain
+    await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
   }
   const { web3, account } = await connectWeb3();
   const contract = new Contract(contractAddress, ERC20, web3);
@@ -604,7 +604,7 @@ export async function decimalPlaces({ contractAddress, chain }) {
  * @returns {string} The resolved eth address
  */
 export async function lookupNameServiceAddress({ chain, name }) {
-  await checkAndSignAuthMessage({ chain }); // this will switch them to the correct chain
+  await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
   const { web3, account } = await connectWeb3();
 
   const parts = name.split(".");
