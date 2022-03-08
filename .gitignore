@@ -10,7 +10,8 @@ node_modules
 /coverage
 
 # production
-#/build
+/build/index*.js
+/build/index*.js.map
 
 # misc
 .DS_Store

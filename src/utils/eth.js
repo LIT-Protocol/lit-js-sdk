@@ -43,14 +43,6 @@ export function decodeCallResult({ abi, functionName, data }) {
 }
 
 export async function connectWeb3() {
-  if (typeof window.ethereum === "undefined") {
-    throwError({
-      message: "No web3 wallet was found",
-      name: "NoWalletException",
-      errorCode: "no_wallet",
-    });
-  }
-
   const rpcUrls = {};
   // need to make it look like this:
   // rpc: {
