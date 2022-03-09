@@ -168,7 +168,7 @@ export async function checkAndSignEVMAuthMessage({ chain }) {
   const selectedChain = LIT_CHAINS[chain];
   let selectedChainId = "0x" + selectedChain.chainId.toString("16");
   log("chainId from web3", chainId);
-  console.debug(
+  log(
     `checkAndSignAuthMessage with chainId ${chainId} and chain set to ${chain} and selectedChain is `,
     selectedChain
   );
