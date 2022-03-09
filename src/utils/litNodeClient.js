@@ -4,7 +4,7 @@ import {
 } from "uint8arrays";
 import naclUtil from "tweetnacl-util";
 
-import { mostCommonString, throwError } from "../lib/utils";
+import { mostCommonString, throwError, log } from "../lib/utils";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import {
   hashAccessControlConditions,
@@ -69,10 +69,10 @@ import {
  */
 export default class LitNodeClient {
   constructor(config) {
-    console.log("config passed in is ", config);
     this.config = {
       alertWhenUnauthorized: true,
       minNodeCount: 6,
+      debug: true,
       bootstrapUrls: [
         "https://node2.litgateway.com:7370",
         "https://node2.litgateway.com:7371",
@@ -101,9 +101,11 @@ export default class LitNodeClient {
       let configOverride = window.localStorage.getItem("LitNodeClientConfig");
       if (configOverride) {
         configOverride = JSON.parse(configOverride);
-        this.config = { ...configOverride };
+        this.config = { ...this.config, ...configOverride };
       }
     }
+
+    globalThis.litConfig = this.config;
   }
 
   /**
@@ -135,10 +137,10 @@ export default class LitNodeClient {
       );
     }
     const signatureShares = await Promise.all(nodePromises);
-    console.log("signatureShares", signatureShares);
+    log("signatureShares", signatureShares);
     const goodShares = signatureShares.filter((d) => d.signatureShare !== "");
     if (goodShares.length < this.config.minNodeCount) {
-      console.log(
+      log(
         `majority of shares are bad. goodShares is ${JSON.stringify(
           goodShares
         )}`
@@ -164,7 +166,7 @@ export default class LitNodeClient {
     ) {
       const msg =
         "Unsigned JWT is not the same from all the nodes.  This means the combined signature will be bad because the nodes signed the wrong things";
-      console.log(msg);
+      log(msg);
       alert(msg);
     }
 
@@ -174,7 +176,7 @@ export default class LitNodeClient {
     // combine the signature shares
 
     const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, "base16");
-    console.log("pkSetAsBytes", pkSetAsBytes);
+    log("pkSetAsBytes", pkSetAsBytes);
 
     const sigShares = signatureShares.map((s) => ({
       shareHex: s.signatureShare,
@@ -184,8 +186,8 @@ export default class LitNodeClient {
       pkSetAsBytes,
       sigShares
     );
-    console.log("raw sig", signature);
-    console.log("signature is ", uint8arrayToString(signature, "base16"));
+    log("raw sig", signature);
+    log("signature is ", uint8arrayToString(signature, "base16"));
 
     const unsignedJwt = mostCommonString(
       signatureShares.map((s) => s.unsignedJwt)
@@ -274,7 +276,7 @@ export default class LitNodeClient {
       return;
     }
     const signatureShares = res.values;
-    console.log("signatureShares", signatureShares);
+    log("signatureShares", signatureShares);
 
     // sanity check
     if (
@@ -284,7 +286,7 @@ export default class LitNodeClient {
     ) {
       const msg =
         "Unsigned JWT is not the same from all the nodes.  This means the combined signature will be bad because the nodes signed the wrong things";
-      console.log(msg);
+      log(msg);
       alert(msg);
     }
 
@@ -294,7 +296,7 @@ export default class LitNodeClient {
     // combine the signature shares
 
     const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, "base16");
-    console.log("pkSetAsBytes", pkSetAsBytes);
+    log("pkSetAsBytes", pkSetAsBytes);
 
     const sigShares = signatureShares.map((s) => ({
       shareHex: s.signatureShare,
@@ -304,8 +306,8 @@ export default class LitNodeClient {
       pkSetAsBytes,
       sigShares
     );
-    console.log("raw sig", signature);
-    console.log("signature is ", uint8arrayToString(signature, "base16"));
+    log("raw sig", signature);
+    log("signature is ", uint8arrayToString(signature, "base16"));
 
     const unsignedJwt = mostCommonString(
       signatureShares.map((s) => s.unsignedJwt)
@@ -342,7 +344,7 @@ export default class LitNodeClient {
     permanant,
     permanent = true,
   }) {
-    console.log("saveSigningCondition");
+    log("saveSigningCondition");
 
     // this is to fix my spelling mistake that we must now maintain forever lol
     if (typeof permanant !== "undefined") {
@@ -465,7 +467,7 @@ export default class LitNodeClient {
       return;
     }
     const decryptionShares = res.values;
-    console.log("decryptionShares", decryptionShares);
+    log("decryptionShares", decryptionShares);
 
     // sort the decryption shares by share index.  this is important when combining the shares.
     decryptionShares.sort((a, b) => a.shareIndex - b.shareIndex);
@@ -496,7 +498,7 @@ export default class LitNodeClient {
       pkSetAsBytes.length,
       ciphertextAsBytes.length
     );
-    // console.log('decrypted is ', uint8arrayToString(decrypted, 'base16'))
+    // log('decrypted is ', uint8arrayToString(decrypted, 'base16'))
 
     return decrypted;
   }
@@ -525,7 +527,7 @@ export default class LitNodeClient {
     permanant,
     permanent = true,
   }) {
-    console.log("LitNodeClient.saveEncryptionKey");
+    log("LitNodeClient.saveEncryptionKey");
 
     // to fix spelling mistake
     if (typeof permanant !== "undefined") {
@@ -565,7 +567,7 @@ export default class LitNodeClient {
         uint8arrayFromString(this.subnetPubKey, "base16"),
         symmetricKey
       );
-      console.log(
+      log(
         "symmetric key encrypted with LIT network key: ",
         uint8arrayToString(encryptedKey, "base16")
       );
@@ -633,7 +635,7 @@ export default class LitNodeClient {
     chain,
     permanent,
   }) {
-    console.log("storeSigningConditionWithNode");
+    log("storeSigningConditionWithNode");
     const urlWithPath = `${url}/web/signing/store`;
     const data = {
       key,
@@ -653,7 +655,7 @@ export default class LitNodeClient {
     chain,
     permanent,
   }) {
-    console.log("storeEncryptionConditionWithNode");
+    log("storeEncryptionConditionWithNode");
     const urlWithPath = `${url}/web/encryption/store`;
     const data = {
       key,
@@ -666,7 +668,7 @@ export default class LitNodeClient {
   }
 
   async getChainDataSigningShare({ url, callRequests, chain, iat, exp }) {
-    console.log("getChainDataSigningShare");
+    log("getChainDataSigningShare");
     const urlWithPath = `${url}/web/signing/sign_chain_data`;
     const data = {
       callRequests,
@@ -688,7 +690,7 @@ export default class LitNodeClient {
     iat,
     exp,
   }) {
-    console.log("getSigningShare");
+    log("getSigningShare");
     const urlWithPath = `${url}/web/signing/retrieve`;
     const data = {
       accessControlConditions,
@@ -712,7 +714,7 @@ export default class LitNodeClient {
     authSig,
     chain,
   }) {
-    console.log("getDecryptionShare");
+    log("getDecryptionShare");
     const urlWithPath = `${url}/web/encryption/retrieve`;
     const data = {
       accessControlConditions,
@@ -727,7 +729,7 @@ export default class LitNodeClient {
 
   async handshakeWithSgx({ url }) {
     const urlWithPath = `${url}/web/handshake`;
-    console.debug(`handshakeWithSgx ${urlWithPath}`);
+    log(`handshakeWithSgx ${urlWithPath}`);
     const data = {
       clientPublicKey: "test",
     };
@@ -735,7 +737,7 @@ export default class LitNodeClient {
   }
 
   sendCommandToNode({ url, data }) {
-    console.log(`sendCommandToNode with url ${url} and data`, data);
+    log(`sendCommandToNode with url ${url} and data`, data);
     return fetch(url, {
       method: "POST",
       headers: {
@@ -760,7 +762,7 @@ export default class LitNodeClient {
 
   async handleNodePromises(promises) {
     const responses = await Promise.allSettled(promises);
-    console.log("responses", responses);
+    log("responses", responses);
     const successes = responses.filter((r) => r.status === "fulfilled");
     if (successes.length >= this.config.minNodeCount) {
       return {
@@ -774,7 +776,7 @@ export default class LitNodeClient {
     const mostCommonError = JSON.parse(
       mostCommonString(rejected.map((r) => JSON.stringify(r.reason)))
     );
-    console.log(`most common error: ${JSON.stringify(mostCommonError)}`);
+    log(`most common error: ${JSON.stringify(mostCommonError)}`);
     return {
       success: false,
       error: mostCommonError,
@@ -838,7 +840,7 @@ export default class LitNodeClient {
             )
           );
           this.ready = true;
-          console.debug("lit is ready");
+          log("lit is ready");
           if (typeof document !== "undefined") {
             document.dispatchEvent(new Event("lit-ready"));
           }

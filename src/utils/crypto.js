@@ -4,7 +4,7 @@ import {
   fromString as uint8arrayFromString,
   toString as uint8arrayToString,
 } from "uint8arrays";
-import { throwError } from "../lib/utils";
+import { throwError, log } from "../lib/utils";
 
 const SYMM_KEY_ALGO_PARAMS = {
   name: "AES-CBC",
@@ -16,7 +16,7 @@ export function hashSolRpcConditions(solRpcConditions) {
     canonicalSolRpcConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
-  console.log("Hashing sol rpc conditions: ", toHash);
+  log("Hashing sol rpc conditions: ", toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
   return crypto.subtle.digest("SHA-256", data);
@@ -175,7 +175,7 @@ export function hashEVMContractConditions(accessControlConditions) {
     canonicalEVMContractConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
-  console.log("Hashing evm contract conditions: ", toHash);
+  log("Hashing evm contract conditions: ", toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
   return crypto.subtle.digest("SHA-256", data);
@@ -227,7 +227,7 @@ export function hashAccessControlConditions(accessControlConditions) {
     canonicalAccessControlConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
-  console.log("Hashing access control conditions: ", toHash);
+  log("Hashing access control conditions: ", toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
   return crypto.subtle.digest("SHA-256", data);

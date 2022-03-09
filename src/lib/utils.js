@@ -20,3 +20,15 @@ export const throwError = ({ message, name, errorCode }) => {
     this.errorCode = errorCode;
   })();
 };
+
+export const log = (...args) => {
+  if (
+    globalThis &&
+    globalThis.litConfig &&
+    globalThis.litConfig.debug === false
+  ) {
+    return;
+  }
+  args.unshift("[Lit-JS-SDK]");
+  console.log(...args);
+};

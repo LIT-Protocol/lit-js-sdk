@@ -4,7 +4,7 @@ import {
   toString as uint8arrayToString,
 } from "uint8arrays";
 import { formatEther, formatUnits } from "@ethersproject/units";
-import { throwError } from "../lib/utils";
+import { throwError, log } from "../lib/utils";
 
 import {
   importSymmetricKey,
@@ -135,16 +135,16 @@ export async function zipAndEncryptFiles(files) {
 export async function decryptZip(encryptedZipBlob, symmKey) {
   // const keypair = await checkAndDeriveKeypair()
 
-  // console.log('Got keypair out of localstorage: ' + keypair)
+  // log('Got keypair out of localstorage: ' + keypair)
   // const privkey = keypair.secretKey
 
   // let decryptedSymmKey = await decryptWithWeb3PrivateKey(symmKey)
   // if (!decryptedSymmKey) {
   //   // fallback to trying the private derived via signature
-  //   console.log('probably not metamask')
+  //   log('probably not metamask')
   //   decryptedSymmKey = decryptWithPrivkey(symmKey, privkey)
   // }
-  // console.log('decrypted', decryptedSymmKey)
+  // log('decrypted', decryptedSymmKey)
 
   // import the decrypted symm key
   const importedSymmKey = await importSymmetricKey(symmKey);
@@ -179,7 +179,7 @@ export async function decryptZip(encryptedZipBlob, symmKey) {
 export async function encryptZip(zip) {
   const zipBlob = await zip.generateAsync({ type: "blob" });
   const zipBlobArrayBuffer = await zipBlob.arrayBuffer();
-  // console.log('blob', zipBlob)
+  // log('blob', zipBlob)
 
   const symmKey = await generateSymmetricKey();
   const encryptedZipBlob = await encryptWithSymmetricKey(
@@ -193,7 +193,7 @@ export async function encryptZip(zip) {
   const exportedSymmKey = new Uint8Array(
     await crypto.subtle.exportKey("raw", symmKey)
   );
-  // console.log('exportedSymmKey in hex', uint8arrayToString(exportedSymmKey, 'base16'))
+  // log('exportedSymmKey in hex', uint8arrayToString(exportedSymmKey, 'base16'))
 
   // encrypt the symmetric key with the
   // public key derived from the eth wallet
@@ -205,11 +205,11 @@ export async function encryptZip(zip) {
   // const encryptedSymmKeyData = encryptWithPubkey(pubkey, JSON.stringify(exportedSymmKey), 'x25519-xsalsa20-poly1305')
   // const packed = JSON.stringify(encryptedSymmKeyData)
 
-  //   console.log('packed symmetric key ', packed)
+  //   log('packed symmetric key ', packed)
   //   const unpacked = JSON.parse(packed)
   //   // test decrypt
   //   const decryptedSymmKey = decryptWithPrivkey(unpacked, privkey)
-  //   console.log('decrypted', decryptedSymmKey)
+  //   log('decrypted', decryptedSymmKey)
   //
   //   // import the decrypted symm key
   //   const importedSymmKey = await importSymmetricKey(decryptedSymmKey)
@@ -224,7 +224,7 @@ export async function encryptZip(zip) {
   //     zipBlobArrayBuffer,
   //     decryptedZipArrayBuffer
   //   )
-  //   console.log('Zip before and after decryption are equal: ', isEqual)
+  //   log('Zip before and after decryption are equal: ', isEqual)
   //   if (!isEqual) {
   //     throw new Error('Decrypted zip does not match original zip.  Something is wrong.')
   //   }
@@ -234,10 +234,10 @@ export async function encryptZip(zip) {
   //     [decryptedZipArrayBuffer],
   //     { type: 'application/zip' }
   //   )
-  //   console.log('decrypted blob', decryptedBlob)
+  //   log('decrypted blob', decryptedBlob)
   //
   //   saveAs(decryptedBlob, 'decrypted.zip')
-  // console.log('saved')
+  // log('saved')
 
   return {
     symmetricKey: exportedSymmKey,
@@ -268,7 +268,7 @@ export async function encryptFileAndZipWithMetadata({
   const exportedSymmKey = new Uint8Array(
     await crypto.subtle.exportKey("raw", symmetricKey)
   );
-  // console.log('exportedSymmKey in hex', uint8arrayToString(exportedSymmKey, 'base16'))
+  // log('exportedSymmKey in hex', uint8arrayToString(exportedSymmKey, 'base16'))
 
   const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
     accessControlConditions,
@@ -276,7 +276,7 @@ export async function encryptFileAndZipWithMetadata({
     authSig,
     chain,
   });
-  console.log("encrypted key saved to Lit", encryptedSymmetricKey);
+  log("encrypted key saved to Lit", encryptedSymmetricKey);
 
   // encrypt the file
   var fileAsArrayBuffer = await file.arrayBuffer();
@@ -324,7 +324,7 @@ export async function decryptZipFileWithMetadata({
   const metadata = JSON.parse(
     await zip.file("lit_protocol_metadata.json").async("string")
   );
-  console.log("zip metadata", metadata);
+  log("zip metadata", metadata);
 
   let symmKey;
   try {
@@ -340,12 +340,12 @@ export async function decryptZipFileWithMetadata({
       if (!additionalAccessControlConditions) {
         throw e;
       }
-      console.log("trying additionalAccessControlConditions");
+      log("trying additionalAccessControlConditions");
 
       for (let i = 0; i < additionalAccessControlConditions.length; i++) {
         const accessControlConditions =
           additionalAccessControlConditions[i].accessControlConditions;
-        console.log("trying additional condition", accessControlConditions);
+        log("trying additional condition", accessControlConditions);
         try {
           symmKey = await litNodeClient.getEncryptionKey({
             accessControlConditions: accessControlConditions,
@@ -375,40 +375,40 @@ export async function decryptZipFileWithMetadata({
   }
   const importedSymmKey = await importSymmetricKey(symmKey);
 
-  // console.log('symmetricKey', importedSymmKey)
+  // log('symmetricKey', importedSymmKey)
 
   const encryptedFile = await zip
     .folder("encryptedAssets")
     .file(metadata.name)
     .async("blob");
-  // console.log('encryptedFile', encryptedFile)
+  // log('encryptedFile', encryptedFile)
 
   const decryptedFile = await decryptWithSymmetricKey(
     encryptedFile,
     importedSymmKey
   );
 
-  // console.log('decryptedFile', decryptedFile)
+  // log('decryptedFile', decryptedFile)
 
   return { decryptedFile, metadata };
 }
 
 async function getNpmPackage(packageName) {
-  // console.log('getting npm package: ' + packageName)
+  // log('getting npm package: ' + packageName)
   if (PACKAGE_CACHE[packageName]) {
-    // console.log('found in cache')
+    // log('found in cache')
     return PACKAGE_CACHE[packageName];
   }
 
   const resp = await fetch("https://unpkg.com/" + packageName);
   if (!resp.ok) {
-    console.log("error with response: ", resp);
+    log("error with response: ", resp);
     throw Error(resp.statusText);
   }
   const blob = await resp.blob();
-  // console.log('got blob', blob)
+  // log('got blob', blob)
   const dataUrl = await fileToDataUrl(blob);
-  // console.log('got dataUrl', dataUrl)
+  // log('got dataUrl', dataUrl)
   PACKAGE_CACHE[packageName] = dataUrl;
   return dataUrl;
 }
@@ -438,7 +438,7 @@ export async function createHtmlLIT({
 }) {
   // uncomment this to embed the LIT JS SDK directly instead of retrieving it from unpkg when a user views the LIT
   // npmPackages.push('lit-js-sdk')
-  // console.log('createHtmlLIT with npmPackages', npmPackages)
+  // log('createHtmlLIT with npmPackages', npmPackages)
   let scriptTags = "";
   for (let i = 0; i < npmPackages.length; i++) {
     const scriptDataUrl = await getNpmPackage(npmPackages[i]);
@@ -450,7 +450,7 @@ export async function createHtmlLIT({
     canonicalAccessControlConditionFormatter(c)
   );
 
-  // console.log('scriptTags: ', scriptTags)
+  // log('scriptTags: ', scriptTags)
 
   return `
 <!DOCTYPE html>
@@ -554,7 +554,7 @@ export async function toggleLock() {
     // try {
     //   merkleProof = await getMerkleProof({ tokenAddress: window.tokenAddress, balanceStorageSlot, tokenId: window.tokenId })
     // } catch (e) {
-    //   console.log(e)
+    //   log(e)
     //   alert('Error - could not obtain merkle proof.  Some nodes do not support this operation yet.  Please try another ETH node.')
     //   return
     // }
@@ -623,25 +623,25 @@ export async function unlockLitWithKey({ symmetricKey }) {
  * @returns {Object} An object with 4 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.  "signature": A uint8array that represents the raw  signature of the JWT.
  */
 export function verifyJwt({ jwt }) {
-  console.log("verifyJwt", jwt);
+  log("verifyJwt", jwt);
   // verify that the wasm was loaded
   if (!globalThis.wasmExports) {
-    console.log("wasmExports is not loaded.");
+    log("wasmExports is not loaded.");
     // initWasmBlsSdk().then((exports) => {
-    //   // console.log('wtf, window? ', typeof window !== 'undefined')
+    //   // log('wtf, window? ', typeof window !== 'undefined')
     //   window.wasmExports = exports;
     // });
   }
 
   const pubKey = uint8arrayFromString(NETWORK_PUB_KEY, "base16");
-  // console.log("pubkey is ", pubKey);
+  // log("pubkey is ", pubKey);
   const jwtParts = jwt.split(".");
   const sig = uint8arrayFromString(jwtParts[2], "base64url");
-  // console.log("sig is ", uint8arrayToString(sig, "base16"));
+  // log("sig is ", uint8arrayToString(sig, "base16"));
   const unsignedJwt = `${jwtParts[0]}.${jwtParts[1]}`;
-  // console.log("unsignedJwt is ", unsignedJwt);
+  // log("unsignedJwt is ", unsignedJwt);
   const message = uint8arrayFromString(unsignedJwt);
-  // console.log("message is ", message);
+  // log("message is ", message);
 
   // TODO check for expiration
 
@@ -721,9 +721,9 @@ export async function humanizeAccessControlConditions({
   tokenList,
   myWalletAddress,
 }) {
-  console.log("humanizing access control conditions");
-  console.log("myWalletAddress", myWalletAddress);
-  console.log("accessControlConditions", accessControlConditions);
+  log("humanizing access control conditions");
+  log("myWalletAddress", myWalletAddress);
+  log("accessControlConditions", accessControlConditions);
   let fixedConditions = accessControlConditions;
 
   // inject and operator if needed
@@ -844,7 +844,7 @@ export async function humanizeAccessControlConditions({
             contractAddress: acc.contractAddress,
           });
         }
-        console.log("decimals", decimals);
+        log("decimals", decimals);
         return `Owns ${humanizeComparator(
           acc.returnValueTest.comparator
         )} ${formatUnits(acc.returnValueTest.value, decimals)} of ${

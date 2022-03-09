@@ -4,7 +4,7 @@ import {
   fromString as uint8arrayFromString,
   toString as uint8arrayToString,
 } from "uint8arrays";
-import { throwError } from "../lib/utils";
+import { throwError, log } from "../lib/utils";
 
 function getProvider() {
   if ("solana" in window) {
@@ -40,14 +40,14 @@ export async function checkAndSignSolAuthMessage({ chain }) {
 
   let authSig = localStorage.getItem("lit-auth-sol-signature");
   if (!authSig) {
-    console.log("signing auth message because sig is not in local storage");
+    log("signing auth message because sig is not in local storage");
     await signAndSaveAuthMessage({ provider, account });
     authSig = localStorage.getItem("lit-auth-sol-signature");
   }
   authSig = JSON.parse(authSig);
 
   if (account !== authSig.address) {
-    console.log(
+    log(
       "signing auth message because account is not the same as the address in the auth sig"
     );
     await signAndSaveAuthMessage({ provider, account });
@@ -55,7 +55,7 @@ export async function checkAndSignSolAuthMessage({ chain }) {
     authSig = JSON.parse(authSig);
   }
 
-  console.log("authSig", authSig);
+  log("authSig", authSig);
 
   return authSig;
 }
