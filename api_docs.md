@@ -125,6 +125,7 @@ A LIT node client.  Connects directly to the LIT nodes to store and retrieve enc
 
     *   `config.alertWhenUnauthorized` **[boolean][100]** Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  An exception will also be thrown regardless of this option. (optional, default `true`)
     *   `config.minNodeCount` **[number][99]** The minimum number of nodes that must be connected for the LitNodeClient to be ready to use. (optional, default `6`)
+    *   `config.debug` **[boolean][100]** Whether or not to show debug messages. (optional, default `true`)
 
 ### getSignedChainDataToken
 
@@ -170,7 +171,8 @@ Associated access control conditions with a resource on the web.  After calling 
     *   `params.chain` **[string][98]** The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
     *   `params.authSig` **[AuthSig][106]** The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions
     *   `params.resourceId` **[ResourceId][107]** The resourceId representing something on the web via a URL
-    *   `params.permanant` **[boolean][100]** Whether or not the access control condition should be saved permanantly.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default. (optional, default `true`)
+    *   `params.permanent` **[boolean][100]** Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default. (optional, default `true`)
+    *   `params.permanant`  
 
 Returns **[boolean][100]** Success
 
@@ -206,7 +208,8 @@ Securely save the association between access control conditions and something th
     *   `params.authSig` **[AuthSig][106]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
     *   `params.symmetricKey` **[string][98]** The symmetric encryption key that was used to encrypt the locked content inside the LIT as a Uint8Array.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.  You must pass either symmetricKey or encryptedSymmetricKey.
     *   `params.encryptedSymmetricKey` **[Uint8Array][108]** The encrypted symmetric key of the item you with to update.  You must pass either symmetricKey or encryptedSymmetricKey.
-    *   `params.permanant` **[boolean][100]** Whether or not the access control condition should be saved permanantly.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default. (optional, default `true`)
+    *   `params.permanent` **[boolean][100]** Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default. (optional, default `true`)
+    *   `params.permanant`  
 
 Returns **[Uint8Array][108]** The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
 

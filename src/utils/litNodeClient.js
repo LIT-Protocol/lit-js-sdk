@@ -66,6 +66,7 @@ import {
  * @param {Object} config
  * @param {boolean} [config.alertWhenUnauthorized=true] Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  An exception will also be thrown regardless of this option.
  * @param {number} [config.minNodeCount=6] The minimum number of nodes that must be connected for the LitNodeClient to be ready to use.
+ * @param {boolean} [config.debug=true] Whether or not to show debug messages.
  */
 export default class LitNodeClient {
   constructor(config) {
