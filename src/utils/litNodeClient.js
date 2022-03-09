@@ -329,7 +329,7 @@ export default class LitNodeClient {
    * @param {string} params.chain The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions
    * @param {ResourceId} params.resourceId The resourceId representing something on the web via a URL
-   * @param {boolean} params.permanant Whether or not the access control condition should be saved permanantly.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default.
+   * @param {boolean} params.permanent Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default.
    * @returns {boolean} Success
    */
   async saveSigningCondition({
@@ -339,9 +339,15 @@ export default class LitNodeClient {
     chain,
     authSig,
     resourceId,
-    permanant = true,
+    permanant,
+    permanent = true,
   }) {
     console.log("saveSigningCondition");
+
+    // this is to fix my spelling mistake that we must now maintain forever lol
+    if (typeof permanant !== "undefined") {
+      permanent = permanant;
+    }
 
     // hash the resource id
     const hashOfResourceId = await hashResourceId(resourceId);
@@ -382,7 +388,7 @@ export default class LitNodeClient {
           val: hashOfConditionsStr,
           authSig,
           chain,
-          permanant: permanant ? 1 : 0,
+          permanent: permanent ? 1 : 0,
         })
       );
     }
@@ -505,7 +511,7 @@ export default class LitNodeClient {
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
    * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT as a Uint8Array.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.  You must pass either symmetricKey or encryptedSymmetricKey.
    * @param {Uint8Array} params.encryptedSymmetricKey The encrypted symmetric key of the item you with to update.  You must pass either symmetricKey or encryptedSymmetricKey.
-   * @param {boolean} params.permanant Whether or not the access control condition should be saved permanantly.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default.
+   * @param {boolean} params.permanent Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default.
    * @returns {Uint8Array} The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
    */
   async saveEncryptionKey({
@@ -516,9 +522,16 @@ export default class LitNodeClient {
     authSig,
     symmetricKey,
     encryptedSymmetricKey,
-    permanant = true,
+    permanant,
+    permanent = true,
   }) {
     console.log("LitNodeClient.saveEncryptionKey");
+
+    // to fix spelling mistake
+    if (typeof permanant !== "undefined") {
+      permanent = permanant;
+    }
+
     if (
       (!symmetricKey || symmetricKey == "") &&
       (!encryptedSymmetricKey || encryptedSymmetricKey == "")
@@ -598,7 +611,7 @@ export default class LitNodeClient {
           val: hashOfConditionsStr,
           authSig,
           chain,
-          permanant: permanant ? 1 : 0,
+          permanent: permanent ? 1 : 0,
         })
       );
     }
@@ -618,7 +631,7 @@ export default class LitNodeClient {
     val,
     authSig,
     chain,
-    permanant,
+    permanent,
   }) {
     console.log("storeSigningConditionWithNode");
     const urlWithPath = `${url}/web/signing/store`;
@@ -627,7 +640,7 @@ export default class LitNodeClient {
       val,
       authSig,
       chain,
-      permanant,
+      permanant: permanent,
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
@@ -638,7 +651,7 @@ export default class LitNodeClient {
     val,
     authSig,
     chain,
-    permanant,
+    permanent,
   }) {
     console.log("storeEncryptionConditionWithNode");
     const urlWithPath = `${url}/web/encryption/store`;
@@ -647,7 +660,7 @@ export default class LitNodeClient {
       val,
       authSig,
       chain,
-      permanant,
+      permanant: permanent,
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
