@@ -30,7 +30,7 @@
   ],
   "license": "GPL-3.0",
   "devDependencies": {
-    "esbuild": "^0.12.1",
+    "esbuild": "^0.14.25",
     "esbuild-node-builtins": "^0.1.0",
     "genversion": "^3.0.1",
     "microbundle": "^0.13.0",

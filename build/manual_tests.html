@@ -72,6 +72,30 @@
         }
       };
 
+      var ERC1155WithMinting = async () => {
+        const chain = "ropsten";
+        const { txHash, tokenId, tokenAddress, mintingAddress, authSig } =
+          await LitJsSdk.mintLIT({ chain, quantity: 1 });
+
+        var accessControlConditions = [
+          {
+            contractAddress: LitJsSdk.LIT_CHAINS[chain].contractAddress,
+            standardContractType: "ERC1155",
+            chain,
+            method: "balanceOf",
+            parameters: [":userAddress", tokenId.toString()],
+            returnValueTest: {
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "ERC1155",
+        });
+      };
+
       var ERC1155 = async () => {
         var accessControlConditions = [
           {
@@ -1468,6 +1492,9 @@
     <br />
     <br />
     <button onclick="ETHEmptyWallet()">ETH (Empty Wallet)</button>
+    <br />
+    <br />
+    <button onclick="ERC1155WithMinting()">ERC1155WithMinting</button>
     <br />
     <br />
     <button onclick="ERC1155()">ERC1155</button>

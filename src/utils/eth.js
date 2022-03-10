@@ -13,7 +13,6 @@ import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
 
 import LIT from "../abis/LIT.json";
-import ERC20 from "../abis/ERC20.json";
 import { LIT_CHAINS } from "../lib/constants";
 import { throwError, log } from "../lib/utils";
 
