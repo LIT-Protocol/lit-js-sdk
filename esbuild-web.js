@@ -7,6 +7,9 @@ build({
   minify: true,
   sourcemap: true,
   outfile: "build/index.web.js",
+  loader: {
+    ".svg": "text"
+  },
   sourceRoot: "./",
   globalName: "LitJsSdk",
   plugins: [nodeBuiltIns()],

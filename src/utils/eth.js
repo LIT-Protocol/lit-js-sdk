@@ -4,10 +4,10 @@ import { verifyMessage } from "@ethersproject/wallet";
 import { Web3Provider, JsonRpcSigner } from "@ethersproject/providers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { hexlify } from "@ethersproject/bytes";
-import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Resolution from "@unstoppabledomains/resolution";
 import detectEthereumProvider from "@metamask/detect-provider";
+import LitConnectModal from "lit-connect-modal";
 
 import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
@@ -72,11 +72,10 @@ export async function connectWeb3() {
   log("getting provider via web3modal");
   // disabled because web3modal uses localstorage and breaks when
   // used on opensea
-  const web3Modal = new Web3Modal({
-    cacheProvider: true, // optional
-    providerOptions, // required
-  });
-  const provider = await web3Modal.connect();
+  const dialog = new LitConnectModal({
+    providerOptions
+  })
+  const provider = await dialog.getWalletProvider();
   log("got provider", provider);
   const web3 = new Web3Provider(provider);
   log("got web3", web3);
