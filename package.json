@@ -11,6 +11,7 @@
     "buildWebWithParcel": "parcel build --global LitJsSdk -d build --out-file index.web.js --public-url ./ src/index.js",
     "cdnDeploy": "yarn build; yarn buildWeb; yarn buildNode",
     "build": "microbundle build -o build/index.js -f cjs",
+    "esbuild": "node esbuild.js",
     "buildWeb": "node esbuild-web.js",
     "buildNode": "node esbuild-nodejs.js",
     "test": "node --experimental-specifier-resolution=node tests/provisioningAndSigning.js",
@@ -30,8 +31,9 @@
   ],
   "license": "GPL-3.0",
   "devDependencies": {
-    "esbuild": "^0.12.1",
+    "esbuild": "^0.14.25",
     "esbuild-node-builtins": "^0.1.0",
+    "esbuild-node-externals": "^1.4.1",
     "genversion": "^3.0.1",
     "microbundle": "^0.13.0",
     "parcel": "1.12.3",
