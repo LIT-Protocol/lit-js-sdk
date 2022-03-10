@@ -69,7 +69,7 @@ export async function connectWeb3() {
     },
   };
 
-  log("getting provider via web3modal");
+  log("getting provider via lit connect modal");
   // disabled because web3modal uses localstorage and breaks when
   // used on opensea
   const dialog = new LitConnectModal({
@@ -99,10 +99,6 @@ export async function connectWeb3() {
 }
 
 export async function disconnectWeb3() {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true, // optional
-  });
-  web3Modal.clearCachedProvider();
   localStorage.removeItem("walletconnect");
   localStorage.removeItem("lit-auth-signature");
   localStorage.removeItem("lit-auth-sol-signature");
