@@ -8,7 +8,7 @@ build({
   sourcemap: true,
   outfile: "build/index.web.js",
   loader: {
-    ".svg": "text"
+    ".svg": "dataurl",
   },
   sourceRoot: "./",
   globalName: "LitJsSdk",
