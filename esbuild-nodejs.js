@@ -7,6 +7,7 @@ build({
   outfile: "build/index.node.js",
   loader: {
     ".svg": "dataurl",
+    ".css": "text",
   },
   sourceRoot: "./",
   platform: "node",

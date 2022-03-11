@@ -9,6 +9,7 @@ build({
   outfile: "build/index.web.js",
   loader: {
     ".svg": "dataurl",
+    ".css": "text",
   },
   sourceRoot: "./",
   globalName: "LitJsSdk",
