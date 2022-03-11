@@ -72,18 +72,18 @@ export async function connectWeb3() {
   log("getting provider via lit connect modal");
   // disabled because web3modal uses localstorage and breaks when
   // used on opensea
-  const currentProvider = localStorage.getItem('lit-web3-provider');
+  const currentProvider = localStorage.getItem("lit-web3-provider");
 
   const dialog = new LitConnectModal({
     providerOptions,
-    currentProvider: currentProvider
+    currentProvider: currentProvider,
   });
   const { provider, providerName } = await dialog.getWalletProvider();
-  localStorage.setItem('lit-web3-provider', providerName);
+  localStorage.setItem("lit-web3-provider", providerName);
 
   log("got provider", provider);
   const web3 = new Web3Provider(provider);
-  
+
   if (!currentProvider) {
     log("got web3", web3);
     await provider.enable();
@@ -110,6 +110,7 @@ export async function disconnectWeb3() {
   localStorage.removeItem("walletconnect");
   localStorage.removeItem("lit-auth-signature");
   localStorage.removeItem("lit-auth-sol-signature");
+  localStorage.removeItem("lit-web3-provider");
 }
 
 // taken from the excellent repo https://github.com/zmitton/eth-proof
