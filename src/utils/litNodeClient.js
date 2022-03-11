@@ -4,6 +4,8 @@ import {
 } from "uint8arrays";
 import naclUtil from "tweetnacl-util";
 
+import { version } from "../version";
+
 import { mostCommonString, throwError, log } from "../lib/utils";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import {
@@ -743,6 +745,7 @@ export default class LitNodeClient {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "lit-js-sdk-version": version,
       },
       body: JSON.stringify(data),
     }).then(async (response) => {
