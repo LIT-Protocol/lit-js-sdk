@@ -72,19 +72,27 @@ export async function connectWeb3() {
   log("getting provider via lit connect modal");
   // disabled because web3modal uses localstorage and breaks when
   // used on opensea
+  const currentProvider = localStorage.getItem('lit-web3-provider');
+
   const dialog = new LitConnectModal({
-    providerOptions
-  })
-  const provider = await dialog.getWalletProvider();
+    providerOptions,
+    currentProvider: currentProvider
+  });
+  const { provider, providerName } = await dialog.getWalletProvider();
+  localStorage.setItem('lit-web3-provider', providerName);
+
   log("got provider", provider);
   const web3 = new Web3Provider(provider);
-  log("got web3", web3);
+  
+  if (!currentProvider) {
+    log("got web3", web3);
+    await provider.enable();
+  }
 
   // const provider = await detectEthereumProvider();
   // const web3 = new Web3Provider(provider);
 
   // trigger metamask popup
-  await provider.enable();
 
   log("listing accounts");
   const accounts = await web3.listAccounts();
