@@ -69,8 +69,6 @@ export async function connectWeb3() {
   };
 
   log("getting provider via lit connect modal");
-  // disabled because web3modal uses localstorage and breaks when
-  // used on opensea
 
   const dialog = new LitConnectModal({
     providerOptions,
