@@ -119,6 +119,15 @@ export default class LitNodeClient {
    * @returns {Object} A signed JWT that proves the response to the function call is genuine. You may present this to a smart contract, or a server for authorization, and it can be verified using the verifyJwt function.
    */
   async getSignedChainDataToken({ callRequests, chain }) {
+    if (!this.ready) {
+      throwError({
+        message:
+          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
+        name: "LitNodeClientNotReadyError",
+        errorCode: "lit_node_client_not_ready",
+      });
+    }
+
     // we need to send jwt params iat (issued at) and exp (expiration)
     // because the nodes may have different wall clock times
     // the nodes will verify that these params are withing a grace period
@@ -224,6 +233,15 @@ export default class LitNodeClient {
     authSig,
     resourceId,
   }) {
+    if (!this.ready) {
+      throwError({
+        message:
+          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
+        name: "LitNodeClientNotReadyError",
+        errorCode: "lit_node_client_not_ready",
+      });
+    }
+
     // we need to send jwt params iat (issued at) and exp (expiration)
     // because the nodes may have different wall clock times
     // the nodes will verify that these params are withing a grace period
@@ -349,6 +367,15 @@ export default class LitNodeClient {
   }) {
     log("saveSigningCondition");
 
+    if (!this.ready) {
+      throwError({
+        message:
+          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
+        name: "LitNodeClientNotReadyError",
+        errorCode: "lit_node_client_not_ready",
+      });
+    }
+
     // this is to fix my spelling mistake that we must now maintain forever lol
     if (typeof permanant !== "undefined") {
       permanent = permanant;
@@ -426,6 +453,15 @@ export default class LitNodeClient {
     chain,
     authSig,
   }) {
+    if (!this.ready) {
+      throwError({
+        message:
+          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
+        name: "LitNodeClientNotReadyError",
+        errorCode: "lit_node_client_not_ready",
+      });
+    }
+
     let formattedAccessControlConditions;
     let formattedEVMContractConditions;
     let formattedSolRpcConditions;
@@ -531,6 +567,15 @@ export default class LitNodeClient {
     permanent = true,
   }) {
     log("LitNodeClient.saveEncryptionKey");
+
+    if (!this.ready) {
+      throwError({
+        message:
+          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
+        name: "LitNodeClientNotReadyError",
+        errorCode: "lit_node_client_not_ready",
+      });
+    }
 
     // to fix spelling mistake
     if (typeof permanant !== "undefined") {
