@@ -11,6 +11,11 @@ import {
   canonicalResourceIdFormatter,
 } from "./crypto";
 
+import * as wasmECDSA from "../lib/ecdsa_wasm";
+
+
+
+
 /**
  * @typedef {Object} AccessControlCondition
  * @property {string} contractAddress - The address of the contract that will be queried
@@ -564,8 +569,26 @@ export default class LitNodeClient {
     }
 
     try
-    {  /// currently doing threshold signing p - (t+1) parties will throw an error - deal with this!
-      const signed_ecdsa_messages = await Promise.all(nodePromises);
+    {  /// currently doing threshold signing p 
+      const share_data = await Promise.all(nodePromises);
+
+      const R_x = share_data[0].local_x;
+      const R_y = share_data[0].local_y;
+      const public_key = share_data[0].public_key;
+
+      const valid_shares = share_data.map((s) => (
+        s.signature_share
+      ));
+
+      const shares = JSON.stringify(valid_shares);
+
+      await wasmECDSA.default();  // init WASM
+
+      const signature = wasmECDSA.combine_signature(R_x, R_y, shares);
+
+      console.log("raw ecdsav sig", signature);
+      
+
     }
     catch (e)
     {
