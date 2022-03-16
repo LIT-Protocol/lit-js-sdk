@@ -72,6 +72,87 @@
         }
       };
 
+      var NestedGrouping = async () => {
+        // var accessControlConditions = [
+        //   [
+        //     {
+        //       contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+        //       standardContractType: "ERC721",
+        //       chain: "xdai",
+        //       method: "balanceOf",
+        //       parameters: [":userAddress"],
+        //       returnValueTest: {
+        //         comparator: ">",
+        //         value: "0",
+        //       },
+        //     },
+        //     {
+        //       operator: "and",
+        //     },
+        //     {
+        //       contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+        //       standardContractType: "POAP",
+        //       chain: "xdai",
+        //       method: "tokenURI",
+        //       parameters: [],
+        //       returnValueTest: {
+        //         comparator: "contains",
+        //         value: "test nested poap",
+        //       },
+        //     },
+        //   ],
+        //   {
+        //     operator: "and",
+        //   },
+        //   {
+        //     contractAddress: "",
+        //     standardContractType: "",
+        //     chain: "ethereum",
+        //     method: "",
+        //     parameters: [":userAddress"],
+        //     returnValueTest: {
+        //       comparator: "=",
+        //       value: "0x50e2dac5e78B5905CB09495547452cEE64426db2",
+        //     },
+        //   },
+        // ];
+
+        var accessControlConditions = [
+          [
+            {
+              contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+              standardContractType: "ERC721",
+              chain: "xdai",
+              method: "balanceOf",
+              parameters: [":userAddress"],
+              returnValueTest: {
+                comparator: ">",
+                value: "0",
+              },
+            },
+            {
+              operator: "and",
+            },
+            {
+              contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+              standardContractType: "POAP",
+              chain: "xdai",
+              method: "tokenURI",
+              parameters: [],
+              returnValueTest: {
+                comparator: "contains",
+                value: "test poap",
+              },
+            },
+          ],
+        ];
+
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "NestedGrouping",
+        });
+      };
+
       var ERC1155WithMinting = async () => {
         const chain = "ropsten";
         const { txHash, tokenId, tokenAddress, mintingAddress, authSig } =
@@ -1600,6 +1681,10 @@
       JWT request - Set the conditions as permanent (but with the correct
       spelling), then try to update the conditions
     </button>
+    <br />
+    <br />
+
+    <button onclick="NestedGrouping()">NestedGrouping</button>
     <br />
     <br />
 
