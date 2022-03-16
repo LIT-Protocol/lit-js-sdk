@@ -5717,10 +5717,10 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.2.4.tgz#eca284f75d2965079309dc0ad9255abb2ebc1632"
   integrity sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==
 
-lit-connect-modal@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/lit-connect-modal/-/lit-connect-modal-0.1.2.tgz#d46c6ffe9bcbd073728bab4ef2eb9bda956e0b0d"
-  integrity sha512-KRpkfhB9urt1xZv2bVpEEMh3zTdod3jecGz0zN0Q9o4ojG+nHgZlyRAgrDhLwavy8IEeTlqtfWLp1y9MCxUapA==
+lit-connect-modal@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/lit-connect-modal/-/lit-connect-modal-0.1.3.tgz#cbed5e6444e5b93b4953d7dcb11d2b635183471f"
+  integrity sha512-6gLuAM9CgvwoyUMiEHAjXT4QqXm8HOaI01lccV+YJQ0o0CkU2ab2h/NNQJR4HPDs42wQ/3b9z/nyEW4K1bDzaA==
   dependencies:
     micromodal "^0.4.10"
 
