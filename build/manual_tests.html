@@ -467,6 +467,68 @@
         });
       };
 
+      var BigComplexBooleanConditionAcrossMultipleChains = async () => {
+        const accessControlConditions = [
+          {
+            chain: "ethereum",
+            method: "",
+            parameters: [":userAddress"],
+            contractAddress: "",
+            returnValueTest: {
+              value: "0xc48b5Be243F1B52ccbF88c0762180B7dE9243e06",
+              comparator: "=",
+            },
+            standardContractType: "",
+          },
+          {
+            operator: "or",
+          },
+          {
+            chain: "rinkeby",
+            method: "",
+            parameters: [":userAddress"],
+            contractAddress: "",
+            returnValueTest: {
+              value: "0xc48b5Be243F1B52ccbF88c0762180B7dE9243e06",
+              comparator: "=",
+            },
+            standardContractType: "",
+          },
+          {
+            operator: "or",
+          },
+          {
+            chain: "rinkeby",
+            method: "balanceOf",
+            parameters: [":userAddress"],
+            contractAddress: "0xF63D250EBAFDda29358C92Cca17DC41c52F4B995",
+            returnValueTest: {
+              value: "0",
+              comparator: ">",
+            },
+            standardContractType: "ERC721",
+          },
+          {
+            operator: "or",
+          },
+          {
+            chain: "rinkeby",
+            method: "balanceOf",
+            parameters: [":userAddress"],
+            contractAddress: "0x827DC4985a343059876ae9562969d16E8F13982F",
+            returnValueTest: {
+              value: "0",
+              comparator: ">",
+            },
+            standardContractType: "ERC721",
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "BigComplexBooleanConditionAcrossMultipleChains",
+        });
+      };
+
       var ProofOfHumanity = async () => {
         const accessControlConditions = [
           {
@@ -1685,6 +1747,12 @@
     <br />
 
     <button onclick="NestedGrouping()">NestedGrouping</button>
+    <br />
+    <br />
+
+    <button onclick="BigComplexBooleanConditionAcrossMultipleChains()">
+      BigComplexBooleanConditionAcrossMultipleChains
+    </button>
     <br />
     <br />
 

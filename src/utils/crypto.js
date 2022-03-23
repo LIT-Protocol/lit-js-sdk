@@ -211,7 +211,10 @@ export function canonicalAccessControlConditionFormatter(cond) {
       standardContractType: cond.standardContractType,
       method: cond.method,
       parameters: cond.parameters,
-      returnValueTest: cond.returnValueTest,
+      returnValueTest: {
+        comparator: cond.returnValueTest.comparator,
+        value: cond.returnValueTest.value,
+      },
     };
   }
 

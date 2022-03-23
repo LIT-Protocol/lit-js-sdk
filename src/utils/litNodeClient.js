@@ -256,13 +256,25 @@ export default class LitNodeClient {
       formattedAccessControlConditions = accessControlConditions.map((c) =>
         canonicalAccessControlConditionFormatter(c)
       );
+      log(
+        "formattedAccessControlConditions",
+        JSON.stringify(formattedAccessControlConditions)
+      );
     } else if (evmContractConditions) {
       formattedEVMContractConditions = evmContractConditions.map((c) =>
         canonicalEVMContractConditionFormatter(c)
       );
+      log(
+        "formattedEVMContractConditions",
+        JSON.stringify(formattedEVMContractConditions)
+      );
     } else if (solRpcConditions) {
       formattedSolRpcConditions = solRpcConditions.map((c) =>
         canonicalSolRpcConditionFormatter(c)
+      );
+      log(
+        "formattedSolRpcConditions",
+        JSON.stringify(formattedSolRpcConditions)
       );
     } else {
       throwError({
@@ -469,13 +481,25 @@ export default class LitNodeClient {
       formattedAccessControlConditions = accessControlConditions.map((c) =>
         canonicalAccessControlConditionFormatter(c)
       );
+      log(
+        "formattedAccessControlConditions: ",
+        JSON.stringify(formattedAccessControlConditions)
+      );
     } else if (evmContractConditions) {
       formattedEVMContractConditions = evmContractConditions.map((c) =>
         canonicalEVMContractConditionFormatter(c)
       );
+      log(
+        "formattedEVMContractConditions",
+        JSON.stringify(formattedEVMContractConditions)
+      );
     } else if (solRpcConditions) {
       formattedSolRpcConditions = solRpcConditions.map((c) =>
         canonicalSolRpcConditionFormatter(c)
+      );
+      log(
+        "formattedSolRpcConditions",
+        JSON.stringify(formattedSolRpcConditions)
       );
     } else {
       throwError({
