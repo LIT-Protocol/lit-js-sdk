@@ -1,7 +1,11 @@
 import { Contract } from "@ethersproject/contracts";
 import { Interface } from "@ethersproject/abi";
 import { verifyMessage } from "@ethersproject/wallet";
-import { Web3Provider, JsonRpcSigner } from "@ethersproject/providers";
+import {
+  Web3Provider,
+  JsonRpcSigner,
+  JsonRpcProvider,
+} from "@ethersproject/providers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { hexlify } from "@ethersproject/bytes";
 import WalletConnectProvider from "@walletconnect/ethereum-provider";
@@ -12,6 +16,7 @@ import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
 
 import LIT from "../abis/LIT.json";
+import ERC20 from "../abis/ERC20.json";
 import { LIT_CHAINS } from "../lib/constants";
 import { throwError, log } from "../lib/utils";
 
@@ -595,11 +600,13 @@ export async function sendLIT({ tokenMetadata, to }) {
  * @returns {number} The number of decimal places in the token
  */
 export async function decimalPlaces({ contractAddress, chain }) {
-  if (chain) {
-    await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
-  }
-  const { web3, account } = await connectWeb3();
-  const contract = new Contract(contractAddress, ERC20, web3);
+  // if (chain) {
+  //   await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
+  // }
+  // const { web3, account } = await connectWeb3();
+  const rpcUrl = LIT_CHAINS[chain].rpcUrls[0];
+  const web3 = new JsonRpcProvider(rpcUrl);
+  const contract = new Contract(contractAddress, ERC20.abi, web3);
   return await contract.decimals();
 }
 
@@ -611,8 +618,10 @@ export async function decimalPlaces({ contractAddress, chain }) {
  * @returns {string} The resolved eth address
  */
 export async function lookupNameServiceAddress({ chain, name }) {
-  await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
-  const { web3, account } = await connectWeb3();
+  // await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
+  // const { web3, account } = await connectWeb3();
+  const rpcUrl = LIT_CHAINS[chain].rpcUrls[0];
+  const web3 = new JsonRpcProvider(rpcUrl);
 
   const parts = name.split(".");
   const tld = parts[parts.length - 1].toLowerCase();
