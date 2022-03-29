@@ -100,12 +100,16 @@ export default class LitNodeClient {
     this.networkPubKey = null;
     this.networkPubKeySet = null;
 
-    if (typeof window !== "undefined" && window && window.localStorage) {
-      let configOverride = window.localStorage.getItem("LitNodeClientConfig");
-      if (configOverride) {
-        configOverride = JSON.parse(configOverride);
-        this.config = { ...this.config, ...configOverride };
+    try {
+      if (typeof window !== "undefined" && window && window.localStorage) {
+        let configOverride = window.localStorage.getItem("LitNodeClientConfig");
+        if (configOverride) {
+          configOverride = JSON.parse(configOverride);
+          this.config = { ...this.config, ...configOverride };
+        }
       }
+    } catch (e) {
+      console.log("Error accessing local storage", e);
     }
 
     globalThis.litConfig = this.config;

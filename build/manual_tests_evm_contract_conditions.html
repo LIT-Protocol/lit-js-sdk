@@ -484,6 +484,36 @@
         });
       };
 
+      var RandomTestFromUser = async () => {
+        var evmContractConditions = [
+          {
+            contractAddress: "0x0fc5726e5CC2f0eE4557ca69F5017f91b35a09F8",
+            functionName: "hasSubscription",
+            functionParams: ["1", ":userAddress"],
+            functionAbi: {
+              inputs: [
+                { internalType: "uint256", name: "profileId", type: "uint256" },
+                { internalType: "address", name: "follower", type: "address" },
+              ],
+              name: "hasSubscription",
+              outputs: [{ internalType: "bool", name: "", type: "bool" }],
+              stateMutability: "view",
+              type: "function",
+            },
+            chain: "mumbai",
+            returnValueTest: {
+              key: "",
+              comparator: "=",
+              value: "true",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          evmContractConditions,
+          testName: "RandomTestFromUser",
+        });
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -535,6 +565,10 @@
     <br />
 
     <button onclick="SignAGroup()">SignAGroup</button>
+    <br />
+    <br />
+
+    <button onclick="RandomTestFromUser()">RandomTestFromUser</button>
     <br />
     <br />
 
