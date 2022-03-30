@@ -11,7 +11,7 @@ import {
   canonicalResourceIdFormatter,
 } from "./crypto";
 
-import * as wasmECDSA from "../lib/ecdsa_wasm";
+import * as wasmECDSA from "../lib/ecdsa-sdk";
 
 
 
@@ -572,8 +572,10 @@ export default class LitNodeClient {
     {  /// currently doing threshold signing p 
       const share_data = await Promise.all(nodePromises);
 
-      const R_x = share_data[0].local_x;
+      // R_x & R_y values can come from any node (they will be different per node), and will generate a valid signature
+      const R_x = share_data[0].local_x;  
       const R_y = share_data[0].local_y;
+      // the public key can come from any node - it obviously will be identical from each node
       const public_key = share_data[0].public_key;
 
       const valid_shares = share_data.map((s) => (
@@ -582,12 +584,13 @@ export default class LitNodeClient {
 
       const shares = JSON.stringify(valid_shares);
 
-      await wasmECDSA.default();  // init WASM
+      await wasmECDSA.initWasmEcdsaSdk();  // init WASM
 
       const signature = wasmECDSA.combine_signature(R_x, R_y, shares);
 
       console.log("raw ecdsav sig", signature);
       
+      return (signature);
 
     }
     catch (e)
