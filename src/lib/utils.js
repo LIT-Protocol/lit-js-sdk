@@ -18,6 +18,17 @@ export const throwError = ({ message, name, errorCode }) => {
     this.message = message;
     this.name = name;
     this.errorCode = errorCode;
-    this.code = errorCode;
   })();
+};
+
+export const log = (...args) => {
+  if (
+    globalThis &&
+    globalThis.litConfig &&
+    globalThis.litConfig.debug === false
+  ) {
+    return;
+  }
+  args.unshift("[Lit-JS-SDK]");
+  console.log(...args);
 };

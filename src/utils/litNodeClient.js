@@ -1,13 +1,21 @@
-import uint8arrayFromString from "uint8arrays/from-string";
-import uint8arrayToString from "uint8arrays/to-string";
-//import naclUtil from "tweetnacl-util";
+import {
+  fromString as uint8arrayFromString,
+  toString as uint8arrayToString,
+} from "uint8arrays";
+import naclUtil from "tweetnacl-util";
 
-import { mostCommonString, throwError } from "../lib/utils";
+import { version } from "../version";
+
+import { mostCommonString, throwError, log } from "../lib/utils";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import {
   hashAccessControlConditions,
+  hashEVMContractConditions,
+  hashSolRpcConditions,
   hashResourceId,
   canonicalAccessControlConditionFormatter,
+  canonicalEVMContractConditionFormatter,
+  canonicalSolRpcConditionFormatter,
   canonicalResourceIdFormatter,
 } from "./crypto";
 
@@ -26,9 +34,23 @@ import * as wasmECDSA from "../lib/ecdsa-sdk";
  * @property {Object} returnValueTest - An object containing two keys: "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.
  */
 
-//  pub base_url: String,
-//  pub path: String,
-//  pub org_id: String,
+/**
+ * @typedef {Object} EVMContractCondition
+ * @property {string} contractAddress - The address of the contract that will be queried
+ * @property {string} chain - The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+ * @property {string} functionName - The smart contract function to call
+ * @property {Array} functionParams - The parameters to use when calling the smart contract.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
+ * @property {Object} functionAbi - The ABI of the smart contract function to call.  This is used to encode the function parameters and decode the return value of the function.  Do not pass the entire contract ABI here.  Instead, find the function you want to call in the contract ABI and pass that function's ABI here.
+ * @property {Object} returnValueTest - An object containing three keys: "key", "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "key": "", "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.  The "key" is used when the return value is a struct which contains multiple values and should be the name of the returned value from the function abi.  You must always pass "key" when using "returnValueTest", even if you pass an empty string for it, because the function only returns a single value.
+ */
+
+/**
+ * @typedef {Object} SolRpcCondition
+ * @property {string} method - The Solana RPC method to be called.  You can find a list here: https://docs.solana.com/developing/clients/jsonrpc-api
+ * @property {Array} params - The parameters to use when making the RPC call.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
+ * @property {string} chain - The chain name of the chain that this contract is deployed on.  See ALL_LIT_CHAINS for currently supported chains.  On Solana, we support "solana" for mainnet, "solanaDevnet" for devnet and "solanaTestnet" for testnet.
+ * @property {Object} returnValueTest - An object containing three keys: "key", "comparator" and "value".  The return value of the rpc call will be compared against these.  The "key" selector supports JSONPath syntax, so you can filter and iterate over the results.  For example, to check if someone holds an NFT with address 29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE, you could use "method": "GetTokenAccountsByOwner", "params": [":userAddress",{"programId":"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"},{"encoding":"jsonParsed"}], "key": "$[?(@.account.data.parsed.info.mint == "29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE")].account.data.parsed.info.tokenAmount.amount", "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.  The "key" is used when the return value is an array or object which contains multiple values and should be the name of the returned value or a JSONPath item.  You must always pass "key" when using "returnValueTest", even if you pass an empty string for it, because the rpc call only returns a single value.
+ */
 
 /**
  * @typedef {Object} ResourceId
@@ -51,13 +73,14 @@ import * as wasmECDSA from "../lib/ecdsa-sdk";
  * @param {Object} config
  * @param {boolean} [config.alertWhenUnauthorized=true] Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  An exception will also be thrown regardless of this option.
  * @param {number} [config.minNodeCount=6] The minimum number of nodes that must be connected for the LitNodeClient to be ready to use.
+ * @param {boolean} [config.debug=true] Whether or not to show debug messages.
  */
 export default class LitNodeClient {
   constructor(config) {
-    console.log("config passed in is ", config);
     this.config = {
       alertWhenUnauthorized: true,
       minNodeCount: 6,
+      debug: true,
       bootstrapUrls: [
         "https://node2.litgateway.com:7370",
         "https://node2.litgateway.com:7371",
@@ -86,9 +109,11 @@ export default class LitNodeClient {
       let configOverride = window.localStorage.getItem("LitNodeClientConfig");
       if (configOverride) {
         configOverride = JSON.parse(configOverride);
-        this.config = { ...configOverride };
+        this.config = { ...this.config, ...configOverride };
       }
     }
+
+    globalThis.litConfig = this.config;
   }
 
   /**
@@ -120,10 +145,10 @@ export default class LitNodeClient {
       );
     }
     const signatureShares = await Promise.all(nodePromises);
-    console.log("signatureShares", signatureShares);
+    log("signatureShares", signatureShares);
     const goodShares = signatureShares.filter((d) => d.signatureShare !== "");
     if (goodShares.length < this.config.minNodeCount) {
-      console.log(
+      log(
         `majority of shares are bad. goodShares is ${JSON.stringify(
           goodShares
         )}`
@@ -149,7 +174,7 @@ export default class LitNodeClient {
     ) {
       const msg =
         "Unsigned JWT is not the same from all the nodes.  This means the combined signature will be bad because the nodes signed the wrong things";
-      console.log(msg);
+      log(msg);
       alert(msg);
     }
 
@@ -159,7 +184,7 @@ export default class LitNodeClient {
     // combine the signature shares
 
     const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, "base16");
-    console.log("pkSetAsBytes", pkSetAsBytes);
+    log("pkSetAsBytes", pkSetAsBytes);
 
     const sigShares = signatureShares.map((s) => ({
       shareHex: s.signatureShare,
@@ -169,8 +194,8 @@ export default class LitNodeClient {
       pkSetAsBytes,
       sigShares
     );
-    console.log("raw sig", signature);
-    console.log("signature is ", uint8arrayToString(signature, "base16"));
+    log("raw sig", signature);
+    log("signature is ", uint8arrayToString(signature, "base16"));
 
     const unsignedJwt = mostCommonString(
       signatureShares.map((s) => s.unsignedJwt)
@@ -188,14 +213,18 @@ export default class LitNodeClient {
   /**
    * Request a signed JWT from the LIT network.  Before calling this function, you must either create or know of a resource id and access control conditions for the item you wish to gain authorization for.  You can create an access control condition using the saveSigningCondition function.
    * @param {Object} params
-   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
-   * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+   * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions solRpcConditions.
+   * @param {Array.<SolRpcCondition>} params.solRpcConditions  Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+   * @param {string} params.chain The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions.
    * @param {ResourceId} params.resourceId The resourceId representing something on the web via a URL
    * @returns {Object} A signed JWT that proves you meet the access control conditions for the given resource id.  You may present this to a server for authorization, and the server can verify it using the verifyJwt function.
    */
   async getSignedToken({
     accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
     chain,
     authSig,
     resourceId,
@@ -207,9 +236,29 @@ export default class LitNodeClient {
     const iat = Math.floor(now / 1000);
     const exp = iat + 12 * 60 * 60; // 12 hours in seconds
 
-    const formattedAccessControlConditions = accessControlConditions.map((c) =>
-      canonicalAccessControlConditionFormatter(c)
-    );
+    let formattedAccessControlConditions;
+    let formattedEVMContractConditions;
+    let formattedSolRpcConditions;
+    if (accessControlConditions) {
+      formattedAccessControlConditions = accessControlConditions.map((c) =>
+        canonicalAccessControlConditionFormatter(c)
+      );
+    } else if (evmContractConditions) {
+      formattedEVMContractConditions = evmContractConditions.map((c) =>
+        canonicalEVMContractConditionFormatter(c)
+      );
+    } else if (solRpcConditions) {
+      formattedSolRpcConditions = solRpcConditions.map((c) =>
+        canonicalSolRpcConditionFormatter(c)
+      );
+    } else {
+      throwError({
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
+    }
+
     const formattedResourceId = canonicalResourceIdFormatter(resourceId);
 
     // ask each node to sign the content
@@ -219,6 +268,8 @@ export default class LitNodeClient {
         this.getSigningShare({
           url,
           accessControlConditions: formattedAccessControlConditions,
+          evmContractConditions: formattedEVMContractConditions,
+          solRpcConditions: formattedSolRpcConditions,
           resourceId: formattedResourceId,
           authSig,
           chain,
@@ -227,27 +278,13 @@ export default class LitNodeClient {
         })
       );
     }
-    const signatureShares = await Promise.all(nodePromises);
-    console.log("signatureShares", signatureShares);
-    const goodShares = signatureShares.filter((d) => d.signatureShare !== "");
-    if (goodShares.length < this.config.minNodeCount) {
-      console.log(
-        `majority of shares are bad. goodShares is ${JSON.stringify(
-          goodShares
-        )}`
-      );
-      if (this.config.alertWhenUnauthorized) {
-        alert(
-          "You are not authorized to receive a signature to grant access to this content"
-        );
-      }
-
-      throwError({
-        message: `You are not authorized to recieve a signature on this item`,
-        name: "UnauthorizedException",
-        errorCode: "not_authorized",
-      });
+    const res = await this.handleNodePromises(nodePromises);
+    if (res.success === false) {
+      this.throwNodeError(res);
+      return;
     }
+    const signatureShares = res.values;
+    log("signatureShares", signatureShares);
 
     // sanity check
     if (
@@ -257,7 +294,7 @@ export default class LitNodeClient {
     ) {
       const msg =
         "Unsigned JWT is not the same from all the nodes.  This means the combined signature will be bad because the nodes signed the wrong things";
-      console.log(msg);
+      log(msg);
       alert(msg);
     }
 
@@ -267,7 +304,7 @@ export default class LitNodeClient {
     // combine the signature shares
 
     const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, "base16");
-    console.log("pkSetAsBytes", pkSetAsBytes);
+    log("pkSetAsBytes", pkSetAsBytes);
 
     const sigShares = signatureShares.map((s) => ({
       shareHex: s.signatureShare,
@@ -277,8 +314,8 @@ export default class LitNodeClient {
       pkSetAsBytes,
       sigShares
     );
-    console.log("raw sig", signature);
-    console.log("signature is ", uint8arrayToString(signature, "base16"));
+    log("raw sig", signature);
+    log("signature is ", uint8arrayToString(signature, "base16"));
 
     const unsignedJwt = mostCommonString(
       signatureShares.map((s) => s.unsignedJwt)
@@ -296,20 +333,31 @@ export default class LitNodeClient {
   /**
    * Associated access control conditions with a resource on the web.  After calling this function, users may use the getSignedToken function to request a signed JWT from the LIT network.  This JWT proves that the user meets the access control conditions, and is authorized to access the resource you specified in the resourceId parameter of the saveSigningCondition function.
    * @param {Object} params
-   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.
-   * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+   * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+   * @param {Array.<SolRpcCondition>} params.solRpcConditions  Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+   * @param {string} params.chain The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions
    * @param {ResourceId} params.resourceId The resourceId representing something on the web via a URL
+   * @param {boolean} params.permanent Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default.
    * @returns {boolean} Success
    */
   async saveSigningCondition({
     accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
     chain,
     authSig,
     resourceId,
-    permanant = 1,
+    permanant,
+    permanent = true,
   }) {
-    console.log("saveSigningCondition");
+    log("saveSigningCondition");
+
+    // this is to fix my spelling mistake that we must now maintain forever lol
+    if (typeof permanant !== "undefined") {
+      permanent = permanant;
+    }
 
     // hash the resource id
     const hashOfResourceId = await hashResourceId(resourceId);
@@ -318,10 +366,24 @@ export default class LitNodeClient {
       "base16"
     );
 
+    let hashOfConditions;
     // hash the access control conditions
-    const hashOfConditions = await hashAccessControlConditions(
-      accessControlConditions
-    );
+    if (accessControlConditions) {
+      hashOfConditions = await hashAccessControlConditions(
+        accessControlConditions
+      );
+    } else if (evmContractConditions) {
+      hashOfConditions = await hashEVMContractConditions(evmContractConditions);
+    } else if (solRpcConditions) {
+      hashOfConditions = await hashSolRpcConditions(solRpcConditions);
+    } else {
+      throwError({
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
+    }
+
     const hashOfConditionsStr = uint8arrayToString(
       new Uint8Array(hashOfConditions),
       "base16"
@@ -336,20 +398,15 @@ export default class LitNodeClient {
           val: hashOfConditionsStr,
           authSig,
           chain,
-          permanant,
+          permanent: permanent ? 1 : 0,
         })
       );
     }
 
-    const responses = await Promise.all(nodePromises);
-    const errors = responses.filter((r) => r.error !== "");
-
-    if (errors.length >= this.connectedNodes.size - this.config.minNodeCount) {
-      throwError({
-        message: errors[0].error,
-        name: "StorageError",
-        errorCode: "storage_error",
-      });
+    const res = await this.handleNodePromises(nodePromises);
+    if (res.success === false) {
+      this.throwNodeError(res);
+      return;
     }
 
     return true;
@@ -358,50 +415,67 @@ export default class LitNodeClient {
   /**
    * Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user meets the access control conditions specified when the data was encrypted.  That access control condition is typically that the user is a holder of the NFT that corresponds to this encrypted data.  This NFT token address and ID was specified when this LIT was created.
    * @param {Object} params
-   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain the encryption key, used to decrypt the data.  This could be posession of an NFT, for example.
+   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+   * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+   * @param {Array.<SolRpcCondition>} params.solRpcConditions  Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
    * @param {string} params.toDecrypt The ciphertext that you wish to decrypt encoded as a hex string
-   * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+   * @param {string} params.chain The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
    * @returns {Uint8Array} The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
    */
   async getEncryptionKey({
     accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
     toDecrypt,
     chain,
     authSig,
   }) {
+    let formattedAccessControlConditions;
+    let formattedEVMContractConditions;
+    let formattedSolRpcConditions;
+    if (accessControlConditions) {
+      formattedAccessControlConditions = accessControlConditions.map((c) =>
+        canonicalAccessControlConditionFormatter(c)
+      );
+    } else if (evmContractConditions) {
+      formattedEVMContractConditions = evmContractConditions.map((c) =>
+        canonicalEVMContractConditionFormatter(c)
+      );
+    } else if (solRpcConditions) {
+      formattedSolRpcConditions = solRpcConditions.map((c) =>
+        canonicalSolRpcConditionFormatter(c)
+      );
+    } else {
+      throwError({
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
+    }
+
     // ask each node to decrypt the content
     const nodePromises = [];
     for (const url of this.connectedNodes) {
       nodePromises.push(
         this.getDecryptionShare({
           url,
-          accessControlConditions,
+          accessControlConditions: formattedAccessControlConditions,
+          evmContractConditions: formattedEVMContractConditions,
+          solRpcConditions: formattedSolRpcConditions,
           toDecrypt,
           authSig,
           chain,
         })
       );
     }
-    const decryptionShares = await Promise.all(nodePromises);
-    console.log("decryptionShares", decryptionShares);
-    const goodShares = decryptionShares.filter((d) => d.decryptionShare !== "");
-    if (goodShares.length < this.config.minNodeCount) {
-      console.log(
-        `majority of shares are bad. goodShares is ${JSON.stringify(
-          goodShares
-        )}`
-      );
-      if (this.config.alertWhenUnauthorized) {
-        alert("You are not authorized to unlock this content");
-      }
-
-      throwError({
-        message: `You are not authorized to unlock this item`,
-        name: "UnauthorizedException",
-        errorCode: "not_authorized",
-      });
+    const res = await this.handleNodePromises(nodePromises);
+    if (res.success === false) {
+      this.throwNodeError(res);
+      return;
     }
+    const decryptionShares = res.values;
+    log("decryptionShares", decryptionShares);
 
     // sort the decryption shares by share index.  this is important when combining the shares.
     decryptionShares.sort((a, b) => a.shareIndex - b.shareIndex);
@@ -432,7 +506,7 @@ export default class LitNodeClient {
       pkSetAsBytes.length,
       ciphertextAsBytes.length
     );
-    // console.log('decrypted is ', uint8arrayToString(decrypted, 'base16'))
+    // log('decrypted is ', uint8arrayToString(decrypted, 'base16'))
 
     return decrypted;
   }
@@ -440,22 +514,34 @@ export default class LitNodeClient {
   /**
    * Securely save the association between access control conditions and something that you wish to decrypt
    * @param {Object} params
-   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.  Save this - you will neeed it to decrypt the content in the future.
-   * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+   * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+   * @param {Array.<SolRpcCondition>} params.solRpcConditions  Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+   * @param {string} params.chain The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
    * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT as a Uint8Array.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.  You must pass either symmetricKey or encryptedSymmetricKey.
    * @param {Uint8Array} params.encryptedSymmetricKey The encrypted symmetric key of the item you with to update.  You must pass either symmetricKey or encryptedSymmetricKey.
+   * @param {boolean} params.permanent Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default.
    * @returns {Uint8Array} The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
    */
   async saveEncryptionKey({
     accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
     chain,
     authSig,
     symmetricKey,
     encryptedSymmetricKey,
-    permanant = 1,
+    permanant,
+    permanent = true,
   }) {
-    console.log("LitNodeClient.saveEncryptionKey");
+    log("LitNodeClient.saveEncryptionKey");
+
+    // to fix spelling mistake
+    if (typeof permanant !== "undefined") {
+      permanent = permanant;
+    }
+
     if (
       (!symmetricKey || symmetricKey == "") &&
       (!encryptedSymmetricKey || encryptedSymmetricKey == "")
@@ -467,8 +553,14 @@ export default class LitNodeClient {
     if (!chain) {
       throw new Error("chain is blank");
     }
-    if (!accessControlConditions || accessControlConditions.length == 0) {
-      throw new Error("accessControlConditions is blank");
+    if (
+      (!accessControlConditions || accessControlConditions.length == 0) &&
+      (!evmContractConditions || evmContractConditions.length == 0) &&
+      (!solRpcConditions || solRpcConditions.length == 0)
+    ) {
+      throw new Error(
+        "accessControlConditions and evmContractConditions and solRpcConditions are blank"
+      );
     }
     if (!authSig) {
       throw new Error("authSig is blank");
@@ -483,7 +575,7 @@ export default class LitNodeClient {
         uint8arrayFromString(this.subnetPubKey, "base16"),
         symmetricKey
       );
-      console.log(
+      log(
         "symmetric key encrypted with LIT network key: ",
         uint8arrayToString(encryptedKey, "base16")
       );
@@ -496,24 +588,29 @@ export default class LitNodeClient {
     );
 
     // hash the access control conditions
-    let hashOfConditions = null;
+    let hashOfConditions;
+    // hash the access control conditions
     if (accessControlConditions) {
       hashOfConditions = await hashAccessControlConditions(
         accessControlConditions
       );
-    } else if (accessControlConditionGroup) {
-      hashOfConditions = await hashAccessControlConditionGroup(
-        accessControlConditionGroup
-      );
+    } else if (evmContractConditions) {
+      hashOfConditions = await hashEVMContractConditions(evmContractConditions);
+    } else if (solRpcConditions) {
+      hashOfConditions = await hashSolRpcConditions(solRpcConditions);
     } else {
-      console.log(
-        "Error, you must pass in either accessControlConditions or accessControlConditionGroup"
-      );
+      throwError({
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
     }
+
     const hashOfConditionsStr = uint8arrayToString(
       new Uint8Array(hashOfConditions),
       "base16"
     );
+
     // create access control conditions on lit nodes
     const nodePromises = [];
     for (const url of this.connectedNodes) {
@@ -524,19 +621,15 @@ export default class LitNodeClient {
           val: hashOfConditionsStr,
           authSig,
           chain,
-          permanant,
+          permanent: permanent ? 1 : 0,
         })
       );
     }
-    const responses = await Promise.all(nodePromises);
-    const errors = responses.filter((r) => r.error !== "");
 
-    if (errors.length >= this.connectedNodes.size - this.config.minNodeCount) {
-      throwError({
-        message: errors[0].error,
-        name: "StorageError",
-        errorCode: "storage_error",
-      });
+    const res = await this.handleNodePromises(nodePromises);
+    if (res.success === false) {
+      this.throwNodeError(res);
+      return;
     }
 
     return encryptedKey;
@@ -612,16 +705,16 @@ export default class LitNodeClient {
     val,
     authSig,
     chain,
-    permanant,
+    permanent,
   }) {
-    console.log("storeSigningConditionWithNode");
+    log("storeSigningConditionWithNode");
     const urlWithPath = `${url}/web/signing/store`;
     const data = {
       key,
       val,
       authSig,
       chain,
-      permanant,
+      permanant: permanent,
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
@@ -632,22 +725,22 @@ export default class LitNodeClient {
     val,
     authSig,
     chain,
-    permanant,
+    permanent,
   }) {
-    console.log("storeEncryptionConditionWithNode");
+    log("storeEncryptionConditionWithNode");
     const urlWithPath = `${url}/web/encryption/store`;
     const data = {
       key,
       val,
       authSig,
       chain,
-      permanant,
+      permanant: permanent,
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
   async getChainDataSigningShare({ url, callRequests, chain, iat, exp }) {
-    console.log("getChainDataSigningShare");
+    log("getChainDataSigningShare");
     const urlWithPath = `${url}/web/signing/sign_chain_data`;
     const data = {
       callRequests,
@@ -661,16 +754,20 @@ export default class LitNodeClient {
   async getSigningShare({
     url,
     accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
     resourceId,
     authSig,
     chain,
     iat,
     exp,
   }) {
-    console.log("getSigningShare");
+    log("getSigningShare");
     const urlWithPath = `${url}/web/signing/retrieve`;
     const data = {
       accessControlConditions,
+      evmContractConditions,
+      solRpcConditions,
       resourceId,
       authSig,
       chain,
@@ -683,14 +780,18 @@ export default class LitNodeClient {
   async getDecryptionShare({
     url,
     accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
     toDecrypt,
     authSig,
     chain,
   }) {
-    console.log("getDecryptionShare");
+    log("getDecryptionShare");
     const urlWithPath = `${url}/web/encryption/retrieve`;
     const data = {
       accessControlConditions,
+      evmContractConditions,
+      solRpcConditions,
       toDecrypt,
       authSig,
       chain,
@@ -700,27 +801,77 @@ export default class LitNodeClient {
 
   async handshakeWithSgx({ url }) {
     const urlWithPath = `${url}/web/handshake`;
-    console.debug(`handshakeWithSgx ${urlWithPath}`);
+    log(`handshakeWithSgx ${urlWithPath}`);
     const data = {
       clientPublicKey: "test",
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
-  async sendCommandToNode({ url, data }) {
-    console.log(`sendCommandToNode with url ${url} and data`, data);
-    return await fetch(url, {
+  sendCommandToNode({ url, data }) {
+    log(`sendCommandToNode with url ${url} and data`, data);
+    return fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "lit-js-sdk-version": version,
       },
       body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-        return data;
+    }).then(async (response) => {
+      const isJson = response.headers
+        .get("content-type")
+        ?.includes("application/json");
+      const data = isJson ? await response.json() : null;
+
+      if (!response.ok) {
+        // get error message from body or default to response status
+        const error = data || response.status;
+        return Promise.reject(error);
+      }
+
+      return data;
+    });
+  }
+
+  async handleNodePromises(promises) {
+    const responses = await Promise.allSettled(promises);
+    log("responses", responses);
+    const successes = responses.filter((r) => r.status === "fulfilled");
+    if (successes.length >= this.config.minNodeCount) {
+      return {
+        success: true,
+        values: successes.map((r) => r.value),
+      };
+    }
+
+    // if we're here, then we did not succeed.  time to handle and report errors.
+    const rejected = responses.filter((r) => r.status === "rejected");
+    const mostCommonError = JSON.parse(
+      mostCommonString(rejected.map((r) => JSON.stringify(r.reason)))
+    );
+    log(`most common error: ${JSON.stringify(mostCommonError)}`);
+    return {
+      success: false,
+      error: mostCommonError,
+    };
+  }
+
+  throwNodeError(res) {
+    if (res.error && res.error.errorCode) {
+      if (
+        res.error.errorCode === "not_authorized" &&
+        this.config.alertWhenUnauthorized
+      ) {
+        alert("You are not authorized to access to this content");
+      }
+      throwError({ ...res.error, name: "NodeError" });
+    } else {
+      throwError({
+        message: `There was an error getting the signing shares from the nodes`,
+        name: "UnknownError",
+        errorCode: "unknown_error",
       });
+    }
   }
 
 
@@ -782,7 +933,7 @@ export default class LitNodeClient {
             )
           );
           this.ready = true;
-          console.debug("lit is ready");
+          log("lit is ready");
           if (typeof document !== "undefined") {
             document.dispatchEvent(new Event("lit-ready"));
           }

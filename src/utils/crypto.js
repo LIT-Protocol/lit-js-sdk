@@ -1,12 +1,70 @@
 import nacl from "tweetnacl";
 import naclUtil from "tweetnacl-util";
-import uint8arrayFromString from "uint8arrays/from-string";
-import { throwError } from "../lib/utils";
+import {
+  fromString as uint8arrayFromString,
+  toString as uint8arrayToString,
+} from "uint8arrays";
+import { throwError, log } from "../lib/utils";
 
 const SYMM_KEY_ALGO_PARAMS = {
   name: "AES-CBC",
   length: 256,
 };
+
+export function hashSolRpcConditions(solRpcConditions) {
+  const conds = solRpcConditions.map((c) =>
+    canonicalSolRpcConditionFormatter(c)
+  );
+  const toHash = JSON.stringify(conds);
+  log("Hashing sol rpc conditions: ", toHash);
+  const encoder = new TextEncoder();
+  const data = encoder.encode(toHash);
+  return crypto.subtle.digest("SHA-256", data);
+}
+
+export function canonicalSolRpcConditionFormatter(cond) {
+  // need to return in the exact format below:
+  /*
+  pub struct SolRpcCondition {
+      pub method: String,
+      pub params: Vec<String>,
+      pub return_value_test: JsonReturnValueTestV2,
+  }
+  */
+
+  if (Array.isArray(cond)) {
+    return cond.map((c) => canonicalSolRpcConditionFormatter(c));
+  }
+
+  if ("operator" in cond) {
+    return {
+      operator: cond.operator,
+    };
+  }
+
+  if ("returnValueTest" in cond) {
+    const { returnValueTest } = cond;
+
+    const canonicalReturnValueTest = {
+      key: returnValueTest.key,
+      comparator: returnValueTest.comparator,
+      value: returnValueTest.value,
+    };
+
+    return {
+      method: cond.method,
+      params: cond.params,
+      chain: cond.chain,
+      returnValueTest: canonicalReturnValueTest,
+    };
+  }
+
+  throwError({
+    message: `You passed an invalid access control condition: ${cond}`,
+    name: "InvalidAccessControlCondition",
+    errorCode: "invalid_access_control_condition",
+  });
+}
 
 export function canonicalResourceIdFormatter(resId) {
   // need to return in the exact format below:
@@ -23,6 +81,101 @@ export function canonicalResourceIdFormatter(resId) {
 export function hashResourceId(resourceId) {
   const resId = canonicalResourceIdFormatter(resourceId);
   const toHash = JSON.stringify(resId);
+  const encoder = new TextEncoder();
+  const data = encoder.encode(toHash);
+  return crypto.subtle.digest("SHA-256", data);
+}
+
+function canonicalAbiParams(params) {
+  return params.map((param) => ({
+    name: param.name,
+    type: param.type,
+  }));
+}
+
+export function canonicalEVMContractConditionFormatter(cond) {
+  // need to return in the exact format below:
+  /*
+  pub struct JsonAccessControlCondition {
+    pub contract_address: String,
+    pub chain: String,
+    pub standard_contract_type: String,
+    pub method: String,
+    pub parameters: Vec<String>,
+    pub return_value_test: JsonReturnValueTest,
+  }
+  */
+
+  if (Array.isArray(cond)) {
+    return cond.map((c) => canonicalEVMContractConditionFormatter(c));
+  }
+
+  if ("operator" in cond) {
+    return {
+      operator: cond.operator,
+    };
+  }
+
+  if ("returnValueTest" in cond) {
+    /* abi needs to match:
+      pub name: String,
+    /// Function input.
+    pub inputs: Vec<Param>,
+    /// Function output.
+    pub outputs: Vec<Param>,
+    #[deprecated(note = "The constant attribute was removed in Solidity 0.5.0 and has been \
+          replaced with stateMutability. If parsing a JSON AST created with \
+          this version or later this value will always be false, which may be wrong.")]
+    /// Constant function.
+    #[cfg_attr(feature = "full-serde", serde(default))]
+    pub constant: bool,
+    /// Whether the function reads or modifies blockchain state
+    #[cfg_attr(feature = "full-serde", serde(rename = "stateMutability", default))]
+    pub state_mutability: StateMutability,
+    */
+
+    const { functionAbi, returnValueTest } = cond;
+
+    const canonicalAbi = {
+      name: functionAbi.name,
+      inputs: canonicalAbiParams(functionAbi.inputs),
+      outputs: canonicalAbiParams(functionAbi.outputs),
+      constant:
+        typeof functionAbi.constant === "undefined"
+          ? false
+          : functionAbi.constant,
+      stateMutability: functionAbi.stateMutability,
+    };
+
+    const canonicalReturnValueTest = {
+      key: returnValueTest.key,
+      comparator: returnValueTest.comparator,
+      value: returnValueTest.value,
+    };
+
+    return {
+      contractAddress: cond.contractAddress,
+      functionName: cond.functionName,
+      functionParams: cond.functionParams,
+      functionAbi: canonicalAbi,
+      chain: cond.chain,
+      returnValueTest: canonicalReturnValueTest,
+    };
+  }
+
+  throwError({
+    message: `You passed an invalid access control condition: ${cond}`,
+    name: "InvalidAccessControlCondition",
+    errorCode: "invalid_access_control_condition",
+  });
+}
+
+export function hashEVMContractConditions(accessControlConditions) {
+  const conds = accessControlConditions.map((c) =>
+    canonicalEVMContractConditionFormatter(c)
+  );
+  const toHash = JSON.stringify(conds);
+  log("Hashing evm contract conditions: ", toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
   return crypto.subtle.digest("SHA-256", data);
@@ -74,6 +227,7 @@ export function hashAccessControlConditions(accessControlConditions) {
     canonicalAccessControlConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
+  log("Hashing access control conditions: ", toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
   return crypto.subtle.digest("SHA-256", data);

@@ -4,7 +4,7 @@ import { verifyMessage } from "@ethersproject/wallet";
 import { Web3Provider, JsonRpcSigner } from "@ethersproject/providers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { hexlify } from "@ethersproject/bytes";
-import Web3Modal from "lit-web3modal";
+import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Resolution from "@unstoppabledomains/resolution";
 import detectEthereumProvider from "@metamask/detect-provider";
@@ -13,11 +13,10 @@ import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
 
 import LIT from "../abis/LIT.json";
-import ERC20 from "../abis/ERC20.json";
 import { LIT_CHAINS } from "../lib/constants";
-import { throwError } from "../lib/utils";
+import { throwError, log } from "../lib/utils";
 
-const AUTH_SIGNATURE_BODY =
+export const AUTH_SIGNATURE_BODY =
   "I am creating an account to use Lit Protocol at {{timestamp}}";
 
 function chainHexIdToChainName(chainHexId) {
@@ -43,14 +42,6 @@ export function decodeCallResult({ abi, functionName, data }) {
 }
 
 export async function connectWeb3() {
-  if (typeof window.ethereum === "undefined") {
-    throwError({
-      message: "No web3 wallet was found",
-      name: "NoWalletException",
-      errorCode: "no_wallet",
-    });
-  }
-
   const rpcUrls = {};
   // need to make it look like this:
   // rpc: {
@@ -77,7 +68,7 @@ export async function connectWeb3() {
     },
   };
 
-  console.log("getting provider via web3modal");
+  log("getting provider via web3modal");
   // disabled because web3modal uses localstorage and breaks when
   // used on opensea
   const web3Modal = new Web3Modal({
@@ -85,9 +76,9 @@ export async function connectWeb3() {
     providerOptions, // required
   });
   const provider = await web3Modal.connect();
-  console.log("got provider", provider);
+  log("got provider", provider);
   const web3 = new Web3Provider(provider);
-  console.log("got web3", web3);
+  log("got web3", web3);
 
   // const provider = await detectEthereumProvider();
   // const web3 = new Web3Provider(provider);
@@ -95,13 +86,13 @@ export async function connectWeb3() {
   // trigger metamask popup
   await provider.enable();
 
-  console.log("listing accounts");
+  log("listing accounts");
   const accounts = await web3.listAccounts();
   // const accounts = await provider.request({
   //   method: "eth_requestAccounts",
   //   params: [],
   // });
-  console.log("accounts", accounts);
+  log("accounts", accounts);
   const account = accounts[0].toLowerCase();
 
   return { web3, account };
@@ -114,15 +105,16 @@ export async function disconnectWeb3() {
   web3Modal.clearCachedProvider();
   localStorage.removeItem("walletconnect");
   localStorage.removeItem("lit-auth-signature");
+  localStorage.removeItem("lit-auth-sol-signature");
 }
 
 // taken from the excellent repo https://github.com/zmitton/eth-proof
 // export async function getMerkleProof({ tokenAddress, balanceStorageSlot, tokenId }) {
-//   console.log(`getMerkleProof for { tokenAddress, balanceStorageSlot, tokenId } ${tokenAddress}, ${balanceStorageSlot}, ${tokenId}`)
+//   log(`getMerkleProof for { tokenAddress, balanceStorageSlot, tokenId } ${tokenAddress}, ${balanceStorageSlot}, ${tokenId}`)
 //   const { web3, account } = await connectWeb3()
-//   console.log(`getting mappingAt(${balanceStorageSlot}, ${tokenId}, ${account})`)
+//   log(`getting mappingAt(${balanceStorageSlot}, ${tokenId}, ${account})`)
 //   const storageAddress = mappingAt(balanceStorageSlot, parseInt(tokenId), account)
-//   console.log('storageAddress: ', storageAddress)
+//   log('storageAddress: ', storageAddress)
 
 //   // you may need to try the below twicce because sometimes the proof isn't available for the latest block on polygon because the node just isn't fast enough
 //   let tries = 0
@@ -133,13 +125,13 @@ export async function disconnectWeb3() {
 //       if (!rpcBlock) {
 //         // only set the rpc block once
 //         rpcBlock = await web3.request({ method: 'eth_getBlockByNumber', params: ['latest', false] })
-//         console.log('rpcBlock: ', rpcBlock)
+//         log('rpcBlock: ', rpcBlock)
 //       }
 //       rpcProof = await web3.request({ method: 'eth_getProof', params: [tokenAddress, [storageAddress], rpcBlock.number] })
-//       console.log('rpcProof: ', rpcProof)
+//       log('rpcProof: ', rpcProof)
 //     } catch (e) {
-//       console.log(e)
-//       console.log(`error getting rpc proof, have made ${tries} attempts`)
+//       log(e)
+//       log(`error getting rpc proof, have made ${tries} attempts`)
 //       tries++
 //     }
 //   }
@@ -169,19 +161,13 @@ export async function disconnectWeb3() {
 //   return keypair
 // }
 
-/**
- * Check for an existing cryptographic authentication signature and create one of it does not exist.  This is used to prove ownership of a given crypto wallet address to the LIT nodes.  The result is stored in LocalStorage so the user doesn't have to sign every time they perform an operation.
- * @param {Object} params
- * @param {string} params.chain The chain you want to use.  "polygon" and "ethereum" are currently supported.
- * @returns {AuthSig} The AuthSig created or retrieved
- */
-export async function checkAndSignAuthMessage({ chain }) {
+export async function checkAndSignEVMAuthMessage({ chain }) {
   const { web3, account } = await connectWeb3();
   const { chainId } = await web3.getNetwork();
   const selectedChain = LIT_CHAINS[chain];
   let selectedChainId = "0x" + selectedChain.chainId.toString("16");
-  console.log("chainId from web3", chainId);
-  console.debug(
+  log("chainId from web3", chainId);
+  log(
     `checkAndSignAuthMessage with chainId ${chainId} and chain set to ${chain} and selectedChain is `,
     selectedChain
   );
@@ -196,13 +182,13 @@ export async function checkAndSignAuthMessage({ chain }) {
       return;
     }
     try {
-      console.log("trying to switch to chainId", selectedChainId);
+      log("trying to switch to chainId", selectedChainId);
       await web3.provider.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: selectedChainId }],
       });
     } catch (switchError) {
-      console.log("error switching to chainId", switchError);
+      log("error switching to chainId", switchError);
       // This error code indicates that the chain has not been added to MetaMask.
       if (switchError.code === 4902) {
         try {
@@ -250,24 +236,24 @@ export async function checkAndSignAuthMessage({ chain }) {
       }
     }
   }
-  console.log("checking if sig is in local storage");
+  log("checking if sig is in local storage");
   let authSig = localStorage.getItem("lit-auth-signature");
   if (!authSig) {
-    console.log("signing auth message because sig is not in local storage");
+    log("signing auth message because sig is not in local storage");
     await signAndSaveAuthMessage({ web3, account });
     authSig = localStorage.getItem("lit-auth-signature");
   }
   authSig = JSON.parse(authSig);
   // make sure we are on the right account
   if (account !== authSig.address) {
-    console.log(
+    log(
       "signing auth message because account is not the same as the address in the auth sig"
     );
     await signAndSaveAuthMessage({ web3, account });
     authSig = localStorage.getItem("lit-auth-signature");
     authSig = JSON.parse(authSig);
   }
-  console.log("got auth sig", authSig);
+  log("got auth sig", authSig);
   return authSig;
 }
 
@@ -300,7 +286,7 @@ export async function signAndSaveAuthMessage({ web3, account }) {
       secretKey: naclUtil.encodeBase64(commsKeyPair.secretKey),
     })
   );
-  console.log("generated and saved lit-comms-keypair");
+  log("generated and saved lit-comms-keypair");
 }
 
 /**
@@ -317,16 +303,16 @@ export async function signMessage({ body, web3, account }) {
     account = resp.account;
   }
 
-  console.log("pausing...");
+  log("pausing...");
   await new Promise((resolve) => setTimeout(resolve, 500));
-  console.log("signing with ", account);
+  log("signing with ", account);
   // const signature = await web3.getSigner().signMessage(body);
   const signature = await signMessageAsync(web3.getSigner(), account, body);
   //.request({ method: 'personal_sign', params: [account, body] })
   const address = verifyMessage(body, signature).toLowerCase();
 
-  console.log("Signature: ", signature);
-  console.log("recovered address: ", address);
+  log("Signature: ", signature);
+  log("recovered address: ", address);
 
   if (address !== account) {
     const msg = `ruh roh, the user signed with a different address (${address}) then they\'re using with web3 (${account}).  this will lead to confusion.`;
@@ -342,7 +328,7 @@ export async function signMessage({ body, web3, account }) {
 
 // wrapper around signMessage that tries personal_sign first.  this is to fix a
 // bug with walletconnect where just using signMessage was failing
-const signMessageAsync = async (signer, address, message) => {
+export const signMessageAsync = async (signer, address, message) => {
   const messageBytes = toUtf8Bytes(message);
   if (signer instanceof JsonRpcSigner) {
     try {
@@ -372,14 +358,14 @@ const signMessageAsync = async (signer, address, message) => {
 //       })
 //     return decryptedMessage
 //   } catch (error) {
-//     console.log(error)
+//     log(error)
 //     return false
 //   }
 // }
 //
 // async function deriveKeysViaSignature () {
 //   const { signature, address } = await signMessage({ body: KEY_DERIVATION_SIGNATURE_BODY })
-//   console.log('Signed message: ' + signature)
+//   log('Signed message: ' + signature)
 //
 //   // derive keypair
 //   const data = Buffer.from(signature.substring(2), 'hex')
@@ -405,10 +391,10 @@ const signMessageAsync = async (signer, address, message) => {
 //       })
 //     return { publicKey }
 //   } catch (error) {
-//     console.log(error)
+//     log(error)
 //     if (error.code === 4001) {
 //       // EIP-1193 userRejectedRequest error
-//       console.log("We can't encrypt anything without the key.")
+//       log("We can't encrypt anything without the key.")
 //       error('You must accept the metamask request to derive your public encryption key')
 //     } else {
 //       console.error(error)
@@ -439,7 +425,7 @@ const signMessageAsync = async (signer, address, message) => {
 //   const { web3, account } = await connectWeb3()
 //   keypair.address = account
 //
-//   console.log('public key: ' + keypair.publicKey)
+//   log('public key: ' + keypair.publicKey)
 //   const asString = JSON.stringify(keypair)
 //   localStorage.setItem('lit-keypair', asString)
 //
@@ -467,20 +453,20 @@ const signMessageAsync = async (signer, address, message) => {
  * @returns {Object} The txHash, tokenId, tokenAddress, mintingAddress, and authSig.
  */
 export async function mintLIT({ chain, quantity }) {
-  console.log(`minting ${quantity} tokens on ${chain}`);
+  log(`minting ${quantity} tokens on ${chain}`);
   try {
-    const authSig = await checkAndSignAuthMessage({ chain });
+    const authSig = await checkAndSignEVMAuthMessage({ chain });
     if (authSig.errorCode) {
       return authSig;
     }
     const { web3, account } = await connectWeb3();
     const tokenAddress = LIT_CHAINS[chain].contractAddress;
     const contract = new Contract(tokenAddress, LIT.abi, web3.getSigner());
-    console.log("sending to chain...");
+    log("sending to chain...");
     const tx = await contract.mint(quantity);
-    console.log("sent to chain.  waiting to be mined...");
+    log("sent to chain.  waiting to be mined...");
     const txReceipt = await tx.wait();
-    console.log("txReceipt: ", txReceipt);
+    log("txReceipt: ", txReceipt);
     const tokenId = txReceipt.events[0].args[3].toNumber();
     return {
       txHash: txReceipt.transactionHash,
@@ -490,10 +476,10 @@ export async function mintLIT({ chain, quantity }) {
       authSig,
     };
   } catch (error) {
-    console.log(error);
+    log(error);
     if (error.code === 4001) {
       // EIP-1193 userRejectedRequest error
-      console.log("User rejected request");
+      log("User rejected request");
       return { errorCode: "user_rejected_request" };
     } else {
       console.error(error);
@@ -510,7 +496,7 @@ export async function mintLIT({ chain, quantity }) {
  * @returns {array} The token ids owned by the accountAddress
  */
 export async function findLITs() {
-  console.log("findLITs");
+  log("findLITs");
 
   try {
     const { web3, account } = await connectWeb3();
@@ -519,8 +505,8 @@ export async function findLITs() {
     // const chainHexId = await web3.request({ method: 'eth_chainId', params: [] })
     const chain = chainHexIdToChainName(chainHexId);
     const tokenAddress = LIT_CHAINS[chain].contractAddress;
-    const contract = new Contract(tokenAddress, LIT.abi, new web3.getSigner());
-    console.log("getting maxTokenid");
+    const contract = new Contract(tokenAddress, LIT.abi, web3.getSigner());
+    log("getting maxTokenid");
     const maxTokenId = await contract.tokenIds();
     const accounts = [];
     const tokenIds = [];
@@ -528,18 +514,18 @@ export async function findLITs() {
       accounts.push(account);
       tokenIds.push(i);
     }
-    console.log("getting balanceOfBatch");
+    log("getting balanceOfBatch");
     const balances = await contract.balanceOfBatch(accounts, tokenIds);
-    // console.log('balances', balances)
+    // log('balances', balances)
     const tokenIdsWithNonzeroBalances = balances
       .map((b, i) => (b.toNumber() === 0 ? null : i))
       .filter((b) => b !== null);
     return { tokenIds: tokenIdsWithNonzeroBalances, chain };
   } catch (error) {
-    console.log(error);
+    log(error);
     if (error.code === 4001) {
       // EIP-1193 userRejectedRequest error
-      console.log("User rejected request");
+      log("User rejected request");
       return { errorCode: "user_rejected_request" };
     } else {
       console.error(error);
@@ -556,13 +542,13 @@ export async function findLITs() {
  * @returns {Object} Success or error
  */
 export async function sendLIT({ tokenMetadata, to }) {
-  console.log("sendLIT for ", tokenMetadata);
+  log("sendLIT for ", tokenMetadata);
 
   try {
     const { web3, account } = await connectWeb3();
     const { tokenAddress, tokenId, chain } = tokenMetadata;
     const contract = new Contract(tokenAddress, LIT.abi, web3.getSigner());
-    console.log("transferring");
+    log("transferring");
     const maxTokenId = await contract.safeTransferFrom(
       account,
       to,
@@ -570,13 +556,13 @@ export async function sendLIT({ tokenMetadata, to }) {
       1,
       []
     );
-    console.log("sent to chain");
+    log("sent to chain");
     return { success: true };
   } catch (error) {
-    console.log(error);
+    log(error);
     if (error.code === 4001) {
       // EIP-1193 userRejectedRequest error
-      console.log("User rejected request");
+      log("User rejected request");
       return { errorCode: "user_rejected_request" };
     } else {
       console.error(error);
@@ -589,9 +575,13 @@ export async function sendLIT({ tokenMetadata, to }) {
  * Get the number of decimal places in a token
  * @param {Object} params
  * @param {string} params.contractAddress The token contract address
+ * @param {string} params.chain The chain on which the token is deployed
  * @returns {number} The number of decimal places in the token
  */
-export async function decimalPlaces({ contractAddress }) {
+export async function decimalPlaces({ contractAddress, chain }) {
+  if (chain) {
+    await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
+  }
   const { web3, account } = await connectWeb3();
   const contract = new Contract(contractAddress, ERC20, web3);
   return await contract.decimals();
@@ -605,8 +595,8 @@ export async function decimalPlaces({ contractAddress }) {
  * @returns {string} The resolved eth address
  */
 export async function lookupNameServiceAddress({ chain, name }) {
+  await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
   const { web3, account } = await connectWeb3();
-  await checkAndSignAuthMessage({ chain }); // this will switch them to the correct chain
 
   const parts = name.split(".");
   const tld = parts[parts.length - 1].toLowerCase();

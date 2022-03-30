@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset='utf-8'>
-  <title>lit-js-sdk 1.1.114 | Documentation</title>
+  <title>lit-js-sdk 1.1.141 | Documentation</title>
   <meta name='description' content='LIT Javascript SDK'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' rel='stylesheet'>
@@ -15,7 +15,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>lit-js-sdk</h3>
-          <div class='mb1'><code>1.1.114</code></div>
+          <div class='mb1'><code>1.1.141</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -327,6 +327,16 @@
               
                 
                 <li><a
+                  href='#humanizeaccesscontrolconditions'
+                  class="">
+                  humanizeAccessControlConditions
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#types'
                   class="h5 bold black caps">
                   Types
@@ -340,6 +350,26 @@
                   href='#accesscontrolcondition'
                   class="">
                   AccessControlCondition
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#evmcontractcondition'
+                  class="">
+                  EVMContractCondition
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#solrpccondition'
+                  class="">
+                  SolRpcCondition
                   
                 </a>
                 
@@ -367,9 +397,39 @@
               
                 
                 <li><a
+                  href='#chain-info'
+                  class="h5 bold black caps">
+                  Chain Info
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#litchain'
                   class="">
                   LITChain
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#litevmchain'
+                  class="">
+                  LITEVMChain
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#litsvmchain'
+                  class="">
+                  LITSVMChain
                   
                 </a>
                 
@@ -390,6 +450,26 @@
                   href='#lit_chains'
                   class="">
                   LIT_CHAINS
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#lit_svm_chains'
+                  class="">
+                  LIT_SVM_CHAINS
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#all_lit_chains'
+                  class="">
+                  ALL_LIT_CHAINS
                   
                 </a>
                 
@@ -450,16 +530,6 @@
                   href='#metadataforfile'
                   class="">
                   metadataForFile
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#humanizeaccesscontrolconditions'
-                  class="">
-                  humanizeAccessControlConditions
                   
                 </a>
                 
@@ -675,6 +745,17 @@
 
 
               
+                <tr>
+  <td class='break-word'><span class='code bold'>config.debug</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>
+  
+    (default <code>true</code>)
+  </td>
+  <td class='break-word'><span>Whether or not to show debug messages.
+</span></td>
+</tr>
+
+
+              
             </tbody>
           </table>
           
@@ -854,7 +935,25 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.accessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#accesscontrolcondition">AccessControlCondition</a>></code>
   </td>
-  <td class='break-word'><span>The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+  <td class='break-word'><span>The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.evmContractConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#evmcontractcondition">EVMContractCondition</a>></code>
+  </td>
+  <td class='break-word'><span>EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions solRpcConditions.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.solRpcConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#solrpccondition">SolRpcCondition</a>></code>
+  </td>
+  <td class='break-word'><span>Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
 </span></td>
 </tr>
 
@@ -863,7 +962,7 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.chain</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span>The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+  <td class='break-word'><span>The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
 </span></td>
 </tr>
 
@@ -976,7 +1075,25 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.accessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#accesscontrolcondition">AccessControlCondition</a>></code>
   </td>
-  <td class='break-word'><span>The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.
+  <td class='break-word'><span>The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.evmContractConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#evmcontractcondition">EVMContractCondition</a>></code>
+  </td>
+  <td class='break-word'><span>EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.solRpcConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#solrpccondition">SolRpcCondition</a>></code>
+  </td>
+  <td class='break-word'><span>Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
 </span></td>
 </tr>
 
@@ -985,7 +1102,7 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.chain</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span>The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+  <td class='break-word'><span>The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
 </span></td>
 </tr>
 
@@ -1010,9 +1127,18 @@
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>params.permanant</span> <code class='quiet'>any</code>
+  <td class='break-word'><span class='code bold'>params.permanent</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>
   
-    (default <code>1</code>)
+    (default <code>true</code>)
+  </td>
+  <td class='break-word'><span>Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.permanant</span> <code class='quiet'>any</code>
   </td>
   <td class='break-word'><span></span></td>
 </tr>
@@ -1108,7 +1234,25 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.accessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#accesscontrolcondition">AccessControlCondition</a>></code>
   </td>
-  <td class='break-word'><span>The access control conditions that the user must meet to obtain the encryption key, used to decrypt the data.  This could be posession of an NFT, for example.
+  <td class='break-word'><span>The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.evmContractConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#evmcontractcondition">EVMContractCondition</a>></code>
+  </td>
+  <td class='break-word'><span>EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.solRpcConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#solrpccondition">SolRpcCondition</a>></code>
+  </td>
+  <td class='break-word'><span>Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
 </span></td>
 </tr>
 
@@ -1126,7 +1270,7 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.chain</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span>The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+  <td class='break-word'><span>The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
 </span></td>
 </tr>
 
@@ -1230,7 +1374,25 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.accessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#accesscontrolcondition">AccessControlCondition</a>></code>
   </td>
-  <td class='break-word'><span>The access control conditions that the user must meet to obtain a signed token.  This could be posession of an NFT, for example.  Save this - you will neeed it to decrypt the content in the future.
+  <td class='break-word'><span>The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.evmContractConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#evmcontractcondition">EVMContractCondition</a>></code>
+  </td>
+  <td class='break-word'><span>EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.solRpcConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#solrpccondition">SolRpcCondition</a>></code>
+  </td>
+  <td class='break-word'><span>Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
 </span></td>
 </tr>
 
@@ -1239,7 +1401,7 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.chain</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span>The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+  <td class='break-word'><span>The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
 </span></td>
 </tr>
 
@@ -1273,9 +1435,18 @@
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>params.permanant</span> <code class='quiet'>any</code>
+  <td class='break-word'><span class='code bold'>params.permanent</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>
   
-    (default <code>1</code>)
+    (default <code>true</code>)
+  </td>
+  <td class='break-word'><span>Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.permanant</span> <code class='quiet'>any</code>
   </td>
   <td class='break-word'><span></span></td>
 </tr>
@@ -2801,7 +2972,7 @@
 
   <p>Decrypt and unzip a zip that was created using encryptZip, zipAndEncryptString, or zipAndEncryptFiles.</p>
 
-    <div class='pre p1 fill-light mt0'>decryptZip(encryptedZipBlob: <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>, symmKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array">Uint8Array</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>></div>
+    <div class='pre p1 fill-light mt0'>decryptZip(encryptedZipBlob: <a href="https://developer.mozilla.org/docs/Web/API/Blob">Blob</a>, symmKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array">Uint8Array</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
   
   
 
@@ -2842,8 +3013,8 @@
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>></code>:
-        A promise containing an array of the decrypted files inside the zip.
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></code>:
+        A promise containing a JSZip object indexed by the filenames of the zipped files.  For example, if you have a file called "meow.jpg" in the root of your zip, you could get it from the JSZip object by doing this: const imageBlob = await decryptedZip['meow.jpg'].async('blob')
 
       
     
@@ -3127,7 +3298,7 @@
   </div>
   
 
-  <p>Check for an existing cryptographic authentication signature and create one of it does not exist.  This is used to prove ownership of a given crypto wallet address to the LIT nodes.  The result is stored in LocalStorage so the user doesn't have to sign every time they perform an operation.</p>
+  <p>Check for an existing cryptographic authentication signature and create one of it does not exist.  This is used to prove ownership of a given crypto wallet address to the Lit nodes.  The result is stored in LocalStorage so the user doesn't have to sign every time they perform an operation.</p>
 
     <div class='pre p1 fill-light mt0'>checkAndSignAuthMessage(params: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="#authsig">AuthSig</a></div>
   
@@ -3166,7 +3337,8 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.chain</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   </td>
-  <td class='break-word'><span>The chain you want to use.  "polygon" and "ethereum" are currently supported.
+  <td class='break-word'><span>The chain you want to use.  Find the supported list of chains here: 
+<a href="https://developer.litprotocol.com/docs/supportedChains">https://developer.litprotocol.com/docs/supportedChains</a>
 </span></td>
 </tr>
 
@@ -3315,6 +3487,118 @@
           
         
           
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='humanizeaccesscontrolconditions'>
+      humanizeAccessControlConditions
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>The human readable name for an access control condition</p>
+
+    <div class='pre p1 fill-light mt0'>humanizeAccessControlConditions(params: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    
+          </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.accessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
+  </td>
+  <td class='break-word'><span>The array of access control conditions that you want to humanize
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.tokenList</span> <code class='quiet'>any</code>
+  </td>
+  <td class='break-word'><span></span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.myWalletAddress</span> <code class='quiet'>any</code>
+  </td>
+  <td class='break-word'><span></span></td>
+</tr>
+
+
+              
+            </tbody>
+          </table>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></code>:
+        A promise containing a human readable description of the access control conditions
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
             <div class='keyline-top-not py2'><section class='py2 clearfix'>
 
   <h2 id='types' class='mt0'>
@@ -3402,6 +3686,195 @@
         <div class='space-bottom0'>
           <span class='code bold'>returnValueTest</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
           : An object containing two keys: "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='evmcontractcondition'>
+      EVMContractCondition
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>EVMContractCondition</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>contractAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The address of the contract that will be queried
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>chain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>functionName</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The smart contract function to call
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>functionParams</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>)</code>
+          : The parameters to use when calling the smart contract.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>functionAbi</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+          : The ABI of the smart contract function to call.  This is used to encode the function parameters and decode the return value of the function.  Do not pass the entire contract ABI here.  Instead, find the function you want to call in the contract ABI and pass that function's ABI here.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>returnValueTest</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+          : An object containing three keys: "key", "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "key": "", "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.  The "key" is used when the return value is a struct which contains multiple values and should be the name of the returned value from the function abi.  You must always pass "key" when using "returnValueTest", even if you pass an empty string for it, because the function only returns a single value.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='solrpccondition'>
+      SolRpcCondition
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>SolRpcCondition</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>method</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The Solana RPC method to be called.  You can find a list here: 
+<a href="https://docs.solana.com/developing/clients/jsonrpc-api">https://docs.solana.com/developing/clients/jsonrpc-api</a>
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>)</code>
+          : The parameters to use when making the RPC call.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>chain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The chain name of the chain that this contract is deployed on.  See ALL_LIT_CHAINS for currently supported chains.  On Solana, we support "solana" for mainnet, "solanaDevnet" for devnet and "solanaTestnet" for testnet.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>returnValueTest</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+          : An object containing three keys: "key", "comparator" and "value".  The return value of the rpc call will be compared against these.  The "key" selector supports JSONPath syntax, so you can filter and iterate over the results.  For example, to check if someone holds an NFT with address 29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE, you could use "method": "GetTokenAccountsByOwner", "params": [":userAddress",{"programId":"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"},{"encoding":"jsonParsed"}], "key": "$[?(@.account.data.parsed.info.mint == "29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE")].account.data.parsed.info.tokenAmount.amount", "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.  The "key" is used when the return value is an array or object which contains multiple values and should be the name of the returned value or a JSONPath item.  You must always pass "key" when using "returnValueTest", even if you pass an empty string for it, because the rpc call only returns a single value.
 
           
         </div>
@@ -3610,6 +4083,19 @@
           
         
           
+            <div class='keyline-top-not py2'><section class='py2 clearfix'>
+
+  <h2 id='chain-info' class='mt0'>
+    Chain Info
+  </h2>
+
+  
+    
+  
+</section></div>
+          
+        
+          
           <section class='p2 mb2 clearfix bg-white minishadow'>
 
   
@@ -3647,8 +4133,81 @@
     <div>
       
         <div class='space-bottom0'>
+          <span class='code bold'>vmType</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : Either EVM for an Ethereum compatible chain or SVM for a Solana compatible chain
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The human readable name of the chain
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='litevmchain'>
+      LITEVMChain
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>LITEVMChain</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
           <span class='code bold'>contractAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The address of the token contract for the optional predeployed ERC1155 contract
+          : The address of the token contract for the optional predeployed ERC1155 contract.  Only present on EVM chains.
 
           
         </div>
@@ -3659,6 +4218,72 @@
 
           
         </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The human readable name of the chain
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='litsvmchain'>
+      LITSVMChain
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>LITSVMChain</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
       
         <div class='space-bottom0'>
           <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
@@ -3716,9 +4341,119 @@
   </div>
   
 
-  <p>Chains supported by the LIT protocol.  Each chain includes an optional pre-deployed token contract that you may use for minting LITs.  These are ERC1155 contracts that let you mint any quantity of a given token.  Use the chain name as a key in this object.</p>
+  <p>EVM Chains supported by the LIT protocol.  Each chain includes an optional pre-deployed token contract that you may use for minting LITs.  These are ERC1155 contracts that let you mint any quantity of a given token.  Use the chain name as a key in this object.</p>
 
     <div class='pre p1 fill-light mt0'>LIT_CHAINS</div>
+  
+    <p>
+      Type:
+      <a href="#litevmchain">LITEVMChain</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='lit_svm_chains'>
+      LIT_SVM_CHAINS
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Solana Chains supported by the LIT protocol.  Use the chain name as a key in this object.</p>
+
+    <div class='pre p1 fill-light mt0'>LIT_SVM_CHAINS</div>
+  
+    <p>
+      Type:
+      <a href="#litsvmchain">LITSVMChain</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='all_lit_chains'>
+      ALL_LIT_CHAINS
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>All Chains supported by the LIT protocol.  Use the chain name as a key in this object.</p>
+
+    <div class='pre p1 fill-light mt0'>ALL_LIT_CHAINS</div>
   
     <p>
       Type:
@@ -4110,6 +4845,15 @@
 
 
               
+                <tr>
+  <td class='break-word'><span class='code bold'>params.chain</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  </td>
+  <td class='break-word'><span>The chain on which the token is deployed
+</span></td>
+</tr>
+
+
+              
             </tbody>
           </table>
           
@@ -4377,118 +5121,6 @@
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
         An object with 3 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='humanizeaccesscontrolconditions'>
-      humanizeAccessControlConditions
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>The human readable name for an access control condition</p>
-
-    <div class='pre p1 fill-light mt0'>humanizeAccessControlConditions(params: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    
-          </div>
-          
-          <table class='mt1 mb2 fixed-table h5 col-12'>
-            <colgroup>
-              <col width='30%' />
-              <col width='70%' />
-            </colgroup>
-            <thead>
-              <tr class='bold fill-light'>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody class='mt1'>
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.accessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>The array of access control conditions that you want to humanize
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.tokenList</span> <code class='quiet'>any</code>
-  </td>
-  <td class='break-word'><span></span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>params.myWalletAddress</span> <code class='quiet'>any</code>
-  </td>
-  <td class='break-word'><span></span></td>
-</tr>
-
-
-              
-            </tbody>
-          </table>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></code>:
-        A promise containing a human readable description of the access control conditions
 
       
     

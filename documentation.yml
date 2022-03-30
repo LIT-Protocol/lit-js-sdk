@@ -26,9 +26,15 @@ toc:
   - fileToDataUrl
   - checkAndSignAuthMessage
   - signAndSaveAuthMessage
+  - humanizeAccessControlConditions
   - name: Types
   - AccessControlCondition
+  - EVMContractCondition
+  - SolRpcCondition
   - ResourceId
   - AuthSig
+  - name: Chain Info
   - LITChain
+  - LITEVMChain
+  - LITSVMChain
   - name: Misc

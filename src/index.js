@@ -16,8 +16,10 @@ if (typeof window !== "undefined") {
   }
 }
 
-import uint8arrayFromString from "uint8arrays/from-string";
-import uint8arrayToString from "uint8arrays/to-string";
+import {
+  fromString as uint8arrayFromString,
+  toString as uint8arrayToString,
+} from "uint8arrays";
 
 import {
   encryptString,
@@ -34,13 +36,13 @@ import {
   decryptZipFileWithMetadata,
   humanizeAccessControlConditions,
   getTokenList,
+  checkAndSignAuthMessage,
 } from "./utils/lit";
 
 import {
   connectWeb3,
   disconnectWeb3,
   mintLIT,
-  checkAndSignAuthMessage,
   signAndSaveAuthMessage,
   findLITs,
   sendLIT,
@@ -48,13 +50,18 @@ import {
   lookupNameServiceAddress,
   encodeCallData,
   decodeCallResult,
+  signMessageAsync,
 } from "./utils/eth";
 
 import {
   decryptWithPrivKey,
   encryptWithPubKey,
   canonicalAccessControlConditionFormatter,
+  canonicalEVMContractConditionFormatter,
   hashAccessControlConditions,
+  hashEVMContractConditions,
+  encryptWithSymmetricKey,
+  decryptWithSymmetricKey,
 } from "./utils/crypto";
 
 import {
@@ -63,7 +70,7 @@ import {
   downloadFile,
 } from "./utils/browser";
 
-import { LIT_CHAINS } from "./lib/constants";
+import { LIT_CHAINS, LIT_SVM_CHAINS, ALL_LIT_CHAINS } from "./lib/constants";
 import { printError } from "./lib/utils";
 import { initWasmBlsSdk } from "./lib/bls-sdk.js";
 
@@ -75,7 +82,7 @@ import { version } from "./version";
 
 initWasmBlsSdk().then((exports) => {
   globalThis.wasmExports = exports;
-  console.log("wasmExports loaded");
+  // console.log("wasmExports loaded");
 });
 
 const functions = {
@@ -92,7 +99,11 @@ const functions = {
   createHtmlLIT,
   mintLIT,
   toggleLock,
+  encryptWithSymmetricKey,
+  decryptWithSymmetricKey,
   LIT_CHAINS,
+  LIT_SVM_CHAINS,
+  ALL_LIT_CHAINS,
   LitNodeClient,
   encryptWithPubKey,
   decryptWithPrivKey,
@@ -104,9 +115,11 @@ const functions = {
   injectViewerIFrame,
   printError,
   canonicalAccessControlConditionFormatter,
+  canonicalEVMContractConditionFormatter,
   verifyJwt,
   encryptFileAndZipWithMetadata,
   hashAccessControlConditions,
+  hashEVMContractConditions,
   decryptZipFileWithMetadata,
   downloadFile,
   decimalPlaces,
@@ -118,6 +131,7 @@ const functions = {
   decodeCallResult,
   uint8arrayFromString,
   uint8arrayToString,
+  signMessageAsync,
 };
 
 module.exports = functions;

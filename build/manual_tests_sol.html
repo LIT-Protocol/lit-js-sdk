@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+    <title>Manual Tests V2</title>
+
+    <script
+      onload="LitJsSdk.litJsSdkLoadedInALIT()"
+      src="/index.web.js"
+    ></script>
+    <script
+      src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+      type="application/javascript"
+    ></script>
+    <script>
+      var chain = "solana";
+
+      //var authSig = JSON.parse("{\"sig\":\"0x18a173d68d2f78cc5c13da0dfe36eec2a293285bee6d42547b9577bf26cdc985660ed3dddc4e75d422366cac07e8a9fc77669b10373bef9c7b8e4280252dfddf1b\",\"derivedVia\":\"web3.eth.personal.sign\",\"signedMessage\":\"I am creating an account to use LITs at 2021-08-04T20:14:04.918Z\",\"address\":\"0xdbd360f30097fb6d938dcc8b7b62854b36160b45\"}")
+
+      var randomPath = () =>
+        "/" +
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15);
+      var testProvisoningAndSigning = async ({
+        solRpcConditions,
+        testName,
+      }) => {
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        // document.getElementById(
+        //   "humanized"
+        // ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+        //   { evmContractConditions }
+        // )}`;
+
+        var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
+
+        let resourceId = {
+          baseUrl: "my-dynamic-content-server.com",
+          path: randomPath(),
+          orgId: "",
+          role: "",
+          extraData: "",
+        };
+
+        await litNodeClient.saveSigningCondition({
+          solRpcConditions,
+          chain,
+          authSig,
+          resourceId,
+        });
+
+        let jwt = await litNodeClient.getSignedToken({
+          solRpcConditions,
+          chain,
+          authSig,
+          resourceId,
+        });
+        console.log("jwt", jwt);
+
+        // uncomment this to break the jwt, to test an invalid jwt
+        // jwt = jwt.replace(/.$/, "3");
+
+        const { verified, header, payload } = LitJsSdk.verifyJwt({ jwt });
+        console.log("verified", verified);
+        console.log("header", header);
+        console.log("payload", payload);
+
+        if (jwt && verified) {
+          document.getElementById("status").innerText = `${testName}: Success`;
+        } else {
+          document.getElementById("status").innerText = `${testName}: Failure`;
+        }
+      };
+
+      var testProvisoningEncryptingAndDecrypting = async ({
+        solRpcConditions,
+        testName,
+      }) => {
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+        });
+
+        // document.getElementById(
+        //   "humanized"
+        // ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+        //   { accessControlConditions }
+        // )}`;
+
+        const { encryptedZip, symmetricKey } =
+          await LitJsSdk.zipAndEncryptString("this is a secret message");
+
+        const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
+          solRpcConditions,
+          symmetricKey,
+          authSig,
+          chain,
+        });
+
+        console.log("encrypted symmetric key", encryptedSymmetricKey);
+
+        const retrievedSymmKey = await litNodeClient.getEncryptionKey({
+          solRpcConditions,
+          toDecrypt: LitJsSdk.uint8arrayToString(
+            encryptedSymmetricKey,
+            "base16"
+          ),
+          chain,
+          authSig,
+        });
+
+        const decryptedFiles = await LitJsSdk.decryptZip(
+          encryptedZip,
+          retrievedSymmKey
+        );
+        const decryptedString = await decryptedFiles["string.txt"].async(
+          "text"
+        );
+        console.log("decrypted string", decryptedString);
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Success.  Decrypted string is: ${decryptedString}`;
+      };
+
+      // Actual tests are below here
+      var SolBalanceSigning = async () => {
+        var solRpcConditions = [
+          {
+            method: "getBalance",
+            params: [":userAddress"],
+            chain,
+            returnValueTest: {
+              key: "",
+              comparator: ">=",
+              value: "100000000", // equals 0.1 SOL
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          solRpcConditions,
+          testName: "SolBalanceSigning",
+        });
+      };
+
+      var SolBalanceEncrypt = async () => {
+        var solRpcConditions = [
+          {
+            method: "getBalance",
+            params: [":userAddress"],
+            chain,
+            returnValueTest: {
+              key: "",
+              comparator: ">=",
+              value: "100000000", // equals 0.1 SOL
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          testName: "SolBalanceEncrypt",
+        });
+      };
+
+      var SolSpecificWalletAddressSigning = async () => {
+        var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
+        var solRpcConditions = [
+          {
+            method: "",
+            params: [":userAddress"],
+            chain,
+            returnValueTest: {
+              key: "",
+              comparator: "=",
+              value: authSig.address,
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          solRpcConditions,
+          testName: "SolSpecificWalletAddressSigning",
+        });
+      };
+
+      var SolSpecificWalletAddressEncrypt = async () => {
+        var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
+        var solRpcConditions = [
+          {
+            method: "",
+            params: [":userAddress"],
+            chain,
+            returnValueTest: {
+              key: "",
+              comparator: "=",
+              value: authSig.address,
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          testName: "SolSpecificWalletAddressEncrypt",
+        });
+      };
+
+      var SolSpecificNftBalanceSigning = async () => {
+        var solRpcConditions = [
+          {
+            method: "getTokenAccountBalance",
+            params: ["E7aAccig7X3X4pSWjf1eqqUJkV3EbzG6DrtyM2gbuuhH"],
+            chain,
+            returnValueTest: {
+              key: "amount",
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          solRpcConditions,
+          testName: "SolSpecificNftBalanceSigning",
+        });
+      };
+
+      var SolSpecificNftBalanceEncrypt = async () => {
+        var solRpcConditions = [
+          {
+            method: "getTokenAccountBalance",
+            params: ["E7aAccig7X3X4pSWjf1eqqUJkV3EbzG6DrtyM2gbuuhH"],
+            chain,
+            returnValueTest: {
+              key: "amount",
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          testName: "SolSpecificNftBalanceEncrypt",
+        });
+      };
+
+      var SolGetTokenAccountsByOwnerEncrypt = async () => {
+        var solRpcConditions = [
+          {
+            method: "GetTokenAccountsByOwner",
+            params: [
+              ":userAddress",
+              {
+                programId: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              },
+              {
+                encoding: "jsonParsed",
+              },
+            ],
+            chain,
+            returnValueTest: {
+              key: '$[?(@.account.data.parsed.info.mint == "29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE")].account.data.parsed.info.tokenAmount.amount',
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          testName: "SolGetTokenAccountsByOwnerEncrypt",
+        });
+      };
+
+      var logout = async () => {
+        const testName = "Logout";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+
+        LitJsSdk.disconnectWeb3();
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Success - Logged out`;
+      };
+
+      document.addEventListener(
+        "lit-ready",
+        function (e) {
+          console.log("LIT network is ready");
+          document.getElementById("networkStatus").innerText =
+            "Success!  Connected to Lit Protocol Network";
+        },
+        false
+      );
+    </script>
+  </head>
+
+  <body>
+    <h1>Manual tests</h1>
+    <br />
+    <br />
+    <div id="networkStatus">Connecting to Lit Protocol Network...</div>
+    <br />
+    <br />
+    <button onclick="SolBalanceSigning()">SolBalanceSigning</button>
+    <br />
+    <br />
+    <button onclick="SolBalanceEncrypt()">SolBalanceEncrypt</button>
+    <br />
+    <br />
+
+    <button onclick="SolSpecificWalletAddressSigning()">
+      SolSpecificWalletAddressSigning
+    </button>
+    <br />
+    <br />
+    <button onclick="SolSpecificWalletAddressEncrypt()">
+      SolSpecificWalletAddressEncrypt
+    </button>
+    <br />
+    <br />
+
+    <button onclick="SolSpecificNftBalanceSigning()">
+      SolSpecificNftBalanceSigning
+    </button>
+    <br />
+    <br />
+    <button onclick="SolSpecificNftBalanceEncrypt()">
+      SolSpecificNftBalanceEncrypt
+    </button>
+    <br />
+    <br />
+
+    <button onclick="SolGetTokenAccountsByOwnerEncrypt()">
+      SolGetTokenAccountsByOwnerEncrypt
+    </button>
+    <br />
+    <br />
+
+    <button onclick="logout()">Logout</button>
+    <br />
+    <br />
+    <h2 id="status"></h2>
+    <br />
+    <p id="humanized"></p>
+  </body>
+</html>
