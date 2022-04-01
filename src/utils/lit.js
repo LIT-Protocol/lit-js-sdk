@@ -842,6 +842,7 @@ export async function humanizeAccessControlConditions({
         } else {
           decimals = await decimalPlaces({
             contractAddress: acc.contractAddress,
+            chain: acc.chain,
           });
         }
         log("decimals", decimals);
