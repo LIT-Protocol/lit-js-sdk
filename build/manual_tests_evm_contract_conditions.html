@@ -487,24 +487,57 @@
       var RandomTestFromUser = async () => {
         var evmContractConditions = [
           {
-            contractAddress: "0x0fc5726e5CC2f0eE4557ca69F5017f91b35a09F8",
-            functionName: "hasSubscription",
-            functionParams: ["1", ":userAddress"],
+            contractAddress: "0xECa8056809e7e8db04A8fF6e4E82cD889a46FE2F",
+            functionName: "getFlow",
+            functionParams: [
+              "0xe3cb950cb164a31c66e32c320a800d477019dcff",
+              ":userAddress",
+              "0x03fc4b2090eb96E27BEc5A52dE6410B7Dc00348A",
+            ],
             functionAbi: {
-              inputs: [
-                { internalType: "uint256", name: "profileId", type: "uint256" },
-                { internalType: "address", name: "follower", type: "address" },
-              ],
-              name: "hasSubscription",
-              outputs: [{ internalType: "bool", name: "", type: "bool" }],
+              constant: true,
+              name: "getFlow",
+              payable: false,
               stateMutability: "view",
               type: "function",
+              inputs: [
+                {
+                  type: "address",
+                  name: "token",
+                },
+                {
+                  type: "address",
+                  name: "sender",
+                },
+                {
+                  type: "address",
+                  name: "receiver",
+                },
+              ],
+              outputs: [
+                {
+                  type: "uint256",
+                  name: "timestamp",
+                },
+                {
+                  type: "int96",
+                  name: "flowRate",
+                },
+                {
+                  type: "uint256",
+                  name: "deposit",
+                },
+                {
+                  type: "uint256",
+                  name: "owedeposit",
+                },
+              ],
             },
-            chain: "mumbai",
+            chain: "kovan",
             returnValueTest: {
-              key: "",
-              comparator: "=",
-              value: "true",
+              key: "flowRate",
+              comparator: ">=",
+              value: "1",
             },
           },
         ];
