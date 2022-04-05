@@ -39,7 +39,7 @@ export function canonicalUnifiedAccessControlConditionFormatter(cond) {
     if (cond.conditionType === "solRpc") {
       return canonicalSolRpcConditionFormatter(cond);
     } else if (cond.conditionType === "evmBasic") {
-      return canonicalEvmBasicConditionFormatter(cond);
+      return canonicalAccessControlConditionFormatter(cond);
     } else if (cond.conditionType === "evmContract") {
       return canonicalEVMContractConditionFormatter(cond);
     } else {

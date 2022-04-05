@@ -13,10 +13,12 @@ import {
   hashEVMContractConditions,
   hashSolRpcConditions,
   hashResourceId,
+  hashUnifiedAccessControlConditions,
   canonicalAccessControlConditionFormatter,
   canonicalEVMContractConditionFormatter,
   canonicalSolRpcConditionFormatter,
   canonicalResourceIdFormatter,
+  canonicalUnifiedAccessControlConditionFormatter,
 } from "./crypto";
 
 /**

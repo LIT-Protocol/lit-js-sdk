@@ -47,7 +47,10 @@
 
         await litNodeClient.saveSigningCondition({
           unifiedAccessControlConditions,
-          authSig: ethAuthSig,
+          authSig: {
+            solana: solAuthSig,
+            ethereum: ethAuthSig,
+          },
           resourceId,
         });
 
