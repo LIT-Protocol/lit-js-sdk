@@ -375,6 +375,7 @@ export default class LitNodeClient {
     accessControlConditions,
     evmContractConditions,
     solRpcConditions,
+    unifiedAccessControlConditions,
     chain,
     authSig,
     resourceId,
@@ -414,9 +415,13 @@ export default class LitNodeClient {
       hashOfConditions = await hashEVMContractConditions(evmContractConditions);
     } else if (solRpcConditions) {
       hashOfConditions = await hashSolRpcConditions(solRpcConditions);
+    } else if (unifiedAccessControlConditions) {
+      hashOfConditions = await hashUnifiedAccessControlConditions(
+        unifiedAccessControlConditions
+      );
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
         name: "InvalidArgumentException",
         errorCode: "invalid_argument",
       });
