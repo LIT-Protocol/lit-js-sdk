@@ -31,6 +31,8 @@
         ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
           { accessControlConditions }
         )}`;
+        document.getElementById("log").innerText = "";
+        let log = "";
 
         var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
 
@@ -42,19 +44,26 @@
           extraData: "",
         };
 
+        let before = new Date();
         await litNodeClient.saveSigningCondition({
           accessControlConditions,
           chain,
           authSig,
           resourceId,
         });
+        let after = new Date();
+        log += `saveSigningCondition took ${after - before}ms\n`;
 
+        before = new Date();
         let jwt = await litNodeClient.getSignedToken({
           accessControlConditions,
           chain,
           authSig,
           resourceId,
         });
+        after = new Date();
+        log += `getSignedToken took ${after - before}ms\n`;
+
         console.log("jwt", jwt);
 
         // uncomment this to break the jwt, to test an invalid jwt
@@ -70,6 +79,7 @@
         } else {
           document.getElementById("status").innerText = `${testName}: Failure`;
         }
+        document.getElementById("log").innerText = log;
       };
 
       var NestedGrouping = async () => {
@@ -718,6 +728,8 @@
         const authSig = await LitJsSdk.checkAndSignAuthMessage({
           chain,
         });
+        document.getElementById("log").innerText = "";
+        let log = "";
         const accessControlConditions = [
           {
             contractAddress: "",
@@ -741,15 +753,19 @@
         const { encryptedZip, symmetricKey } =
           await LitJsSdk.zipAndEncryptString("this is a secret message");
 
+        let before = Date.now();
         const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
           accessControlConditions,
           symmetricKey,
           authSig,
           chain,
         });
+        let after = Date.now();
+        log += `saveEncryptionKey took ${after - before} ms\n`;
 
         console.log("encrypted symmetric key", encryptedSymmetricKey);
 
+        before = Date.now();
         const retrievedSymmKey = await litNodeClient.getEncryptionKey({
           accessControlConditions,
           toDecrypt: LitJsSdk.uint8arrayToString(
@@ -759,6 +775,8 @@
           chain,
           authSig,
         });
+        after = Date.now();
+        log += `getEncryptionKey took ${after - before} ms\n`;
 
         const decryptedFiles = await LitJsSdk.decryptZip(
           encryptedZip,
@@ -772,6 +790,7 @@
         document.getElementById(
           "status"
         ).innerText = `${testName}: Success.  Decrypted string is: ${decryptedString}`;
+        document.getElementById("log").innerText = log;
       };
 
       var EncryptDecryptWithAnUpdate = async () => {
@@ -1758,6 +1777,8 @@
 
     <button onclick="logout()">Logout</button>
     <br />
+    <br />
+    <pre id="log"></pre>
     <br />
     <h2 id="status"></h2>
     <br />

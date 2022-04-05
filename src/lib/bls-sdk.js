@@ -410,10 +410,18 @@ export const wasmBlsSdkHelpers = new (function () {
       return;
     }
     const RNG_VALUES_SIZE = globalThis.wasmExports.get_rng_values_size();
-    const rngValues = new Uint32Array(RNG_VALUES_SIZE);
-    globalThis.crypto.getRandomValues(rngValues);
-    for (let i = 0; i < rngValues.length; i++) {
-      globalThis.wasmExports.set_rng_value(i, rngValues[i]);
+    // getRandomValues only provides 65536 bytes at a time so loop
+    const arrayLength = 65536 / 4; // because we want 32 bit numbers and 32 / 8 = 4 so divide bytes by 4
+    const batches = Math.ceil(RNG_VALUES_SIZE / arrayLength);
+    for (let j = 0; j < batches; j++) {
+      const rngValues = new Uint32Array(arrayLength);
+      globalThis.crypto.getRandomValues(rngValues);
+      for (let i = 0; i < rngValues.length; i++) {
+        if (i + j * arrayLength >= RNG_VALUES_SIZE) {
+          break;
+        }
+        globalThis.wasmExports.set_rng_value(i + j * arrayLength, rngValues[i]);
+      }
     }
   };
 
