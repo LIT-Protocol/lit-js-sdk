@@ -295,7 +295,7 @@ export default class LitNodeClient {
       );
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
         name: "InvalidArgumentException",
         errorCode: "invalid_argument",
       });
@@ -485,6 +485,7 @@ export default class LitNodeClient {
     accessControlConditions,
     evmContractConditions,
     solRpcConditions,
+    unifiedAccessControlConditions,
     toDecrypt,
     chain,
     authSig,
@@ -501,6 +502,7 @@ export default class LitNodeClient {
     let formattedAccessControlConditions;
     let formattedEVMContractConditions;
     let formattedSolRpcConditions;
+    let formattedUnifiedAccessControlConditions;
     if (accessControlConditions) {
       formattedAccessControlConditions = accessControlConditions.map((c) =>
         canonicalAccessControlConditionFormatter(c)
@@ -525,9 +527,18 @@ export default class LitNodeClient {
         "formattedSolRpcConditions",
         JSON.stringify(formattedSolRpcConditions)
       );
+    } else if (unifiedAccessControlConditions) {
+      formattedUnifiedAccessControlConditions =
+        unifiedAccessControlConditions.map((c) =>
+          canonicalUnifiedAccessControlConditionFormatter(c)
+        );
+      log(
+        "formattedUnifiedAccessControlConditions",
+        JSON.stringify(formattedUnifiedAccessControlConditions)
+      );
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
         name: "InvalidArgumentException",
         errorCode: "invalid_argument",
       });
@@ -542,6 +553,8 @@ export default class LitNodeClient {
           accessControlConditions: formattedAccessControlConditions,
           evmContractConditions: formattedEVMContractConditions,
           solRpcConditions: formattedSolRpcConditions,
+          unifiedAccessControlConditions:
+            formattedUnifiedAccessControlConditions,
           toDecrypt,
           authSig,
           chain,
@@ -607,6 +620,7 @@ export default class LitNodeClient {
     accessControlConditions,
     evmContractConditions,
     solRpcConditions,
+    unifiedAccessControlConditions,
     chain,
     authSig,
     symmetricKey,
@@ -638,16 +652,16 @@ export default class LitNodeClient {
         "symmetricKey and encryptedSymmetricKey are blank.  You must pass one or the other"
       );
     }
-    if (!chain) {
-      throw new Error("chain is blank");
-    }
+
     if (
       (!accessControlConditions || accessControlConditions.length == 0) &&
       (!evmContractConditions || evmContractConditions.length == 0) &&
-      (!solRpcConditions || solRpcConditions.length == 0)
+      (!solRpcConditions || solRpcConditions.length == 0) &&
+      (!unifiedAccessControlConditions ||
+        unifiedAccessControlConditions.length == 0)
     ) {
       throw new Error(
-        "accessControlConditions and evmContractConditions and solRpcConditions are blank"
+        "accessControlConditions and evmContractConditions and solRpcConditions and unifiedAccessControlConditions are blank"
       );
     }
     if (!authSig) {
@@ -686,9 +700,13 @@ export default class LitNodeClient {
       hashOfConditions = await hashEVMContractConditions(evmContractConditions);
     } else if (solRpcConditions) {
       hashOfConditions = await hashSolRpcConditions(solRpcConditions);
+    } else if (unifiedAccessControlConditions) {
+      hashOfConditions = await hashUnifiedAccessControlConditions(
+        unifiedAccessControlConditions
+      );
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
         name: "InvalidArgumentException",
         errorCode: "invalid_argument",
       });
@@ -808,6 +826,7 @@ export default class LitNodeClient {
     accessControlConditions,
     evmContractConditions,
     solRpcConditions,
+    unifiedAccessControlConditions,
     toDecrypt,
     authSig,
     chain,
@@ -818,6 +837,7 @@ export default class LitNodeClient {
       accessControlConditions,
       evmContractConditions,
       solRpcConditions,
+      unifiedAccessControlConditions,
       toDecrypt,
       authSig,
       chain,
