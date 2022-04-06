@@ -235,6 +235,7 @@ export default class LitNodeClient {
     accessControlConditions,
     evmContractConditions,
     solRpcConditions,
+    unifiedAccessControlConditions,
     chain,
     authSig,
     resourceId,
@@ -258,6 +259,7 @@ export default class LitNodeClient {
     let formattedAccessControlConditions;
     let formattedEVMContractConditions;
     let formattedSolRpcConditions;
+    let formattedUnifiedAccessControlConditions;
     if (accessControlConditions) {
       formattedAccessControlConditions = accessControlConditions.map((c) =>
         canonicalAccessControlConditionFormatter(c)
@@ -282,6 +284,15 @@ export default class LitNodeClient {
         "formattedSolRpcConditions",
         JSON.stringify(formattedSolRpcConditions)
       );
+    } else if (unifiedAccessControlConditions) {
+      formattedUnifiedAccessControlConditions =
+        unifiedAccessControlConditions.map((c) =>
+          canonicalUnifiedAccessControlConditionFormatter(c)
+        );
+      log(
+        "formattedUnifiedAccessControlConditions",
+        JSON.stringify(formattedUnifiedAccessControlConditions)
+      );
     } else {
       throwError({
         message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
@@ -301,6 +312,8 @@ export default class LitNodeClient {
           accessControlConditions: formattedAccessControlConditions,
           evmContractConditions: formattedEVMContractConditions,
           solRpcConditions: formattedSolRpcConditions,
+          unifiedAccessControlConditions:
+            formattedUnifiedAccessControlConditions,
           resourceId: formattedResourceId,
           authSig,
           chain,
@@ -767,6 +780,7 @@ export default class LitNodeClient {
     accessControlConditions,
     evmContractConditions,
     solRpcConditions,
+    unifiedAccessControlConditions,
     resourceId,
     authSig,
     chain,
@@ -779,6 +793,7 @@ export default class LitNodeClient {
       accessControlConditions,
       evmContractConditions,
       solRpcConditions,
+      unifiedAccessControlConditions,
       resourceId,
       authSig,
       chain,
