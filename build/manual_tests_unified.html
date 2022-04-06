@@ -84,8 +84,11 @@
         testName,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
-        const authSig = await LitJsSdk.checkAndSignAuthMessage({
-          chain,
+        var solAuthSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain: "solana",
+        });
+        var ethAuthSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain: "ethereum",
         });
 
         // document.getElementById(
@@ -100,7 +103,10 @@
         const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
           unifiedAccessControlConditions,
           symmetricKey,
-          authSig,
+          authSig: {
+            ethereum: ethAuthSig,
+            solana: solAuthSig,
+          },
           chain,
         });
 
@@ -113,7 +119,10 @@
             "base16"
           ),
           chain,
-          authSig,
+          authSig: {
+            ethereum: ethAuthSig,
+            solana: solAuthSig,
+          },
         });
 
         const decryptedFiles = await LitJsSdk.decryptZip(
@@ -187,7 +196,7 @@
                 },
               ],
             },
-            chain: "ethereum",
+            chain: "polygon",
             returnValueTest: {
               key: "",
               comparator: ">",
@@ -204,124 +213,70 @@
       var BalanceEncrypt = async () => {
         var unifiedAccessControlConditions = [
           {
+            conditionType: "solRpc",
             method: "getBalance",
             params: [":userAddress"],
-            chain,
+            chain: "solana",
             returnValueTest: {
               key: "",
               comparator: ">=",
               value: "100000000", // equals 0.1 SOL
             },
           },
+          { operator: "or" },
+          {
+            conditionType: "evmBasic",
+            contractAddress: "",
+            standardContractType: "",
+            chain: "ethereum",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+          { operator: "or" },
+          {
+            conditionType: "evmContract",
+            contractAddress: "0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88",
+            functionName: "balanceOf",
+            functionParams: [":userAddress", "8"],
+            functionAbi: {
+              type: "function",
+              stateMutability: "view",
+              outputs: [
+                {
+                  type: "uint256",
+                  name: "",
+                  internalType: "uint256",
+                },
+              ],
+              name: "balanceOf",
+              inputs: [
+                {
+                  type: "address",
+                  name: "account",
+                  internalType: "address",
+                },
+                {
+                  type: "uint256",
+                  name: "id",
+                  internalType: "uint256",
+                },
+              ],
+            },
+            chain: "polygon",
+            returnValueTest: {
+              key: "",
+              comparator: ">",
+              value: "0",
+            },
+          },
         ];
         await testProvisoningEncryptingAndDecrypting({
           unifiedAccessControlConditions,
           testName: "BalanceEncrypt",
-        });
-      };
-
-      var SolSpecificWalletAddressSigning = async () => {
-        var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
-        var solRpcConditions = [
-          {
-            method: "",
-            params: [":userAddress"],
-            chain,
-            returnValueTest: {
-              key: "",
-              comparator: "=",
-              value: authSig.address,
-            },
-          },
-        ];
-        await testProvisoningAndSigning({
-          solRpcConditions,
-          testName: "SolSpecificWalletAddressSigning",
-        });
-      };
-
-      var SolSpecificWalletAddressEncrypt = async () => {
-        var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
-        var solRpcConditions = [
-          {
-            method: "",
-            params: [":userAddress"],
-            chain,
-            returnValueTest: {
-              key: "",
-              comparator: "=",
-              value: authSig.address,
-            },
-          },
-        ];
-        await testProvisoningEncryptingAndDecrypting({
-          solRpcConditions,
-          testName: "SolSpecificWalletAddressEncrypt",
-        });
-      };
-
-      var SolSpecificNftBalanceSigning = async () => {
-        var solRpcConditions = [
-          {
-            method: "getTokenAccountBalance",
-            params: ["E7aAccig7X3X4pSWjf1eqqUJkV3EbzG6DrtyM2gbuuhH"],
-            chain,
-            returnValueTest: {
-              key: "amount",
-              comparator: ">",
-              value: "0",
-            },
-          },
-        ];
-        await testProvisoningAndSigning({
-          solRpcConditions,
-          testName: "SolSpecificNftBalanceSigning",
-        });
-      };
-
-      var SolSpecificNftBalanceEncrypt = async () => {
-        var solRpcConditions = [
-          {
-            method: "getTokenAccountBalance",
-            params: ["E7aAccig7X3X4pSWjf1eqqUJkV3EbzG6DrtyM2gbuuhH"],
-            chain,
-            returnValueTest: {
-              key: "amount",
-              comparator: ">",
-              value: "0",
-            },
-          },
-        ];
-        await testProvisoningEncryptingAndDecrypting({
-          solRpcConditions,
-          testName: "SolSpecificNftBalanceEncrypt",
-        });
-      };
-
-      var SolGetTokenAccountsByOwnerEncrypt = async () => {
-        var solRpcConditions = [
-          {
-            method: "GetTokenAccountsByOwner",
-            params: [
-              ":userAddress",
-              {
-                programId: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-              },
-              {
-                encoding: "jsonParsed",
-              },
-            ],
-            chain,
-            returnValueTest: {
-              key: '$[?(@.account.data.parsed.info.mint == "29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE")].account.data.parsed.info.tokenAmount.amount',
-              comparator: ">",
-              value: "0",
-            },
-          },
-        ];
-        await testProvisoningEncryptingAndDecrypting({
-          solRpcConditions,
-          testName: "SolGetTokenAccountsByOwnerEncrypt",
         });
       };
 
