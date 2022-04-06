@@ -285,29 +285,58 @@
           "!!! This test only works from address 0xdbd360F30097fB6d938dcc8B7b62854B36160B45"
         );
         const chain = "xdai";
+        // var accessControlConditions = [
+        //   // {
+        //   //   contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+        //   //   standardContractType: "ERC721",
+        //   //   chain,
+        //   //   method: "balanceOf",
+        //   //   parameters: [":userAddress"],
+        //   //   returnValueTest: {
+        //   //     comparator: ">",
+        //   //     value: "0",
+        //   //   },
+        //   // },
+        //   {
+        //     contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+        //     standardContractType: "POAP",
+        //     chain,
+        //     method: "tokenURI",
+        //     parameters: [],
+        //     returnValueTest: {
+        //       comparator: "contains",
+        //       value: "Burning Man 2021",
+        //     },
+        //   },
+        // ];
         var accessControlConditions = [
-          {
-            contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
-            standardContractType: "ERC721",
-            chain,
-            method: "balanceOf",
-            parameters: [":userAddress"],
-            returnValueTest: {
-              comparator: ">",
-              value: "0",
+          [
+            {
+              contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+              standardContractType: "POAP",
+              chain: "xdai",
+              method: "tokenURI",
+              parameters: [],
+              returnValueTest: {
+                comparator: "contains",
+                value: "Lit Protocol Test",
+              },
             },
-          },
-          {
-            contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
-            standardContractType: "POAP",
-            chain,
-            method: "tokenURI",
-            parameters: [],
-            returnValueTest: {
-              comparator: "contains",
-              value: "Burning Man 2021",
+            {
+              operator: "or",
             },
-          },
+            {
+              contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+              standardContractType: "POAP",
+              chain: "ethereum",
+              method: "tokenURI",
+              parameters: [],
+              returnValueTest: {
+                comparator: "contains",
+                value: "Lit Protocol Test",
+              },
+            },
+          ],
         ];
         await testProvisoningAndSigning({
           accessControlConditions,
