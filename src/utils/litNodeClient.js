@@ -862,12 +862,12 @@ export default class LitNodeClient {
 
   throwNodeError(res) {
     if (res.error && res.error.errorCode) {
-      if (
-        res.error.errorCode === "not_authorized" &&
-        this.config.alertWhenUnauthorized
-      ) {
-        alert("You are not authorized to access to this content");
-      }
+      // if (
+      //   res.error.errorCode === "not_authorized" &&
+      //   this.config.alertWhenUnauthorized
+      // ) {
+      //   alert("You are not authorized to access to this content");
+      // }
       throwError({ ...res.error, name: "NodeError" });
     } else {
       throwError({
