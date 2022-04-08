@@ -484,6 +484,69 @@
         });
       };
 
+      var RandomTestFromUser = async () => {
+        var evmContractConditions = [
+          {
+            contractAddress: "0xECa8056809e7e8db04A8fF6e4E82cD889a46FE2F",
+            functionName: "getFlow",
+            functionParams: [
+              "0xe3cb950cb164a31c66e32c320a800d477019dcff",
+              ":userAddress",
+              "0x03fc4b2090eb96E27BEc5A52dE6410B7Dc00348A",
+            ],
+            functionAbi: {
+              constant: true,
+              name: "getFlow",
+              payable: false,
+              stateMutability: "view",
+              type: "function",
+              inputs: [
+                {
+                  type: "address",
+                  name: "token",
+                },
+                {
+                  type: "address",
+                  name: "sender",
+                },
+                {
+                  type: "address",
+                  name: "receiver",
+                },
+              ],
+              outputs: [
+                {
+                  type: "uint256",
+                  name: "timestamp",
+                },
+                {
+                  type: "int96",
+                  name: "flowRate",
+                },
+                {
+                  type: "uint256",
+                  name: "deposit",
+                },
+                {
+                  type: "uint256",
+                  name: "owedeposit",
+                },
+              ],
+            },
+            chain: "kovan",
+            returnValueTest: {
+              key: "flowRate",
+              comparator: ">=",
+              value: "1",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          evmContractConditions,
+          testName: "RandomTestFromUser",
+        });
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -535,6 +598,10 @@
     <br />
 
     <button onclick="SignAGroup()">SignAGroup</button>
+    <br />
+    <br />
+
+    <button onclick="RandomTestFromUser()">RandomTestFromUser</button>
     <br />
     <br />
 

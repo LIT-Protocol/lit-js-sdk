@@ -1,18 +1,22 @@
 import { Contract } from "@ethersproject/contracts";
 import { Interface } from "@ethersproject/abi";
 import { verifyMessage } from "@ethersproject/wallet";
-import { Web3Provider, JsonRpcSigner } from "@ethersproject/providers";
+import {
+  Web3Provider,
+  JsonRpcSigner,
+  JsonRpcProvider,
+} from "@ethersproject/providers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { hexlify } from "@ethersproject/bytes";
-import Web3Modal from "web3modal";
-import WalletConnectProvider from "@walletconnect/web3-provider";
+import WalletConnectProvider from "@walletconnect/ethereum-provider";
 import Resolution from "@unstoppabledomains/resolution";
-import detectEthereumProvider from "@metamask/detect-provider";
+import LitConnectModal from "lit-connect-modal";
 
 import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
 
 import LIT from "../abis/LIT.json";
+import ERC20 from "../abis/ERC20.json";
 import { LIT_CHAINS } from "../lib/constants";
 import { throwError, log } from "../lib/utils";
 
@@ -41,7 +45,7 @@ export function decodeCallResult({ abi, functionName, data }) {
   return decoded;
 }
 
-export async function connectWeb3() {
+export async function connectWeb3({ chainId = 1 } = {}) {
   const rpcUrls = {};
   // need to make it look like this:
   // rpc: {
@@ -64,21 +68,20 @@ export async function connectWeb3() {
       options: {
         // infuraId: "cd614bfa5c2f4703b7ab0ec0547d9f81",
         rpc: rpcUrls,
+        chainId,
       },
     },
   };
 
-  log("getting provider via web3modal");
-  // disabled because web3modal uses localstorage and breaks when
-  // used on opensea
-  const web3Modal = new Web3Modal({
-    cacheProvider: true, // optional
-    providerOptions, // required
+  log("getting provider via lit connect modal");
+
+  const dialog = new LitConnectModal({
+    providerOptions,
   });
-  const provider = await web3Modal.connect();
+  const provider = await dialog.getWalletProvider();
+
   log("got provider", provider);
   const web3 = new Web3Provider(provider);
-  log("got web3", web3);
 
   // const provider = await detectEthereumProvider();
   // const web3 = new Web3Provider(provider);
@@ -99,13 +102,10 @@ export async function connectWeb3() {
 }
 
 export async function disconnectWeb3() {
-  const web3Modal = new Web3Modal({
-    cacheProvider: true, // optional
-  });
-  web3Modal.clearCachedProvider();
   localStorage.removeItem("walletconnect");
   localStorage.removeItem("lit-auth-signature");
   localStorage.removeItem("lit-auth-sol-signature");
+  localStorage.removeItem("lit-web3-provider");
 }
 
 // taken from the excellent repo https://github.com/zmitton/eth-proof
@@ -162,9 +162,25 @@ export async function disconnectWeb3() {
 // }
 
 export async function checkAndSignEVMAuthMessage({ chain }) {
-  const { web3, account } = await connectWeb3();
-  const { chainId } = await web3.getNetwork();
   const selectedChain = LIT_CHAINS[chain];
+  const { web3, account } = await connectWeb3({
+    chainId: selectedChain.chainId,
+  });
+  log(`got web3 and account: ${account}`);
+
+  let chainId;
+  try {
+    const resp = await web3.getNetwork();
+    chainId = resp.chainId;
+  } catch (e) {
+    // couldn't get chainId.  throw the incorrect network error
+    log("getNetwork threw an exception", e);
+    throwError({
+      message: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
+      name: "WrongNetworkException",
+      errorCode: "wrong_network",
+    });
+  }
   let selectedChainId = "0x" + selectedChain.chainId.toString("16");
   log("chainId from web3", chainId);
   log(
@@ -332,18 +348,23 @@ export const signMessageAsync = async (signer, address, message) => {
   const messageBytes = toUtf8Bytes(message);
   if (signer instanceof JsonRpcSigner) {
     try {
+      log("Signing with personal_sign");
       const signature = await signer.provider.send("personal_sign", [
         hexlify(messageBytes),
         address.toLowerCase(),
       ]);
       return signature;
     } catch (e) {
+      log(
+        "Signing with personal_sign failed, trying signMessage as a fallback"
+      );
       if (e.message.includes("personal_sign")) {
         return await signer.signMessage(messageBytes);
       }
       throw e;
     }
   } else {
+    log("signing with signMessage");
     return await signer.signMessage(messageBytes);
   }
 };
@@ -579,11 +600,13 @@ export async function sendLIT({ tokenMetadata, to }) {
  * @returns {number} The number of decimal places in the token
  */
 export async function decimalPlaces({ contractAddress, chain }) {
-  if (chain) {
-    await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
-  }
-  const { web3, account } = await connectWeb3();
-  const contract = new Contract(contractAddress, ERC20, web3);
+  // if (chain) {
+  //   await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
+  // }
+  // const { web3, account } = await connectWeb3();
+  const rpcUrl = LIT_CHAINS[chain].rpcUrls[0];
+  const web3 = new JsonRpcProvider(rpcUrl);
+  const contract = new Contract(contractAddress, ERC20.abi, web3);
   return await contract.decimals();
 }
 
@@ -595,8 +618,10 @@ export async function decimalPlaces({ contractAddress, chain }) {
  * @returns {string} The resolved eth address
  */
 export async function lookupNameServiceAddress({ chain, name }) {
-  await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
-  const { web3, account } = await connectWeb3();
+  // await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
+  // const { web3, account } = await connectWeb3();
+  const rpcUrl = LIT_CHAINS[chain].rpcUrls[0];
+  const web3 = new JsonRpcProvider(rpcUrl);
 
   const parts = name.split(".");
   const tld = parts[parts.length - 1].toLowerCase();

@@ -30,7 +30,9 @@ export const LIT_CHAINS = {
     symbol: "ETH",
     decimals: 18,
     type: "ERC1155",
-    rpcUrls: ["https://api.mycryptoapi.com/eth"],
+    rpcUrls: [
+      "https://eth-mainnet.alchemyapi.io/v2/EuGnkVlzVoEkzdg0lpCarhm8YHOxWVxE",
+    ],
     blockExplorerUrls: ["https://etherscan.io"],
     vmType: "EVM",
   },
