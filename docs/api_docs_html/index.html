@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset='utf-8'>
-  <title>lit-js-sdk 1.1.141 | Documentation</title>
+  <title>lit-js-sdk 1.1.156 | Documentation</title>
   <meta name='description' content='LIT Javascript SDK'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' rel='stylesheet'>
@@ -15,7 +15,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>lit-js-sdk</h3>
-          <div class='mb1'><code>1.1.141</code></div>
+          <div class='mb1'><code>1.1.156</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -935,7 +935,7 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.accessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#accesscontrolcondition">AccessControlCondition</a>></code>
   </td>
-  <td class='break-word'><span>The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+  <td class='break-word'><span>The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
 </span></td>
 </tr>
 
@@ -944,7 +944,7 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.evmContractConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#evmcontractcondition">EVMContractCondition</a>></code>
   </td>
-  <td class='break-word'><span>EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions solRpcConditions.
+  <td class='break-word'><span>EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions solRpcConditions or unifiedAccessControlConditions.
 </span></td>
 </tr>
 
@@ -954,6 +954,15 @@
   <td class='break-word'><span class='code bold'>params.solRpcConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#solrpccondition">SolRpcCondition</a>></code>
   </td>
   <td class='break-word'><span>Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.unifiedAccessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;(<a href="#accesscontrolcondition">AccessControlCondition</a> | <a href="#evmcontractcondition">EVMContractCondition</a> | <a href="#solrpccondition">SolRpcCondition</a>)></code>
+  </td>
+  <td class='break-word'><span>An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
 </span></td>
 </tr>
 
@@ -1075,7 +1084,7 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.accessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#accesscontrolcondition">AccessControlCondition</a>></code>
   </td>
-  <td class='break-word'><span>The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+  <td class='break-word'><span>The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
 </span></td>
 </tr>
 
@@ -1084,7 +1093,7 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.evmContractConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#evmcontractcondition">EVMContractCondition</a>></code>
   </td>
-  <td class='break-word'><span>EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+  <td class='break-word'><span>EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
 </span></td>
 </tr>
 
@@ -1094,6 +1103,15 @@
   <td class='break-word'><span class='code bold'>params.solRpcConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#solrpccondition">SolRpcCondition</a>></code>
   </td>
   <td class='break-word'><span>Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.unifiedAccessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;(<a href="#accesscontrolcondition">AccessControlCondition</a> | <a href="#evmcontractcondition">EVMContractCondition</a> | <a href="#solrpccondition">SolRpcCondition</a>)></code>
+  </td>
+  <td class='break-word'><span>An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
 </span></td>
 </tr>
 
@@ -1234,7 +1252,7 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.accessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#accesscontrolcondition">AccessControlCondition</a>></code>
   </td>
-  <td class='break-word'><span>The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+  <td class='break-word'><span>The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
 </span></td>
 </tr>
 
@@ -1243,7 +1261,7 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.evmContractConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#evmcontractcondition">EVMContractCondition</a>></code>
   </td>
-  <td class='break-word'><span>EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+  <td class='break-word'><span>EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
 </span></td>
 </tr>
 
@@ -1253,6 +1271,15 @@
   <td class='break-word'><span class='code bold'>params.solRpcConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#solrpccondition">SolRpcCondition</a>></code>
   </td>
   <td class='break-word'><span>Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.unifiedAccessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;(<a href="#accesscontrolcondition">AccessControlCondition</a> | <a href="#evmcontractcondition">EVMContractCondition</a> | <a href="#solrpccondition">SolRpcCondition</a>)></code>
+  </td>
+  <td class='break-word'><span>An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
 </span></td>
 </tr>
 
@@ -1374,7 +1401,7 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.accessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#accesscontrolcondition">AccessControlCondition</a>></code>
   </td>
-  <td class='break-word'><span>The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+  <td class='break-word'><span>The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
 </span></td>
 </tr>
 
@@ -1383,7 +1410,7 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.evmContractConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#evmcontractcondition">EVMContractCondition</a>></code>
   </td>
-  <td class='break-word'><span>EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+  <td class='break-word'><span>EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
 </span></td>
 </tr>
 
@@ -1393,6 +1420,15 @@
   <td class='break-word'><span class='code bold'>params.solRpcConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#solrpccondition">SolRpcCondition</a>></code>
   </td>
   <td class='break-word'><span>Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.unifiedAccessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;(<a href="#accesscontrolcondition">AccessControlCondition</a> | <a href="#evmcontractcondition">EVMContractCondition</a> | <a href="#solrpccondition">SolRpcCondition</a>)></code>
+  </td>
+  <td class='break-word'><span>An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
 </span></td>
 </tr>
 
@@ -2683,7 +2719,34 @@
                 <tr>
   <td class='break-word'><span class='code bold'>params.accessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#accesscontrolcondition">AccessControlCondition</a>></code>
   </td>
-  <td class='break-word'><span>The array of access control conditions to under which the content can be decrypted
+  <td class='break-word'><span>The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.evmContractConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#evmcontractcondition">EVMContractCondition</a>></code>
+  </td>
+  <td class='break-word'><span>EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.solRpcConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#solrpccondition">SolRpcCondition</a>></code>
+  </td>
+  <td class='break-word'><span>Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.unifiedAccessControlConditions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;(<a href="#accesscontrolcondition">AccessControlCondition</a> | <a href="#evmcontractcondition">EVMContractCondition</a> | <a href="#solrpccondition">SolRpcCondition</a>)></code>
+  </td>
+  <td class='break-word'><span>An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
 </span></td>
 </tr>
 
@@ -5100,6 +5163,30 @@
               
                 <tr>
   <td class='break-word'><span class='code bold'>params.size</span> <code class='quiet'>any</code>
+  </td>
+  <td class='break-word'><span></span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.evmContractConditions</span> <code class='quiet'>any</code>
+  </td>
+  <td class='break-word'><span></span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.solRpcConditions</span> <code class='quiet'>any</code>
+  </td>
+  <td class='break-word'><span></span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>params.unifiedAccessControlConditions</span> <code class='quiet'>any</code>
   </td>
   <td class='break-word'><span></span></td>
 </tr>
