@@ -44,7 +44,9 @@ export function canonicalUnifiedAccessControlConditionFormatter(cond) {
       return canonicalEVMContractConditionFormatter(cond);
     } else {
       throwError({
-        message: `You passed an invalid access control condition that missing or has a wrong "conditionType": ${cond}`,
+        message: `You passed an invalid access control condition that is missing or has a wrong "conditionType": ${JSON.stringify(
+          cond
+        )}`,
         name: "InvalidAccessControlCondition",
         errorCode: "invalid_access_control_condition",
       });

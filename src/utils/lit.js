@@ -12,6 +12,9 @@ import {
   encryptWithSymmetricKey,
   decryptWithSymmetricKey,
   canonicalAccessControlConditionFormatter,
+  canonicalEVMContractConditionFormatter,
+  canonicalSolRpcConditionFormatter,
+  canonicalUnifiedAccessControlConditionFormatter,
 } from "./crypto";
 
 import { checkAndSignEVMAuthMessage, decimalPlaces } from "./eth";
@@ -249,7 +252,10 @@ export async function encryptZip(zip) {
  * Encrypt a single file, save the key to the Lit network, and then zip it up with the metadata.
  * @param {Object} params
  * @param {Object} params.authSig The authSig of the user.  Returned via the checkAndSignAuthMessage function
- * @param {Array.<AccessControlCondition>} params.accessControlConditions The array of access control conditions to under which the content can be decrypted
+ * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+ * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+ * @param {Array.<SolRpcCondition>} params.solRpcConditions  Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+ * @param {Array.<AccessControlCondition|EVMContractCondition|SolRpcCondition>} params.unifiedAccessControlConditions  An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
  * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
  * @param {File} params.file The file you wish to encrypt
  * @param {LitNodeClient} params.litNodeClient An instance of LitNodeClient that is already connected
@@ -259,6 +265,9 @@ export async function encryptZip(zip) {
 export async function encryptFileAndZipWithMetadata({
   authSig,
   accessControlConditions,
+  evmContractConditions,
+  solRpcConditions,
+  unifiedAccessControlConditions,
   chain,
   file,
   litNodeClient,
@@ -272,6 +281,9 @@ export async function encryptFileAndZipWithMetadata({
 
   const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
     accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
+    unifiedAccessControlConditions,
     symmetricKey: exportedSymmKey,
     authSig,
     chain,
@@ -292,6 +304,9 @@ export async function encryptFileAndZipWithMetadata({
     size: file.size,
     encryptedSymmetricKey,
     accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
+    unifiedAccessControlConditions,
     chain,
   });
 
@@ -330,6 +345,9 @@ export async function decryptZipFileWithMetadata({
   try {
     symmKey = await litNodeClient.getEncryptionKey({
       accessControlConditions: metadata.accessControlConditions,
+      evmContractConditions: metadata.evmContractConditions,
+      solRpcConditions: metadata.solRpcConditions,
+      unifiedAccessControlConditions: metadata.unifiedAccessControlConditions,
       toDecrypt: metadata.encryptedSymmetricKey,
       chain: metadata.chain,
       authSig,
@@ -371,6 +389,8 @@ export async function decryptZipFileWithMetadata({
         // we tried all the access control conditions and none worked
         throw e;
       }
+    } else {
+      throw e;
     }
   }
   const importedSymmKey = await importSymmetricKey(symmKey);
@@ -678,17 +698,20 @@ function metadataForFile({
   type,
   size,
   accessControlConditions,
+  evmContractConditions,
+  solRpcConditions,
+  unifiedAccessControlConditions,
   chain,
   encryptedSymmetricKey,
 }) {
-  const formattedAccessControlConditions = accessControlConditions.map((c) =>
-    canonicalAccessControlConditionFormatter(c)
-  );
   return {
     name,
     type,
     size,
-    accessControlConditions: formattedAccessControlConditions,
+    accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
+    unifiedAccessControlConditions,
     chain,
     encryptedSymmetricKey: uint8arrayToString(encryptedSymmetricKey, "base16"),
   };
