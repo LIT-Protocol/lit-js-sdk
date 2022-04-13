@@ -15,5 +15,5 @@ build({
   globalName: "LitJsSdk",
   plugins: [nodeBuiltIns()],
   define: { global: "window" },
-  inject: ["./polyfills.js"],
+  inject: ["./esbuild-web-shims.js"],
 });
