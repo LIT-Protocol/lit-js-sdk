@@ -101,6 +101,9 @@ export async function connectWeb3({ chainId = 1 } = {}) {
   return { web3, account };
 }
 
+/**
+ * Delete any saved AuthSigs from local storage.  Takes no params and returns nothing.  This will also clear out the WalletConnect cache in local storage.  We often run this function as a result of the user pressing a "Logout" button.
+ */
 export async function disconnectWeb3() {
   localStorage.removeItem("walletconnect");
   localStorage.removeItem("lit-auth-signature");
