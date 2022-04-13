@@ -8,6 +8,8 @@ import { version } from "../version";
 
 import { mostCommonString, throwError, log } from "../lib/utils";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
+import * as  wasmECDSA  from "../lib/ecdsa-sdk";
+
 import {
   hashAccessControlConditions,
   hashEVMContractConditions,
@@ -583,6 +585,7 @@ export default class LitNodeClient {
    * @param {boolean} params.permanent Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default.
    * @returns {Uint8Array} The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
    */
+  
   async saveEncryptionKey({
     accessControlConditions,
     evmContractConditions,
@@ -702,6 +705,179 @@ export default class LitNodeClient {
 
     return encryptedKey;
   }
+
+
+
+  /**
+   * Signs a message with Lit threshold ECDSA algorithms. 
+   * @param {Object} params
+   * @param {string} params.message The message to be signed - note this message is not currently converted to a digest!!!!!
+   * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+   * @returns {Object} JSON structure with signed message, signature & public key.
+   */
+  async signWithEcdsa({
+    message,
+    chain,
+  }) {
+    // ask each node to decrypt the content
+    const nodePromises = [];
+    for (const url of this.connectedNodes) {
+      nodePromises.push(
+        this.signECDSA({       
+          url,   
+          message,
+          chain,
+          iat : 0,
+          exp: 0
+        })
+      );
+    }
+
+    try
+    {  
+      const share_data = await Promise.all(nodePromises);
+      // R_x & R_y values can come from any node (they will be different per node), and will generate a valid signature
+      const R_x = share_data[0].local_x;  
+      const R_y = share_data[0].local_y;
+      // the public key can come from any node - it obviously will be identical from each node
+      const public_key = share_data[0].public_key;
+      const valid_shares = share_data.map((s) => (
+        s.signature_share
+      ));
+      const shares = JSON.stringify(valid_shares);
+      await wasmECDSA.initWasmEcdsaSdk();  // init WASM
+      const signature = wasmECDSA.combine_signature(R_x, R_y, shares);
+      console.log("raw ecdsav sig", signature);
+      return (signature);
+    }
+    catch (e)
+    {
+        console.log("Error - signed_ecdsa_messages ");
+        const signed_ecdsa_message = nodePromises[0];
+        return signed_ecdsa_message;
+    }   
+    return throwError("some other error?");
+  }
+
+
+
+  /**
+   * Validates a condition, and then signs the condition if the validation returns true.   Before calling this function, you must know the on chain conditions that you wish to validate.  
+   * @param {Object} params
+   * @param {Array.<AccessControlCondition>} params.accessControlConditions The on chain control conditions that are to be evaluated and - if valid -  signed.
+   * @param {string} params.chain The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
+   * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that seeks to evaluate conditions.
+   * @returns {Object} JSON structure with signed message, signature & public key.. 
+  */
+  async validate_and_sign_ecdsa({
+    accessControlConditions,
+    chain,
+    auth_sig,    
+  }) 
+  {
+    if (!this.ready) {
+      throwError({
+        message: "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
+        name: "LitNodeClientNotReadyError",
+        errorCode: "lit_node_client_not_ready",
+      });
+    }
+
+    // we need to send jwt params iat (issued at) and exp (expiration)
+    // because the nodes may have different wall clock times
+    // the nodes will verify that these params are withing a grace period
+    const now = Date.now();
+    const iat = Math.floor(now / 1000);
+    const exp = iat + 12 * 60 * 60; // 12 hours in seconds
+
+    let formattedAccessControlConditions;
+    let formattedEVMContractConditions;
+    let formattedSolRpcConditions;
+    if (accessControlConditions) {
+      formattedAccessControlConditions = accessControlConditions.map((c) =>
+        canonicalAccessControlConditionFormatter(c)
+      );
+      log(
+        "formattedAccessControlConditions",
+        JSON.stringify(formattedAccessControlConditions)
+      );
+    }     
+    // else if (evmContractConditions) {
+    //   formattedEVMContractConditions = evmContractConditions.map((c) =>
+    //     canonicalEVMContractConditionFormatter(c)
+    //   );
+    //   log(
+    //     "formattedEVMContractConditions",
+    //     JSON.stringify(formattedEVMContractConditions)
+    //   );
+    // } else if (solRpcConditions) {
+    //   formattedSolRpcConditions = solRpcConditions.map((c) =>
+    //     canonicalSolRpcConditionFormatter(c)
+    //   );
+    //   log(
+    //     "formattedSolRpcConditions",
+    //     JSON.stringify(formattedSolRpcConditions)
+    //   );
+    // } 
+    else {
+      throwError({
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
+    }
+
+    // ask each node to sign the content
+    const nodePromises = [];
+    for (const url of this.connectedNodes) {
+      nodePromises.push(
+        this.sign_condition_ecdsa({
+          url,
+          accessControlConditions: formattedAccessControlConditions,
+          evmContractConditions: formattedEVMContractConditions,
+          solRpcConditions: formattedSolRpcConditions,          
+          auth_sig,
+          chain,
+          iat,
+          exp,
+        })
+      );
+    }
+
+    try
+    {  
+      const share_data = await Promise.all(nodePromises);
+      
+      if (share_data[0].result == 'failure')
+        return ('Condition Failed');
+        
+        
+        // R_x & R_y values can come from any node (they will be different per node), and will generate a valid signature
+      const R_x = share_data[0].local_x;  
+      const R_y = share_data[0].local_y;
+
+      // the public key can come from any node - it obviously will be identical from each node
+      const public_key = share_data[0].public_key;
+      const valid_shares = share_data.map((s) => (
+        s.signature_share
+      ));
+      const shares = JSON.stringify(valid_shares);
+      await wasmECDSA.initWasmEcdsaSdk();  // init WASM
+      const signature = wasmECDSA.combine_signature(R_x, R_y, shares);
+      console.log("raw ecdsa sig", signature);
+      return (signature);
+    }
+    catch (e)
+    {
+        console.log("Error - signed_ecdsa_messages - ", e);
+        const signed_ecdsa_message = nodePromises[0];
+        return signed_ecdsa_message;
+    }   
+
+  }
+
+
+
 
   async storeSigningConditionWithNode({
     url,
@@ -877,6 +1053,53 @@ export default class LitNodeClient {
       });
     }
   }
+
+
+
+  async signECDSA({
+    url,
+    message,
+    chain,
+    iat,
+    exp,
+  }) {
+    console.log("sign_message_ecdsa");
+    const urlWithPath = `${url}/web/signing/sign_message_ecdsa`;
+    const data = {    
+      message,
+      chain,
+      iat,
+      exp,
+    };
+    return await this.sendCommandToNode({ url: urlWithPath, data });
+  }
+
+
+  async sign_condition_ecdsa({
+    url,
+    accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,    
+    auth_sig,
+    chain,
+    iat,
+    exp,
+  }) {
+    log("sign_condition_ecdsa");
+    const urlWithPath = `${url}/web/signing/sign_condition_ecdsa`;
+    const data = {
+      access_control_conditions: accessControlConditions,
+      evmContractConditions,
+      solRpcConditions,
+      auth_sig,
+      chain,
+      iat,
+      exp,
+    };
+    return await this.sendCommandToNode({ url: urlWithPath, data });
+  }
+
+
 
   /**
    * Connect to the LIT nodes.
