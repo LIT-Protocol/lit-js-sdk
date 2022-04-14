@@ -17,6 +17,52 @@
 
       //var authSig = JSON.parse("{\"sig\":\"0x18a173d68d2f78cc5c13da0dfe36eec2a293285bee6d42547b9577bf26cdc985660ed3dddc4e75d422366cac07e8a9fc77669b10373bef9c7b8e4280252dfddf1b\",\"derivedVia\":\"web3.eth.personal.sign\",\"signedMessage\":\"I am creating an account to use LITs at 2021-08-04T20:14:04.918Z\",\"address\":\"0xdbd360f30097fb6d938dcc8b7b62854b36160b45\"}")
 
+      var testEncryptingFileAndZipWithMetadata = async ({
+        accessControlConditions,
+        evmContractConditions,
+        solRpcConditions,
+        unifiedAccessControlConditions,
+        testName,
+        authSig,
+        chain,
+      }) => {
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        var file = new File(["meow meow this is a test"], "testFilename.txt", {
+          type: "text/plain",
+        });
+
+        const { zipBlob } = await LitJsSdk.encryptFileAndZipWithMetadata({
+          file,
+          accessControlConditions,
+          evmContractConditions,
+          solRpcConditions,
+          unifiedAccessControlConditions,
+          authSig,
+          chain,
+          litNodeClient,
+          readme: "this is a test",
+        });
+
+        const { decryptedFile } = await LitJsSdk.decryptZipFileWithMetadata({
+          authSig,
+          litNodeClient,
+          file: zipBlob,
+        });
+
+        var enc = new TextDecoder("utf-8");
+        const decoded = enc.decode(decryptedFile);
+
+        if (decoded && decoded === "meow meow this is a test") {
+          document.getElementById(
+            "status"
+          ).innerText = `${testName} passed!  Decrypted string is "${decoded}"`;
+          return true;
+        } else {
+          document.getElementById("status").innerText = `${testName} failed!`;
+          return false;
+        }
+      };
+
       var randomPath = () =>
         "/" +
         Math.random().toString(36).substring(2, 15) +
@@ -295,29 +341,58 @@
           "!!! This test only works from address 0xdbd360F30097fB6d938dcc8B7b62854B36160B45"
         );
         const chain = "xdai";
+        // var accessControlConditions = [
+        //   // {
+        //   //   contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+        //   //   standardContractType: "ERC721",
+        //   //   chain,
+        //   //   method: "balanceOf",
+        //   //   parameters: [":userAddress"],
+        //   //   returnValueTest: {
+        //   //     comparator: ">",
+        //   //     value: "0",
+        //   //   },
+        //   // },
+        //   {
+        //     contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+        //     standardContractType: "POAP",
+        //     chain,
+        //     method: "tokenURI",
+        //     parameters: [],
+        //     returnValueTest: {
+        //       comparator: "contains",
+        //       value: "Burning Man 2021",
+        //     },
+        //   },
+        // ];
         var accessControlConditions = [
-          {
-            contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
-            standardContractType: "ERC721",
-            chain,
-            method: "balanceOf",
-            parameters: [":userAddress"],
-            returnValueTest: {
-              comparator: ">",
-              value: "0",
+          [
+            {
+              contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+              standardContractType: "POAP",
+              chain: "xdai",
+              method: "tokenURI",
+              parameters: [],
+              returnValueTest: {
+                comparator: "contains",
+                value: "Lit Protocol Test",
+              },
             },
-          },
-          {
-            contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
-            standardContractType: "POAP",
-            chain,
-            method: "tokenURI",
-            parameters: [],
-            returnValueTest: {
-              comparator: "contains",
-              value: "Burning Man 2021",
+            {
+              operator: "or",
             },
-          },
+            {
+              contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+              standardContractType: "POAP",
+              chain: "ethereum",
+              method: "tokenURI",
+              parameters: [],
+              returnValueTest: {
+                comparator: "contains",
+                value: "Lit Protocol Test",
+              },
+            },
+          ],
         ];
         await testProvisoningAndSigning({
           accessControlConditions,
@@ -477,65 +552,23 @@
         });
       };
 
-      var BigComplexBooleanConditionAcrossMultipleChains = async () => {
+      var RandomTestFromUser = async () => {
         const accessControlConditions = [
           {
+            contractAddress: "0x588da869464f8c8eafa264f5b446e6c9bd4543ac",
+            standardContractType: "ERC1155",
             chain: "ethereum",
-            method: "",
-            parameters: [":userAddress"],
-            contractAddress: "",
-            returnValueTest: {
-              value: "0xc48b5Be243F1B52ccbF88c0762180B7dE9243e06",
-              comparator: "=",
-            },
-            standardContractType: "",
-          },
-          {
-            operator: "or",
-          },
-          {
-            chain: "rinkeby",
-            method: "",
-            parameters: [":userAddress"],
-            contractAddress: "",
-            returnValueTest: {
-              value: "0xc48b5Be243F1B52ccbF88c0762180B7dE9243e06",
-              comparator: "=",
-            },
-            standardContractType: "",
-          },
-          {
-            operator: "or",
-          },
-          {
-            chain: "rinkeby",
             method: "balanceOf",
-            parameters: [":userAddress"],
-            contractAddress: "0xF63D250EBAFDda29358C92Cca17DC41c52F4B995",
-            returnValueTest: {
-              value: "0",
-              comparator: ">",
-            },
-            standardContractType: "ERC721",
-          },
-          {
-            operator: "or",
-          },
-          {
-            chain: "rinkeby",
-            method: "balanceOf",
-            parameters: [":userAddress"],
-            contractAddress: "0x827DC4985a343059876ae9562969d16E8F13982F",
-            returnValueTest: {
-              value: "0",
-              comparator: ">",
-            },
-            standardContractType: "ERC721",
+            parameters: [
+              ":userAddress",
+              "95268251546285662909660874610252721742451934934531784487819138932576410927105",
+            ],
+            returnValueTest: { comparator: ">=", value: "1" },
           },
         ];
         await testProvisoningAndSigning({
           accessControlConditions,
-          testName: "BigComplexBooleanConditionAcrossMultipleChains",
+          testName: "RandomTestFromUser",
         });
       };
 
@@ -1623,6 +1656,193 @@
         ).innerText = `${testName}: Failure.  We updated a condition we shouldn't been able to!  OMG FIX THIS`;
       };
 
+      var EncryptFileAndZipWithMetadata = async () => {
+        const testResults = {};
+        const testName = "EncryptFileAndZipWithMetadata";
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+        });
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain,
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+
+        let res = await testEncryptingFileAndZipWithMetadata({
+          accessControlConditions,
+          testName,
+          authSig,
+          chain: "polygon",
+        });
+        testResults.accessControlConditions = res;
+
+        var evmContractConditions = [
+          {
+            contractAddress: "0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88",
+            functionName: "balanceOf",
+            functionParams: [":userAddress", "8"],
+            functionAbi: {
+              type: "function",
+              stateMutability: "view",
+              outputs: [
+                {
+                  type: "uint256",
+                  name: "",
+                  internalType: "uint256",
+                },
+              ],
+              name: "balanceOf",
+              inputs: [
+                {
+                  type: "address",
+                  name: "account",
+                  internalType: "address",
+                },
+                {
+                  type: "uint256",
+                  name: "id",
+                  internalType: "uint256",
+                },
+              ],
+            },
+            chain,
+            returnValueTest: {
+              key: "",
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+
+        res = await testEncryptingFileAndZipWithMetadata({
+          evmContractConditions,
+          testName,
+          authSig,
+          chain: "polygon",
+        });
+
+        testResults.evmContractConditions = res;
+
+        var solAuthSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain: "solana",
+        });
+
+        var solRpcConditions = [
+          {
+            method: "getBalance",
+            params: [":userAddress"],
+            chain: "solana",
+            returnValueTest: {
+              key: "",
+              comparator: ">=",
+              value: "100000000", // equals 0.1 SOL
+            },
+          },
+        ];
+
+        res = await testEncryptingFileAndZipWithMetadata({
+          solRpcConditions,
+          testName,
+          authSig: solAuthSig,
+          chain: "solana",
+        });
+        testResults.solRpcConditions = res;
+
+        var unifiedAccessControlConditions = [
+          {
+            conditionType: "solRpc",
+            method: "getBalance",
+            params: [":userAddress"],
+            chain: "solana",
+            returnValueTest: {
+              key: "",
+              comparator: ">=",
+              value: "100000000", // equals 0.1 SOL
+            },
+          },
+          { operator: "or" },
+          {
+            conditionType: "evmBasic",
+            contractAddress: "",
+            standardContractType: "",
+            chain: "ethereum",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+          { operator: "or" },
+          {
+            conditionType: "evmContract",
+            contractAddress: "0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88",
+            functionName: "balanceOf",
+            functionParams: [":userAddress", "8"],
+            functionAbi: {
+              type: "function",
+              stateMutability: "view",
+              outputs: [
+                {
+                  type: "uint256",
+                  name: "",
+                  internalType: "uint256",
+                },
+              ],
+              name: "balanceOf",
+              inputs: [
+                {
+                  type: "address",
+                  name: "account",
+                  internalType: "address",
+                },
+                {
+                  type: "uint256",
+                  name: "id",
+                  internalType: "uint256",
+                },
+              ],
+            },
+            chain: "polygon",
+            returnValueTest: {
+              key: "",
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+
+        res = await testEncryptingFileAndZipWithMetadata({
+          unifiedAccessControlConditions,
+          testName,
+          authSig: {
+            ethereum: authSig,
+            solana: solAuthSig,
+          },
+        });
+        testResults.unifiedAccessControlConditions = res;
+
+        console.log("testResults", testResults);
+
+        if (Object.values(testResults).every((res) => res === true)) {
+          document.getElementById(
+            "status"
+          ).innerText = `${testName}: Success.  All tests passed.`;
+        } else {
+          document.getElementById(
+            "status"
+          ).innerText = `${testName}: Failure.  One or more tests failed.  Check the console for the testResults object to see which one.`;
+        }
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -1769,8 +1989,12 @@
     <br />
     <br />
 
-    <button onclick="BigComplexBooleanConditionAcrossMultipleChains()">
-      BigComplexBooleanConditionAcrossMultipleChains
+    <button onclick="RandomTestFromUser()">RandomTestFromUser</button>
+    <br />
+    <br />
+
+    <button onclick="EncryptFileAndZipWithMetadata()">
+      EncryptFileAndZipWithMetadata
     </button>
     <br />
     <br />

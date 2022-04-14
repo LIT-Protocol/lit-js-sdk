@@ -11,6 +11,55 @@ const SYMM_KEY_ALGO_PARAMS = {
   length: 256,
 };
 
+export function hashUnifiedAccessControlConditions(
+  unifiedAccessControlConditions
+) {
+  const conds = unifiedAccessControlConditions.map((c) =>
+    canonicalUnifiedAccessControlConditionFormatter(c)
+  );
+  const toHash = JSON.stringify(conds);
+  log("Hashing unified access control conditions: ", toHash);
+  const encoder = new TextEncoder();
+  const data = encoder.encode(toHash);
+  return crypto.subtle.digest("SHA-256", data);
+}
+
+export function canonicalUnifiedAccessControlConditionFormatter(cond) {
+  if (Array.isArray(cond)) {
+    return cond.map((c) => canonicalUnifiedAccessControlConditionFormatter(c));
+  }
+
+  if ("operator" in cond) {
+    return {
+      operator: cond.operator,
+    };
+  }
+
+  if ("returnValueTest" in cond) {
+    if (cond.conditionType === "solRpc") {
+      return canonicalSolRpcConditionFormatter(cond);
+    } else if (cond.conditionType === "evmBasic") {
+      return canonicalAccessControlConditionFormatter(cond);
+    } else if (cond.conditionType === "evmContract") {
+      return canonicalEVMContractConditionFormatter(cond);
+    } else {
+      throwError({
+        message: `You passed an invalid access control condition that is missing or has a wrong "conditionType": ${JSON.stringify(
+          cond
+        )}`,
+        name: "InvalidAccessControlCondition",
+        errorCode: "invalid_access_control_condition",
+      });
+    }
+  }
+
+  throwError({
+    message: `You passed an invalid access control condition: ${cond}`,
+    name: "InvalidAccessControlCondition",
+    errorCode: "invalid_access_control_condition",
+  });
+}
+
 export function hashSolRpcConditions(solRpcConditions) {
   const conds = solRpcConditions.map((c) =>
     canonicalSolRpcConditionFormatter(c)

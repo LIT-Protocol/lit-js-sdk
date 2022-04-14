@@ -4,6 +4,8 @@ yarn versionBump
 RESULT=$(cat src/version.js | grep -E -o "'.*'")
 VERSION="${RESULT:1:${#RESULT}-2}" # strip the 's at the beginning and end
 
+./gen_docs.sh
+
 yarn build
 yarn buildWeb
 yarn buildNode

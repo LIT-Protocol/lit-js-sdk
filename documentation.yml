@@ -1,16 +1,8 @@
 toc:
   - name: Welcome
     description: |
-      Welcome to the LIT JS SDK API documentation.  To understand how these functions fit together, please view the README in the github repo for this SDK, located at https://github.com/LIT-Protocol/lit-js-sdk/blob/main/README.md
-  - mintLIT
+      Welcome to the LIT JS SDK API documentation.  To understand how these functions fit together, please view the documentation for this SDK, located at https://developer.litprotocol.com/docs/SDK/intro
   - LitNodeClient
-  - unlockLitWithKey
-  - verifyJwt
-  - findLITs
-  - sendLIT
-  - createHtmlLIT
-  - toggleLock
-  - injectViewerIFrame
   - name: Static Content - Encryption and decryption utilities
   - encryptString
   - decryptString
@@ -22,11 +14,23 @@ toc:
   - decryptZip
   - decryptWithSymmetricKey
   - encryptWithSymmetricKey
-  - name: Other Utilities
-  - fileToDataUrl
+  - name: Dynamic Content - Loading content from a server
+  - verifyJwt
+  - name: Authentication Signature Utilities
   - checkAndSignAuthMessage
   - signAndSaveAuthMessage
+  - disconnectWeb3
+  - name: Other Utilities
+  - fileToDataUrl
   - humanizeAccessControlConditions
+  - name: HTML NFT Utilities
+  - findLITs
+  - sendLIT
+  - createHtmlLIT
+  - mintLIT
+  - unlockLitWithKey
+  - toggleLock
+  - injectViewerIFrame
   - name: Types
   - AccessControlCondition
   - EVMContractCondition
