@@ -6,14 +6,16 @@ const go = async () => {
     bundle: true,
     minify: true,
     sourcemap: true,
-    outfile: "build/index.node.js",
+    outfile: "build/index.universal.js",
     loader: {
       ".svg": "dataurl",
       ".css": "text",
     },
     sourceRoot: "./",
-    platform: "node",
-    inject: ["./esbuild-nodejs-shims.js"],
+    format: "esm",
+    mainFields: ["main"],
+    platform: "neutral",
+    inject: ["./esbuild-universal-shims.js"],
     metafile: true,
   });
   let text = await analyzeMetafile(result.metafile);

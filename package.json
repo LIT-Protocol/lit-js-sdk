@@ -13,6 +13,7 @@
     "build": "microbundle build -o build/index.js -f cjs",
     "buildWeb": "node esbuild-web.js",
     "buildNode": "node esbuild-nodejs.js",
+    "buildUniversal": "node esbuild-universal.js",
     "test": "node --experimental-specifier-resolution=node tests/provisioningAndSigning.js",
     "versionBump": "node node_modules/semver-bump/index.js ../../package.json; npx genversion -e src/version.js"
   },
@@ -53,6 +54,7 @@
     "buffer": "^6.0.3",
     "bufferutil": "^4.0.6",
     "cross-blob": "^3.0.1",
+    "cross-fetch": "^3.1.5",
     "jszip": "^3.6.0",
     "lit-connect-modal": "^0.1.8",
     "node-fetch": "^3.2.3",
