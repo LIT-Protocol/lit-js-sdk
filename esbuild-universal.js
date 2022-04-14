@@ -16,6 +16,7 @@ const go = async () => {
     mainFields: ["main"],
     platform: "neutral",
     inject: ["./esbuild-universal-shims.js"],
+    define: { window: "globalThis", global: "globalThis" },
     metafile: true,
   });
   let text = await analyzeMetafile(result.metafile);
