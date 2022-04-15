@@ -118,7 +118,7 @@ export async function zipAndEncryptString(string) {
 /**
  * Zip and encrypt multiple files.
  * @param {array} files An array of the files you wish to zip and encrypt
- * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
+ * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
  */
 export async function zipAndEncryptFiles(files) {
   // let's zip em
@@ -177,7 +177,7 @@ export async function decryptZip(encryptedZipBlob, symmKey) {
 /**
  * Encrypt a zip file created with JSZip using a new random symmetric key via WebCrypto.
  * @param {JSZip} zip The JSZip instance to encrypt
- * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.
+ * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array string.
  */
 export async function encryptZip(zip) {
   const zipBlob = await zip.generateAsync({ type: "blob" });
@@ -411,6 +411,45 @@ export async function decryptZipFileWithMetadata({
   // log('decryptedFile', decryptedFile)
 
   return { decryptedFile, metadata };
+}
+
+/**
+ * Encrypt a file without doing any zipping or packing.  This is useful for large files.  A 1gb file can be encrypted in only 2 seconds, for example.  A new random symmetric key will be created and returned along with the encrypted file.
+ * @param {Object} params
+ * @param {File} params.file The file you wish to encrypt
+ * @returns {Promise<Object>} A promise containing an object with keys encryptedFile and symmetricKey.  encryptedFile is a Blob, and symmetricKey is a Uint8Array that can be used to decrypt the file.
+ */
+export async function encryptFile({ file }) {
+  // generate a random symmetric key
+  const symmetricKey = await generateSymmetricKey();
+  const exportedSymmKey = new Uint8Array(
+    await crypto.subtle.exportKey("raw", symmetricKey)
+  );
+
+  // encrypt the file
+  var fileAsArrayBuffer = await file.arrayBuffer();
+  const encryptedFile = await encryptWithSymmetricKey(
+    symmetricKey,
+    fileAsArrayBuffer
+  );
+
+  return { encryptedFile, symmetricKey: exportedSymmKey };
+}
+
+/**
+ * Decrypt a file that was encrypted with the encryptFile function, without doing any unzipping or unpacking.  This is useful for large files.  A 1gb file can be decrypted in only 1 second, for example.
+ * @param {Object} params
+ * @param {File} params.file The file you wish to decrypt
+ * @param {Uint8Array} params.symmetricKey The symmetric key used that will be used to decrypt this.
+ * @returns {Promise<Object>} A promise containing the decrypted file.  The file is an ArrayBuffer.
+ */
+export async function decryptFile({ file, symmetricKey }) {
+  const importedSymmKey = await importSymmetricKey(symmetricKey);
+
+  // decrypt the file
+  const decryptedFile = await decryptWithSymmetricKey(file, importedSymmKey);
+
+  return decryptedFile;
 }
 
 async function getNpmPackage(packageName) {
