@@ -379,6 +379,7 @@ Sign the auth message with the user's wallet, and store it in localStorage.  Cal
 
     *   `params.web3` **Web3Provider** An ethers.js Web3Provider instance
     *   `params.account` **[string][106]** The account to sign the message with
+    *   `params.chainId`  
 
 Returns **[AuthSig][110]** The AuthSig created or retrieved
 
