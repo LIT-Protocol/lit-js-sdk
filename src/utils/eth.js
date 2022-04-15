@@ -20,9 +20,6 @@ import ERC20 from "../abis/ERC20.json";
 import { LIT_CHAINS } from "../lib/constants";
 import { throwError, log } from "../lib/utils";
 
-export const AUTH_SIGNATURE_BODY =
-  "I am creating an account to use Lit Protocol at {{timestamp}}";
-
 function chainHexIdToChainName(chainHexId) {
   for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
     const chainName = Object.keys(LIT_CHAINS)[i];
@@ -259,7 +256,11 @@ export async function checkAndSignEVMAuthMessage({ chain }) {
   let authSig = localStorage.getItem("lit-auth-signature");
   if (!authSig) {
     log("signing auth message because sig is not in local storage");
-    await signAndSaveAuthMessage({ web3, account });
+    await signAndSaveAuthMessage({
+      web3,
+      account,
+      chainId: selectedChain.chainId,
+    });
     authSig = localStorage.getItem("lit-auth-signature");
   }
   authSig = JSON.parse(authSig);
@@ -268,7 +269,11 @@ export async function checkAndSignEVMAuthMessage({ chain }) {
     log(
       "signing auth message because account is not the same as the address in the auth sig"
     );
-    await signAndSaveAuthMessage({ web3, account });
+    await signAndSaveAuthMessage({
+      web3,
+      account,
+      chainId: selectedChain.chainId,
+    });
     authSig = localStorage.getItem("lit-auth-signature");
     authSig = JSON.parse(authSig);
   }
@@ -283,17 +288,12 @@ export async function checkAndSignEVMAuthMessage({ chain }) {
  * @param {string} params.account The account to sign the message with
  * @returns {AuthSig} The AuthSig created or retrieved
  */
-export async function signAndSaveAuthMessage({ web3, account }) {
-  // const now = new Date().toISOString();
-  // const body = AUTH_SIGNATURE_BODY.replace("{{timestamp}}", now);
-  // const signedResult = await signMessage({ body, web3, account });
-
-  const { chainId } = await web3.getNetwork();
+export async function signAndSaveAuthMessage({ web3, account, chainId }) {
+  // const { chainId } = await web3.getNetwork();
 
   const message = new SiweMessage({
     domain: globalThis.location.host,
     address: account,
-    statement: "Sign in with Ethereum",
     uri: globalThis.location.origin,
     version: "1",
     chainId,
