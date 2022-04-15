@@ -599,7 +599,7 @@ Type: [Object][105]
 ### Properties
 
 *   `sig` **[string][110]** The actual hex-encoded signature
-*   `derivedVia` **[string][110]** The method used to derive the signature
+*   `derivedVia` **[string][110]** The method used to derive the signature. Typically "web3.eth.personal.sign"
 *   `signedMessage` **[string][110]** The message that was signed
 *   `address` **[string][110]** The crypto wallet address that signed the message
 
