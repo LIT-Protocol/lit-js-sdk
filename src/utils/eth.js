@@ -331,10 +331,11 @@ export async function signAndSaveAuthMessage({ web3, account, chainId }) {
 /**
  * @typedef {Object} AuthSig
  * @property {string} sig - The actual hex-encoded signature
- * @property {string} derivedVia - The method used to derive the signature
+ * @property {string} derivedVia - The method used to derive the signature. Typically "web3.eth.personal.sign"
  * @property {string} signedMessage - The message that was signed
  * @property {string} address - The crypto wallet address that signed the message
  */
+
 export async function signMessage({ body, web3, account }) {
   if (!web3 || !account) {
     let resp = await connectWeb3();
