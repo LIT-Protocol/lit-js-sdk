@@ -39,7 +39,6 @@
     "standard": "^16.0.3"
   },
   "dependencies": {
-    "@ethersproject/abi": "^5.5.0",
     "@ethersproject/bytes": "^5.5.0",
     "@ethersproject/contracts": "^5.2.0",
     "@ethersproject/hash": "^5.4.0",
@@ -55,6 +54,7 @@
     "cross-blob": "^3.0.1",
     "jszip": "^3.6.0",
     "lit-connect-modal": "^0.1.8",
+    "lit-siwe": "^1.1.8",
     "node-fetch": "^3.2.3",
     "pako": "^2.0.4",
     "tslib": "^2.3.1",

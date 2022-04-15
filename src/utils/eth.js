@@ -1,5 +1,4 @@
 import { Contract } from "@ethersproject/contracts";
-import { Interface } from "@ethersproject/abi";
 import { verifyMessage } from "@ethersproject/wallet";
 import {
   Web3Provider,
@@ -11,6 +10,7 @@ import { hexlify } from "@ethersproject/bytes";
 import WalletConnectProvider from "@walletconnect/ethereum-provider";
 import Resolution from "@unstoppabledomains/resolution";
 import LitConnectModal from "lit-connect-modal";
+import { SiweMessage } from "lit-siwe";
 
 import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
@@ -284,9 +284,29 @@ export async function checkAndSignEVMAuthMessage({ chain }) {
  * @returns {AuthSig} The AuthSig created or retrieved
  */
 export async function signAndSaveAuthMessage({ web3, account }) {
-  const now = new Date().toISOString();
-  const body = AUTH_SIGNATURE_BODY.replace("{{timestamp}}", now);
-  const signedResult = await signMessage({ body, web3, account });
+  // const now = new Date().toISOString();
+  // const body = AUTH_SIGNATURE_BODY.replace("{{timestamp}}", now);
+  // const signedResult = await signMessage({ body, web3, account });
+
+  const { chainId } = await web3.getNetwork();
+
+  const message = new SiweMessage({
+    domain: globalThis.location.host,
+    address: account,
+    statement: "Sign in with Ethereum",
+    uri: globalThis.location.origin,
+    version: "1",
+    chainId,
+  });
+
+  const body = message.prepareMessage();
+
+  const signedResult = await signMessage({
+    body,
+    web3,
+    account,
+  });
+
   localStorage.setItem(
     "lit-auth-signature",
     JSON.stringify({
