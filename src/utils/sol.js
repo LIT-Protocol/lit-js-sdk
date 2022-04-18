@@ -1,4 +1,3 @@
-import * as solWeb3 from "@solana/web3.js";
 import {
   fromString as uint8arrayFromString,
   toString as uint8arrayToString,
