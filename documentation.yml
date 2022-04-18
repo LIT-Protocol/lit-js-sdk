@@ -6,6 +6,8 @@ toc:
   - name: Static Content - Encryption and decryption utilities
   - encryptString
   - decryptString
+  - encryptFile
+  - decryptFile
   - zipAndEncryptString
   - zipAndEncryptFiles
   - encryptFileAndZipWithMetadata

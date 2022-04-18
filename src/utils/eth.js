@@ -1,5 +1,4 @@
 import { Contract } from "@ethersproject/contracts";
-import { Interface } from "@ethersproject/abi";
 import { verifyMessage } from "@ethersproject/wallet";
 import {
   Web3Provider,
@@ -11,6 +10,7 @@ import { hexlify } from "@ethersproject/bytes";
 import WalletConnectProvider from "@walletconnect/ethereum-provider";
 import Resolution from "@unstoppabledomains/resolution";
 import LitConnectModal from "lit-connect-modal";
+import { SiweMessage } from "lit-siwe";
 
 import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
@@ -19,9 +19,6 @@ import LIT from "../abis/LIT.json";
 import ERC20 from "../abis/ERC20.json";
 import { LIT_CHAINS } from "../lib/constants";
 import { throwError, log } from "../lib/utils";
-
-export const AUTH_SIGNATURE_BODY =
-  "I am creating an account to use Lit Protocol at {{timestamp}}";
 
 function chainHexIdToChainName(chainHexId) {
   for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
@@ -259,7 +256,11 @@ export async function checkAndSignEVMAuthMessage({ chain }) {
   let authSig = localStorage.getItem("lit-auth-signature");
   if (!authSig) {
     log("signing auth message because sig is not in local storage");
-    await signAndSaveAuthMessage({ web3, account });
+    await signAndSaveAuthMessage({
+      web3,
+      account,
+      chainId: selectedChain.chainId,
+    });
     authSig = localStorage.getItem("lit-auth-signature");
   }
   authSig = JSON.parse(authSig);
@@ -268,7 +269,11 @@ export async function checkAndSignEVMAuthMessage({ chain }) {
     log(
       "signing auth message because account is not the same as the address in the auth sig"
     );
-    await signAndSaveAuthMessage({ web3, account });
+    await signAndSaveAuthMessage({
+      web3,
+      account,
+      chainId: selectedChain.chainId,
+    });
     authSig = localStorage.getItem("lit-auth-signature");
     authSig = JSON.parse(authSig);
   }
@@ -283,10 +288,25 @@ export async function checkAndSignEVMAuthMessage({ chain }) {
  * @param {string} params.account The account to sign the message with
  * @returns {AuthSig} The AuthSig created or retrieved
  */
-export async function signAndSaveAuthMessage({ web3, account }) {
-  const now = new Date().toISOString();
-  const body = AUTH_SIGNATURE_BODY.replace("{{timestamp}}", now);
-  const signedResult = await signMessage({ body, web3, account });
+export async function signAndSaveAuthMessage({ web3, account, chainId }) {
+  // const { chainId } = await web3.getNetwork();
+
+  const message = new SiweMessage({
+    domain: globalThis.location.host,
+    address: account,
+    uri: globalThis.location.origin,
+    version: "1",
+    chainId,
+  });
+
+  const body = message.prepareMessage();
+
+  const signedResult = await signMessage({
+    body,
+    web3,
+    account,
+  });
+
   localStorage.setItem(
     "lit-auth-signature",
     JSON.stringify({
@@ -311,10 +331,11 @@ export async function signAndSaveAuthMessage({ web3, account }) {
 /**
  * @typedef {Object} AuthSig
  * @property {string} sig - The actual hex-encoded signature
- * @property {string} derivedVia - The method used to derive the signature
+ * @property {string} derivedVia - The method used to derive the signature. Typically "web3.eth.personal.sign"
  * @property {string} signedMessage - The message that was signed
  * @property {string} address - The crypto wallet address that signed the message
  */
+
 export async function signMessage({ body, web3, account }) {
   if (!web3 || !account) {
     let resp = await connectWeb3();
