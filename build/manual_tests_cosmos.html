@@ -22,7 +22,7 @@
         Math.random().toString(36).substring(2, 15) +
         Math.random().toString(36).substring(2, 15);
       var testProvisoningAndSigning = async ({
-        solRpcConditions,
+        unifiedAccessControlConditions,
         testName,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -43,16 +43,15 @@
         };
 
         await litNodeClient.saveSigningCondition({
-          solRpcConditions,
+          unifiedAccessControlConditions,
           chain,
           authSig,
           resourceId,
         });
 
         let jwt = await litNodeClient.getSignedToken({
-          solRpcConditions,
-          chain,
-          authSig,
+          unifiedAccessControlConditions,
+          authSig: { solana: authSig },
           resourceId,
         });
         console.log("jwt", jwt);
@@ -73,7 +72,7 @@
       };
 
       var testProvisoningEncryptingAndDecrypting = async ({
-        solRpcConditions,
+        unifiedAccessControlConditions,
         testName,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -91,16 +90,15 @@
           await LitJsSdk.zipAndEncryptString("this is a secret message");
 
         const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
-          solRpcConditions,
+          unifiedAccessControlConditions,
           symmetricKey,
-          authSig,
-          chain,
+          authSig: { cosmos: authSig },
         });
 
         console.log("encrypted symmetric key", encryptedSymmetricKey);
 
         const retrievedSymmKey = await litNodeClient.getEncryptionKey({
-          solRpcConditions,
+          unifiedAccessControlConditions,
           toDecrypt: LitJsSdk.uint8arrayToString(
             encryptedSymmetricKey,
             "base16"
@@ -124,22 +122,22 @@
       };
 
       // Actual tests are below here
-      var SolBalanceSigning = async () => {
-        var solRpcConditions = [
+      var CosmosBalanceSigning = async () => {
+        var unifiedAccessControlConditions = [
           {
-            method: "getBalance",
-            params: [":userAddress"],
+            conditionType: "cosmos",
+            path: "/cosmos/bank/v1beta1/balances/:userAddress",
             chain,
             returnValueTest: {
-              key: "",
+              key: "$.balances[0].amount",
               comparator: ">=",
-              value: "100000000", // equals 0.1 SOL
+              value: "1000000", // equals 1 ATOM
             },
           },
         ];
         await testProvisoningAndSigning({
-          solRpcConditions,
-          testName: "SolBalanceSigning",
+          unifiedAccessControlConditions,
+          testName: "CosmosBalanceSigning",
         });
       };
 
@@ -297,7 +295,7 @@
     <div id="networkStatus">Connecting to Lit Protocol Network...</div>
     <br />
     <br />
-    <button onclick="SolBalanceSigning()">SolBalanceSigning</button>
+    <button onclick="CosmosBalanceSigning()">CosmosBalanceSigning</button>
     <br />
     <br />
     <button onclick="SolBalanceEncrypt()">SolBalanceEncrypt</button>
