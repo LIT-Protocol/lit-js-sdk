@@ -105,6 +105,7 @@ export async function disconnectWeb3() {
   localStorage.removeItem("walletconnect");
   localStorage.removeItem("lit-auth-signature");
   localStorage.removeItem("lit-auth-sol-signature");
+  localStorage.removeItem("lit-auth-cosmos-signature");
   localStorage.removeItem("lit-web3-provider");
 }
 

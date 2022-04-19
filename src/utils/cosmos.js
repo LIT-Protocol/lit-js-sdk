@@ -5,6 +5,7 @@ import {
 } from "uint8arrays";
 import { throwError, log } from "../lib/utils";
 import { LIT_COSMOS_CHAINS } from "../lib/constants";
+import { serializeSignDoc } from "@cosmjs/amino";
 
 export const AUTH_SIGNATURE_BODY =
   "I am creating an account to use Lit Protocol at {{timestamp}}";
@@ -47,6 +48,8 @@ export async function connectCosmosProvider({ chain }) {
   //   offlineSigner
   // );
 
+  // console.log("accounts[0]", accounts[0]);
+
   return { provider: keplr, account: accounts[0].address, chainId };
 }
 
@@ -86,12 +89,42 @@ export async function signAndSaveAuthMessage({ provider, account, chainId }) {
   const signed = await provider.signArbitrary(chainId, account, body);
   // const hexSig = uint8arrayToString(signed.signature, "base16");
 
-  console.log("signed", signed);
+  const data = Buffer.from(body).toString("base64");
+
+  // console.log("signed", signed);
+  // console.log("pubkey: ", signed.pub_key.value);
+
+  // ok now we have to create the actual message
+  const signDoc = {
+    chain_id: "",
+    account_number: "0",
+    sequence: "0",
+    fee: {
+      gas: "0",
+      amount: [],
+    },
+    msgs: [
+      {
+        type: "sign/MsgSignData",
+        value: {
+          signer: account,
+          data,
+        },
+      },
+    ],
+    memo: "",
+  };
+
+  const encodedSignedMsg = serializeSignDoc(signDoc);
+  const digest = await crypto.subtle.digest("SHA-256", encodedSignedMsg);
+  // console.log("digest length", digest.byteLength);
+  const digest_hex = uint8arrayToString(new Uint8Array(digest), "base16");
+  // console.log("digest_hex length", digest_hex.length);
 
   const authSig = {
     sig: signed.signature,
     derivedVia: "cosmos.signArbitrary",
-    signedMessage: body,
+    signedMessage: digest_hex,
     address: account,
   };
 
