@@ -17,6 +17,11 @@
  */
 
 /**
+ * @typedef {Object} LITCosmosChain
+ * @property {string} name - The human readable name of the chain
+ */
+
+/**
  * EVM Chains supported by the LIT protocol.  Each chain includes an optional pre-deployed token contract that you may use for minting LITs.  These are ERC1155 contracts that let you mint any quantity of a given token.  Use the chain name as a key in this object.
  * @constant
  * @type {LITEVMChain}
@@ -239,6 +244,24 @@ export const LIT_SVM_CHAINS = {
 };
 
 /**
+ * Cosmos Chains supported by the LIT protocol.  Use the chain name as a key in this object.
+ * @constant
+ * @type {LITCosmosChain}
+ * @default
+ */
+export const LIT_COSMOS_CHAINS = {
+  cosmos: {
+    name: "Cosmos",
+    symbol: "ATOM",
+    decimals: 6,
+    chainId: "cosmoshub-4",
+    rpcUrls: ["https://lcd-cosmoshub.keplr.app"],
+    blockExplorerUrls: ["https://atomscan.com/"],
+    vmType: "CVM",
+  },
+};
+
+/**
  * All Chains supported by the LIT protocol.  Use the chain name as a key in this object.
  * @constant
  * @type {LITChain}
@@ -247,6 +270,7 @@ export const LIT_SVM_CHAINS = {
 export const ALL_LIT_CHAINS = {
   ...LIT_CHAINS,
   ...LIT_SVM_CHAINS,
+  ...LIT_COSMOS_CHAINS,
 };
 
 export const NETWORK_PUB_KEY =

@@ -19,6 +19,7 @@ import {
 
 import { checkAndSignEVMAuthMessage, decimalPlaces } from "./eth";
 import { checkAndSignSolAuthMessage } from "./sol";
+import { checkAndSignCosmosAuthMessage } from "./cosmos";
 
 import { sendMessageToFrameParent } from "./frameComms";
 
@@ -51,6 +52,8 @@ export async function checkAndSignAuthMessage({ chain }) {
     return checkAndSignEVMAuthMessage({ chain });
   } else if (chainInfo.vmType === "SVM") {
     return checkAndSignSolAuthMessage({ chain });
+  } else if (chainInfo.vmType === "CVM") {
+    return checkAndSignCosmosAuthMessage({ chain });
   } else {
     throwError({
       message: `vmType not found for this chain: ${chain}.  This should not happen.  Unsupported chain selected.  Please select one of: ${Object.keys(
