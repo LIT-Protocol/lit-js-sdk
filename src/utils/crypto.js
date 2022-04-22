@@ -42,6 +42,8 @@ export function canonicalUnifiedAccessControlConditionFormatter(cond) {
       return canonicalAccessControlConditionFormatter(cond);
     } else if (cond.conditionType === "evmContract") {
       return canonicalEVMContractConditionFormatter(cond);
+    } else if (cond.conditionType === "cosmos") {
+      return canonicalCosmosConditionFormatter(cond);
     } else {
       throwError({
         message: `You passed an invalid access control condition that is missing or has a wrong "conditionType": ${JSON.stringify(
@@ -51,6 +53,60 @@ export function canonicalUnifiedAccessControlConditionFormatter(cond) {
         errorCode: "invalid_access_control_condition",
       });
     }
+  }
+
+  throwError({
+    message: `You passed an invalid access control condition: ${cond}`,
+    name: "InvalidAccessControlCondition",
+    errorCode: "invalid_access_control_condition",
+  });
+}
+
+export function hashCosmosConditions(cosmosConditions) {
+  const conds = cosmosConditions.map((c) =>
+    canonicalCosmosConditionFormatter(c)
+  );
+  const toHash = JSON.stringify(conds);
+  log("Hashing cosmos conditions: ", toHash);
+  const encoder = new TextEncoder();
+  const data = encoder.encode(toHash);
+  return crypto.subtle.digest("SHA-256", data);
+}
+
+export function canonicalCosmosConditionFormatter(cond) {
+  // need to return in the exact format below:
+  /*
+  pub struct CosmosCondition {
+      pub path: String,
+      pub chain: String,
+      pub return_value_test: JsonReturnValueTestV2,
+}
+  */
+
+  if (Array.isArray(cond)) {
+    return cond.map((c) => canonicalCosmosConditionFormatter(c));
+  }
+
+  if ("operator" in cond) {
+    return {
+      operator: cond.operator,
+    };
+  }
+
+  if ("returnValueTest" in cond) {
+    const { returnValueTest } = cond;
+
+    const canonicalReturnValueTest = {
+      key: returnValueTest.key,
+      comparator: returnValueTest.comparator,
+      value: returnValueTest.value,
+    };
+
+    return {
+      path: cond.path,
+      chain: cond.chain,
+      returnValueTest: canonicalReturnValueTest,
+    };
   }
 
   throwError({
