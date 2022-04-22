@@ -259,6 +259,15 @@ export const LIT_COSMOS_CHAINS = {
     blockExplorerUrls: ["https://atomscan.com/"],
     vmType: "CVM",
   },
+  kyve: {
+    name: "Kyve",
+    symbol: "KYVE",
+    decimals: 6,
+    chainId: "korellia",
+    rpcUrls: ["https://api.korellia.kyve.network"],
+    blockExplorerUrls: ["https://explorer.kyve.network/"],
+    vmType: "CVM",
+  },
 };
 
 /**
