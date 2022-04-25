@@ -28,7 +28,7 @@
   "keywords": [
     "library"
   ],
-  "license": "GPL-3.0",
+  "license": "MIT",
   "devDependencies": {
     "esbuild": "^0.14.25",
     "esbuild-node-builtins": "^0.1.0",
