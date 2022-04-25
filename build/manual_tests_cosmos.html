@@ -24,6 +24,7 @@
       var testProvisoningAndSigning = async ({
         unifiedAccessControlConditions,
         testName,
+        authSig,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
         // document.getElementById(
@@ -31,8 +32,6 @@
         // ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
         //   { evmContractConditions }
         // )}`;
-
-        var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
 
         let resourceId = {
           baseUrl: "my-dynamic-content-server.com",
@@ -44,14 +43,13 @@
 
         await litNodeClient.saveSigningCondition({
           unifiedAccessControlConditions,
-          chain,
           authSig,
           resourceId,
         });
 
         let jwt = await litNodeClient.getSignedToken({
           unifiedAccessControlConditions,
-          authSig: { cosmos: authSig },
+          authSig,
           resourceId,
         });
         console.log("jwt", jwt);
@@ -74,11 +72,9 @@
       var testProvisoningEncryptingAndDecrypting = async ({
         unifiedAccessControlConditions,
         testName,
+        authSig,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
-        const authSig = await LitJsSdk.checkAndSignAuthMessage({
-          chain,
-        });
 
         // document.getElementById(
         //   "humanized"
@@ -92,7 +88,7 @@
         const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
           unifiedAccessControlConditions,
           symmetricKey,
-          authSig: { cosmos: authSig },
+          authSig,
         });
 
         console.log("encrypted symmetric key", encryptedSymmetricKey);
@@ -103,7 +99,6 @@
             encryptedSymmetricKey,
             "base16"
           ),
-          chain,
           authSig,
         });
 
@@ -135,9 +130,14 @@
             },
           },
         ];
+        var authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain: "cosmos",
+        });
+
         await testProvisoningAndSigning({
           unifiedAccessControlConditions,
           testName: "CosmosBalanceSigning",
+          authSig,
         });
       };
 
@@ -154,14 +154,20 @@
             },
           },
         ];
+        var authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain: "cosmos",
+        });
         await testProvisoningEncryptingAndDecrypting({
           unifiedAccessControlConditions,
           testName: "CosmosBalanceEncrypt",
+          authSig: { cosmos: authSig },
         });
       };
 
       var CosmosSpecificWalletAddressSigning = async () => {
-        var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
+        var authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain: "cosmos",
+        });
         var unifiedAccessControlConditions = [
           {
             conditionType: "cosmos",
@@ -177,6 +183,7 @@
         await testProvisoningAndSigning({
           unifiedAccessControlConditions,
           testName: "CosmosSpecificWalletAddressSigning",
+          authSig,
         });
       };
 
@@ -197,10 +204,12 @@
         await testProvisoningEncryptingAndDecrypting({
           unifiedAccessControlConditions,
           testName: "CosmosSpecificWalletAddressEncrypt",
+          authSig: { cosmos: authSig },
         });
       };
 
       var KyveFundersSigning = async () => {
+        var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain: "kyve" });
         var unifiedAccessControlConditions = [
           {
             conditionType: "cosmos",
@@ -216,10 +225,12 @@
         await testProvisoningAndSigning({
           unifiedAccessControlConditions,
           testName: "KyveFundersSigning",
+          authSig: { kyve: authSig },
         });
       };
 
       var KyveFundersEncryptDecrypt = async () => {
+        var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain: "kyve" });
         var unifiedAccessControlConditions = [
           {
             conditionType: "cosmos",
@@ -235,6 +246,48 @@
         await testProvisoningEncryptingAndDecrypting({
           unifiedAccessControlConditions,
           testName: "KyveFundersEncryptDecrypt",
+          authSig: { kyve: authSig },
+        });
+      };
+
+      var CosmosBalancePlusKyveFundersEncryptDecrypt = async () => {
+        var cosmosAuthSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain: "cosmos",
+        });
+        var kyveAuthSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain: "kyve",
+        });
+
+        var unifiedAccessControlConditions = [
+          {
+            conditionType: "cosmos",
+            path: "/kyve/registry/v1beta1/funders_list/0",
+            chain: "kyve",
+            returnValueTest: {
+              key: "$.funders.*.account",
+              comparator: "contains",
+              value: "kyve14n6s289f7fs8nkegcj4yjp7wfk057zatrwuva0",
+            },
+          },
+          { operator: "or" },
+          {
+            conditionType: "cosmos",
+            path: "/cosmos/bank/v1beta1/balances/:userAddress",
+            chain: "cosmos",
+            returnValueTest: {
+              key: "$.balances[0].amount",
+              comparator: ">=",
+              value: "1000000", // equals 1 ATOM
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          unifiedAccessControlConditions,
+          testName: "KyveFundersEncryptDecrypt",
+          authSig: {
+            cosmos: cosmosAuthSig,
+            kyve: kyveAuthSig,
+          },
         });
       };
 
@@ -291,6 +344,12 @@
     <br />
     <button onclick="KyveFundersEncryptDecrypt()">
       KyveFundersEncryptDecrypt
+    </button>
+    <br />
+    <br />
+
+    <button onclick="CosmosBalancePlusKyveFundersEncryptDecrypt()">
+      CosmosBalancePlusKyveFundersEncryptDecrypt
     </button>
     <br />
     <br />
