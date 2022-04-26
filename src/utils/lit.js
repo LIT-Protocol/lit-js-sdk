@@ -946,7 +946,7 @@ async function humanizeEvmBasicAccessControlConditions({
         // erc1155 owns an amount of specific tokens
         return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${
           acc.returnValueTest.value
-        } of ${acc.contractAddress} tokens`;
+        } of ${acc.contractAddress} tokens with token id ${acc.parameters[1]}`;
       } else if (
         acc.standardContractType === "ERC1155" &&
         acc.method === "balanceOfBatch"
