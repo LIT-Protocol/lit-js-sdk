@@ -442,6 +442,9 @@ The human readable name for an access control condition
 *   `params` **[Object][108]** 
 
     *   `params.accessControlConditions` **[Array][111]** The array of access control conditions that you want to humanize
+    *   `params.evmContractConditions`  
+    *   `params.solRpcConditions`  
+    *   `params.unifiedAccessControlConditions`  
     *   `params.tokenList`  
     *   `params.myWalletAddress`  
 
