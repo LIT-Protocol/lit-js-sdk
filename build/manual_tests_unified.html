@@ -24,11 +24,11 @@
         testName,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
-        // document.getElementById(
-        //   "humanized"
-        // ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
-        //   { evmContractConditions }
-        // )}`;
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { unifiedAccessControlConditions }
+        )}`;
 
         var solAuthSig = await LitJsSdk.checkAndSignAuthMessage({
           chain: "solana",
@@ -91,11 +91,11 @@
           chain: "ethereum",
         });
 
-        // document.getElementById(
-        //   "humanized"
-        // ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
-        //   { accessControlConditions }
-        // )}`;
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { unifiedAccessControlConditions }
+        )}`;
 
         const { encryptedZip, symmetricKey } =
           await LitJsSdk.zipAndEncryptString("this is a secret message");

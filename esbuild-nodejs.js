@@ -18,8 +18,8 @@ const go = async () => {
     inject: ["./esbuild-nodejs-shims.js"],
     metafile: true,
   });
-  let text = await analyzeMetafile(result.metafile);
-  console.log(text);
+  // let text = await analyzeMetafile(result.metafile);
+  // console.log(text);
 };
 
 go();

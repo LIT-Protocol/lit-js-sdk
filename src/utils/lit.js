@@ -783,10 +783,106 @@ function humanizeComparator(comparator) {
  */
 export async function humanizeAccessControlConditions({
   accessControlConditions,
+  evmContractConditions,
+  solRpcConditions,
+  unifiedAccessControlConditions,
   tokenList,
   myWalletAddress,
 }) {
-  log("humanizing access control conditions");
+  if (accessControlConditions) {
+    return humanizeEvmBasicAccessControlConditions({
+      accessControlConditions,
+      tokenList,
+      myWalletAddress,
+    });
+  } else if (evmContractConditions) {
+    return humanizeEvmContractConditions({
+      evmContractConditions,
+      tokenList,
+      myWalletAddress,
+    });
+  } else if (solRpcConditions) {
+    return humanizeSolRpcConditions({
+      solRpcConditions,
+      tokenList,
+      myWalletAddress,
+    });
+  } else if (unifiedAccessControlConditions) {
+    return humanizeUnifiedAccessControlConditions({
+      unifiedAccessControlConditions,
+      tokenList,
+      myWalletAddress,
+    });
+  }
+}
+
+async function humanizeUnifiedAccessControlConditions({
+  unifiedAccessControlConditions,
+  tokenList,
+  myWalletAddress,
+}) {
+  const promises = await Promise.all(
+    unifiedAccessControlConditions.map(async (acc) => {
+      if (Array.isArray(acc)) {
+        // this is a group.  recurse.
+        const group = await humanizeUnifiedAccessControlConditions({
+          unifiedAccessControlConditions: acc,
+          tokenList,
+          myWalletAddress,
+        });
+        return `( ${group} )`;
+      }
+
+      if (acc.operator) {
+        if (acc.operator.toLowerCase() === "and") {
+          return " and ";
+        } else if (acc.operator.toLowerCase() === "or") {
+          return " or ";
+        }
+      }
+
+      if (acc.conditionType === "evmBasic") {
+        return humanizeEvmBasicAccessControlConditions({
+          accessControlConditions: [acc],
+          tokenList,
+          myWalletAddress,
+        });
+      } else if (acc.conditionType === "evmContract") {
+        return humanizeEvmContractConditions({
+          evmContractConditions: [acc],
+          tokenList,
+          myWalletAddress,
+        });
+      } else if (acc.conditionType === "solRpc") {
+        return humanizeSolRpcConditions({
+          solRpcConditions: [acc],
+          tokenList,
+          myWalletAddress,
+        });
+      } else if (acc.conditionType === "cosmos") {
+        return humanizeCosmosConditions({
+          cosmosConditions: [acc],
+          tokenList,
+          myWalletAddress,
+        });
+      } else {
+        throwError({
+          message: `Unrecognized condition type: ${acc.conditionType}`,
+          name: "InvalidUnifiedConditionType",
+          errorCode: "invalid_unified_condition_type",
+        });
+      }
+    })
+  );
+  return promises.join("");
+}
+
+async function humanizeEvmBasicAccessControlConditions({
+  accessControlConditions,
+  tokenList,
+  myWalletAddress,
+}) {
+  log("humanizing evm basic access control conditions");
   log("myWalletAddress", myWalletAddress);
   log("accessControlConditions", accessControlConditions);
   let fixedConditions = accessControlConditions;
@@ -821,7 +917,7 @@ export async function humanizeAccessControlConditions({
     fixedConditions.map(async (acc) => {
       if (Array.isArray(acc)) {
         // this is a group.  recurse.
-        const group = await humanizeAccessControlConditions({
+        const group = await humanizeEvmBasicAccessControlConditions({
           accessControlConditions: acc,
           tokenList,
           myWalletAddress,
@@ -881,7 +977,7 @@ export async function humanizeAccessControlConditions({
         acc.method === "tokenURI"
       ) {
         // owns a POAP
-        return `Owner of a ${acc.returnValueTest.value} POAP`;
+        return `Owner of a ${acc.returnValueTest.value} POAP on ${acc.chain}`;
       } else if (
         acc.standardContractType === "ERC721" &&
         acc.method === "balanceOf"
@@ -937,6 +1033,182 @@ export async function humanizeAccessControlConditions({
     })
   );
   return promises.join("");
+}
+
+async function humanizeSolRpcConditions({
+  solRpcConditions,
+  tokenList,
+  myWalletAddress,
+}) {
+  log("humanizing sol rpc conditions");
+  log("myWalletAddress", myWalletAddress);
+  log("solRpcConditions", solRpcConditions);
+
+  const promises = await Promise.all(
+    solRpcConditions.map(async (acc) => {
+      if (Array.isArray(acc)) {
+        // this is a group.  recurse.
+        const group = await humanizeSolRpcConditions({
+          solRpcConditions: acc,
+          tokenList,
+          myWalletAddress,
+        });
+        return `( ${group} )`;
+      }
+
+      if (acc.operator) {
+        if (acc.operator.toLowerCase() === "and") {
+          return " and ";
+        } else if (acc.operator.toLowerCase() === "or") {
+          return " or ";
+        }
+      }
+
+      if (acc.method === "getBalance") {
+        return `Owns ${humanizeComparator(
+          acc.returnValueTest.comparator
+        )} ${formatSol(acc.returnValueTest.value)} SOL`;
+      } else if (acc.method === "") {
+        if (
+          myWalletAddress &&
+          acc.returnValueTest.value.toLowerCase() ===
+            myWalletAddress.toLowerCase()
+        ) {
+          return `Controls your wallet (${myWalletAddress})`;
+        } else {
+          return `Controls wallet with address ${acc.returnValueTest.value}`;
+        }
+      } else {
+        let msg = `Solana RPC method ${acc.method}(${acc.params.join(
+          ", "
+        )}) should have a result of ${humanizeComparator(
+          acc.returnValueTest.comparator
+        )} ${acc.returnValueTest.value}`;
+        if (acc.returnValueTest.key !== "") {
+          msg += ` for key ${acc.returnValueTest.key}`;
+        }
+        return msg;
+      }
+    })
+  );
+  return promises.join("");
+}
+
+async function humanizeEvmContractConditions({
+  evmContractConditions,
+  tokenList,
+  myWalletAddress,
+}) {
+  log("humanizing evm contract conditions");
+  log("myWalletAddress", myWalletAddress);
+  log("evmContractConditions", evmContractConditions);
+
+  const promises = await Promise.all(
+    evmContractConditions.map(async (acc) => {
+      if (Array.isArray(acc)) {
+        // this is a group.  recurse.
+        const group = await humanizeEvmContractConditions({
+          evmContractConditions: acc,
+          tokenList,
+          myWalletAddress,
+        });
+        return `( ${group} )`;
+      }
+
+      if (acc.operator) {
+        if (acc.operator.toLowerCase() === "and") {
+          return " and ";
+        } else if (acc.operator.toLowerCase() === "or") {
+          return " or ";
+        }
+      }
+
+      let msg = `${acc.functionName}(${acc.functionParams.join(
+        ", "
+      )}) on contract address ${
+        acc.contractAddress
+      } should have a result of ${humanizeComparator(
+        acc.returnValueTest.comparator
+      )} ${acc.returnValueTest.value}`;
+      if (acc.returnValueTest.key !== "") {
+        msg += ` for key ${acc.returnValueTest.key}`;
+      }
+      return msg;
+    })
+  );
+  return promises.join("");
+}
+
+async function humanizeCosmosConditions({
+  cosmosConditions,
+  tokenList,
+  myWalletAddress,
+}) {
+  log("humanizing cosmos conditions");
+  log("myWalletAddress", myWalletAddress);
+  log("cosmosConditions", cosmosConditions);
+
+  const promises = await Promise.all(
+    cosmosConditions.map(async (acc) => {
+      if (Array.isArray(acc)) {
+        // this is a group.  recurse.
+        const group = await humanizeCosmosConditions({
+          accessControlConditions: acc,
+          tokenList,
+          myWalletAddress,
+        });
+        return `( ${group} )`;
+      }
+
+      if (acc.operator) {
+        if (acc.operator.toLowerCase() === "and") {
+          return " and ";
+        } else if (acc.operator.toLowerCase() === "or") {
+          return " or ";
+        }
+      }
+
+      if (acc.path === "/cosmos/bank/v1beta1/balances/:userAddress") {
+        return `Owns ${humanizeComparator(
+          acc.returnValueTest.comparator
+        )} ${formatAtom(acc.returnValueTest.value)} ATOM`;
+      } else if (acc.path === ":userAddress") {
+        if (
+          myWalletAddress &&
+          acc.returnValueTest.value.toLowerCase() ===
+            myWalletAddress.toLowerCase()
+        ) {
+          return `Controls your wallet (${myWalletAddress})`;
+        } else {
+          return `Controls wallet with address ${acc.returnValueTest.value}`;
+        }
+      } else if (
+        acc.chain === "kyve" &&
+        acc.path === "/kyve/registry/v1beta1/funders_list/0"
+      ) {
+        return `Is a current KYVE funder`;
+      } else {
+        let msg = `Cosmos RPC request for ${
+          acc.path
+        } should have a result of ${humanizeComparator(
+          acc.returnValueTest.comparator
+        )} ${acc.returnValueTest.value}`;
+        if (acc.returnValueTest.key !== "") {
+          msg += ` for key ${acc.returnValueTest.key}`;
+        }
+        return msg;
+      }
+    })
+  );
+  return promises.join("");
+}
+
+function formatSol(amount) {
+  return formatUnits(amount, 9);
+}
+
+function formatAtom(amount) {
+  return formatUnits(amount, 6);
 }
 
 export async function getTokenList() {

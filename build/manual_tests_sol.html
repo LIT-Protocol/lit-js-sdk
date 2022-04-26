@@ -26,11 +26,11 @@
         testName,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
-        // document.getElementById(
-        //   "humanized"
-        // ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
-        //   { evmContractConditions }
-        // )}`;
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { solRpcConditions }
+        )}`;
 
         var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
 
@@ -81,11 +81,11 @@
           chain,
         });
 
-        // document.getElementById(
-        //   "humanized"
-        // ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
-        //   { accessControlConditions }
-        // )}`;
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { solRpcConditions }
+        )}`;
 
         const { encryptedZip, symmetricKey } =
           await LitJsSdk.zipAndEncryptString("this is a secret message");

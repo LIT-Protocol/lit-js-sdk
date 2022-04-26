@@ -21,8 +21,8 @@ const go = async () => {
     metafile: true,
   });
 
-  let text = await analyzeMetafile(result.metafile);
-  console.log(text);
+  // let text = await analyzeMetafile(result.metafile);
+  // console.log(text);
 };
 
 go();
