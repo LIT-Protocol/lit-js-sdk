@@ -278,6 +278,28 @@
         });
       };
 
+      var TimeLockEncryptDecrypt = async () => {
+        const thirtySecsFromNow = new Date(new Date().getTime() + 30000);
+        var unifiedAccessControlConditions = [
+          {
+            conditionType: "evmBasic",
+            contractAddress: "",
+            standardContractType: "timestamp",
+            chain: "ethereum",
+            method: "eth_getBlockByNumber",
+            parameters: ["latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: thirtySecsFromNow.getTime().toString(),
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          unifiedAccessControlConditions,
+          testName: "BalanceEncrypt",
+        });
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
