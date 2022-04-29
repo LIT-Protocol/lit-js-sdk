@@ -81,6 +81,7 @@
 
       var testProvisoningEncryptingAndDecrypting = async ({
         unifiedAccessControlConditions,
+        sleepTime,
         testName,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -110,6 +111,40 @@
         });
 
         console.log("encrypted symmetric key", encryptedSymmetricKey);
+
+        if (sleepTime) {
+          let failed = false;
+          try {
+            const retrievedSymmKey = await litNodeClient.getEncryptionKey({
+              unifiedAccessControlConditions,
+              toDecrypt: LitJsSdk.uint8arrayToString(
+                encryptedSymmetricKey,
+                "base16"
+              ),
+              authSig: {
+                ethereum: ethAuthSig,
+                solana: solAuthSig,
+              },
+            });
+          } catch (e) {
+            console.log("exception thrown when unlocking", e);
+            if (e.errorCode === "not_authorized") {
+              failed = true;
+            }
+          }
+          if (failed === false) {
+            document.getElementById(
+              "status"
+            ).innerText = `Test failed because I was able to unlock the content before the timelock elapsed.`;
+            return;
+          }
+
+          document.getElementById(
+            "status"
+          ).innerText = `Previous failure is good.  Sleeping for ${sleepTime}ms before trying retrieval again...`;
+
+          await new Promise((resolve) => setTimeout(resolve, sleepTime));
+        }
 
         const retrievedSymmKey = await litNodeClient.getEncryptionKey({
           unifiedAccessControlConditions,
@@ -279,7 +314,10 @@
       };
 
       var TimeLockEncryptDecrypt = async () => {
-        const thirtySecsFromNow = new Date(new Date().getTime() + 30000);
+        const futureTimestamp = new Date(new Date().getTime() + 5000);
+        const futureTimestampString = Math.floor(
+          futureTimestamp.getTime() / 1000
+        ).toString();
         var unifiedAccessControlConditions = [
           {
             conditionType: "evmBasic",
@@ -290,13 +328,14 @@
             parameters: ["latest"],
             returnValueTest: {
               comparator: ">=",
-              value: thirtySecsFromNow.getTime().toString(),
+              value: futureTimestampString,
             },
           },
         ];
         await testProvisoningEncryptingAndDecrypting({
           unifiedAccessControlConditions,
-          testName: "BalanceEncrypt",
+          sleepTime: 35000,
+          testName: "TimeLockEncryptDecrypt",
         });
       };
 
@@ -334,6 +373,10 @@
     <br />
     <br />
     <button onclick="BalanceEncrypt()">BalanceEncrypt</button>
+    <br />
+    <br />
+
+    <button onclick="TimeLockEncryptDecrypt()">TimeLockEncryptDecrypt</button>
     <br />
     <br />
 
