@@ -934,6 +934,11 @@ async function humanizeEvmBasicAccessControlConditions({
       }
 
       if (
+        acc.standardContractType === "timestamp" &&
+        acc.method === "eth_getBlockByNumber"
+      ) {
+        return `Latest mined block must be past the unix timestamp ${acc.returnValueTest.value}`;
+      } else if (
         acc.standardContractType === "MolochDAOv2.1" &&
         acc.method === "members"
       ) {
