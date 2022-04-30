@@ -390,6 +390,45 @@
         });
       };
 
+      var POAPEventId = async () => {
+        console.log(
+          "!!! This test only works from address 0xdbd360F30097fB6d938dcc8B7b62854B36160B45"
+        );
+        const chain = "xdai";
+
+        var accessControlConditions = [
+          {
+            contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+            standardContractType: "POAP",
+            chain: "xdai",
+            method: "eventId",
+            parameters: [],
+            returnValueTest: {
+              comparator: "=",
+              value: "37582",
+            },
+          },
+          {
+            operator: "or",
+          },
+          {
+            contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
+            standardContractType: "POAP",
+            chain: "ethereum",
+            method: "eventId",
+            parameters: [],
+            returnValueTest: {
+              comparator: "=",
+              value: "37582",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "POAPEventId",
+        });
+      };
+
       var ERC20 = async () => {
         const accessControlConditions = [
           {
@@ -1898,6 +1937,9 @@
     <br />
     <br />
     <button onclick="POAP()">POAP</button>
+    <br />
+    <br />
+    <button onclick="POAPEventId()">POAPEventId</button>
     <br />
     <br />
     <button onclick="ERC20()">ERC20</button>
