@@ -107,6 +107,17 @@ export const LIT_CHAINS = {
     blockExplorerUrls: ["https://snowtrace.io/"],
     vmType: "EVM",
   },
+  fuji: {
+    contractAddress: "0xc716950e5DEae248160109F562e1C9bF8E0CA25B",
+    chainId: 43113,
+    name: "Avalanche FUJI Testnet",
+    symbol: "AVAX",
+    decimals: 18,
+    type: "ERC1155",
+    rpcUrls: ["https://api.avax-test.network/ext/bc/C/rpc"],
+    blockExplorerUrls: ["https://testnet.explorer.avax.network/"],
+    vmType: "EVM",
+  },
   harmony: {
     contractAddress: "0xBB118507E802D17ECDD4343797066dDc13Cde7C6",
     chainId: 1666600000,
