@@ -509,6 +509,26 @@
         });
       };
 
+      var ETHOnFuji = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "fuji",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "ETHOnFuji",
+        });
+      };
+
       var ETHOnCelo = async () => {
         const accessControlConditions = [
           {
@@ -1955,6 +1975,9 @@
     <br />
     <br />
     <button onclick="ETHOnAvax()">ETHOnAvax</button>
+    <br />
+    <br />
+    <button onclick="ETHOnFuji()">ETHOnFuji</button>
     <br />
     <br />
     <button onclick="ETHOnCelo()">ETHOnCelo</button>

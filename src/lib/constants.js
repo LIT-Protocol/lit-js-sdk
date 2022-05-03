@@ -115,7 +115,7 @@ export const LIT_CHAINS = {
     decimals: 18,
     type: "ERC1155",
     rpcUrls: ["https://api.avax-test.network/ext/bc/C/rpc"],
-    blockExplorerUrls: ["https://testnet.explorer.avax.network/"],
+    blockExplorerUrls: ["https://testnet.snowtrace.io/"],
     vmType: "EVM",
   },
   harmony: {
