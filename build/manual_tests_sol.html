@@ -243,7 +243,7 @@
       var SolGetTokenAccountsByOwnerEncrypt = async () => {
         var solRpcConditions = [
           {
-            method: "GetTokenAccountsByOwner",
+            method: "getTokenAccountsByOwner",
             params: [
               ":userAddress",
               {
@@ -256,6 +256,30 @@
             chain,
             returnValueTest: {
               key: '$[?(@.account.data.parsed.info.mint == "29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE")].account.data.parsed.info.tokenAmount.amount',
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          testName: "SolGetTokenAccountsByOwnerEncrypt",
+        });
+      };
+
+      var SolGetMetadata = async () => {
+        var solRpcConditions = [
+          {
+            method: "getAccountInfo",
+            params: [
+              "29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE",
+              {
+                encoding: "jsonParsed",
+              },
+            ],
+            chain,
+            returnValueTest: {
+              key: "",
               comparator: ">",
               value: "0",
             },
@@ -329,6 +353,10 @@
     <button onclick="SolGetTokenAccountsByOwnerEncrypt()">
       SolGetTokenAccountsByOwnerEncrypt
     </button>
+    <br />
+    <br />
+
+    <button onclick="SolGetMetadata()">SolGetMetadata</button>
     <br />
     <br />
 
