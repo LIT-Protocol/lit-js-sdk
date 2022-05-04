@@ -44,12 +44,14 @@
         await litNodeClient.saveSigningCondition({
           unifiedAccessControlConditions,
           authSig,
+          chain,
           resourceId,
         });
 
         let jwt = await litNodeClient.getSignedToken({
           unifiedAccessControlConditions,
           authSig,
+          chain,
           resourceId,
         });
         console.log("jwt", jwt);
@@ -88,6 +90,7 @@
         const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
           unifiedAccessControlConditions,
           symmetricKey,
+          chain,
           authSig,
         });
 
@@ -100,6 +103,7 @@
             "base16"
           ),
           authSig,
+          chain,
         });
 
         const decryptedFiles = await LitJsSdk.decryptZip(

@@ -77,16 +77,16 @@
         testName,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
-        // const authSig = await LitJsSdk.checkAndSignAuthMessage({
-        //   chain,
-        // });
-        const authSig = {
-          sig: "0x49ae73506caef12d0bf8e5f7864b265c94352926fdddcf62d8b818a04a75529a1aa73b67f9cd938c756a61a6959c55ea8a2845209b28a1d2a6903555314e3a291b",
-          derivedVia: "web3.eth.personal.sign",
-          signedMessage:
-            "I am creating an account to use Lit Protocol at 2022-04-12T09:23:31.290Z",
-          address: "0x7e7763BE1379Bb48AFEE4F5c232Fb67D7c03947F",
-        };
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+        });
+        // const authSig = {
+        //   sig: "0x49ae73506caef12d0bf8e5f7864b265c94352926fdddcf62d8b818a04a75529a1aa73b67f9cd938c756a61a6959c55ea8a2845209b28a1d2a6903555314e3a291b",
+        //   derivedVia: "web3.eth.personal.sign",
+        //   signedMessage:
+        //     "I am creating an account to use Lit Protocol at 2022-04-12T09:23:31.290Z",
+        //   address: "0x7e7763BE1379Bb48AFEE4F5c232Fb67D7c03947F",
+        // };
 
         // document.getElementById(
         //   "humanized"
