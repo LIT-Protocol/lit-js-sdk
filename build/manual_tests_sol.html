@@ -206,10 +206,10 @@
         var solRpcConditions = [
           {
             method: "getTokenAccountBalance",
-            params: ["E7aAccig7X3X4pSWjf1eqqUJkV3EbzG6DrtyM2gbuuhH"],
+            params: ["tn2WEWk4Kqj157XsSdmBBcjWumVhkyJECXCKPq9ReL9"],
             chain,
             returnValueTest: {
-              key: "amount",
+              key: "$.amount",
               comparator: ">",
               value: "0",
             },
@@ -225,10 +225,10 @@
         var solRpcConditions = [
           {
             method: "getTokenAccountBalance",
-            params: ["E7aAccig7X3X4pSWjf1eqqUJkV3EbzG6DrtyM2gbuuhH"],
+            params: ["tn2WEWk4Kqj157XsSdmBBcjWumVhkyJECXCKPq9ReL9"],
             chain,
             returnValueTest: {
-              key: "amount",
+              key: "$.amount",
               comparator: ">",
               value: "0",
             },
@@ -267,16 +267,11 @@
         });
       };
 
-      var SolGetMetadata = async () => {
+      var SolNftInACollection = async () => {
         var solRpcConditions = [
           {
-            method: "getAccountInfo",
-            params: [
-              "29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE",
-              {
-                encoding: "jsonParsed",
-              },
-            ],
+            method: "balanceOfMetaplexCollection",
+            params: ["FfyafED6kiJUFwEhogyTRQHiL6NguqNg9xcdeoyyJs33"],
             chain,
             returnValueTest: {
               key: "",
@@ -287,7 +282,7 @@
         ];
         await testProvisoningEncryptingAndDecrypting({
           solRpcConditions,
-          testName: "SolGetTokenAccountsByOwnerEncrypt",
+          testName: "SolNftInACollection",
         });
       };
 
@@ -356,7 +351,7 @@
     <br />
     <br />
 
-    <button onclick="SolGetMetadata()">SolGetMetadata</button>
+    <button onclick="SolNftInACollection()">SolNftInACollection</button>
     <br />
     <br />
 
