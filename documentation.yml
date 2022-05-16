@@ -25,6 +25,7 @@ toc:
   - name: Other Utilities
   - fileToDataUrl
   - humanizeAccessControlConditions
+  - hashUnifiedAccessControlConditions
   - name: HTML NFT Utilities
   - findLITs
   - sendLIT
@@ -37,6 +38,7 @@ toc:
   - AccessControlCondition
   - EVMContractCondition
   - SolRpcCondition
+  - CosmosCondition
   - ResourceId
   - AuthSig
   - name: Chain Info

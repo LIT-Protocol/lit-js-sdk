@@ -11,6 +11,11 @@ const SYMM_KEY_ALGO_PARAMS = {
   length: 256,
 };
 
+/**
+ * Hash the unified access control conditions using SHA-256 in a deterministic way.
+ * @param {Object} unifiedAccessControlConditions - The unified access control conditions to hash.
+ * @returns {Promise<ArrayBuffer>} A promise that resolves to an ArrayBuffer that contains the hash
+ */
 export function hashUnifiedAccessControlConditions(
   unifiedAccessControlConditions
 ) {
