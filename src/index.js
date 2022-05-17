@@ -77,6 +77,7 @@ import {
 import { LIT_CHAINS, LIT_SVM_CHAINS, ALL_LIT_CHAINS } from "./lib/constants";
 import { printError } from "./lib/utils";
 import { initWasmBlsSdk, wasmBlsSdkHelpers } from "./lib/bls-sdk.js";
+import * as wasmECDSA from "./lib/ecdsa-sdk";
 
 import LitNodeClient from "./utils/litNodeClient";
 
@@ -141,6 +142,7 @@ const functions = {
   uint8arrayToString,
   signMessageAsync,
   wasmBlsSdkHelpers,
+  wasmECDSA,
 };
 
 module.exports = functions;
