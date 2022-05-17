@@ -17,6 +17,11 @@
  */
 
 /**
+ * @typedef {Object} LITCosmosChain
+ * @property {string} name - The human readable name of the chain
+ */
+
+/**
  * EVM Chains supported by the LIT protocol.  Each chain includes an optional pre-deployed token contract that you may use for minting LITs.  These are ERC1155 contracts that let you mint any quantity of a given token.  Use the chain name as a key in this object.
  * @constant
  * @type {LITEVMChain}
@@ -100,6 +105,17 @@ export const LIT_CHAINS = {
     type: "ERC1155",
     rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
     blockExplorerUrls: ["https://snowtrace.io/"],
+    vmType: "EVM",
+  },
+  fuji: {
+    contractAddress: "0xc716950e5DEae248160109F562e1C9bF8E0CA25B",
+    chainId: 43113,
+    name: "Avalanche FUJI Testnet",
+    symbol: "AVAX",
+    decimals: 18,
+    type: "ERC1155",
+    rpcUrls: ["https://api.avax-test.network/ext/bc/C/rpc"],
+    blockExplorerUrls: ["https://testnet.snowtrace.io/"],
     vmType: "EVM",
   },
   harmony: {
@@ -188,7 +204,18 @@ export const LIT_CHAINS = {
     symbol: "ETH",
     decimals: 18,
     rpcUrls: ["https://mainnet.optimism.io"],
-    blockExplorerUrls: ["https://optimistic.etherscan.io "],
+    blockExplorerUrls: ["https://optimistic.etherscan.io"],
+    type: "ERC1155",
+    vmType: "EVM",
+  },
+  celo: {
+    contractAddress: "0xBB118507E802D17ECDD4343797066dDc13Cde7C6",
+    chainId: 42220,
+    name: "Celo",
+    symbol: "CELO",
+    decimals: 18,
+    rpcUrls: ["https://forno.celo.org"],
+    blockExplorerUrls: ["https://explorer.celo.org"],
     type: "ERC1155",
     vmType: "EVM",
   },
@@ -228,6 +255,33 @@ export const LIT_SVM_CHAINS = {
 };
 
 /**
+ * Cosmos Chains supported by the LIT protocol.  Use the chain name as a key in this object.
+ * @constant
+ * @type {LITCosmosChain}
+ * @default
+ */
+export const LIT_COSMOS_CHAINS = {
+  cosmos: {
+    name: "Cosmos",
+    symbol: "ATOM",
+    decimals: 6,
+    chainId: "cosmoshub-4",
+    rpcUrls: ["https://lcd-cosmoshub.keplr.app"],
+    blockExplorerUrls: ["https://atomscan.com/"],
+    vmType: "CVM",
+  },
+  kyve: {
+    name: "Kyve",
+    symbol: "KYVE",
+    decimals: 6,
+    chainId: "korellia",
+    rpcUrls: ["https://api.korellia.kyve.network"],
+    blockExplorerUrls: ["https://explorer.kyve.network/"],
+    vmType: "CVM",
+  },
+};
+
+/**
  * All Chains supported by the LIT protocol.  Use the chain name as a key in this object.
  * @constant
  * @type {LITChain}
@@ -236,6 +290,7 @@ export const LIT_SVM_CHAINS = {
 export const ALL_LIT_CHAINS = {
   ...LIT_CHAINS,
   ...LIT_SVM_CHAINS,
+  ...LIT_COSMOS_CHAINS,
 };
 
 export const NETWORK_PUB_KEY =

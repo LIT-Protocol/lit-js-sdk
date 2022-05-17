@@ -1,6 +1,6 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.1.155",
+  "version": "1.1.179",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
   "main": "build/index.js",
@@ -28,7 +28,7 @@
   "keywords": [
     "library"
   ],
-  "license": "GPL-3.0",
+  "license": "MIT",
   "devDependencies": {
     "esbuild": "^0.14.25",
     "esbuild-node-builtins": "^0.1.0",
@@ -39,7 +39,8 @@
     "standard": "^16.0.3"
   },
   "dependencies": {
-    "@ethersproject/abi": "^5.5.0",
+    "@cosmjs/amino": "^0.28.4",
+    "@cosmjs/launchpad": "^0.27.1",
     "@ethersproject/bytes": "^5.5.0",
     "@ethersproject/contracts": "^5.2.0",
     "@ethersproject/hash": "^5.4.0",
@@ -47,7 +48,6 @@
     "@ethersproject/strings": "^5.5.0",
     "@ethersproject/units": "^5.4.0",
     "@ethersproject/wallet": "^5.2.0",
-    "@solana/web3.js": "^1.36.0",
     "@unstoppabledomains/resolution": "^7.1.2",
     "@walletconnect/ethereum-provider": "^1.7.5",
     "buffer": "^6.0.3",
@@ -55,6 +55,7 @@
     "cross-blob": "^3.0.1",
     "jszip": "^3.6.0",
     "lit-connect-modal": "^0.1.8",
+    "lit-siwe": "^1.1.8",
     "node-fetch": "^3.2.3",
     "pako": "^2.0.4",
     "tslib": "^2.3.1",

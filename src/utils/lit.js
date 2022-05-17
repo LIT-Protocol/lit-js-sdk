@@ -12,10 +12,14 @@ import {
   encryptWithSymmetricKey,
   decryptWithSymmetricKey,
   canonicalAccessControlConditionFormatter,
+  canonicalEVMContractConditionFormatter,
+  canonicalSolRpcConditionFormatter,
+  canonicalUnifiedAccessControlConditionFormatter,
 } from "./crypto";
 
 import { checkAndSignEVMAuthMessage, decimalPlaces } from "./eth";
 import { checkAndSignSolAuthMessage } from "./sol";
+import { checkAndSignCosmosAuthMessage } from "./cosmos";
 
 import { sendMessageToFrameParent } from "./frameComms";
 
@@ -48,6 +52,8 @@ export async function checkAndSignAuthMessage({ chain }) {
     return checkAndSignEVMAuthMessage({ chain });
   } else if (chainInfo.vmType === "SVM") {
     return checkAndSignSolAuthMessage({ chain });
+  } else if (chainInfo.vmType === "CVM") {
+    return checkAndSignCosmosAuthMessage({ chain });
   } else {
     throwError({
       message: `vmType not found for this chain: ${chain}.  This should not happen.  Unsupported chain selected.  Please select one of: ${Object.keys(
@@ -115,7 +121,7 @@ export async function zipAndEncryptString(string) {
 /**
  * Zip and encrypt multiple files.
  * @param {array} files An array of the files you wish to zip and encrypt
- * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
+ * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
  */
 export async function zipAndEncryptFiles(files) {
   // let's zip em
@@ -174,7 +180,7 @@ export async function decryptZip(encryptedZipBlob, symmKey) {
 /**
  * Encrypt a zip file created with JSZip using a new random symmetric key via WebCrypto.
  * @param {JSZip} zip The JSZip instance to encrypt
- * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a JSON string.
+ * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array string.
  */
 export async function encryptZip(zip) {
   const zipBlob = await zip.generateAsync({ type: "blob" });
@@ -249,7 +255,10 @@ export async function encryptZip(zip) {
  * Encrypt a single file, save the key to the Lit network, and then zip it up with the metadata.
  * @param {Object} params
  * @param {Object} params.authSig The authSig of the user.  Returned via the checkAndSignAuthMessage function
- * @param {Array.<AccessControlCondition>} params.accessControlConditions The array of access control conditions to under which the content can be decrypted
+ * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+ * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+ * @param {Array.<SolRpcCondition>} params.solRpcConditions  Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+ * @param {Array.<AccessControlCondition|EVMContractCondition|SolRpcCondition>} params.unifiedAccessControlConditions  An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
  * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
  * @param {File} params.file The file you wish to encrypt
  * @param {LitNodeClient} params.litNodeClient An instance of LitNodeClient that is already connected
@@ -259,6 +268,9 @@ export async function encryptZip(zip) {
 export async function encryptFileAndZipWithMetadata({
   authSig,
   accessControlConditions,
+  evmContractConditions,
+  solRpcConditions,
+  unifiedAccessControlConditions,
   chain,
   file,
   litNodeClient,
@@ -272,6 +284,9 @@ export async function encryptFileAndZipWithMetadata({
 
   const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
     accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
+    unifiedAccessControlConditions,
     symmetricKey: exportedSymmKey,
     authSig,
     chain,
@@ -292,6 +307,9 @@ export async function encryptFileAndZipWithMetadata({
     size: file.size,
     encryptedSymmetricKey,
     accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
+    unifiedAccessControlConditions,
     chain,
   });
 
@@ -330,6 +348,9 @@ export async function decryptZipFileWithMetadata({
   try {
     symmKey = await litNodeClient.getEncryptionKey({
       accessControlConditions: metadata.accessControlConditions,
+      evmContractConditions: metadata.evmContractConditions,
+      solRpcConditions: metadata.solRpcConditions,
+      unifiedAccessControlConditions: metadata.unifiedAccessControlConditions,
       toDecrypt: metadata.encryptedSymmetricKey,
       chain: metadata.chain,
       authSig,
@@ -371,6 +392,8 @@ export async function decryptZipFileWithMetadata({
         // we tried all the access control conditions and none worked
         throw e;
       }
+    } else {
+      throw e;
     }
   }
   const importedSymmKey = await importSymmetricKey(symmKey);
@@ -391,6 +414,45 @@ export async function decryptZipFileWithMetadata({
   // log('decryptedFile', decryptedFile)
 
   return { decryptedFile, metadata };
+}
+
+/**
+ * Encrypt a file without doing any zipping or packing.  This is useful for large files.  A 1gb file can be encrypted in only 2 seconds, for example.  A new random symmetric key will be created and returned along with the encrypted file.
+ * @param {Object} params
+ * @param {File} params.file The file you wish to encrypt
+ * @returns {Promise<Object>} A promise containing an object with keys encryptedFile and symmetricKey.  encryptedFile is a Blob, and symmetricKey is a Uint8Array that can be used to decrypt the file.
+ */
+export async function encryptFile({ file }) {
+  // generate a random symmetric key
+  const symmetricKey = await generateSymmetricKey();
+  const exportedSymmKey = new Uint8Array(
+    await crypto.subtle.exportKey("raw", symmetricKey)
+  );
+
+  // encrypt the file
+  var fileAsArrayBuffer = await file.arrayBuffer();
+  const encryptedFile = await encryptWithSymmetricKey(
+    symmetricKey,
+    fileAsArrayBuffer
+  );
+
+  return { encryptedFile, symmetricKey: exportedSymmKey };
+}
+
+/**
+ * Decrypt a file that was encrypted with the encryptFile function, without doing any unzipping or unpacking.  This is useful for large files.  A 1gb file can be decrypted in only 1 second, for example.
+ * @param {Object} params
+ * @param {File} params.file The file you wish to decrypt
+ * @param {Uint8Array} params.symmetricKey The symmetric key used that will be used to decrypt this.
+ * @returns {Promise<Object>} A promise containing the decrypted file.  The file is an ArrayBuffer.
+ */
+export async function decryptFile({ file, symmetricKey }) {
+  const importedSymmKey = await importSymmetricKey(symmetricKey);
+
+  // decrypt the file
+  const decryptedFile = await decryptWithSymmetricKey(file, importedSymmKey);
+
+  return decryptedFile;
 }
 
 async function getNpmPackage(packageName) {
@@ -678,17 +740,20 @@ function metadataForFile({
   type,
   size,
   accessControlConditions,
+  evmContractConditions,
+  solRpcConditions,
+  unifiedAccessControlConditions,
   chain,
   encryptedSymmetricKey,
 }) {
-  const formattedAccessControlConditions = accessControlConditions.map((c) =>
-    canonicalAccessControlConditionFormatter(c)
-  );
   return {
     name,
     type,
     size,
-    accessControlConditions: formattedAccessControlConditions,
+    accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
+    unifiedAccessControlConditions,
     chain,
     encryptedSymmetricKey: uint8arrayToString(encryptedSymmetricKey, "base16"),
   };
@@ -718,10 +783,106 @@ function humanizeComparator(comparator) {
  */
 export async function humanizeAccessControlConditions({
   accessControlConditions,
+  evmContractConditions,
+  solRpcConditions,
+  unifiedAccessControlConditions,
   tokenList,
   myWalletAddress,
 }) {
-  log("humanizing access control conditions");
+  if (accessControlConditions) {
+    return humanizeEvmBasicAccessControlConditions({
+      accessControlConditions,
+      tokenList,
+      myWalletAddress,
+    });
+  } else if (evmContractConditions) {
+    return humanizeEvmContractConditions({
+      evmContractConditions,
+      tokenList,
+      myWalletAddress,
+    });
+  } else if (solRpcConditions) {
+    return humanizeSolRpcConditions({
+      solRpcConditions,
+      tokenList,
+      myWalletAddress,
+    });
+  } else if (unifiedAccessControlConditions) {
+    return humanizeUnifiedAccessControlConditions({
+      unifiedAccessControlConditions,
+      tokenList,
+      myWalletAddress,
+    });
+  }
+}
+
+async function humanizeUnifiedAccessControlConditions({
+  unifiedAccessControlConditions,
+  tokenList,
+  myWalletAddress,
+}) {
+  const promises = await Promise.all(
+    unifiedAccessControlConditions.map(async (acc) => {
+      if (Array.isArray(acc)) {
+        // this is a group.  recurse.
+        const group = await humanizeUnifiedAccessControlConditions({
+          unifiedAccessControlConditions: acc,
+          tokenList,
+          myWalletAddress,
+        });
+        return `( ${group} )`;
+      }
+
+      if (acc.operator) {
+        if (acc.operator.toLowerCase() === "and") {
+          return " and ";
+        } else if (acc.operator.toLowerCase() === "or") {
+          return " or ";
+        }
+      }
+
+      if (acc.conditionType === "evmBasic") {
+        return humanizeEvmBasicAccessControlConditions({
+          accessControlConditions: [acc],
+          tokenList,
+          myWalletAddress,
+        });
+      } else if (acc.conditionType === "evmContract") {
+        return humanizeEvmContractConditions({
+          evmContractConditions: [acc],
+          tokenList,
+          myWalletAddress,
+        });
+      } else if (acc.conditionType === "solRpc") {
+        return humanizeSolRpcConditions({
+          solRpcConditions: [acc],
+          tokenList,
+          myWalletAddress,
+        });
+      } else if (acc.conditionType === "cosmos") {
+        return humanizeCosmosConditions({
+          cosmosConditions: [acc],
+          tokenList,
+          myWalletAddress,
+        });
+      } else {
+        throwError({
+          message: `Unrecognized condition type: ${acc.conditionType}`,
+          name: "InvalidUnifiedConditionType",
+          errorCode: "invalid_unified_condition_type",
+        });
+      }
+    })
+  );
+  return promises.join("");
+}
+
+async function humanizeEvmBasicAccessControlConditions({
+  accessControlConditions,
+  tokenList,
+  myWalletAddress,
+}) {
+  log("humanizing evm basic access control conditions");
   log("myWalletAddress", myWalletAddress);
   log("accessControlConditions", accessControlConditions);
   let fixedConditions = accessControlConditions;
@@ -756,7 +917,7 @@ export async function humanizeAccessControlConditions({
     fixedConditions.map(async (acc) => {
       if (Array.isArray(acc)) {
         // this is a group.  recurse.
-        const group = await humanizeAccessControlConditions({
+        const group = await humanizeEvmBasicAccessControlConditions({
           accessControlConditions: acc,
           tokenList,
           myWalletAddress,
@@ -773,6 +934,11 @@ export async function humanizeAccessControlConditions({
       }
 
       if (
+        acc.standardContractType === "timestamp" &&
+        acc.method === "eth_getBlockByNumber"
+      ) {
+        return `Latest mined block must be past the unix timestamp ${acc.returnValueTest.value}`;
+      } else if (
         acc.standardContractType === "MolochDAOv2.1" &&
         acc.method === "members"
       ) {
@@ -785,7 +951,7 @@ export async function humanizeAccessControlConditions({
         // erc1155 owns an amount of specific tokens
         return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${
           acc.returnValueTest.value
-        } of ${acc.contractAddress} tokens`;
+        } of ${acc.contractAddress} tokens with token id ${acc.parameters[1]}`;
       } else if (
         acc.standardContractType === "ERC1155" &&
         acc.method === "balanceOfBatch"
@@ -816,7 +982,13 @@ export async function humanizeAccessControlConditions({
         acc.method === "tokenURI"
       ) {
         // owns a POAP
-        return `Owner of a ${acc.returnValueTest.value} POAP`;
+        return `Owner of a ${acc.returnValueTest.value} POAP on ${acc.chain}`;
+      } else if (
+        acc.standardContractType === "POAP" &&
+        acc.method === "eventId"
+      ) {
+        // owns a POAP
+        return `Owner of a POAP from event ID ${acc.returnValueTest.value} on ${acc.chain}`;
       } else if (
         acc.standardContractType === "ERC721" &&
         acc.method === "balanceOf"
@@ -872,6 +1044,182 @@ export async function humanizeAccessControlConditions({
     })
   );
   return promises.join("");
+}
+
+async function humanizeSolRpcConditions({
+  solRpcConditions,
+  tokenList,
+  myWalletAddress,
+}) {
+  log("humanizing sol rpc conditions");
+  log("myWalletAddress", myWalletAddress);
+  log("solRpcConditions", solRpcConditions);
+
+  const promises = await Promise.all(
+    solRpcConditions.map(async (acc) => {
+      if (Array.isArray(acc)) {
+        // this is a group.  recurse.
+        const group = await humanizeSolRpcConditions({
+          solRpcConditions: acc,
+          tokenList,
+          myWalletAddress,
+        });
+        return `( ${group} )`;
+      }
+
+      if (acc.operator) {
+        if (acc.operator.toLowerCase() === "and") {
+          return " and ";
+        } else if (acc.operator.toLowerCase() === "or") {
+          return " or ";
+        }
+      }
+
+      if (acc.method === "getBalance") {
+        return `Owns ${humanizeComparator(
+          acc.returnValueTest.comparator
+        )} ${formatSol(acc.returnValueTest.value)} SOL`;
+      } else if (acc.method === "") {
+        if (
+          myWalletAddress &&
+          acc.returnValueTest.value.toLowerCase() ===
+            myWalletAddress.toLowerCase()
+        ) {
+          return `Controls your wallet (${myWalletAddress})`;
+        } else {
+          return `Controls wallet with address ${acc.returnValueTest.value}`;
+        }
+      } else {
+        let msg = `Solana RPC method ${acc.method}(${acc.params.join(
+          ", "
+        )}) should have a result of ${humanizeComparator(
+          acc.returnValueTest.comparator
+        )} ${acc.returnValueTest.value}`;
+        if (acc.returnValueTest.key !== "") {
+          msg += ` for key ${acc.returnValueTest.key}`;
+        }
+        return msg;
+      }
+    })
+  );
+  return promises.join("");
+}
+
+async function humanizeEvmContractConditions({
+  evmContractConditions,
+  tokenList,
+  myWalletAddress,
+}) {
+  log("humanizing evm contract conditions");
+  log("myWalletAddress", myWalletAddress);
+  log("evmContractConditions", evmContractConditions);
+
+  const promises = await Promise.all(
+    evmContractConditions.map(async (acc) => {
+      if (Array.isArray(acc)) {
+        // this is a group.  recurse.
+        const group = await humanizeEvmContractConditions({
+          evmContractConditions: acc,
+          tokenList,
+          myWalletAddress,
+        });
+        return `( ${group} )`;
+      }
+
+      if (acc.operator) {
+        if (acc.operator.toLowerCase() === "and") {
+          return " and ";
+        } else if (acc.operator.toLowerCase() === "or") {
+          return " or ";
+        }
+      }
+
+      let msg = `${acc.functionName}(${acc.functionParams.join(
+        ", "
+      )}) on contract address ${
+        acc.contractAddress
+      } should have a result of ${humanizeComparator(
+        acc.returnValueTest.comparator
+      )} ${acc.returnValueTest.value}`;
+      if (acc.returnValueTest.key !== "") {
+        msg += ` for key ${acc.returnValueTest.key}`;
+      }
+      return msg;
+    })
+  );
+  return promises.join("");
+}
+
+async function humanizeCosmosConditions({
+  cosmosConditions,
+  tokenList,
+  myWalletAddress,
+}) {
+  log("humanizing cosmos conditions");
+  log("myWalletAddress", myWalletAddress);
+  log("cosmosConditions", cosmosConditions);
+
+  const promises = await Promise.all(
+    cosmosConditions.map(async (acc) => {
+      if (Array.isArray(acc)) {
+        // this is a group.  recurse.
+        const group = await humanizeCosmosConditions({
+          accessControlConditions: acc,
+          tokenList,
+          myWalletAddress,
+        });
+        return `( ${group} )`;
+      }
+
+      if (acc.operator) {
+        if (acc.operator.toLowerCase() === "and") {
+          return " and ";
+        } else if (acc.operator.toLowerCase() === "or") {
+          return " or ";
+        }
+      }
+
+      if (acc.path === "/cosmos/bank/v1beta1/balances/:userAddress") {
+        return `Owns ${humanizeComparator(
+          acc.returnValueTest.comparator
+        )} ${formatAtom(acc.returnValueTest.value)} ATOM`;
+      } else if (acc.path === ":userAddress") {
+        if (
+          myWalletAddress &&
+          acc.returnValueTest.value.toLowerCase() ===
+            myWalletAddress.toLowerCase()
+        ) {
+          return `Controls your wallet (${myWalletAddress})`;
+        } else {
+          return `Controls wallet with address ${acc.returnValueTest.value}`;
+        }
+      } else if (
+        acc.chain === "kyve" &&
+        acc.path === "/kyve/registry/v1beta1/funders_list/0"
+      ) {
+        return `Is a current KYVE funder`;
+      } else {
+        let msg = `Cosmos RPC request for ${
+          acc.path
+        } should have a result of ${humanizeComparator(
+          acc.returnValueTest.comparator
+        )} ${acc.returnValueTest.value}`;
+        if (acc.returnValueTest.key !== "") {
+          msg += ` for key ${acc.returnValueTest.key}`;
+        }
+        return msg;
+      }
+    })
+  );
+  return promises.join("");
+}
+
+function formatSol(amount) {
+  return formatUnits(amount, 9);
+}
+
+function formatAtom(amount) {
+  return formatUnits(amount, 6);
 }
 
 export async function getTokenList() {

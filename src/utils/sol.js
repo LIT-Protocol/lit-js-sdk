@@ -1,10 +1,11 @@
-import * as solWeb3 from "@solana/web3.js";
-import { AUTH_SIGNATURE_BODY } from "./eth";
 import {
   fromString as uint8arrayFromString,
   toString as uint8arrayToString,
 } from "uint8arrays";
 import { throwError, log } from "../lib/utils";
+
+export const AUTH_SIGNATURE_BODY =
+  "I am creating an account to use Lit Protocol at {{timestamp}}";
 
 function getProvider() {
   if ("solana" in window) {
@@ -15,7 +16,8 @@ function getProvider() {
     // }
   } else {
     throwError({
-      message: "No web3 wallet was found",
+      message:
+        "No web3 wallet was found that works with Solana.  Install a Solana wallet or choose another chain",
       name: "NoWalletException",
       errorCode: "no_wallet",
     });

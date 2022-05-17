@@ -80,6 +80,13 @@
         const authSig = await LitJsSdk.checkAndSignAuthMessage({
           chain,
         });
+        // const authSig = {
+        //   sig: "0x49ae73506caef12d0bf8e5f7864b265c94352926fdddcf62d8b818a04a75529a1aa73b67f9cd938c756a61a6959c55ea8a2845209b28a1d2a6903555314e3a291b",
+        //   derivedVia: "web3.eth.personal.sign",
+        //   signedMessage:
+        //     "I am creating an account to use Lit Protocol at 2022-04-12T09:23:31.290Z",
+        //   address: "0x7e7763BE1379Bb48AFEE4F5c232Fb67D7c03947F",
+        // };
 
         // document.getElementById(
         //   "humanized"
@@ -487,58 +494,21 @@
       var RandomTestFromUser = async () => {
         var evmContractConditions = [
           {
-            contractAddress: "0xECa8056809e7e8db04A8fF6e4E82cD889a46FE2F",
-            functionName: "getFlow",
-            functionParams: [
-              "0xe3cb950cb164a31c66e32c320a800d477019dcff",
-              ":userAddress",
-              "0x03fc4b2090eb96E27BEc5A52dE6410B7Dc00348A",
-            ],
+            contractAddress: "0x0884B4695631c1e92C2f3803904859E414D80750",
+            functionName: "isAuthorizedToView",
+            functionParams: [":userAddress", "0"],
             functionAbi: {
-              constant: true,
-              name: "getFlow",
-              payable: false,
-              stateMutability: "view",
-              type: "function",
+              name: "isAuthorizedToView",
               inputs: [
-                {
-                  type: "address",
-                  name: "token",
-                },
-                {
-                  type: "address",
-                  name: "sender",
-                },
-                {
-                  type: "address",
-                  name: "receiver",
-                },
+                { name: "viewer", type: "address" },
+                { name: "tokenId", type: "uint256" },
               ],
-              outputs: [
-                {
-                  type: "uint256",
-                  name: "timestamp",
-                },
-                {
-                  type: "int96",
-                  name: "flowRate",
-                },
-                {
-                  type: "uint256",
-                  name: "deposit",
-                },
-                {
-                  type: "uint256",
-                  name: "owedeposit",
-                },
-              ],
+              outputs: [{ name: "", type: "bool" }],
+              constant: true,
+              stateMutability: "view",
             },
-            chain: "kovan",
-            returnValueTest: {
-              key: "flowRate",
-              comparator: ">=",
-              value: "1",
-            },
+            chain: "mumbai",
+            returnValueTest: { key: "", comparator: "=", value: "true" },
           },
         ];
         await testProvisoningEncryptingAndDecrypting({

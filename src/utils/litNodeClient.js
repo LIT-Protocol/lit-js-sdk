@@ -15,10 +15,12 @@ import {
   hashEVMContractConditions,
   hashSolRpcConditions,
   hashResourceId,
+  hashUnifiedAccessControlConditions,
   canonicalAccessControlConditionFormatter,
   canonicalEVMContractConditionFormatter,
   canonicalSolRpcConditionFormatter,
   canonicalResourceIdFormatter,
+  canonicalUnifiedAccessControlConditionFormatter,
 } from "./crypto";
 
 /**
@@ -47,6 +49,13 @@ import {
  * @property {Array} params - The parameters to use when making the RPC call.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
  * @property {string} chain - The chain name of the chain that this contract is deployed on.  See ALL_LIT_CHAINS for currently supported chains.  On Solana, we support "solana" for mainnet, "solanaDevnet" for devnet and "solanaTestnet" for testnet.
  * @property {Object} returnValueTest - An object containing three keys: "key", "comparator" and "value".  The return value of the rpc call will be compared against these.  The "key" selector supports JSONPath syntax, so you can filter and iterate over the results.  For example, to check if someone holds an NFT with address 29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE, you could use "method": "GetTokenAccountsByOwner", "params": [":userAddress",{"programId":"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"},{"encoding":"jsonParsed"}], "key": "$[?(@.account.data.parsed.info.mint == "29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE")].account.data.parsed.info.tokenAmount.amount", "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.  The "key" is used when the return value is an array or object which contains multiple values and should be the name of the returned value or a JSONPath item.  You must always pass "key" when using "returnValueTest", even if you pass an empty string for it, because the rpc call only returns a single value.
+ */
+
+/**
+ * @typedef {Object} CosmosCondition
+ * @property {string} path - The RPC URL path that will be called.  This will typically contain any parameters you need for the call.  Note that you can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature.  For example, this path would be used to get the requesting user's balance: "/cosmos/bank/v1beta1/balances/:userAddress"
+ * @property {string} chain - The chain name of the chain that this contract is deployed on.  See ALL_LIT_CHAINS for currently supported chains.  On Cosmos we currently support "cosmos" and "kyve"
+ * @property {Object} returnValueTest - An object containing three keys: "key", "comparator" and "value".  The return value of the rpc call will be compared against these.  The "key" selector supports JSONPath syntax, so you can filter and iterate over the results.  For example, to check the balance of someone's account, you can use the key "$.balances[0].amount" which will pull out balances[0].amount from the JSON response and compare it against the "value" field according to the "comparator".  The "key" is used when the return value is an array or object which contains multiple values and should be the name of the returned value or a JSONPath item.  You must always pass "key" when using "returnValueTest", even if you pass an empty string for it, because the rpc call only returns a single value.
  */
 
 /**
@@ -223,9 +232,10 @@ export default class LitNodeClient {
   /**
    * Request a signed JWT from the LIT network.  Before calling this function, you must either create or know of a resource id and access control conditions for the item you wish to gain authorization for.  You can create an access control condition using the saveSigningCondition function.
    * @param {Object} params
-   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
-   * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions solRpcConditions.
+   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+   * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions solRpcConditions or unifiedAccessControlConditions.
    * @param {Array.<SolRpcCondition>} params.solRpcConditions  Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+   * @param {Array.<AccessControlCondition|EVMContractCondition|SolRpcCondition>} params.unifiedAccessControlConditions  An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
    * @param {string} params.chain The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions.
    * @param {ResourceId} params.resourceId The resourceId representing something on the web via a URL
@@ -235,6 +245,7 @@ export default class LitNodeClient {
     accessControlConditions,
     evmContractConditions,
     solRpcConditions,
+    unifiedAccessControlConditions,
     chain,
     authSig,
     resourceId,
@@ -258,6 +269,7 @@ export default class LitNodeClient {
     let formattedAccessControlConditions;
     let formattedEVMContractConditions;
     let formattedSolRpcConditions;
+    let formattedUnifiedAccessControlConditions;
     if (accessControlConditions) {
       formattedAccessControlConditions = accessControlConditions.map((c) =>
         canonicalAccessControlConditionFormatter(c)
@@ -282,9 +294,18 @@ export default class LitNodeClient {
         "formattedSolRpcConditions",
         JSON.stringify(formattedSolRpcConditions)
       );
+    } else if (unifiedAccessControlConditions) {
+      formattedUnifiedAccessControlConditions =
+        unifiedAccessControlConditions.map((c) =>
+          canonicalUnifiedAccessControlConditionFormatter(c)
+        );
+      log(
+        "formattedUnifiedAccessControlConditions",
+        JSON.stringify(formattedUnifiedAccessControlConditions)
+      );
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
         name: "InvalidArgumentException",
         errorCode: "invalid_argument",
       });
@@ -301,6 +322,8 @@ export default class LitNodeClient {
           accessControlConditions: formattedAccessControlConditions,
           evmContractConditions: formattedEVMContractConditions,
           solRpcConditions: formattedSolRpcConditions,
+          unifiedAccessControlConditions:
+            formattedUnifiedAccessControlConditions,
           resourceId: formattedResourceId,
           authSig,
           chain,
@@ -364,9 +387,10 @@ export default class LitNodeClient {
   /**
    * Associated access control conditions with a resource on the web.  After calling this function, users may use the getSignedToken function to request a signed JWT from the LIT network.  This JWT proves that the user meets the access control conditions, and is authorized to access the resource you specified in the resourceId parameter of the saveSigningCondition function.
    * @param {Object} params
-   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
-   * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+   * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
    * @param {Array.<SolRpcCondition>} params.solRpcConditions  Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+   * @param {Array.<AccessControlCondition|EVMContractCondition|SolRpcCondition>} params.unifiedAccessControlConditions  An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
    * @param {string} params.chain The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions
    * @param {ResourceId} params.resourceId The resourceId representing something on the web via a URL
@@ -377,6 +401,7 @@ export default class LitNodeClient {
     accessControlConditions,
     evmContractConditions,
     solRpcConditions,
+    unifiedAccessControlConditions,
     chain,
     authSig,
     resourceId,
@@ -416,9 +441,13 @@ export default class LitNodeClient {
       hashOfConditions = await hashEVMContractConditions(evmContractConditions);
     } else if (solRpcConditions) {
       hashOfConditions = await hashSolRpcConditions(solRpcConditions);
+    } else if (unifiedAccessControlConditions) {
+      hashOfConditions = await hashUnifiedAccessControlConditions(
+        unifiedAccessControlConditions
+      );
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
         name: "InvalidArgumentException",
         errorCode: "invalid_argument",
       });
@@ -455,9 +484,10 @@ export default class LitNodeClient {
   /**
    * Retrieve the symmetric encryption key from the LIT nodes.  Note that this will only work if the current user meets the access control conditions specified when the data was encrypted.  That access control condition is typically that the user is a holder of the NFT that corresponds to this encrypted data.  This NFT token address and ID was specified when this LIT was created.
    * @param {Object} params
-   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
-   * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+   * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
    * @param {Array.<SolRpcCondition>} params.solRpcConditions  Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+   * @param {Array.<AccessControlCondition|EVMContractCondition|SolRpcCondition>} params.unifiedAccessControlConditions  An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
    * @param {string} params.toDecrypt The ciphertext that you wish to decrypt encoded as a hex string
    * @param {string} params.chain The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
@@ -467,6 +497,7 @@ export default class LitNodeClient {
     accessControlConditions,
     evmContractConditions,
     solRpcConditions,
+    unifiedAccessControlConditions,
     toDecrypt,
     chain,
     authSig,
@@ -483,6 +514,7 @@ export default class LitNodeClient {
     let formattedAccessControlConditions;
     let formattedEVMContractConditions;
     let formattedSolRpcConditions;
+    let formattedUnifiedAccessControlConditions;
     if (accessControlConditions) {
       formattedAccessControlConditions = accessControlConditions.map((c) =>
         canonicalAccessControlConditionFormatter(c)
@@ -507,9 +539,18 @@ export default class LitNodeClient {
         "formattedSolRpcConditions",
         JSON.stringify(formattedSolRpcConditions)
       );
+    } else if (unifiedAccessControlConditions) {
+      formattedUnifiedAccessControlConditions =
+        unifiedAccessControlConditions.map((c) =>
+          canonicalUnifiedAccessControlConditionFormatter(c)
+        );
+      log(
+        "formattedUnifiedAccessControlConditions",
+        JSON.stringify(formattedUnifiedAccessControlConditions)
+      );
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
         name: "InvalidArgumentException",
         errorCode: "invalid_argument",
       });
@@ -524,6 +565,8 @@ export default class LitNodeClient {
           accessControlConditions: formattedAccessControlConditions,
           evmContractConditions: formattedEVMContractConditions,
           solRpcConditions: formattedSolRpcConditions,
+          unifiedAccessControlConditions:
+            formattedUnifiedAccessControlConditions,
           toDecrypt,
           authSig,
           chain,
@@ -575,9 +618,10 @@ export default class LitNodeClient {
   /**
    * Securely save the association between access control conditions and something that you wish to decrypt
    * @param {Object} params
-   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
-   * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions.
+   * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+   * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
    * @param {Array.<SolRpcCondition>} params.solRpcConditions  Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+   * @param {Array.<AccessControlCondition|EVMContractCondition|SolRpcCondition>} params.unifiedAccessControlConditions  An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
    * @param {string} params.chain The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
    * @param {string} params.symmetricKey The symmetric encryption key that was used to encrypt the locked content inside the LIT as a Uint8Array.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.  You must pass either symmetricKey or encryptedSymmetricKey.
@@ -590,6 +634,7 @@ export default class LitNodeClient {
     accessControlConditions,
     evmContractConditions,
     solRpcConditions,
+    unifiedAccessControlConditions,
     chain,
     authSig,
     symmetricKey,
@@ -621,16 +666,16 @@ export default class LitNodeClient {
         "symmetricKey and encryptedSymmetricKey are blank.  You must pass one or the other"
       );
     }
-    if (!chain) {
-      throw new Error("chain is blank");
-    }
+
     if (
       (!accessControlConditions || accessControlConditions.length == 0) &&
       (!evmContractConditions || evmContractConditions.length == 0) &&
-      (!solRpcConditions || solRpcConditions.length == 0)
+      (!solRpcConditions || solRpcConditions.length == 0) &&
+      (!unifiedAccessControlConditions ||
+        unifiedAccessControlConditions.length == 0)
     ) {
       throw new Error(
-        "accessControlConditions and evmContractConditions and solRpcConditions are blank"
+        "accessControlConditions and evmContractConditions and solRpcConditions and unifiedAccessControlConditions are blank"
       );
     }
     if (!authSig) {
@@ -669,9 +714,13 @@ export default class LitNodeClient {
       hashOfConditions = await hashEVMContractConditions(evmContractConditions);
     } else if (solRpcConditions) {
       hashOfConditions = await hashSolRpcConditions(solRpcConditions);
+    } else if (unifiedAccessControlConditions) {
+      hashOfConditions = await hashUnifiedAccessControlConditions(
+        unifiedAccessControlConditions
+      );
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
         name: "InvalidArgumentException",
         errorCode: "invalid_argument",
       });
@@ -936,6 +985,7 @@ export default class LitNodeClient {
     accessControlConditions,
     evmContractConditions,
     solRpcConditions,
+    unifiedAccessControlConditions,
     resourceId,
     authSig,
     chain,
@@ -948,6 +998,7 @@ export default class LitNodeClient {
       accessControlConditions,
       evmContractConditions,
       solRpcConditions,
+      unifiedAccessControlConditions,
       resourceId,
       authSig,
       chain,
@@ -962,6 +1013,7 @@ export default class LitNodeClient {
     accessControlConditions,
     evmContractConditions,
     solRpcConditions,
+    unifiedAccessControlConditions,
     toDecrypt,
     authSig,
     chain,
@@ -972,6 +1024,7 @@ export default class LitNodeClient {
       accessControlConditions,
       evmContractConditions,
       solRpcConditions,
+      unifiedAccessControlConditions,
       toDecrypt,
       authSig,
       chain,
