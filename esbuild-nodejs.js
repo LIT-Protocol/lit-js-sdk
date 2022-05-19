@@ -1,5 +1,5 @@
 const { build, analyzeMetafile } = require("esbuild");
-const { dedupBn, fixImportOfRandom } = require("./esbuild-plugins.js");
+const { dedupBn } = require("./esbuild-plugins.js");
 
 const go = async () => {
   let result = await build({
@@ -12,7 +12,7 @@ const go = async () => {
       ".svg": "dataurl",
       ".css": "text",
     },
-    plugins: [dedupBn, fixImportOfRandom],
+    plugins: [dedupBn],
     sourceRoot: "./",
     platform: "node",
     inject: ["./esbuild-nodejs-shims.js"],
