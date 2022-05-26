@@ -141,6 +141,7 @@ const functions = {
   uint8arrayToString,
   signMessageAsync,
   wasmBlsSdkHelpers,
+  initWasmBlsSdk,
 };
 
 module.exports = functions;
