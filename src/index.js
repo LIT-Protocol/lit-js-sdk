@@ -143,6 +143,7 @@ const functions = {
   signMessageAsync,
   wasmBlsSdkHelpers,
   wasmECDSA,
+  initWasmBlsSdk,
 };
 
 module.exports = functions;

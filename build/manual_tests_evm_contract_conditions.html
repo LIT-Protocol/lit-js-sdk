@@ -494,23 +494,44 @@
       var RandomTestFromUser = async () => {
         var evmContractConditions = [
           {
-            contractAddress: "0x0884B4695631c1e92C2f3803904859E414D80750",
-            functionName: "isAuthorizedToView",
-            functionParams: [":userAddress", "0"],
+            contractAddress: "0xCA120e8aEaA69Ea37077E492b27E1a6F197DDA63",
+            functionName: "hasAccess",
+            functionParams: [
+              ":userAddress",
+              "c230000000000000000000000000000000000000000000000000000000000000",
+            ],
             functionAbi: {
-              name: "isAuthorizedToView",
-              inputs: [
-                { name: "viewer", type: "address" },
-                { name: "tokenId", type: "uint256" },
-              ],
-              outputs: [{ name: "", type: "bool" }],
               constant: true,
+              inputs: [
+                {
+                  name: "user",
+                  type: "address",
+                },
+                {
+                  name: "id",
+                  type: "bytes32",
+                },
+              ],
+              name: "hasAccess",
+              outputs: [
+                {
+                  name: "access",
+                  type: "bool",
+                },
+              ],
+              payable: false,
               stateMutability: "view",
+              type: "function",
             },
-            chain: "mumbai",
-            returnValueTest: { key: "", comparator: "=", value: "true" },
+            chain: "xdai",
+            returnValueTest: {
+              key: "",
+              comparator: "=",
+              value: "true",
+            },
           },
         ];
+
         await testProvisoningEncryptingAndDecrypting({
           evmContractConditions,
           testName: "RandomTestFromUser",
