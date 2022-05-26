@@ -569,6 +569,26 @@
         });
       };
 
+      var ETHOnXdai = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "xdai",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "EthOnXdai",
+        });
+      };
+
       var ETHPlusERC721 = async () => {
         const accessControlConditions = [
           {
@@ -1984,6 +2004,9 @@
     <br />
     <br />
     <button onclick="ETHOnEth()">ETHOnEth</button>
+    <br />
+    <br />
+    <button onclick="ETHOnXdai()">ETHOnXdai</button>
     <br />
     <br />
     <button onclick="ETHPlusERC721()">

@@ -69,7 +69,7 @@ export const LIT_CHAINS = {
     name: "xDai",
     symbol: "xDai",
     decimals: 18,
-    rpcUrls: ["https://rpc.xdaichain.com"],
+    rpcUrls: ["https://rpc.gnosischain.com"],
     blockExplorerUrls: [" https://blockscout.com/xdai/mainnet"],
     type: "ERC1155",
     vmType: "EVM",
