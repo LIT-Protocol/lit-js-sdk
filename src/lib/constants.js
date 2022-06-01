@@ -219,6 +219,28 @@ export const LIT_CHAINS = {
     type: "ERC1155",
     vmType: "EVM",
   },
+  aurora: {
+    contractAddress: "",
+    chainId: 1313161554,
+    name: "Aurora",
+    symbol: "ETH",
+    decimals: 18,
+    rpcUrls: ["https://mainnet.aurora.dev"],
+    blockExplorerUrls: ["https://aurorascan.dev"],
+    type: "ERC1155",
+    vmType: "EVM",
+  },
+  // eluvio: {
+  //   contractAddress: "",
+  //   chainId: 955305,
+  //   name: "Eluvio",
+  //   symbol: "ELV",
+  //   decimals: 18,
+  //   rpcUrls: ["https://host-76-74-28-226.contentfabric.io/eth"],
+  //   blockExplorerUrls: ["https://explorer.eluv.io"],
+  //   type: "ERC1155",
+  //   vmType: "EVM",
+  // },
 };
 
 /**
