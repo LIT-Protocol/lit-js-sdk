@@ -5,6 +5,7 @@ import {
   toString as uint8arrayToString,
 } from "uint8arrays";
 import { throwError, log } from "../lib/utils";
+import * as wasmECDSA from "../lib/ecdsa-sdk";
 
 const SYMM_KEY_ALGO_PARAMS = {
   name: "AES-CBC",
@@ -519,4 +520,28 @@ export function decryptWithPrivKey(encryptedData, receiverPrivateKey) {
     default:
       throw new Error("Encryption type/version not supported.");
   }
+}
+
+export function combineEcdsaShares(sigShares) {
+  // R_x & R_y values can come from any node (they will be different per node), and will generate a valid signature
+  const R_x = sigShares[0].localX;
+  const R_y = sigShares[0].localY;
+  // the public key can come from any node - it obviously will be identical from each node
+  const publicKey = sigShares[0].publicKey;
+  const dataSigned = "0x" + sigShares[0].dataSigned;
+  const validShares = sigShares.map((s) => s.shareHex);
+  const shares = JSON.stringify(validShares);
+  log("shares is", shares);
+  const sig = JSON.parse(wasmECDSA.combine_signature(R_x, R_y, shares));
+
+  log("signature", sig);
+
+  // log("sig.recid that came from the signature itself", sig.recid);
+
+  let modifiedRecId = sig.recid == 0 ? 1 : 0;
+  log("modified recId to", modifiedRecId);
+
+  sig.recid = modifiedRecId;
+
+  return sig;
 }

@@ -75,7 +75,7 @@ import {
 } from "./utils/browser";
 
 import { LIT_CHAINS, LIT_SVM_CHAINS, ALL_LIT_CHAINS } from "./lib/constants";
-import { printError } from "./lib/utils";
+import { printError, log } from "./lib/utils";
 import { initWasmBlsSdk, wasmBlsSdkHelpers } from "./lib/bls-sdk.js";
 import * as wasmECDSA from "./lib/ecdsa-sdk";
 
@@ -87,7 +87,11 @@ import { version } from "./version";
 
 initWasmBlsSdk().then((exports) => {
   globalThis.wasmExports = exports;
-  // console.log("wasmExports loaded");
+  log("BLS wasmExports loaded");
+});
+
+wasmECDSA.initWasmEcdsaSdk().then(() => {
+  log("wasmECDSA loaded");
 });
 
 const functions = {
