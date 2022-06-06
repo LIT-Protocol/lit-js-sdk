@@ -536,12 +536,5 @@ export function combineEcdsaShares(sigShares) {
 
   log("signature", sig);
 
-  // log("sig.recid that came from the signature itself", sig.recid);
-
-  let modifiedRecId = sig.recid == 0 ? 1 : 0;
-  log("modified recId to", modifiedRecId);
-
-  sig.recid = modifiedRecId;
-
   return sig;
 }
