@@ -69,7 +69,7 @@ export const LIT_CHAINS = {
     name: "xDai",
     symbol: "xDai",
     decimals: 18,
-    rpcUrls: ["https://rpc.xdaichain.com"],
+    rpcUrls: ["https://rpc.gnosischain.com"],
     blockExplorerUrls: [" https://blockscout.com/xdai/mainnet"],
     type: "ERC1155",
     vmType: "EVM",
@@ -219,6 +219,28 @@ export const LIT_CHAINS = {
     type: "ERC1155",
     vmType: "EVM",
   },
+  aurora: {
+    contractAddress: "",
+    chainId: 1313161554,
+    name: "Aurora",
+    symbol: "ETH",
+    decimals: 18,
+    rpcUrls: ["https://mainnet.aurora.dev"],
+    blockExplorerUrls: ["https://aurorascan.dev"],
+    type: "ERC1155",
+    vmType: "EVM",
+  },
+  // eluvio: {
+  //   contractAddress: "",
+  //   chainId: 955305,
+  //   name: "Eluvio",
+  //   symbol: "ELV",
+  //   decimals: 18,
+  //   rpcUrls: ["https://host-76-74-28-226.contentfabric.io/eth"],
+  //   blockExplorerUrls: ["https://explorer.eluv.io"],
+  //   type: "ERC1155",
+  //   vmType: "EVM",
+  // },
 };
 
 /**
@@ -295,3 +317,30 @@ export const ALL_LIT_CHAINS = {
 
 export const NETWORK_PUB_KEY =
   "9971e835a1fe1a4d78e381eebbe0ddc84fde5119169db816900de796d10187f3c53d65c1202ac083d099a517f34a9b62";
+
+export const LIT_NETWORKS = {
+  jalapeno: [
+    "https://node2.litgateway.com:7370",
+    "https://node2.litgateway.com:7371",
+    "https://node2.litgateway.com:7372",
+    "https://node2.litgateway.com:7373",
+    "https://node2.litgateway.com:7374",
+    "https://node2.litgateway.com:7375",
+    "https://node2.litgateway.com:7376",
+    "https://node2.litgateway.com:7377",
+    "https://node2.litgateway.com:7378",
+    "https://node2.litgateway.com:7379",
+  ],
+  serrano: [
+    "https://serrano.litgateway.com:7370",
+    "https://serrano.litgateway.com:7371",
+    "https://serrano.litgateway.com:7372",
+    "https://serrano.litgateway.com:7373",
+    "https://serrano.litgateway.com:7374",
+    "https://serrano.litgateway.com:7375",
+    "https://serrano.litgateway.com:7376",
+    "https://serrano.litgateway.com:7377",
+    "https://serrano.litgateway.com:7378",
+    "https://serrano.litgateway.com:7379",
+  ],
+};

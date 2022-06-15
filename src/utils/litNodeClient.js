@@ -9,6 +9,7 @@ import { version } from "../version";
 import { mostCommonString, throwError, log } from "../lib/utils";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import * as wasmECDSA from "../lib/ecdsa-sdk";
+import { LIT_NETWORKS } from "../lib/constants";
 
 import {
   hashAccessControlConditions,
@@ -100,6 +101,7 @@ export default class LitNodeClient {
         "https://node2.litgateway.com:7378",
         "https://node2.litgateway.com:7379",
       ],
+      litNetwork: "jalapeno",
     };
     if (config) {
       this.config = { ...this.config, ...config };
@@ -122,6 +124,21 @@ export default class LitNodeClient {
       }
     } catch (e) {
       console.log("Error accessing local storage", e);
+    }
+
+    // set bootstrapUrls to match the network litNetwork unless it's set to custom
+    if (this.config.litNetwork !== "custom") {
+      // set bootstrapUrls to match the network litNetwork
+      if (!(this.config.litNetwork in LIT_NETWORKS)) {
+        // network not found, report error
+        throwError({
+          message:
+            "the litNetwork specified in the LitNodeClient config not found in LIT_NETWORKS",
+          name: "LitNodeClientConfigBad",
+          errorCode: "lit_node_client_config_bad",
+        });
+      }
+      this.config.bootstrapUrls = LIT_NETWORKS[this.config.litNetwork];
     }
 
     globalThis.litConfig = this.config;
