@@ -317,3 +317,30 @@ export const ALL_LIT_CHAINS = {
 
 export const NETWORK_PUB_KEY =
   "9971e835a1fe1a4d78e381eebbe0ddc84fde5119169db816900de796d10187f3c53d65c1202ac083d099a517f34a9b62";
+
+export const LIT_NETWORKS = {
+  jalapeno: [
+    "https://node2.litgateway.com:7370",
+    "https://node2.litgateway.com:7371",
+    "https://node2.litgateway.com:7372",
+    "https://node2.litgateway.com:7373",
+    "https://node2.litgateway.com:7374",
+    "https://node2.litgateway.com:7375",
+    "https://node2.litgateway.com:7376",
+    "https://node2.litgateway.com:7377",
+    "https://node2.litgateway.com:7378",
+    "https://node2.litgateway.com:7379",
+  ],
+  serrano: [
+    "https://serrano.litgateway.com:7370",
+    "https://serrano.litgateway.com:7371",
+    "https://serrano.litgateway.com:7372",
+    "https://serrano.litgateway.com:7373",
+    "https://serrano.litgateway.com:7374",
+    "https://serrano.litgateway.com:7375",
+    "https://serrano.litgateway.com:7376",
+    "https://serrano.litgateway.com:7377",
+    "https://serrano.litgateway.com:7378",
+    "https://serrano.litgateway.com:7379",
+  ],
+};
