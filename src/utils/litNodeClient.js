@@ -142,6 +142,7 @@ export default class LitNodeClient {
     }
 
     globalThis.litConfig = this.config;
+    log("LitNodeClient config", this.config);
   }
 
   async executeJs({ code, authSig }) {
