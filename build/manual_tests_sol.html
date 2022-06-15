@@ -23,6 +23,7 @@
         Math.random().toString(36).substring(2, 15);
       var testProvisoningAndSigning = async ({
         solRpcConditions,
+        chain = "solana",
         testName,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -74,6 +75,7 @@
 
       var testProvisoningEncryptingAndDecrypting = async ({
         solRpcConditions,
+        chain = "solana",
         testName,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -159,6 +161,48 @@
         await testProvisoningEncryptingAndDecrypting({
           solRpcConditions,
           testName: "SolBalanceEncrypt",
+        });
+      };
+
+      var SolBalanceEncryptDevnet = async () => {
+        const chain = "solanaDevnet";
+        var solRpcConditions = [
+          {
+            method: "getBalance",
+            params: [":userAddress"],
+            chain,
+            returnValueTest: {
+              key: "",
+              comparator: ">=",
+              value: "100000000", // equals 0.1 SOL
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          chain,
+          testName: "SolBalanceEncryptDevnet",
+        });
+      };
+
+      var SolBalanceEncryptTestnet = async () => {
+        const chain = "solanaTestnet";
+        var solRpcConditions = [
+          {
+            method: "getBalance",
+            params: [":userAddress"],
+            chain,
+            returnValueTest: {
+              key: "",
+              comparator: ">=",
+              value: "100000000", // equals 0.1 SOL
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          chain,
+          testName: "SolBalanceEncryptTestnet",
         });
       };
 
@@ -255,7 +299,7 @@
             ],
             chain,
             returnValueTest: {
-              key: '$[?(@.account.data.parsed.info.mint == "29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE")].account.data.parsed.info.tokenAmount.amount',
+              key: '$[?(@.account.data.parsed.info.mint == "FrYwrqLcGfmXrgJKcZfrzoWsZ3pqQB9pjjUC9PxSq3xT")].account.data.parsed.info.tokenAmount.amount',
               comparator: ">",
               value: "0",
             },
@@ -283,6 +327,25 @@
         await testProvisoningEncryptingAndDecrypting({
           solRpcConditions,
           testName: "SolNftInACollection",
+        });
+      };
+
+      var SolBalanceOfToken = async () => {
+        var solRpcConditions = [
+          {
+            method: "balanceOfToken",
+            params: ["FrYwrqLcGfmXrgJKcZfrzoWsZ3pqQB9pjjUC9PxSq3xT"],
+            chain,
+            returnValueTest: {
+              key: "$.amount",
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          testName: "SolBalanceOfToken",
         });
       };
 
@@ -323,6 +386,16 @@
     <br />
     <br />
 
+    <button onclick="SolBalanceEncryptDevnet()">SolBalanceEncryptDevnet</button>
+    <br />
+    <br />
+
+    <button onclick="SolBalanceEncryptTestnet()">
+      SolBalanceEncryptTestnet
+    </button>
+    <br />
+    <br />
+
     <button onclick="SolSpecificWalletAddressSigning()">
       SolSpecificWalletAddressSigning
     </button>
@@ -352,6 +425,10 @@
     <br />
 
     <button onclick="SolNftInACollection()">SolNftInACollection</button>
+    <br />
+    <br />
+
+    <button onclick="SolBalanceOfToken()">SolBalanceOfToken</button>
     <br />
     <br />
 
