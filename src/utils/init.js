@@ -1,4 +1,4 @@
-import { sendMessageToFrameParent } from "./frameComms";
+import { sendMessageToFrameParent } from "./lit";
 import LitNodeClient from "./litNodeClient";
 
 export const litJsSdkLoadedInALIT = () => {

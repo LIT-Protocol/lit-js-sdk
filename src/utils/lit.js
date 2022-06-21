@@ -21,8 +21,6 @@ import { checkAndSignEVMAuthMessage, decimalPlaces } from "./eth";
 import { checkAndSignSolAuthMessage } from "./sol";
 import { checkAndSignCosmosAuthMessage } from "./cosmos";
 
-import { sendMessageToFrameParent } from "./frameComms";
-
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 
 import { fileToDataUrl } from "./browser";
@@ -1238,3 +1236,7 @@ export async function getTokenList() {
   );
   return sorted;
 }
+
+export const sendMessageToFrameParent = (data) => {
+  window.parent.postMessage(data, "*");
+};
