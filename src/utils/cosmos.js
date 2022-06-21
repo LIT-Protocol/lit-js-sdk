@@ -1,11 +1,9 @@
-import { SigningCosmosClient } from "@cosmjs/launchpad";
 import {
   fromString as uint8arrayFromString,
   toString as uint8arrayToString,
 } from "uint8arrays";
 import { throwError, log } from "../lib/utils";
 import { LIT_COSMOS_CHAINS } from "../lib/constants";
-import { serializeSignDoc } from "@cosmjs/amino";
 
 export const AUTH_SIGNATURE_BODY =
   "I am creating an account to use Lit Protocol at {{timestamp}}";
@@ -89,7 +87,7 @@ export async function signAndSaveAuthMessage({ provider, account, chainId }) {
   const signed = await provider.signArbitrary(chainId, account, body);
   // const hexSig = uint8arrayToString(signed.signature, "base16");
 
-  const data = Buffer.from(body).toString("base64");
+  const data = uint8arrayToString(uint8arrayFromString(body, "utf8"), "base64"); //Buffer.from(body).toString("base64");
 
   // console.log("signed", signed);
   // console.log("pubkey: ", signed.pub_key.value);
@@ -129,4 +127,25 @@ export async function signAndSaveAuthMessage({ provider, account, chainId }) {
   };
 
   localStorage.setItem("lit-auth-cosmos-signature", JSON.stringify(authSig));
+}
+
+function sortedObject(obj) {
+  if (typeof obj !== "object" || obj === null) {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(sortedObject);
+  }
+  const sortedKeys = Object.keys(obj).sort();
+  const result = {};
+  // NOTE: Use forEach instead of reduce for performance with large objects eg Wasm code
+  sortedKeys.forEach((key) => {
+    result[key] = sortedObject(obj[key]);
+  });
+  return result;
+}
+
+export function serializeSignDoc(signDoc) {
+  const sorted = JSON.stringify(sortedObject(signDoc));
+  return uint8arrayFromString(sorted, "utf8");
 }

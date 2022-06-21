@@ -1,4 +1,3 @@
-import { LIT_CHAINS } from "../lib/constants";
 import { unlockLitWithKey } from "./lit";
 
 export const listenForChildFrameMessages = async () => {
@@ -97,10 +96,6 @@ export const listenForFrameParentMessages = async () => {
     },
     false
   );
-};
-
-export const sendMessageToFrameParent = (data) => {
-  window.parent.postMessage(data, "*");
 };
 
 export const inIframe = () => {
