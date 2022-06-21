@@ -10,6 +10,13 @@ yarn build
 yarn buildWeb
 yarn buildNode
 
-yarn publish --new-version $VERSION
+if [ $# -eq 0 ]
+  then
+    yarn publish --new-version $VERSION
+else
+    yarn publish --new-version $VERSION --tag $1
+fi
+
+
 
 echo "Don't forget to git push to get this running on the netlify cdn"
