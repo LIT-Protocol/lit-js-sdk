@@ -47,7 +47,7 @@
     "@ethersproject/units": "^5.4.0",
     "@ethersproject/wallet": "^5.2.0",
     "@unstoppabledomains/resolution": "^7.1.2",
-    "@walletconnect/ethereum-provider": "^1.7.5",
+    "@walletconnect/ethereum-provider": "^1.7.8",
     "buffer": "^6.0.3",
     "bufferutil": "^4.0.6",
     "cross-blob": "^3.0.1",
