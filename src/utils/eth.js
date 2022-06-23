@@ -7,6 +7,7 @@ import {
 } from "@ethersproject/providers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { hexlify } from "@ethersproject/bytes";
+import { getAddress } from "@ethersproject/address";
 import WalletConnectProvider from "@walletconnect/ethereum-provider";
 import Resolution from "@unstoppabledomains/resolution";
 import LitConnectModal from "lit-connect-modal";
@@ -162,7 +163,7 @@ export async function disconnectWeb3() {
 //   return keypair
 // }
 
-export async function checkAndSignEVMAuthMessage({ chain }) {
+export async function checkAndSignEVMAuthMessage({ chain, resources }) {
   const selectedChain = LIT_CHAINS[chain];
   const { web3, account } = await connectWeb3({
     chainId: selectedChain.chainId,
@@ -261,6 +262,7 @@ export async function checkAndSignEVMAuthMessage({ chain }) {
       web3,
       account,
       chainId: selectedChain.chainId,
+      resources,
     });
     authSig = localStorage.getItem("lit-auth-signature");
   }
@@ -274,9 +276,32 @@ export async function checkAndSignEVMAuthMessage({ chain }) {
       web3,
       account,
       chainId: selectedChain.chainId,
+      resources,
     });
     authSig = localStorage.getItem("lit-auth-signature");
     authSig = JSON.parse(authSig);
+  } else {
+    // check the resources of the sig and re-sign if they don't match
+    try {
+      const parsedSiwe = new SiweMessage(authSig.signedMessage);
+      log("parsedSiwe.resources", parsedSiwe.resources);
+
+      if (JSON.stringify(parsedSiwe.resources) !== JSON.stringify(resources)) {
+        log(
+          "signing auth message because resources differ from the resources in the auth sig"
+        );
+        await signAndSaveAuthMessage({
+          web3,
+          account,
+          chainId: selectedChain.chainId,
+          resources,
+        });
+        authSig = localStorage.getItem("lit-auth-signature");
+        authSig = JSON.parse(authSig);
+      }
+    } catch (e) {
+      log("error parsing siwe sig.  swallowing: ", e);
+    }
   }
   log("got auth sig", authSig);
   return authSig;
@@ -289,16 +314,27 @@ export async function checkAndSignEVMAuthMessage({ chain }) {
  * @param {string} params.account The account to sign the message with
  * @returns {AuthSig} The AuthSig created or retrieved
  */
-export async function signAndSaveAuthMessage({ web3, account, chainId }) {
+export async function signAndSaveAuthMessage({
+  web3,
+  account,
+  chainId,
+  resources,
+}) {
   // const { chainId } = await web3.getNetwork();
 
-  const message = new SiweMessage({
+  const preparedMessage = {
     domain: globalThis.location.host,
-    address: account,
+    address: getAddress(account), // convert to EIP-55 format or else SIWE complains
     uri: globalThis.location.origin,
     version: "1",
     chainId,
-  });
+  };
+
+  if (resources && resources.length > 0) {
+    preparedMessage.resources = resources;
+  }
+
+  const message = new SiweMessage(preparedMessage);
 
   const body = message.prepareMessage();
 

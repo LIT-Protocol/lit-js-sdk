@@ -34,7 +34,7 @@ const PACKAGE_CACHE = {};
  * @param {string} params.chain The chain you want to use.  Find the supported list of chains here: https://developer.litprotocol.com/docs/supportedChains
  * @returns {AuthSig} The AuthSig created or retrieved
  */
-export async function checkAndSignAuthMessage({ chain }) {
+export async function checkAndSignAuthMessage({ chain, resources }) {
   const chainInfo = ALL_LIT_CHAINS[chain];
   if (!chainInfo) {
     throwError({
@@ -47,7 +47,7 @@ export async function checkAndSignAuthMessage({ chain }) {
   }
 
   if (chainInfo.vmType === "EVM") {
-    return checkAndSignEVMAuthMessage({ chain });
+    return checkAndSignEVMAuthMessage({ chain, resources });
   } else if (chainInfo.vmType === "SVM") {
     return checkAndSignSolAuthMessage({ chain });
   } else if (chainInfo.vmType === "CVM") {
