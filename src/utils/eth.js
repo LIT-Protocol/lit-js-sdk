@@ -702,6 +702,15 @@ export async function lookupNameServiceAddress({ chain, name }) {
   } else {
     const resolution = Resolution.fromEthersProvider(web3);
     const address = await resolution.addr(name, "ETH");
+
+    // TODO: remove unstoppable dependency because it's big.  the below code is
+    // from the ethers ens lib.  can we make the above this small and remove the unstoppable lib?
+    // const addrData = await this.call({
+    //   to: network.ensAddress,
+    //   data: "0x0178b8bf" + namehash(name).substring(2),
+    // });
+    // return this.formatter.callAddress(addrData);
+
     return address;
   }
 }
