@@ -34,7 +34,6 @@
     "esbuild-node-builtins": "^0.1.0",
     "genversion": "^3.0.1",
     "microbundle": "^0.13.0",
-    "parcel": "1.12.3",
     "semver-bump": "^1.0.0",
     "standard": "^16.0.3"
   },
