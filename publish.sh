@@ -16,12 +16,12 @@ case $BRANCH in
     yarn publish --new-version $VERSION
     ;;
 
-  "beta")
-    yarn publish --new-version $VERSION --tag beta
+  "serrano")
+    yarn publish --new-version $VERSION --tag serrano
     ;;
 
   *)
-    echo -n "Invalid branch.  Only main and beta supported for publishing."
+    echo -n "Invalid branch.  Only main and serrano supported for publishing."
     exit
     ;;
 esac
