@@ -282,6 +282,7 @@ export async function checkAndSignEVMAuthMessage({ chain, resources }) {
     authSig = JSON.parse(authSig);
   } else {
     // check the resources of the sig and re-sign if they don't match
+    let mustResign = false;
     try {
       const parsedSiwe = new SiweMessage(authSig.signedMessage);
       log("parsedSiwe.resources", parsedSiwe.resources);
@@ -290,17 +291,26 @@ export async function checkAndSignEVMAuthMessage({ chain, resources }) {
         log(
           "signing auth message because resources differ from the resources in the auth sig"
         );
-        await signAndSaveAuthMessage({
-          web3,
-          account,
-          chainId: selectedChain.chainId,
-          resources,
-        });
-        authSig = localStorage.getItem("lit-auth-signature");
-        authSig = JSON.parse(authSig);
+        mustResign = true;
+      } else if (parsedSiwe.address !== getAddress(parsedSiwe.address)) {
+        log(
+          "signing auth message because parsedSig.address is not equal to the same address but checksummed.  This usually means the user had a non-checksummed address saved and so they need to re-sign."
+        );
+        mustResign = true;
       }
     } catch (e) {
-      log("error parsing siwe sig.  swallowing: ", e);
+      log("error parsing siwe sig.  making the user sign again: ", e);
+      mustResign = true;
+    }
+    if (mustResign) {
+      await signAndSaveAuthMessage({
+        web3,
+        account,
+        chainId: selectedChain.chainId,
+        resources,
+      });
+      authSig = localStorage.getItem("lit-auth-signature");
+      authSig = JSON.parse(authSig);
     }
   }
   log("got auth sig", authSig);
