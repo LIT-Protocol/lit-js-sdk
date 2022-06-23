@@ -145,7 +145,7 @@ export default class LitNodeClient {
     log("LitNodeClient config", this.config);
   }
 
-  async executeJs({ code, authSig }) {
+  async executeJs({ code, ipfsId, authSig }) {
     if (!this.ready) {
       throwError({
         message:
@@ -155,11 +155,23 @@ export default class LitNodeClient {
       });
     }
 
-    // base64 encode before sending over the wire
-    const encodedJs = uint8arrayToString(
-      uint8arrayFromString(code, "utf8"),
-      "base64"
-    );
+    const reqBody = { authSig };
+    if (code) {
+      // base64 encode before sending over the wire
+      const encodedJs = uint8arrayToString(
+        uint8arrayFromString(code, "utf8"),
+        "base64"
+      );
+      reqBody.code = encodedJs;
+    } else if (ipfsId) {
+      reqBody.ipfsId = ipfsId;
+    } else {
+      throwError({
+        message: "You must pass either code or ipfsId",
+        name: "MissingParameterError",
+        errorCode: "missing_parameter",
+      });
+    }
 
     // ask each node to run the js
     const nodePromises = [];
@@ -167,8 +179,7 @@ export default class LitNodeClient {
       nodePromises.push(
         this.getJsExecutionShares({
           url,
-          code: encodedJs,
-          authSig,
+          ...reqBody,
         })
       );
     }
@@ -1086,11 +1097,12 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
-  async getJsExecutionShares({ url, code, authSig }) {
+  async getJsExecutionShares({ url, code, ipfsId, authSig }) {
     log("getJsExecutionShares");
     const urlWithPath = `${url}/web/execute`;
     const data = {
       code,
+      ipfsId,
       authSig,
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
