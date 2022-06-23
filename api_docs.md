@@ -402,7 +402,7 @@ Check for an existing cryptographic authentication signature and create one of i
 *   `params` **[Object][112]** 
 
     *   `params.chain` **[string][117]** The chain you want to use.  Find the supported list of chains here: [https://developer.litprotocol.com/docs/supportedChains][127]
-    *   `params.resources`  
+    *   `params.resources` **[Array][115]<[string][117]>** Optional and only used with EVM chains.  A list of resources to be passed to Sign In with Ethereum.  These resources will be part of the Sign in with Ethereum signed message presented to the user.
 
 Returns **[AuthSig][121]** The AuthSig created or retrieved
 
