@@ -402,6 +402,7 @@ Check for an existing cryptographic authentication signature and create one of i
 *   `params` **[Object][112]** 
 
     *   `params.chain` **[string][117]** The chain you want to use.  Find the supported list of chains here: [https://developer.litprotocol.com/docs/supportedChains][127]
+    *   `params.resources`  
 
 Returns **[AuthSig][121]** The AuthSig created or retrieved
 
@@ -416,6 +417,7 @@ Sign the auth message with the user's wallet, and store it in localStorage.  Cal
     *   `params.web3` **Web3Provider** An ethers.js Web3Provider instance
     *   `params.account` **[string][117]** The account to sign the message with
     *   `params.chainId`  
+    *   `params.resources`  
 
 Returns **[AuthSig][121]** The AuthSig created or retrieved
 
