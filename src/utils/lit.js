@@ -32,6 +32,7 @@ const PACKAGE_CACHE = {};
  * Check for an existing cryptographic authentication signature and create one of it does not exist.  This is used to prove ownership of a given crypto wallet address to the Lit nodes.  The result is stored in LocalStorage so the user doesn't have to sign every time they perform an operation.
  * @param {Object} params
  * @param {string} params.chain The chain you want to use.  Find the supported list of chains here: https://developer.litprotocol.com/docs/supportedChains
+ * @param {Array<string>} params.resources Optional and only used with EVM chains.  A list of resources to be passed to Sign In with Ethereum.  These resources will be part of the Sign in with Ethereum signed message presented to the user.
  * @returns {AuthSig} The AuthSig created or retrieved
  */
 export async function checkAndSignAuthMessage({ chain, resources }) {
