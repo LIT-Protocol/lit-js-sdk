@@ -145,6 +145,14 @@ export default class LitNodeClient {
     log("LitNodeClient config", this.config);
   }
 
+  /**
+   * Execute JS on the nodes and combine and return any resulting signatures
+   * @param {Object} params
+   * @param {string} params.code JS code to run on the nodes
+   * @param {string} params.ipfsId The IPFS ID of some JS code to run on the nodes
+   * @param {AuthSig} params.authSig the authSig to use to authorize the user with the nodes
+   * @returns {Object} An object containing the resulting signatures.  Each signature comes with the public key and the data signed.
+   */
   async executeJs({ code, ipfsId, authSig }) {
     if (!this.ready) {
       throwError({
