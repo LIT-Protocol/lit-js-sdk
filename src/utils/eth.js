@@ -552,6 +552,15 @@ export async function mintLIT({ chain, quantity }) {
     }
     const { web3, account } = await connectWeb3();
     const tokenAddress = LIT_CHAINS[chain].contractAddress;
+    if (!tokenAddress) {
+      log("No token address for this chain.  It's not supported via MintLIT.");
+      throwError({
+        message: `This chain is not supported for minting with the Lit token contract because it hasn't been deployed to this chain.  You can use Lit with your own token contract on this chain, though.`,
+        name: "MintingNotSupported",
+        errorCode: "minting_not_supported",
+      });
+      return;
+    }
     const contract = new Contract(tokenAddress, LIT.abi, web3.getSigner());
     log("sending to chain...");
     const tx = await contract.mint(quantity);
