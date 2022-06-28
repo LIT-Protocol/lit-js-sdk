@@ -330,6 +330,36 @@
         });
       };
 
+      var SolNftInACollectionThatsNotActuallyAcollection = async () => {
+        var solRpcConditions = [
+          {
+            method: "balanceOfMetaplexCollection",
+            params: ["openDKyuDPS6Ak1BuD3JtvkQGV3tzCxjpHUfe1mdC79"],
+            chain: "solanaDevnet",
+            returnValueTest: {
+              key: "",
+              comparator: ">=",
+              value: "1000000000",
+            },
+          },
+          { operator: "or" },
+          {
+            method: "balanceOfToken",
+            params: ["openDKyuDPS6Ak1BuD3JtvkQGV3tzCxjpHUfe1mdC79"],
+            chain: "solanaDevnet",
+            returnValueTest: {
+              key: "$.amount",
+              comparator: ">=",
+              value: "1000000000",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          testName: "SolNftInACollectionThatsNotActuallyAcollection",
+        });
+      };
+
       var SolBalanceOfToken = async () => {
         var solRpcConditions = [
           {
@@ -425,6 +455,12 @@
     <br />
 
     <button onclick="SolNftInACollection()">SolNftInACollection</button>
+    <br />
+    <br />
+
+    <button onclick="SolNftInACollectionThatsNotActuallyAcollection()">
+      SolNftInACollectionThatsNotActuallyAcollection
+    </button>
     <br />
     <br />
 

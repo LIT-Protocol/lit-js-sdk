@@ -9,7 +9,6 @@ import { toUtf8Bytes } from "@ethersproject/strings";
 import { hexlify } from "@ethersproject/bytes";
 import { getAddress } from "@ethersproject/address";
 import WalletConnectProvider from "@walletconnect/ethereum-provider";
-import Resolution from "@unstoppabledomains/resolution";
 import LitConnectModal from "lit-connect-modal";
 import { SiweMessage } from "lit-siwe";
 
@@ -694,23 +693,26 @@ export async function lookupNameServiceAddress({ chain, name }) {
   const rpcUrl = LIT_CHAINS[chain].rpcUrls[0];
   const web3 = new JsonRpcProvider(rpcUrl);
 
-  const parts = name.split(".");
-  const tld = parts[parts.length - 1].toLowerCase();
-  if (tld === "eth") {
-    var address = await web3.resolveName(name);
-    return address;
-  } else {
-    const resolution = Resolution.fromEthersProvider(web3);
-    const address = await resolution.addr(name, "ETH");
+  var address = await web3.resolveName(name);
+  return address;
 
-    // TODO: remove unstoppable dependency because it's big.  the below code is
-    // from the ethers ens lib.  can we make the above this small and remove the unstoppable lib?
-    // const addrData = await this.call({
-    //   to: network.ensAddress,
-    //   data: "0x0178b8bf" + namehash(name).substring(2),
-    // });
-    // return this.formatter.callAddress(addrData);
+  // const parts = name.split(".");
+  // const tld = parts[parts.length - 1].toLowerCase();
+  // if (tld === "eth") {
+  //   var address = await web3.resolveName(name);
+  //   return address;
+  // } //else {
+  // const resolution = Resolution.fromEthersProvider(web3);
+  // const address = await resolution.addr(name, "ETH");
 
-    return address;
-  }
+  // // TODO: remove unstoppable dependency because it's big.  the below code is
+  // // from the ethers ens lib.  can we make the above this small and remove the unstoppable lib?
+  // // const addrData = await this.call({
+  // //   to: network.ensAddress,
+  // //   data: "0x0178b8bf" + namehash(name).substring(2),
+  // // });
+  // // return this.formatter.callAddress(addrData);
+
+  // return address;
+  //}
 }
