@@ -659,6 +659,46 @@
         });
       };
 
+      var ETHOnEluvioEmptyWallet = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "eluvio",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "ETHOnEluvioEmptyWallet",
+        });
+      };
+
+      var ETHOnAlfajoresEmptyWallet = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "alfajores",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "ETHOnAlfajoresEmptyWallet",
+        });
+      };
+
       var ETHPlusERC721 = async () => {
         const accessControlConditions = [
           {
@@ -2086,6 +2126,14 @@
     <br />
     <br />
     <button onclick="ETHOnAurora()">ETHOnAurora</button>
+    <br />
+    <br />
+    <button onclick="ETHOnEluvioEmptyWallet()">ETHOnEluvioEmptyWallet</button>
+    <br />
+    <br />
+    <button onclick="ETHOnAlfajoresEmptyWallet()">
+      ETHOnAlfajoresEmptyWallet
+    </button>
     <br />
     <br />
     <button onclick="ETHPlusERC721()">
