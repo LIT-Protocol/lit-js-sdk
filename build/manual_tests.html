@@ -70,6 +70,7 @@
       var testProvisoningAndSigning = async ({
         accessControlConditions,
         testName,
+        authSig,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
         document.getElementById(
@@ -78,7 +79,9 @@
           { accessControlConditions }
         )}`;
 
-        var authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
+        if (!authSig) {
+          authSig = await LitJsSdk.checkAndSignAuthMessage({ chain });
+        }
 
         let resourceId = {
           baseUrl: "my-dynamic-content-server.com",
@@ -323,6 +326,53 @@
         await testProvisoningAndSigning({
           accessControlConditions,
           testName: "ERC721Collection",
+        });
+      };
+
+      var SIWEDomainParam = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "SIWE",
+            chain,
+            method: "",
+            parameters: [":domain"],
+            returnValueTest: {
+              comparator: "=",
+              value: "localhost:3050",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "SIWEDomainParam",
+        });
+      };
+
+      var SIWEResourceParam = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "SIWE",
+            chain,
+            method: "",
+            parameters: [":resources"],
+            returnValueTest: {
+              comparator: "contains",
+              value: "ipfs://someTestId",
+            },
+          },
+        ];
+
+        let authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+          resources: ["ipfs://someTestId", "ipfs://anotherTestId"],
+        });
+
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "SIWEResourceParam",
+          authSig,
         });
       };
 
@@ -606,6 +656,46 @@
         await testProvisoningAndSigning({
           accessControlConditions,
           testName: "EthOnAurora",
+        });
+      };
+
+      var ETHOnEluvioEmptyWallet = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "eluvio",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "ETHOnEluvioEmptyWallet",
+        });
+      };
+
+      var ETHOnAlfajoresEmptyWallet = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "alfajores",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "ETHOnAlfajoresEmptyWallet",
         });
       };
 
@@ -2076,6 +2166,12 @@
     <button onclick="ERC721Collection()">ERC721Collection</button>
     <br />
     <br />
+    <button onclick="SIWEDomainParam()">SIWEDomainParam</button>
+    <br />
+    <br />
+    <button onclick="SIWEResourceParam()">SIWEResourceParam</button>
+    <br />
+    <br />
     <button onclick="POAP()">POAP</button>
     <br />
     <br />
@@ -2110,6 +2206,14 @@
     <br />
     <br />
     <button onclick="ETHOnAurora()">ETHOnAurora</button>
+    <br />
+    <br />
+    <button onclick="ETHOnEluvioEmptyWallet()">ETHOnEluvioEmptyWallet</button>
+    <br />
+    <br />
+    <button onclick="ETHOnAlfajoresEmptyWallet()">
+      ETHOnAlfajoresEmptyWallet
+    </button>
     <br />
     <br />
     <button onclick="ETHPlusERC721()">

@@ -7,8 +7,8 @@ import {
 } from "@ethersproject/providers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { hexlify } from "@ethersproject/bytes";
+import { getAddress } from "@ethersproject/address";
 import WalletConnectProvider from "@walletconnect/ethereum-provider";
-import Resolution from "@unstoppabledomains/resolution";
 import LitConnectModal from "lit-connect-modal";
 import { SiweMessage } from "lit-siwe";
 
@@ -162,7 +162,7 @@ export async function disconnectWeb3() {
 //   return keypair
 // }
 
-export async function checkAndSignEVMAuthMessage({ chain }) {
+export async function checkAndSignEVMAuthMessage({ chain, resources }) {
   const selectedChain = LIT_CHAINS[chain];
   const { web3, account } = await connectWeb3({
     chainId: selectedChain.chainId,
@@ -261,6 +261,7 @@ export async function checkAndSignEVMAuthMessage({ chain }) {
       web3,
       account,
       chainId: selectedChain.chainId,
+      resources,
     });
     authSig = localStorage.getItem("lit-auth-signature");
   }
@@ -274,9 +275,42 @@ export async function checkAndSignEVMAuthMessage({ chain }) {
       web3,
       account,
       chainId: selectedChain.chainId,
+      resources,
     });
     authSig = localStorage.getItem("lit-auth-signature");
     authSig = JSON.parse(authSig);
+  } else {
+    // check the resources of the sig and re-sign if they don't match
+    let mustResign = false;
+    try {
+      const parsedSiwe = new SiweMessage(authSig.signedMessage);
+      log("parsedSiwe.resources", parsedSiwe.resources);
+
+      if (JSON.stringify(parsedSiwe.resources) !== JSON.stringify(resources)) {
+        log(
+          "signing auth message because resources differ from the resources in the auth sig"
+        );
+        mustResign = true;
+      } else if (parsedSiwe.address !== getAddress(parsedSiwe.address)) {
+        log(
+          "signing auth message because parsedSig.address is not equal to the same address but checksummed.  This usually means the user had a non-checksummed address saved and so they need to re-sign."
+        );
+        mustResign = true;
+      }
+    } catch (e) {
+      log("error parsing siwe sig.  making the user sign again: ", e);
+      mustResign = true;
+    }
+    if (mustResign) {
+      await signAndSaveAuthMessage({
+        web3,
+        account,
+        chainId: selectedChain.chainId,
+        resources,
+      });
+      authSig = localStorage.getItem("lit-auth-signature");
+      authSig = JSON.parse(authSig);
+    }
   }
   log("got auth sig", authSig);
   return authSig;
@@ -289,16 +323,27 @@ export async function checkAndSignEVMAuthMessage({ chain }) {
  * @param {string} params.account The account to sign the message with
  * @returns {AuthSig} The AuthSig created or retrieved
  */
-export async function signAndSaveAuthMessage({ web3, account, chainId }) {
+export async function signAndSaveAuthMessage({
+  web3,
+  account,
+  chainId,
+  resources,
+}) {
   // const { chainId } = await web3.getNetwork();
 
-  const message = new SiweMessage({
+  const preparedMessage = {
     domain: globalThis.location.host,
-    address: account,
+    address: getAddress(account), // convert to EIP-55 format or else SIWE complains
     uri: globalThis.location.origin,
     version: "1",
     chainId,
-  });
+  };
+
+  if (resources && resources.length > 0) {
+    preparedMessage.resources = resources;
+  }
+
+  const message = new SiweMessage(preparedMessage);
 
   const body = message.prepareMessage();
 
@@ -507,6 +552,15 @@ export async function mintLIT({ chain, quantity }) {
     }
     const { web3, account } = await connectWeb3();
     const tokenAddress = LIT_CHAINS[chain].contractAddress;
+    if (!tokenAddress) {
+      log("No token address for this chain.  It's not supported via MintLIT.");
+      throwError({
+        message: `This chain is not supported for minting with the Lit token contract because it hasn't been deployed to this chain.  You can use Lit with your own token contract on this chain, though.`,
+        name: "MintingNotSupported",
+        errorCode: "minting_not_supported",
+      });
+      return;
+    }
     const contract = new Contract(tokenAddress, LIT.abi, web3.getSigner());
     log("sending to chain...");
     const tx = await contract.mint(quantity);
@@ -648,14 +702,26 @@ export async function lookupNameServiceAddress({ chain, name }) {
   const rpcUrl = LIT_CHAINS[chain].rpcUrls[0];
   const web3 = new JsonRpcProvider(rpcUrl);
 
-  const parts = name.split(".");
-  const tld = parts[parts.length - 1].toLowerCase();
-  if (tld === "eth") {
-    var address = await web3.resolveName(name);
-    return address;
-  } else {
-    const resolution = Resolution.fromEthersProvider(web3);
-    const address = await resolution.addr(name, "ETH");
-    return address;
-  }
+  var address = await web3.resolveName(name);
+  return address;
+
+  // const parts = name.split(".");
+  // const tld = parts[parts.length - 1].toLowerCase();
+  // if (tld === "eth") {
+  //   var address = await web3.resolveName(name);
+  //   return address;
+  // } //else {
+  // const resolution = Resolution.fromEthersProvider(web3);
+  // const address = await resolution.addr(name, "ETH");
+
+  // // TODO: remove unstoppable dependency because it's big.  the below code is
+  // // from the ethers ens lib.  can we make the above this small and remove the unstoppable lib?
+  // // const addrData = await this.call({
+  // //   to: network.ensAddress,
+  // //   data: "0x0178b8bf" + namehash(name).substring(2),
+  // // });
+  // // return this.formatter.callAddress(addrData);
+
+  // return address;
+  //}
 }

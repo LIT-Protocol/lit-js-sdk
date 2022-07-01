@@ -1,6 +1,6 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.1.188",
+  "version": "1.1.196",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
   "main": "build/index.js",
@@ -34,7 +34,6 @@
     "esbuild-node-builtins": "^0.1.0",
     "genversion": "^3.0.1",
     "microbundle": "^0.13.0",
-    "parcel": "1.12.3",
     "semver-bump": "^1.0.0",
     "standard": "^16.0.3"
   },
@@ -46,7 +45,6 @@
     "@ethersproject/strings": "^5.5.0",
     "@ethersproject/units": "^5.4.0",
     "@ethersproject/wallet": "^5.2.0",
-    "@unstoppabledomains/resolution": "^7.1.2",
     "@walletconnect/ethereum-provider": "^1.7.8",
     "buffer": "^6.0.3",
     "bufferutil": "^4.0.6",

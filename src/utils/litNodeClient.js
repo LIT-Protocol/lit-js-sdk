@@ -153,7 +153,7 @@ export default class LitNodeClient {
    * @param {AuthSig} params.authSig the authSig to use to authorize the user with the nodes
    * @returns {Object} An object containing the resulting signatures.  Each signature comes with the public key and the data signed.
    */
-  async executeJs({ code, ipfsId, authSig }) {
+  async executeJs({ code, ipfsId, authSig, jsParams }) {
     if (!this.ready) {
       throwError({
         message:
@@ -163,7 +163,7 @@ export default class LitNodeClient {
       });
     }
 
-    const reqBody = { authSig };
+    const reqBody = { authSig, jsParams };
     if (code) {
       // base64 encode before sending over the wire
       const encodedJs = uint8arrayToString(
@@ -1105,13 +1105,14 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
-  async getJsExecutionShares({ url, code, ipfsId, authSig }) {
+  async getJsExecutionShares({ url, code, ipfsId, authSig, jsParams }) {
     log("getJsExecutionShares");
     const urlWithPath = `${url}/web/execute`;
     const data = {
       code,
       ipfsId,
       authSig,
+      jsParams,
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }

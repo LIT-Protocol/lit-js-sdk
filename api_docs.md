@@ -449,7 +449,12 @@ Check for an existing cryptographic authentication signature and create one of i
 
 *   `params` **[Object][118]** 
 
+<<<<<<< HEAD
     *   `params.chain` **[string][121]** The chain you want to use.  Find the supported list of chains here: [https://developer.litprotocol.com/docs/supportedChains][133]
+=======
+    *   `params.chain` **[string][117]** The chain you want to use.  Find the supported list of chains here: [https://developer.litprotocol.com/docs/supportedChains][127]
+    *   `params.resources` **[Array][115]<[string][117]>** Optional and only used with EVM chains.  A list of resources to be passed to Sign In with Ethereum.  These resources will be part of the Sign in with Ethereum signed message presented to the user.
+>>>>>>> main
 
 Returns **[AuthSig][122]** The AuthSig created or retrieved
 
@@ -464,6 +469,7 @@ Sign the auth message with the user's wallet, and store it in localStorage.  Cal
     *   `params.web3` **Web3Provider** An ethers.js Web3Provider instance
     *   `params.account` **[string][121]** The account to sign the message with
     *   `params.chainId`  
+    *   `params.resources`  
 
 Returns **[AuthSig][122]** The AuthSig created or retrieved
 
