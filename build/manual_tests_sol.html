@@ -332,27 +332,18 @@
 
       var SolNftInACollectionThatsNotActuallyAcollection = async () => {
         var solRpcConditions = [
-          {
-            method: "balanceOfMetaplexCollection",
-            params: ["openDKyuDPS6Ak1BuD3JtvkQGV3tzCxjpHUfe1mdC79"],
-            chain: "solanaDevnet",
-            returnValueTest: {
-              key: "",
-              comparator: ">=",
-              value: "1000000000",
+          [
+            {
+              method: "balanceOfMetaplexCollection",
+              params: ["SMBH3wF6baUj6JWtzYvqcKuj2XCKWDqQxzspY12xPND"],
+              chain: "solana",
+              returnValueTest: {
+                key: "",
+                comparator: ">=",
+                value: "1",
+              },
             },
-          },
-          { operator: "or" },
-          {
-            method: "balanceOfToken",
-            params: ["openDKyuDPS6Ak1BuD3JtvkQGV3tzCxjpHUfe1mdC79"],
-            chain: "solanaDevnet",
-            returnValueTest: {
-              key: "$.amount",
-              comparator: ">=",
-              value: "1000000000",
-            },
-          },
+          ],
         ];
         await testProvisoningEncryptingAndDecrypting({
           solRpcConditions,
