@@ -146,6 +146,7 @@ Execute JS on the nodes and combine and return any resulting signatures
     *   `params.code` **[string][121]** JS code to run on the nodes
     *   `params.ipfsId` **[string][121]** The IPFS ID of some JS code to run on the nodes
     *   `params.authSig` **[AuthSig][122]** the authSig to use to authorize the user with the nodes
+    *   `params.jsParams`  
 
 Returns **[Object][118]** An object containing the resulting signatures.  Each signature comes with the public key and the data signed.
 
@@ -449,12 +450,8 @@ Check for an existing cryptographic authentication signature and create one of i
 
 *   `params` **[Object][118]** 
 
-<<<<<<< HEAD
     *   `params.chain` **[string][121]** The chain you want to use.  Find the supported list of chains here: [https://developer.litprotocol.com/docs/supportedChains][133]
-=======
-    *   `params.chain` **[string][117]** The chain you want to use.  Find the supported list of chains here: [https://developer.litprotocol.com/docs/supportedChains][127]
-    *   `params.resources` **[Array][115]<[string][117]>** Optional and only used with EVM chains.  A list of resources to be passed to Sign In with Ethereum.  These resources will be part of the Sign in with Ethereum signed message presented to the user.
->>>>>>> main
+    *   `params.resources` **[Array][123]<[string][121]>** Optional and only used with EVM chains.  A list of resources to be passed to Sign In with Ethereum.  These resources will be part of the Sign in with Ethereum signed message presented to the user.
 
 Returns **[AuthSig][122]** The AuthSig created or retrieved
 
