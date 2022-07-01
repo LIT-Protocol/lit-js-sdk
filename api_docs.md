@@ -146,7 +146,7 @@ Execute JS on the nodes and combine and return any resulting signatures
     *   `params.code` **[string][121]** JS code to run on the nodes
     *   `params.ipfsId` **[string][121]** The IPFS ID of some JS code to run on the nodes
     *   `params.authSig` **[AuthSig][122]** the authSig to use to authorize the user with the nodes
-    *   `params.jsParams`  
+    *   `params.jsParams` **[Object][118]** An object that contains params to expose to the Lit Action.  These will be injected to the JS runtime before your code runs, so you can use any of these as normal variables in your Lit Action.
 
 Returns **[Object][118]** An object containing the resulting signatures.  Each signature comes with the public key and the data signed.
 
