@@ -151,6 +151,7 @@ export default class LitNodeClient {
    * @param {string} params.code JS code to run on the nodes
    * @param {string} params.ipfsId The IPFS ID of some JS code to run on the nodes
    * @param {AuthSig} params.authSig the authSig to use to authorize the user with the nodes
+   * @param {Object} params.jsParams An object that contains params to expose to the Lit Action.  These will be injected to the JS runtime before your code runs, so you can use any of these as normal variables in your Lit Action.
    * @returns {Object} An object containing the resulting signatures.  Each signature comes with the public key and the data signed.
    */
   async executeJs({ code, ipfsId, authSig, jsParams }) {
