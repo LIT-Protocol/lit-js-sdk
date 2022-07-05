@@ -295,6 +295,29 @@
         });
       };
 
+      var EvmosBalanceEncrypt = async () => {
+        var unifiedAccessControlConditions = [
+          {
+            conditionType: "cosmos",
+            path: "/cosmos/bank/v1beta1/balances/:userAddress",
+            chain,
+            returnValueTest: {
+              key: "$.balances[0].amount",
+              comparator: ">=",
+              value: "1000000", // equals 1 ATOM
+            },
+          },
+        ];
+        var authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain: "evmosCosmos",
+        });
+        await testProvisoningEncryptingAndDecrypting({
+          unifiedAccessControlConditions,
+          testName: "EvmosBalanceEncrypt",
+          authSig: { evmos: authSig },
+        });
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -355,6 +378,10 @@
     <button onclick="CosmosBalancePlusKyveFundersEncryptDecrypt()">
       CosmosBalancePlusKyveFundersEncryptDecrypt
     </button>
+    <br />
+    <br />
+
+    <button onclick="EvmosBalanceEncrypt()">EvmosBalanceEncrypt</button>
     <br />
     <br />
 
