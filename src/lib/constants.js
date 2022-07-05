@@ -345,6 +345,24 @@ export const LIT_COSMOS_CHAINS = {
     blockExplorerUrls: ["https://explorer.kyve.network/"],
     vmType: "CVM",
   },
+  evmosCosmos: {
+    name: "EVMOS Cosmos",
+    symbol: "EVMOS",
+    decimals: 18,
+    chainId: "evmos_9001-2",
+    rpcUrls: ["https://rest.bd.evmos.org:1317"],
+    blockExplorerUrls: ["https://evmos.bigdipper.live"],
+    vmType: "CVM",
+  },
+  evmosCosmosTestnet: {
+    name: "Evmos Cosmos Testnet",
+    symbol: "EVMOS",
+    decimals: 18,
+    chainId: "evmos_9000-4",
+    rpcUrls: ["https://rest.bd.evmos.dev:1317"],
+    blockExplorerUrls: ["https://testnet.bigdipper.live"],
+    vmType: "CVM",
+  },
 };
 
 /**
