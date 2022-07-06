@@ -989,6 +989,12 @@ async function humanizeEvmBasicAccessControlConditions({
         // owns a POAP
         return `Owner of a POAP from event ID ${acc.returnValueTest.value} on ${acc.chain}`;
       } else if (
+        acc.standardContractType === "CASK" &&
+        acc.method === "getActiveSubscriptionCount"
+      ) {
+        // Cask powered subscription
+        return `Cask subscriber to provider ${acc.parameters[1]} for plan ${acc.parameters[2]} on ${acc.chain}`;
+      } else if (
         acc.standardContractType === "ERC721" &&
         acc.method === "balanceOf"
       ) {
