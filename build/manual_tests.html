@@ -699,6 +699,30 @@
         });
       };
 
+      var CASK = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "0x921ec72BEf414D75F0C6fFee37975BB3ae80d41C",
+            standardContractType: "CASK",
+            chain: "fuji",
+            method: "getActiveSubscriptionCount",
+            parameters: [
+              ":userAddress",
+              "0x50e2dac5e78B5905CB09495547452cEE64426db2",
+              "100",
+            ],
+            returnValueTest: {
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "CASK",
+        });
+      };
+
       var ETHPlusERC721 = async () => {
         const accessControlConditions = [
           {
@@ -2214,6 +2238,9 @@
     <button onclick="ETHOnAlfajoresEmptyWallet()">
       ETHOnAlfajoresEmptyWallet
     </button>
+    <br />
+    <br />
+    <button onclick="CASK()">CASK</button>
     <br />
     <br />
     <button onclick="ETHPlusERC721()">
