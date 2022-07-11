@@ -23,6 +23,7 @@ import {
   canonicalResourceIdFormatter,
   canonicalUnifiedAccessControlConditionFormatter,
   combineEcdsaShares,
+  combineBlsShares,
 } from "./crypto";
 
 /**
@@ -208,6 +209,7 @@ export default class LitNodeClient {
       const shares = signedData.map((r) => r[key]);
       shares.sort((a, b) => a.shareIndex - b.shareIndex);
       const sigShares = shares.map((s) => ({
+        sigType: s.sigType,
         shareHex: s.signatureShare,
         shareIndex: s.shareIndex,
         localX: s.localX,
@@ -216,11 +218,18 @@ export default class LitNodeClient {
         dataSigned: s.dataSigned,
       }));
       console.log("sigShares", sigShares);
-      const signature = combineEcdsaShares(sigShares);
+      const sigType = mostCommonString(sigShares.map((s) => s.sigType));
+      let signature;
+      if (sigType === "BLS") {
+        signature = combineBlsShares(sigShares, this.networkPubKeySet);
+      } else if (sigType === "ECDSA") {
+        signature = combineEcdsaShares(sigShares);
+      }
+
       signatures[key] = {
         ...signature,
-        publicKey: sigShares[0].publicKey,
-        dataSigned: sigShares[0].dataSigned,
+        publicKey: mostCommonString(sigShares.map((s) => s.publicKey)),
+        dataSigned: mostCommonString(sigShares.map((s) => s.dataSigned)),
       };
     });
 

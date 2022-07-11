@@ -6,6 +6,7 @@ import {
 } from "uint8arrays";
 import { throwError, log } from "../lib/utils";
 import * as wasmECDSA from "../lib/ecdsa-sdk";
+import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 
 const SYMM_KEY_ALGO_PARAMS = {
   name: "AES-CBC",
@@ -537,4 +538,22 @@ export function combineEcdsaShares(sigShares) {
   log("signature", sig);
 
   return sig;
+}
+
+export function combineBlsShares(sigSharesWithEverything, networkPubKeySet) {
+  const pkSetAsBytes = uint8arrayFromString(networkPubKeySet, "base16");
+  log("pkSetAsBytes", pkSetAsBytes);
+
+  const sigShares = sigSharesWithEverything.map((s) => ({
+    shareHex: s.shareHex,
+    shareIndex: s.shareIndex,
+  }));
+  const signature = wasmBlsSdkHelpers.combine_signatures(
+    pkSetAsBytes,
+    sigShares
+  );
+  // log("raw sig", signature);
+  log("signature is ", uint8arrayToString(signature, "base16"));
+
+  return { signature: uint8arrayToString(signature, "base16") };
 }
