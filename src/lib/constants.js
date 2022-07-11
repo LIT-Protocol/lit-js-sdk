@@ -405,4 +405,16 @@ export const LIT_NETWORKS = {
     "https://serrano.litgateway.com:7378",
     "https://serrano.litgateway.com:7379",
   ],
+  localhost: [
+    "http://localhost:7470",
+    "http://localhost:7471",
+    "http://localhost:7472",
+    "http://localhost:7473",
+    "http://localhost:7474",
+    "http://localhost:7475",
+    "http://localhost:7476",
+    "http://localhost:7477",
+    "http://localhost:7478",
+    "http://localhost:7479",
+  ],
 };
