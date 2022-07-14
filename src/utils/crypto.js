@@ -574,10 +574,10 @@ export function combineBlsDecryptionShares(
   decryptionShares.sort((a, b) => a.shareIndex - b.shareIndex);
 
   // combine the decryption shares
-  log("combineBlsDecryptionShares");
-  log("decryptionShares", decryptionShares);
-  log("networkPubKeySet", networkPubKeySet);
-  log("toDecrypt", toDecrypt);
+  // log("combineBlsDecryptionShares");
+  // log("decryptionShares", decryptionShares);
+  // log("networkPubKeySet", networkPubKeySet);
+  // log("toDecrypt", toDecrypt);
 
   // set decryption shares bytes in wasm
   decryptionShares.forEach((s, idx) => {
@@ -603,6 +603,6 @@ export function combineBlsDecryptionShares(
     pkSetAsBytes.length,
     ciphertextAsBytes.length
   );
-  log("decrypted is ", uint8arrayToString(decrypted, "base16"));
+  // log("decrypted is ", uint8arrayToString(decrypted, "base16"));
   return decrypted;
 }
