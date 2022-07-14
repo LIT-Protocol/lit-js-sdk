@@ -32,3 +32,26 @@ export const log = (...args) => {
   args.unshift("[Lit-JS-SDK]");
   console.log(...args);
 };
+
+/**
+ * 
+ * Get the type of a variable, could be an object instance type. 
+ * eg Uint8Array instance should return 'Uint8Array` as string
+ * or simply a `string` or `int` type
+ * 
+ * @param { * } value 
+ * @returns { String } type
+ */
+export const getVarType = (value) => {
+
+  // if it's an object
+  if(value instanceof Object){
+      if(value.constructor.name == 'Object'){
+          return 'Object';
+      }
+      return value.constructor.name;
+  }
+
+  // if it's other type, like string and int
+  return typeof value;
+}
