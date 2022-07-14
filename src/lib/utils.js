@@ -55,3 +55,28 @@ export const getVarType = (value) => {
   // if it's other type, like string and int
   return typeof value;
 }
+
+/**
+ * 
+ *  Check if the given value is the given type
+ *  If not, throw `invalidParamType` error
+ * 
+ * @param { * } value 
+ * @param { string } type 
+ * @returns { Boolean } true/false
+ */
+export const is = (value, type ) => {
+
+  if( getVarType(value) !== type){
+
+    throwError({
+      message: `Expecting "${type}", but received "${getVarType(value)}" instead. value: ${value instanceof Object ? JSON.stringify(value) : value}`,
+      name: "invalidParamType",
+      errorCode: "invalid_param_type",
+    });
+    return false;
+  }
+
+  return true;
+
+}

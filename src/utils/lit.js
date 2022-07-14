@@ -4,7 +4,7 @@ import {
   toString as uint8arrayToString,
 } from "uint8arrays";
 import { formatEther, formatUnits } from "@ethersproject/units";
-import { throwError, log, getVarType } from "../lib/utils";
+import { throwError, log, getVarType, is } from "../lib/utils";
 
 import {
   importSymmetricKey,
@@ -70,6 +70,10 @@ export async function checkAndSignAuthMessage({ chain, resources }) {
  * @returns {Promise<Object>} A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
  */
 export async function encryptString(str) {
+
+  // -- validate
+  if( ! is(str, 'string')) return;
+
   const encodedString = uint8arrayFromString(str, "utf8");
 
   const symmKey = await generateSymmetricKey();
@@ -80,8 +84,6 @@ export async function encryptString(str) {
     encodedString.buffer
   );
 
-  const encryptedData = encryptedString;
-
   const exportedSymmKey = new Uint8Array(
     await crypto.subtle.exportKey("raw", symmKey)
   );
@@ -89,7 +91,7 @@ export async function encryptString(str) {
   return {
     symmetricKey: exportedSymmKey,
     encryptedString,
-    encryptedData
+    encryptedData: encryptedString
   };
 }
 
@@ -102,8 +104,8 @@ export async function encryptString(str) {
 export async function decryptString(encryptedStringBlob, symmKey) {
 
   // -- validate
-  if(getVarType(encryptedStringBlob) !== 'Blob') throw Error('encryptedStringBlob must be a "Blob" object');
-  if(getVarType(symmKey) !== 'Uint8Array') throw Error('symmetricKey must be a "Uint8Array"');
+  if( ! is(encryptedStringBlob, 'Blob')) return;
+  if( ! is(symmKey, 'Uint8Array')) return;
 
   // import the decrypted symm key
   const importedSymmKey = await importSymmetricKey(symmKey);
