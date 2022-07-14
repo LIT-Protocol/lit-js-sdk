@@ -358,6 +358,13 @@ export function compareArrayBuffers(buf1, buf2) {
   return true;
 }
 
+export function encryptWithBlsPubkey({ pubkey, data }) {
+  return wasmBlsSdkHelpers.encrypt(
+    uint8arrayFromString(pubkey, "base16"),
+    data
+  );
+}
+
 export async function importSymmetricKey(symmKey) {
   const importedSymmKey = await crypto.subtle.importKey(
     "raw",
@@ -556,4 +563,46 @@ export function combineBlsShares(sigSharesWithEverything, networkPubKeySet) {
   log("signature is ", uint8arrayToString(signature, "base16"));
 
   return { signature: uint8arrayToString(signature, "base16") };
+}
+
+export function combineBlsDecryptionShares(
+  decryptionShares,
+  networkPubKeySet,
+  toDecrypt
+) {
+  // sort the decryption shares by share index.  this is important when combining the shares.
+  decryptionShares.sort((a, b) => a.shareIndex - b.shareIndex);
+
+  // combine the decryption shares
+  log("combineBlsDecryptionShares");
+  log("decryptionShares", decryptionShares);
+  log("networkPubKeySet", networkPubKeySet);
+  log("toDecrypt", toDecrypt);
+
+  // set decryption shares bytes in wasm
+  decryptionShares.forEach((s, idx) => {
+    wasmExports.set_share_indexes(idx, s.shareIndex);
+    const shareAsBytes = uint8arrayFromString(s.decryptionShare, "base16");
+    for (let i = 0; i < shareAsBytes.length; i++) {
+      wasmExports.set_decryption_shares_byte(i, idx, shareAsBytes[i]);
+    }
+  });
+
+  // set the public key set bytes in wasm
+  const pkSetAsBytes = uint8arrayFromString(networkPubKeySet, "base16");
+  wasmBlsSdkHelpers.set_mc_bytes(pkSetAsBytes);
+
+  // set the ciphertext bytes
+  const ciphertextAsBytes = uint8arrayFromString(toDecrypt, "base16");
+  for (let i = 0; i < ciphertextAsBytes.length; i++) {
+    wasmExports.set_ct_byte(i, ciphertextAsBytes[i]);
+  }
+
+  const decrypted = wasmBlsSdkHelpers.combine_decryption_shares(
+    decryptionShares.length,
+    pkSetAsBytes.length,
+    ciphertextAsBytes.length
+  );
+  log("decrypted is ", uint8arrayToString(decrypted, "base16"));
+  return decrypted;
 }

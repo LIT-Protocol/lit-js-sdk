@@ -336,7 +336,7 @@ export async function signAndSaveAuthMessage({
     address: getAddress(account), // convert to EIP-55 format or else SIWE complains
     uri: globalThis.location.origin,
     version: "1",
-    chainId,
+    // chainId,
   };
 
   if (resources && resources.length > 0) {

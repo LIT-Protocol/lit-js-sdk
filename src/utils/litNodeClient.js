@@ -24,6 +24,7 @@ import {
   canonicalUnifiedAccessControlConditionFormatter,
   combineEcdsaShares,
   combineBlsShares,
+  combineBlsDecryptionShares,
 } from "./crypto";
 
 /**
@@ -202,6 +203,7 @@ export default class LitNodeClient {
 
     log("responseData", JSON.stringify(responseData, null, 2));
 
+    // combine the signatures
     const signedData = responseData.map((r) => r.signedData);
 
     const signatures = {};
@@ -224,6 +226,12 @@ export default class LitNodeClient {
         signature = combineBlsShares(sigShares, this.networkPubKeySet);
       } else if (sigType === "ECDSA") {
         signature = combineEcdsaShares(sigShares);
+      } else {
+        throwError({
+          message: "Unknown signature type",
+          name: "UnknownSignatureTypeError",
+          errorCode: "unknown_signature_type",
+        });
       }
 
       signatures[key] = {
@@ -233,7 +241,61 @@ export default class LitNodeClient {
       };
     });
 
-    return signatures;
+    // combine the decryptions
+    const decryptedData = responseData.map((r) => r.decryptedData);
+
+    const decryptions = {};
+    Object.keys(decryptedData[0]).forEach((key) => {
+      const shares = decryptedData.map((r) => r[key]);
+      const decShares = shares.map((s) => ({
+        algorithmType: s.algorithmType,
+        decryptionShare: s.decryptionShare,
+        shareIndex: s.shareIndex,
+        publicKey: s.publicKey,
+        ciphertext: s.ciphertext,
+      }));
+      const algorithmType = mostCommonString(
+        decShares.map((s) => s.algorithmType)
+      );
+      const ciphertext = mostCommonString(decShares.map((s) => s.ciphertext));
+      let decrypted;
+      if (algorithmType === "BLS") {
+        decrypted = combineBlsDecryptionShares(
+          decShares,
+          this.networkPubKeySet,
+          ciphertext
+        );
+      } else {
+        throwError({
+          message: "Unknown decryption algorithm type",
+          name: "UnknownDecryptionAlgorithmTypeError",
+          errorCode: "unknown_decryption_algorithm_type",
+        });
+      }
+
+      decryptions[key] = {
+        decrypted: uint8arrayToString(decrypted, "base16"),
+        publicKey: mostCommonString(decShares.map((s) => s.publicKey)),
+        ciphertext: mostCommonString(decShares.map((s) => s.ciphertext)),
+      };
+    });
+    /*
+    {
+    "success": true,
+    "signedData": {},
+    "decryptedData": {
+      "decryption1": {
+        "algorithmType": "BLS",
+        "dataDecrypted": "0082cee95315ed4071d576807dddb60a83795acb253ded717b10b0bfb74d4db79e470515da4977c5484a0d6f050595018d6e0ee45e12de6a4621e4b761d08537ebaa60608a3525927f1176dece930b6d40a3d54197c8796275f5d40085c676b88aad52fa05731ed2f841951d8be8211ff4cd24821ac0e826c8f297b1e67864fa00000000000000200c8143774be40adf50b850d67be05b47ee3c806fe7f08677da14d38fd7931dc7a14dbb1576faa88d8ed897a773ff3193",
+        "decryptionShare": "b1259b9f4b108e6fc8503b585716a9df978168c4c6f9cd7ae27b82006defa7381c9b04b087039f3c5c0615e4fef2e7ee",
+        "shareIndex": 5,
+        "publicKey": "864c31bbbd00cc397448147ad1eabf818ce1b7be3f166ac96768051480e9e80d4837c9803389449d7cab639cc8cdf17d",
+        "decryptionName": "decryption1"
+      }
+    }
+  }*/
+
+    return { signatures, decryptions };
   }
 
   /**
@@ -691,36 +753,42 @@ export default class LitNodeClient {
     const decryptionShares = res.values;
     log("decryptionShares", decryptionShares);
 
-    // sort the decryption shares by share index.  this is important when combining the shares.
-    decryptionShares.sort((a, b) => a.shareIndex - b.shareIndex);
+    // // sort the decryption shares by share index.  this is important when combining the shares.
+    // decryptionShares.sort((a, b) => a.shareIndex - b.shareIndex);
 
-    // combine the decryption shares
+    // // combine the decryption shares
 
-    // set decryption shares bytes in wasm
-    decryptionShares.forEach((s, idx) => {
-      wasmExports.set_share_indexes(idx, s.shareIndex);
-      const shareAsBytes = uint8arrayFromString(s.decryptionShare, "base16");
-      for (let i = 0; i < shareAsBytes.length; i++) {
-        wasmExports.set_decryption_shares_byte(i, idx, shareAsBytes[i]);
-      }
-    });
+    // // set decryption shares bytes in wasm
+    // decryptionShares.forEach((s, idx) => {
+    //   wasmExports.set_share_indexes(idx, s.shareIndex);
+    //   const shareAsBytes = uint8arrayFromString(s.decryptionShare, "base16");
+    //   for (let i = 0; i < shareAsBytes.length; i++) {
+    //     wasmExports.set_decryption_shares_byte(i, idx, shareAsBytes[i]);
+    //   }
+    // });
 
-    // set the public key set bytes in wasm
-    const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, "base16");
-    wasmBlsSdkHelpers.set_mc_bytes(pkSetAsBytes);
+    // // set the public key set bytes in wasm
+    // const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, "base16");
+    // wasmBlsSdkHelpers.set_mc_bytes(pkSetAsBytes);
 
-    // set the ciphertext bytes
-    const ciphertextAsBytes = uint8arrayFromString(toDecrypt, "base16");
-    for (let i = 0; i < ciphertextAsBytes.length; i++) {
-      wasmExports.set_ct_byte(i, ciphertextAsBytes[i]);
-    }
+    // // set the ciphertext bytes
+    // const ciphertextAsBytes = uint8arrayFromString(toDecrypt, "base16");
+    // for (let i = 0; i < ciphertextAsBytes.length; i++) {
+    //   wasmExports.set_ct_byte(i, ciphertextAsBytes[i]);
+    // }
 
-    const decrypted = wasmBlsSdkHelpers.combine_decryption_shares(
-      decryptionShares.length,
-      pkSetAsBytes.length,
-      ciphertextAsBytes.length
-    );
+    // const decrypted = wasmBlsSdkHelpers.combine_decryption_shares(
+    //   decryptionShares.length,
+    //   pkSetAsBytes.length,
+    //   ciphertextAsBytes.length
+    // );
     // log('decrypted is ', uint8arrayToString(decrypted, 'base16'))
+
+    const decrypted = combineBlsDecryptionShares(
+      decryptionShares,
+      this.networkPubKeySet,
+      toDecrypt
+    );
 
     return decrypted;
   }

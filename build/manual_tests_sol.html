@@ -370,6 +370,27 @@
         });
       };
 
+      var SolPDA = async () => {
+        // this is just an idea and not implemented yet
+        var solRpcConditions = [
+          {
+            method: "getPDA",
+            params: ["<programId>", "<seed1>", "<other seeds, etc...>"],
+            chain: "solana",
+            interface: { owner: 32, authority: 32, customBool: 1 },
+            returnValueTest: {
+              key: "owner",
+              comparator: "=",
+              value: ":userAddress",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          testName: "SolBalanceOfToken",
+        });
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;

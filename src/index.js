@@ -72,6 +72,7 @@ import {
   hashUnifiedAccessControlConditions,
   encryptWithSymmetricKey,
   decryptWithSymmetricKey,
+  encryptWithBlsPubkey,
 } from "./utils/crypto";
 
 import {
@@ -154,6 +155,7 @@ const functions = {
   wasmBlsSdkHelpers,
   wasmECDSA,
   initWasmBlsSdk,
+  encryptWithBlsPubkey,
 };
 
 module.exports = functions;
