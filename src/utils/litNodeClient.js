@@ -154,9 +154,10 @@ export default class LitNodeClient {
    * @param {string} params.ipfsId The IPFS ID of some JS code to run on the nodes
    * @param {AuthSig} params.authSig the authSig to use to authorize the user with the nodes
    * @param {Object} params.jsParams An object that contains params to expose to the Lit Action.  These will be injected to the JS runtime before your code runs, so you can use any of these as normal variables in your Lit Action.
+   * @param {Boolean} params.debug A boolean that defines if debug info will be returned or not.
    * @returns {Object} An object containing the resulting signatures.  Each signature comes with the public key and the data signed.
    */
-  async executeJs({ code, ipfsId, authSig, jsParams }) {
+  async executeJs({ code, ipfsId, authSig, jsParams, debug }) {
     if (!this.ready) {
       throwError({
         message:
@@ -290,7 +291,26 @@ export default class LitNodeClient {
       );
     }
 
-    return { signatures, decryptions, response };
+    const mostCommonLogs = mostCommonString(responseData.map((r) => r.logs));
+
+    let returnVal = {
+      signatures,
+      decryptions,
+      response,
+      logs: mostCommonLogs,
+    };
+
+    if (debug) {
+      const allNodeResponses = responseData.map((r) => r.response);
+      const allNodeLogs = responseData.map((r) => r.logs);
+      returnVal.debug = {
+        allNodeResponses,
+        allNodeLogs,
+        rawNodeHTTPResponses: responseData,
+      };
+    }
+
+    return returnVal;
   }
 
   /**
