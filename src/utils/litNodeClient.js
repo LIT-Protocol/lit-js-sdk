@@ -279,23 +279,18 @@ export default class LitNodeClient {
         ciphertext: mostCommonString(decShares.map((s) => s.ciphertext)),
       };
     });
-    /*
-    {
-    "success": true,
-    "signedData": {},
-    "decryptedData": {
-      "decryption1": {
-        "algorithmType": "BLS",
-        "dataDecrypted": "0082cee95315ed4071d576807dddb60a83795acb253ded717b10b0bfb74d4db79e470515da4977c5484a0d6f050595018d6e0ee45e12de6a4621e4b761d08537ebaa60608a3525927f1176dece930b6d40a3d54197c8796275f5d40085c676b88aad52fa05731ed2f841951d8be8211ff4cd24821ac0e826c8f297b1e67864fa00000000000000200c8143774be40adf50b850d67be05b47ee3c806fe7f08677da14d38fd7931dc7a14dbb1576faa88d8ed897a773ff3193",
-        "decryptionShare": "b1259b9f4b108e6fc8503b585716a9df978168c4c6f9cd7ae27b82006defa7381c9b04b087039f3c5c0615e4fef2e7ee",
-        "shareIndex": 5,
-        "publicKey": "864c31bbbd00cc397448147ad1eabf818ce1b7be3f166ac96768051480e9e80d4837c9803389449d7cab639cc8cdf17d",
-        "decryptionName": "decryption1"
-      }
-    }
-  }*/
 
-    return { signatures, decryptions };
+    let response = mostCommonString(responseData.map((r) => r.response));
+    try {
+      response = JSON.parse(response);
+    } catch (e) {
+      log(
+        "Error parsing response as json.  Swallowing and returning as string.",
+        response
+      );
+    }
+
+    return { signatures, decryptions, response };
   }
 
   /**
@@ -684,13 +679,18 @@ export default class LitNodeClient {
     }
 
     // -- validate
-    if( accessControlConditions && ! is(accessControlConditions, 'Array')) return;
-    if( evmContractConditions && ! is(evmContractConditions, 'Array')) return;
-    if( solRpcConditions && ! is(solRpcConditions, 'Array')) return;
-    if( unifiedAccessControlConditions && ! is(unifiedAccessControlConditions, 'Array')) return;
-    if( ! is(toDecrypt, 'string') ) return;
-    if( ! is(chain, 'string') ) return;
-    if( ! is(authSig, 'Object') ) return;
+    if (accessControlConditions && !is(accessControlConditions, "Array"))
+      return;
+    if (evmContractConditions && !is(evmContractConditions, "Array")) return;
+    if (solRpcConditions && !is(solRpcConditions, "Array")) return;
+    if (
+      unifiedAccessControlConditions &&
+      !is(unifiedAccessControlConditions, "Array")
+    )
+      return;
+    if (!is(toDecrypt, "string")) return;
+    if (!is(chain, "string")) return;
+    if (!is(authSig, "Object")) return;
 
     let formattedAccessControlConditions;
     let formattedEVMContractConditions;
@@ -841,14 +841,20 @@ export default class LitNodeClient {
     }
 
     // -- validate
-    if( accessControlConditions && ! is(accessControlConditions, 'Array')) return;
-    if( evmContractConditions && ! is(evmContractConditions, 'Array')) return;
-    if( solRpcConditions && ! is(solRpcConditions, 'Array')) return;
-    if( unifiedAccessControlConditions && ! is(unifiedAccessControlConditions, 'Array')) return;
-    if( ! is(chain, 'string') ) return;
-    if( ! is(authSig, 'Object') ) return;
-    if( ! is(symmetricKey, 'Uint8Array') ) return;
-    if( encryptedSymmetricKey && ! is(encryptedSymmetricKey, 'Uint8Array') ) return;
+    if (accessControlConditions && !is(accessControlConditions, "Array"))
+      return;
+    if (evmContractConditions && !is(evmContractConditions, "Array")) return;
+    if (solRpcConditions && !is(solRpcConditions, "Array")) return;
+    if (
+      unifiedAccessControlConditions &&
+      !is(unifiedAccessControlConditions, "Array")
+    )
+      return;
+    if (!is(chain, "string")) return;
+    if (!is(authSig, "Object")) return;
+    if (!is(symmetricKey, "Uint8Array")) return;
+    if (encryptedSymmetricKey && !is(encryptedSymmetricKey, "Uint8Array"))
+      return;
 
     // to fix spelling mistake
     if (typeof permanant !== "undefined") {
