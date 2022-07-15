@@ -19,6 +19,7 @@ import LIT from "../abis/LIT.json";
 import ERC20 from "../abis/ERC20.json";
 import { LIT_CHAINS } from "../lib/constants";
 import { throwError, log } from "../lib/utils";
+import { ethers } from "ethers";
 
 function chainHexIdToChainName(chainHexId) {
   for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
@@ -59,41 +60,63 @@ export async function connectWeb3({ chainId = 1 } = {}) {
     rpcUrls[chainId] = rpcUrl;
   }
 
-  const providerOptions = {
-    walletconnect: {
-      package: WalletConnectProvider, // required
-      options: {
-        // infuraId: "cd614bfa5c2f4703b7ab0ec0547d9f81",
-        rpc: rpcUrls,
-        chainId,
+  let web3;
+  let account;
+
+  // -- node
+  if( LIT_ENV == 'node'){
+
+    const privateKey = process.env.PRIVATE_KEY;
+    const rpcUrl = rpcUrls[chainId];
+    const jsonRpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
+    const walletWithProvider = new ethers.Wallet(privateKey, jsonRpcProvider);
+    
+    web3 = jsonRpcProvider;
+  
+    account = walletWithProvider.address;
+      
+    log("account:", account);
+  }
+
+  // -- browser
+  if( LIT_ENV == 'client'){
+
+    const providerOptions = {
+      walletconnect: {
+        package: WalletConnectProvider, // required
+        options: {
+          // infuraId: "cd614bfa5c2f4703b7ab0ec0547d9f81",
+          rpc: rpcUrls,
+          chainId,
+        },
       },
-    },
-  };
+    };
 
-  log("getting provider via lit connect modal");
-
-  const dialog = new LitConnectModal({
-    providerOptions,
-  });
-  const provider = await dialog.getWalletProvider();
-
-  log("got provider", provider);
-  const web3 = new Web3Provider(provider);
-
-  // const provider = await detectEthereumProvider();
-  // const web3 = new Web3Provider(provider);
-
-  // trigger metamask popup
-  await provider.enable();
-
-  log("listing accounts");
-  const accounts = await web3.listAccounts();
-  // const accounts = await provider.request({
-  //   method: "eth_requestAccounts",
-  //   params: [],
-  // });
-  log("accounts", accounts);
-  const account = accounts[0].toLowerCase();
+    log("getting provider via lit connect modal");
+  
+    const dialog = new LitConnectModal({
+      providerOptions,
+    });
+    const provider = await dialog.getWalletProvider();
+  
+    log("got provider", provider);
+    web3 = new Web3Provider(provider);
+  
+    // // const provider = await detectEthereumProvider();
+    // // const web3 = new Web3Provider(provider);
+  
+    // // trigger metamask popup
+    await provider.enable();
+  
+    log("listing accounts");
+    const accounts = await web3.listAccounts();
+    // // const accounts = await provider.request({
+    // //   method: "eth_requestAccounts",
+    // //   params: [],
+    // // });
+    log("accounts", accounts);
+    account = accounts[0].toLowerCase();
+  }
 
   return { web3, account };
 }
@@ -163,13 +186,18 @@ export async function disconnectWeb3() {
 // }
 
 export async function checkAndSignEVMAuthMessage({ chain, resources }) {
+
   const selectedChain = LIT_CHAINS[chain];
+
   const { web3, account } = await connectWeb3({
     chainId: selectedChain.chainId,
   });
+
   log(`got web3 and account: ${account}`);
+  log("LIT_ENV:", LIT_ENV)
 
   let chainId;
+  
   try {
     const resp = await web3.getNetwork();
     chainId = resp.chainId;
@@ -182,6 +210,7 @@ export async function checkAndSignEVMAuthMessage({ chain, resources }) {
       errorCode: "wrong_network",
     });
   }
+
   let selectedChainId = "0x" + selectedChain.chainId.toString("16");
   log("chainId from web3", chainId);
   log(
@@ -253,19 +282,43 @@ export async function checkAndSignEVMAuthMessage({ chain, resources }) {
       }
     }
   }
-  log("checking if sig is in local storage");
-  let authSig = localStorage.getItem("lit-auth-signature");
-  if (!authSig) {
-    log("signing auth message because sig is not in local storage");
+
+  // -- get auth sig
+  let authSig;
+
+  if( LIT_ENV == 'client' ){
+    log("checking if sig is in local storage");
+    
+    authSig = localStorage.getItem("lit-auth-signature");
+    
+    if (!authSig) {
+      log("signing auth message because sig is not in local storage");
+      await signAndSaveAuthMessage({
+        web3,
+        account,
+        chainId: selectedChain.chainId,
+        resources,
+      });
+      authSig = localStorage.getItem("lit-auth-signature");
+    }
+    authSig = JSON.parse(authSig);
+  }else{
     await signAndSaveAuthMessage({
       web3,
       account,
       chainId: selectedChain.chainId,
       resources,
-    });
-    authSig = localStorage.getItem("lit-auth-signature");
+    })
+
+    authSig = AUTH_SIG;
+    log("========= authSig =========");
+    log(authSig);
+    authSig = JSON.parse(authSig);
   }
-  authSig = JSON.parse(authSig);
+
+  // console.log("account:", account);
+  // console.log("authSig.address:", authSig.address);
+
   // make sure we are on the right account
   if (account !== authSig.address) {
     log(
@@ -277,7 +330,15 @@ export async function checkAndSignEVMAuthMessage({ chain, resources }) {
       chainId: selectedChain.chainId,
       resources,
     });
-    authSig = localStorage.getItem("lit-auth-signature");
+
+    if(LIT_ENV == 'client'){
+      authSig = localStorage.getItem("lit-auth-signature");
+    }
+
+    if(LIT_ENV == 'node'){
+      authSig = AUTH_SIG;
+    }
+
     authSig = JSON.parse(authSig);
   } else {
     // check the resources of the sig and re-sign if they don't match
@@ -308,7 +369,13 @@ export async function checkAndSignEVMAuthMessage({ chain, resources }) {
         chainId: selectedChain.chainId,
         resources,
       });
-      authSig = localStorage.getItem("lit-auth-signature");
+      if(LIT_ENV == 'client'){
+        authSig = localStorage.getItem("lit-auth-signature");
+      }
+  
+      if(LIT_ENV == 'node'){
+        authSig = AUTH_SIG;
+      }
       authSig = JSON.parse(authSig);
     }
   }
@@ -329,15 +396,36 @@ export async function signAndSaveAuthMessage({
   chainId,
   resources,
 }) {
+
+  log("Start: signAndSaveAuthMessage");
+
+  // convert to EIP-55 format or else SIWE complains
+  const address = getAddress(account);
+  log("address:", address);
+
   // const { chainId } = await web3.getNetwork();
 
-  const preparedMessage = {
-    domain: globalThis.location.host,
-    address: getAddress(account), // convert to EIP-55 format or else SIWE complains
-    uri: globalThis.location.origin,
-    version: "1",
-    // chainId,
-  };
+  let preparedMessage;
+
+  if(LIT_ENV == 'client'){
+    preparedMessage = {
+      domain: globalThis.location.host,
+      address, 
+      uri: globalThis.location.origin,
+      version: "1",
+      // chainId,
+    };
+  }else{
+    preparedMessage = {
+      domain: LIT_HOST,
+      address, 
+      uri: LIT_ORIGIN,
+      version: "1",
+      chainId,
+    };
+  }
+
+  log("preparedMessage:", preparedMessage);
 
   if (resources && resources.length > 0) {
     preparedMessage.resources = resources;
@@ -345,7 +433,11 @@ export async function signAndSaveAuthMessage({
 
   const message = new SiweMessage(preparedMessage);
 
+  log("message:", message);
+
   const body = message.prepareMessage();
+
+  log("body:", body);
 
   const signedResult = await signMessage({
     body,
@@ -353,24 +445,35 @@ export async function signAndSaveAuthMessage({
     account,
   });
 
-  localStorage.setItem(
-    "lit-auth-signature",
-    JSON.stringify({
-      sig: signedResult.signature,
-      derivedVia: "web3.eth.personal.sign",
-      signedMessage: body,
-      address: signedResult.address,
-    })
-  );
+  log("signedResult:", signedResult);
+
+  const authSig = JSON.stringify({
+    sig: signedResult.signature,
+    derivedVia: "web3.eth.personal.sign",
+    signedMessage: body,
+    address: signedResult.address,
+  });
+
+  if( LIT_ENV == 'client'){
+    localStorage.setItem("lit-auth-signature", authSig);
+  }else{
+    globalThis.AUTH_SIG = authSig;
+  }
+
   // store a keypair in localstorage for communication with sgx
   const commsKeyPair = nacl.box.keyPair();
-  localStorage.setItem(
-    "lit-comms-keypair",
-    JSON.stringify({
-      publicKey: naclUtil.encodeBase64(commsKeyPair.publicKey),
-      secretKey: naclUtil.encodeBase64(commsKeyPair.secretKey),
-    })
-  );
+
+  const keyPair = JSON.stringify({
+    publicKey: naclUtil.encodeBase64(commsKeyPair.publicKey),
+    secretKey: naclUtil.encodeBase64(commsKeyPair.secretKey),
+  });
+
+  if( LIT_ENV == 'client'){
+    localStorage.setItem("lit-comms-keypair", keyPair);
+  }else{
+    globalThis.KEY_PAIR = keyPair;
+  }
+
   log("generated and saved lit-comms-keypair");
 }
 
@@ -388,25 +491,39 @@ export async function signMessage({ body, web3, account }) {
     web3 = resp.web3;
     account = resp.account;
   }
+  
+  let signer;
+
+  if(LIT_ENV == 'client'){
+    signer = web3.getSigner();
+  }else{
+    signer = web3.getSigner(account);
+  }
 
   log("pausing...");
   await new Promise((resolve) => setTimeout(resolve, 500));
-  log("signing with ", account);
+  log("signing with: ", account);
   // const signature = await web3.getSigner().signMessage(body);
-  const signature = await signMessageAsync(web3.getSigner(), account, body);
+  const signature = await signMessageAsync(signer, account, body, web3);
   //.request({ method: 'personal_sign', params: [account, body] })
   const address = verifyMessage(body, signature).toLowerCase();
 
   log("Signature: ", signature);
   log("recovered address: ", address);
 
-  if (address !== account) {
-    const msg = `ruh roh, the user signed with a different address (${address}) then they\'re using with web3 (${account}).  this will lead to confusion.`;
-    console.error(msg);
-    alert(
-      "something seems to be wrong with your wallets message signing.  maybe restart your browser or your wallet.  your recovered sig address does not match your web3 account address"
-    );
-    throw new Error(msg);
+  // TODO: How do I know which version of the address the node is using?
+  if(LIT_ENV == 'client'){
+    if (address !== account) {
+      const msg = `ruh roh, the user signed with a different address (${address}) then they\'re using with web3 (${account}).  this will lead to confusion.`;
+      console.error(msg);
+  
+      if(LIT_ENV == 'client'){
+        alert(
+          "something seems to be wrong with your wallets message signing.  maybe restart your browser or your wallet.  your recovered sig address does not match your web3 account address"
+        );
+      }
+      throw new Error(msg);
+    }
   }
 
   return { signature, address };
@@ -414,28 +531,61 @@ export async function signMessage({ body, web3, account }) {
 
 // wrapper around signMessage that tries personal_sign first.  this is to fix a
 // bug with walletconnect where just using signMessage was failing
-export const signMessageAsync = async (signer, address, message) => {
+export const signMessageAsync = async (signer, address, message, web3) => {
+
+  log("--------------------------------------------------------");
+  log("signer:", signer);
+  log("address:", address);
+  log("message:", message);
+
+  const walletWithProvider = new ethers.Wallet(process.env.PRIVATE_KEY, web3);
+
   const messageBytes = toUtf8Bytes(message);
   if (signer instanceof JsonRpcSigner) {
     try {
       log("Signing with personal_sign");
-      const signature = await signer.provider.send("personal_sign", [
-        hexlify(messageBytes),
-        address.toLowerCase(),
-      ]);
+
+      let signature;
+
+      if( LIT_ENV == 'client'){
+        signature = await signer.provider.send("personal_sign", [
+          hexlify(messageBytes),
+          address.toLowerCase(),
+        ]);
+      }else{
+        signature = await walletWithProvider.sendTransaction("personal_sign", [
+          hexlify(messageBytes),
+          address.toLowerCase(),
+        ]);
+      }
       return signature;
     } catch (e) {
       log(
         "Signing with personal_sign failed, trying signMessage as a fallback"
       );
       if (e.message.includes("personal_sign")) {
-        return await signer.signMessage(messageBytes);
+
+        let signature;
+
+        if( LIT_ENV == 'client'){
+          signature = await signer.signMessage(messageBytes);
+        }else{
+          signature = await walletWithProvider.signMessage(messageBytes);
+        }
+        return signature;
       }
       throw e;
     }
   } else {
     log("signing with signMessage");
-    return await signer.signMessage(messageBytes);
+    let signature;
+
+    if( LIT_ENV == 'client'){
+      signature = await signer.signMessage(messageBytes);
+    }else{
+      signature = await walletWithProvider.signMessage(messageBytes);
+    }
+    return signature;
   }
 };
 

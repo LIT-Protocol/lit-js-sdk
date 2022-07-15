@@ -104,6 +104,7 @@ export default class LitNodeClient {
         "https://node2.litgateway.com:7379",
       ],
       litNetwork: "jalapeno",
+      env: 'client',
     };
     if (config) {
       this.config = { ...this.config, ...config };
@@ -127,6 +128,11 @@ export default class LitNodeClient {
     } catch (e) {
       console.log("Error accessing local storage", e);
     }
+
+    // -- set env
+    globalThis.LIT_ENV = this.config?.env;
+    globalThis.LIT_HOST = this.config?.host; 
+    globalThis.LIT_ORIGIN = this.config?.origin; 
 
     // set bootstrapUrls to match the network litNetwork unless it's set to custom
     if (this.config.litNetwork !== "custom") {
