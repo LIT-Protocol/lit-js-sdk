@@ -32,3 +32,51 @@ export const log = (...args) => {
   args.unshift("[Lit-JS-SDK]");
   console.log(...args);
 };
+
+/**
+ * 
+ * Get the type of a variable, could be an object instance type. 
+ * eg Uint8Array instance should return 'Uint8Array` as string
+ * or simply a `string` or `int` type
+ * 
+ * @param { * } value 
+ * @returns { String } type
+ */
+ export const getVarType = (value) => {
+
+  // if it's an object
+  if(value instanceof Object){
+      if(value.constructor.name == 'Object'){
+          return 'Object';
+      }
+      return value.constructor.name;
+  }
+
+  // if it's other type, like string and int
+  return typeof value;
+}
+
+/**
+ * 
+ *  Check if the given value is the given type
+ *  If not, throw `invalidParamType` error
+ * 
+ * @param { * } value 
+ * @param { string } type 
+ * @returns { Boolean } true/false
+ */
+export const is = (value, type ) => {
+
+  if( getVarType(value) !== type){
+
+    throwError({
+      message: `Expecting "${type}", but received "${getVarType(value)}" instead. value: ${value instanceof Object ? JSON.stringify(value) : value}`,
+      name: "invalidParamType",
+      errorCode: "invalid_param_type",
+    });
+    return false;
+  }
+
+  return true;
+
+}
