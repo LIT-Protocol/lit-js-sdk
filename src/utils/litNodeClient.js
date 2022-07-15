@@ -6,7 +6,7 @@ import naclUtil from "tweetnacl-util";
 
 import { version } from "../version";
 
-import { mostCommonString, throwError, log } from "../lib/utils";
+import { mostCommonString, throwError, log, is } from "../lib/utils";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import {
   hashAccessControlConditions,
@@ -509,6 +509,15 @@ export default class LitNodeClient {
       });
     }
 
+    // -- validate
+    if( accessControlConditions && ! is(accessControlConditions, 'Array')) return;
+    if( evmContractConditions && ! is(evmContractConditions, 'Array')) return;
+    if( solRpcConditions && ! is(solRpcConditions, 'Array')) return;
+    if( unifiedAccessControlConditions && ! is(unifiedAccessControlConditions, 'Array')) return;
+    if( ! is(toDecrypt, 'string') ) return;
+    if( ! is(chain, 'string') ) return;
+    if( ! is(authSig, 'Object') ) return;
+
     let formattedAccessControlConditions;
     let formattedEVMContractConditions;
     let formattedSolRpcConditions;
@@ -649,6 +658,16 @@ export default class LitNodeClient {
         errorCode: "lit_node_client_not_ready",
       });
     }
+
+    // -- validate
+    if( accessControlConditions && ! is(accessControlConditions, 'Array')) return;
+    if( evmContractConditions && ! is(evmContractConditions, 'Array')) return;
+    if( solRpcConditions && ! is(solRpcConditions, 'Array')) return;
+    if( unifiedAccessControlConditions && ! is(unifiedAccessControlConditions, 'Array')) return;
+    if( ! is(chain, 'string') ) return;
+    if( ! is(authSig, 'Object') ) return;
+    if( ! is(symmetricKey, 'Uint8Array') ) return;
+    if( encryptedSymmetricKey && ! is(encryptedSymmetricKey, 'Uint8Array') ) return;
 
     // to fix spelling mistake
     if (typeof permanant !== "undefined") {
