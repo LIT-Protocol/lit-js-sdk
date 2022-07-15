@@ -4,7 +4,7 @@ import {
   toString as uint8arrayToString,
 } from "uint8arrays";
 import { formatEther, formatUnits } from "@ethersproject/units";
-import { throwError, log } from "../lib/utils";
+import { throwError, log, is } from "../lib/utils";
 
 import {
   importSymmetricKey,
@@ -70,6 +70,10 @@ export async function checkAndSignAuthMessage({ chain, resources }) {
  * @returns {Promise<Object>} A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
  */
 export async function encryptString(str) {
+
+  // -- validate
+  if( ! is(str, 'string')) return;
+
   const encodedString = uint8arrayFromString(str, "utf8");
 
   const symmKey = await generateSymmetricKey();
@@ -85,6 +89,7 @@ export async function encryptString(str) {
   return {
     symmetricKey: exportedSymmKey,
     encryptedString,
+    encryptedData: encryptedString
   };
 }
 
@@ -95,6 +100,11 @@ export async function encryptString(str) {
  * @returns {Promise<string>} A promise containing the decrypted string
  */
 export async function decryptString(encryptedStringBlob, symmKey) {
+
+  // -- validate
+  if( ! is(encryptedStringBlob, 'Blob')) return;
+  if( ! is(symmKey, 'Uint8Array')) return;
+
   // import the decrypted symm key
   const importedSymmKey = await importSymmetricKey(symmKey);
 
