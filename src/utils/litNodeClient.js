@@ -6,7 +6,13 @@ import naclUtil from "tweetnacl-util";
 
 import { version } from "../version";
 
-import { mostCommonString, throwError, log, is } from "../lib/utils";
+import {
+  mostCommonString,
+  throwError,
+  log,
+  is,
+  checkIfAuthSigRequiresChainParam,
+} from "../lib/utils";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import {
   hashAccessControlConditions,
@@ -510,13 +516,45 @@ export default class LitNodeClient {
     }
 
     // -- validate
-    if( accessControlConditions && ! is(accessControlConditions, 'Array')) return;
-    if( evmContractConditions && ! is(evmContractConditions, 'Array')) return;
-    if( solRpcConditions && ! is(solRpcConditions, 'Array')) return;
-    if( unifiedAccessControlConditions && ! is(unifiedAccessControlConditions, 'Array')) return;
-    if( ! is(toDecrypt, 'string') ) return;
-    if( ! is(chain, 'string') ) return;
-    if( ! is(authSig, 'Object') ) return;
+    if (
+      accessControlConditions &&
+      !is(
+        accessControlConditions,
+        "Array",
+        "accessControlConditions",
+        "getEncryptionKey"
+      )
+    )
+      return;
+    if (
+      evmContractConditions &&
+      !is(
+        evmContractConditions,
+        "Array",
+        "evmContractConditions",
+        "getEncryptionKey"
+      )
+    )
+      return;
+    if (
+      solRpcConditions &&
+      !is(solRpcConditions, "Array", "solRpcConditions", "getEncryptionKey")
+    )
+      return;
+    if (
+      unifiedAccessControlConditions &&
+      !is(
+        unifiedAccessControlConditions,
+        "Array",
+        "unifiedAccessControlConditions",
+        "getEncryptionKey"
+      )
+    )
+      return;
+    if (!is(toDecrypt, "string", "toDecrypt", "getEncryptionKey")) return;
+    if (!is(authSig, "Object", "authSig", "getEncryptionKey")) return;
+    if (!checkIfAuthSigRequiresChainParam(authSig, chain, "getEncryptionKey"))
+      return;
 
     let formattedAccessControlConditions;
     let formattedEVMContractConditions;
@@ -660,14 +698,60 @@ export default class LitNodeClient {
     }
 
     // -- validate
-    if( accessControlConditions && ! is(accessControlConditions, 'Array')) return;
-    if( evmContractConditions && ! is(evmContractConditions, 'Array')) return;
-    if( solRpcConditions && ! is(solRpcConditions, 'Array')) return;
-    if( unifiedAccessControlConditions && ! is(unifiedAccessControlConditions, 'Array')) return;
-    if( ! is(chain, 'string') ) return;
-    if( ! is(authSig, 'Object') ) return;
-    if( ! is(symmetricKey, 'Uint8Array') ) return;
-    if( encryptedSymmetricKey && ! is(encryptedSymmetricKey, 'Uint8Array') ) return;
+    if (
+      accessControlConditions &&
+      !is(
+        accessControlConditions,
+        "Array",
+        "accessControlConditions",
+        "saveEncryptionKey"
+      )
+    )
+      return;
+    if (
+      evmContractConditions &&
+      !is(
+        evmContractConditions,
+        "Array",
+        "evmContractConditions",
+        "saveEncryptionKey"
+      )
+    )
+      return;
+    if (
+      solRpcConditions &&
+      !is(solRpcConditions, "Array", "solRpcConditions", "saveEncryptionKey")
+    )
+      return;
+    if (
+      unifiedAccessControlConditions &&
+      !is(
+        unifiedAccessControlConditions,
+        "Array",
+        "unifiedAccessControlConditions",
+        "saveEncryptionKey"
+      )
+    )
+      return;
+
+    if (!is(authSig, "Object", "authSig", "saveEncryptionKey")) return;
+    if (!checkIfAuthSigRequiresChainParam(authSig, chain, "saveEncryptionKey"))
+      return;
+    if (
+      symmetricKey &&
+      !is(symmetricKey, "Uint8Array", "symmetricKey", "saveEncryptionKey")
+    )
+      return;
+    if (
+      encryptedSymmetricKey &&
+      !is(
+        encryptedSymmetricKey,
+        "Uint8Array",
+        "encryptedSymmetricKey",
+        "saveEncryptionKey"
+      )
+    )
+      return;
 
     // to fix spelling mistake
     if (typeof permanant !== "undefined") {

@@ -1,3 +1,6 @@
+import { constants } from "buffer";
+import { LIT_AUTH_SIG_CHAIN_KEYS } from "./constants.js";
+
 export const printError = (e) => {
   console.log("Error Stack", e.stack);
   console.log("Error Name", e.name);
@@ -34,49 +37,78 @@ export const log = (...args) => {
 };
 
 /**
- * 
- * Get the type of a variable, could be an object instance type. 
+ *
+ * Get the type of a variable, could be an object instance type.
  * eg Uint8Array instance should return 'Uint8Array` as string
  * or simply a `string` or `int` type
- * 
- * @param { * } value 
+ *
+ * @param { * } value
  * @returns { String } type
  */
- export const getVarType = (value) => {
-
+export const getVarType = (value) => {
   // if it's an object
-  if(value instanceof Object){
-      if(value.constructor.name == 'Object'){
-          return 'Object';
-      }
-      return value.constructor.name;
+  if (value instanceof Object) {
+    if (value.constructor.name == "Object") {
+      return "Object";
+    }
+    return value.constructor.name;
   }
 
   // if it's other type, like string and int
   return typeof value;
-}
+};
 
 /**
- * 
+ *
  *  Check if the given value is the given type
  *  If not, throw `invalidParamType` error
- * 
- * @param { * } value 
- * @param { string } type 
+ *
+ * @param { * } value
+ * @param { string } type
+ * @param { string } paramName
+ * @param { string } functionName
  * @returns { Boolean } true/false
  */
-export const is = (value, type ) => {
+export const is = (
+  value,
+  type,
+  paramName,
+  functionName,
+  throwOnError = true
+) => {
+  if (getVarType(value) !== type) {
+    let message = `Expecting "${type}" type for parameter named ${paramName} in Lit-JS-SDK function ${functionName}(), but received "${getVarType(
+      value
+    )}" type instead. value: ${
+      value instanceof Object ? JSON.stringify(value) : value
+    }`;
 
-  if( getVarType(value) !== type){
-
-    throwError({
-      message: `Expecting "${type}", but received "${getVarType(value)}" instead. value: ${value instanceof Object ? JSON.stringify(value) : value}`,
-      name: "invalidParamType",
-      errorCode: "invalid_param_type",
-    });
+    if (throwOnError) {
+      throwError({
+        message,
+        name: "invalidParamType",
+        errorCode: "invalid_param_type",
+      });
+    }
     return false;
   }
 
   return true;
+};
 
-}
+export const checkIfAuthSigRequiresChainParam = (
+  authSig,
+  chain,
+  functionName
+) => {
+  for (const key of LIT_AUTH_SIG_CHAIN_KEYS) {
+    if (key in authSig) {
+      return true;
+    }
+  }
+
+  // if we're here, then we need the chain param
+  if (!is(chain, "string", "chain", functionName)) return false;
+
+  return true;
+};

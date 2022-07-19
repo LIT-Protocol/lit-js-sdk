@@ -379,3 +379,7 @@ export const ALL_LIT_CHAINS = {
 
 export const NETWORK_PUB_KEY =
   "9971e835a1fe1a4d78e381eebbe0ddc84fde5119169db816900de796d10187f3c53d65c1202ac083d099a517f34a9b62";
+
+// you can either pass a "chain" param to lit functions, which it uses to tell which network your sig came from.
+// or, you can pass a authSig that has and of these keys in it to tell which network your sig came from.
+export const LIT_AUTH_SIG_CHAIN_KEYS = ["ethereum", "solana", "cosmos", "kyve"];

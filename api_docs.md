@@ -452,9 +452,9 @@ The human readable name for an access control condition
 *   `params` **[Object][116]** 
 
     *   `params.accessControlConditions` **[Array][119]** The array of access control conditions that you want to humanize
-    *   `params.evmContractConditions`  
-    *   `params.solRpcConditions`  
-    *   `params.unifiedAccessControlConditions`  
+    *   `params.evmContractConditions` **[Array][119]** The array of evm contract conditions that you want to humanize
+    *   `params.solRpcConditions` **[Array][119]** The array of Solana RPC conditions that you want to humanize
+    *   `params.unifiedAccessControlConditions` **[Array][119]** The array of unified access control conditions that you want to humanize
     *   `params.tokenList`  
     *   `params.myWalletAddress`  
 
