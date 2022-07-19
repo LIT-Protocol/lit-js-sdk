@@ -312,7 +312,7 @@ Encrypt a file without doing any zipping or packing.  This is useful for large f
 
 *   `params` **[Object][122]** 
 
-    *   `params.file` **([Blob][129] | File)** The file you wish to encrypt
+    *   `params.file` **([Blob][135] | File)** The file you wish to encrypt
 
 Returns **[Promise][134]<[Object][122]>** A promise containing an object with keys encryptedFile and symmetricKey.  encryptedFile is a Blob, and symmetricKey is a Uint8Array that can be used to decrypt the file.
 
@@ -324,7 +324,8 @@ Decrypt a file that was encrypted with the encryptFile function, without doing a
 
 *   `params` **[Object][122]** 
 
-
+    *   `params.file` **([Blob][135] | File)** The file you wish to decrypt
+    *   `params.symmetricKey` **[Uint8Array][133]** The symmetric key used that will be used to decrypt this.
 
 Returns **[Promise][134]<[Object][122]>** A promise containing the decrypted file.  The file is an ArrayBuffer.
 
@@ -376,7 +377,9 @@ Given a zip file with metadata inside it, unzip, load the metadata, and return t
 
 *   `params` **[Object][122]** 
 
-
+    *   `params.authSig` **[Object][122]** The authSig of the user.  Returned via the checkAndSignAuthMessage function
+    *   `params.file` **[Blob][135]** The zip file blob with metadata inside it and the encrypted asset
+    *   `params.litNodeClient` **[LitNodeClient][136]** An instance of LitNodeClient that is already connected
     *   `params.additionalAccessControlConditions`  
 
 Returns **[Promise][134]<[Object][122]>** A promise containing an object that contains decryptedFile and metadata properties.  The decryptedFile is an ArrayBuffer that is ready to use, and metadata is an object that contains all the properties of the file like it's name and size and type.
@@ -498,7 +501,10 @@ The human readable name for an access control condition
 
 *   `params` **[Object][122]** 
 
-
+    *   `params.accessControlConditions` **[Array][127]** The array of access control conditions that you want to humanize
+    *   `params.evmContractConditions` **[Array][127]** The array of evm contract conditions that you want to humanize
+    *   `params.solRpcConditions` **[Array][127]** The array of Solana RPC conditions that you want to humanize
+    *   `params.unifiedAccessControlConditions` **[Array][127]** The array of unified access control conditions that you want to humanize
     *   `params.tokenList`  
     *   `params.myWalletAddress`  
 
@@ -770,7 +776,10 @@ If not, throw `invalidParamType` error
 ### Parameters
 
 *   `value` **any** 
-
+*   `type` **[string][125]** 
+*   `paramName` **[string][125]** 
+*   `functionName` **[string][125]** 
+*   `throwOnError`   (optional, default `true`)
 
 Returns **[Boolean][123]** true/false
 
