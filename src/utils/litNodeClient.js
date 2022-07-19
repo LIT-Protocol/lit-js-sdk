@@ -12,6 +12,7 @@ import {
   log,
   is,
   checkIfAuthSigRequiresChainParam,
+  convertLitActionsParams,
 } from "../lib/utils";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import * as wasmECDSA from "../lib/ecdsa-sdk";
@@ -172,6 +173,9 @@ export default class LitNodeClient {
         errorCode: "lit_node_client_not_ready",
       });
     }
+
+    // some JS types don't serialize well, so we will convert them before sending to the nodes
+    jsParams = convertLitActionsParams(jsParams);
 
     const reqBody = { authSig, jsParams };
     if (code) {

@@ -112,3 +112,24 @@ export const checkIfAuthSigRequiresChainParam = (
 
   return true;
 };
+
+/**
+ * Convert types before sending to Lit Actions as jsParams.
+ * @param {Object} params.jsParams The jsParams you are sending
+ * @returns {Object} The jsParams object, but with any incompatible types automatically converted
+ */
+export const convertLitActionsParams = (jsParams) => {
+  const convertedParams = {};
+  for (const [key, value] of Object.entries(jsParams)) {
+    const varType = getVarType(value);
+    if (varType === "Uint8Array") {
+      convertedParams[key] = Array.from(value);
+    } else if (varType === "Object") {
+      // recurse over any objects
+      convertedParams[key] = convertLitActionsParams(value);
+    } else {
+      convertedParams[key] = value;
+    }
+  }
+  return convertedParams;
+};
