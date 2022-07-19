@@ -418,3 +418,7 @@ export const LIT_NETWORKS = {
     "http://localhost:7479",
   ],
 };
+
+// you can either pass a "chain" param to lit functions, which it uses to tell which network your sig came from.
+// or, you can pass a authSig that has and of these keys in it to tell which network your sig came from.
+export const LIT_AUTH_SIG_CHAIN_KEYS = ["ethereum", "solana", "cosmos", "kyve"];

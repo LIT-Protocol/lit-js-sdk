@@ -4,7 +4,12 @@ import {
   toString as uint8arrayToString,
 } from "uint8arrays";
 import { formatEther, formatUnits } from "@ethersproject/units";
-import { throwError, log, is } from "../lib/utils";
+import {
+  throwError,
+  log,
+  is,
+  checkIfAuthSigRequiresChainParam,
+} from "../lib/utils";
 
 import {
   importSymmetricKey,
@@ -70,9 +75,8 @@ export async function checkAndSignAuthMessage({ chain, resources }) {
  * @returns {Promise<Object>} A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
  */
 export async function encryptString(str) {
-
   // -- validate
-  if( ! is(str, 'string')) return;
+  if (!is(str, "string", "str", "encryptString")) return;
 
   const encodedString = uint8arrayFromString(str, "utf8");
 
@@ -89,7 +93,7 @@ export async function encryptString(str) {
   return {
     symmetricKey: exportedSymmKey,
     encryptedString,
-    encryptedData: encryptedString
+    encryptedData: encryptedString,
   };
 }
 
@@ -100,10 +104,10 @@ export async function encryptString(str) {
  * @returns {Promise<string>} A promise containing the decrypted string
  */
 export async function decryptString(encryptedStringBlob, symmKey) {
-
   // -- validate
-  if( ! is(encryptedStringBlob, 'Blob')) return;
-  if( ! is(symmKey, 'Uint8Array')) return;
+  if (!is(encryptedStringBlob, "Blob", "encryptedStringBlob", "decryptString"))
+    return;
+  if (!is(symmKey, "Uint8Array", "symmKey", "decryptString")) return;
 
   // import the decrypted symm key
   const importedSymmKey = await importSymmetricKey(symmKey);
@@ -122,6 +126,8 @@ export async function decryptString(encryptedStringBlob, symmKey) {
  * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a single file called "string.txt"
  */
 export async function zipAndEncryptString(string) {
+  if (!is(string, "string", "string", "zipAndEncryptString")) return;
+
   const zip = new JSZip();
   zip.file("string.txt", string);
   return encryptZip(zip);
@@ -136,6 +142,7 @@ export async function zipAndEncryptFiles(files) {
   // let's zip em
   const zip = new JSZip();
   for (let i = 0; i < files.length; i++) {
+    if (!is(files[i], "File", `files[${i}]`, "zipAndEncryptFiles")) return;
     zip.folder("encryptedAssets").file(files[i].name, files[i]);
   }
   return encryptZip(zip);
@@ -148,6 +155,8 @@ export async function zipAndEncryptFiles(files) {
  * @returns {Promise<Object>} A promise containing a JSZip object indexed by the filenames of the zipped files.  For example, if you have a file called "meow.jpg" in the root of your zip, you could get it from the JSZip object by doing this: const imageBlob = await decryptedZip['meow.jpg'].async('blob')
  */
 export async function decryptZip(encryptedZipBlob, symmKey) {
+  if (!is(encryptedZipBlob, "Blob", "encryptedZipBlob", "decryptZip")) return;
+  if (!is(symmKey, "Uint8Array", "symmKey", "decryptZip")) return;
   // const keypair = await checkAndDeriveKeypair()
 
   // log('Got keypair out of localstorage: ' + keypair)
@@ -285,6 +294,64 @@ export async function encryptFileAndZipWithMetadata({
   litNodeClient,
   readme,
 }) {
+  // -- validate
+  if (!is(authSig, "Object", "authSig", "encryptFileAndZipWithMetadata"))
+    return;
+  if (
+    accessControlConditions &&
+    !is(
+      accessControlConditions,
+      "Array",
+      "accessControlConditions",
+      "encryptFileAndZipWithMetadata"
+    )
+  )
+    return;
+  if (
+    evmContractConditions &&
+    !is(
+      evmContractConditions,
+      "Array",
+      "evmContractConditions",
+      "encryptFileAndZipWithMetadata"
+    )
+  )
+    return;
+  if (
+    solRpcConditions &&
+    !is(
+      solRpcConditions,
+      "Array",
+      "solRpcConditions",
+      "encryptFileAndZipWithMetadata"
+    )
+  )
+    return;
+  if (
+    unifiedAccessControlConditions &&
+    !is(
+      unifiedAccessControlConditions,
+      "Array",
+      "unifiedAccessControlConditions",
+      "encryptFileAndZipWithMetadata"
+    )
+  )
+    return;
+  if (
+    !checkIfAuthSigRequiresChainParam(
+      authSig,
+      chain,
+      "encryptFileAndZipWithMetadata"
+    )
+  )
+    return;
+  if (!is(file, "File", "file", "encryptFileAndZipWithMetadata")) return;
+  if (
+    readme &&
+    !is(readme, "string", "readme", "encryptFileAndZipWithMetadata")
+  )
+    return;
+
   const symmetricKey = await generateSymmetricKey();
   const exportedSymmKey = new Uint8Array(
     await crypto.subtle.exportKey("raw", symmetricKey)
@@ -337,7 +404,7 @@ export async function encryptFileAndZipWithMetadata({
  * Given a zip file with metadata inside it, unzip, load the metadata, and return the decrypted file and the metadata.  This zip file would have been created with the encryptFileAndZipWithMetadata function.
  * @param {Object} params
  * @param {Object} params.authSig The authSig of the user.  Returned via the checkAndSignAuthMessage function
- * @param {File} params.file The zip file with metadata inside it and the encrypted asset
+ * @param {Blob} params.file The zip file blob with metadata inside it and the encrypted asset
  * @param {LitNodeClient} params.litNodeClient An instance of LitNodeClient that is already connected
  * @returns {Promise<Object>} A promise containing an object that contains decryptedFile and metadata properties.  The decryptedFile is an ArrayBuffer that is ready to use, and metadata is an object that contains all the properties of the file like it's name and size and type.
  */
@@ -347,6 +414,10 @@ export async function decryptZipFileWithMetadata({
   litNodeClient,
   additionalAccessControlConditions,
 }) {
+  // -- validate
+  if (!is(authSig, "Object", "authSig", "decryptZipFileWithMetadata")) return;
+  if (!is(file, "Blob", "file", "decryptZipFileWithMetadata")) return;
+
   const zip = await JSZip.loadAsync(file);
   const metadata = JSON.parse(
     await zip.file("lit_protocol_metadata.json").async("string")
@@ -428,10 +499,17 @@ export async function decryptZipFileWithMetadata({
 /**
  * Encrypt a file without doing any zipping or packing.  This is useful for large files.  A 1gb file can be encrypted in only 2 seconds, for example.  A new random symmetric key will be created and returned along with the encrypted file.
  * @param {Object} params
- * @param {File} params.file The file you wish to encrypt
+ * @param {Blob|File} params.file The file you wish to encrypt
  * @returns {Promise<Object>} A promise containing an object with keys encryptedFile and symmetricKey.  encryptedFile is a Blob, and symmetricKey is a Uint8Array that can be used to decrypt the file.
  */
 export async function encryptFile({ file }) {
+  if (!is(file, "Blob", "file", "decryptFile", false)) {
+    // if it's a file, we don't have to do anything, because a file is a subclass of Blob and it will just work.
+    if (!is(file, "File", "file", "decryptFile", false)) {
+      // so, check if it's a file above, and if not, then run the blob check again but this time throw an error.
+      is(file, "Blob", "file", "decryptFile", true);
+    }
+  }
   // generate a random symmetric key
   const symmetricKey = await generateSymmetricKey();
   const exportedSymmKey = new Uint8Array(
@@ -451,11 +529,21 @@ export async function encryptFile({ file }) {
 /**
  * Decrypt a file that was encrypted with the encryptFile function, without doing any unzipping or unpacking.  This is useful for large files.  A 1gb file can be decrypted in only 1 second, for example.
  * @param {Object} params
- * @param {File} params.file The file you wish to decrypt
+ * @param {Blob|File} params.file The file you wish to decrypt
  * @param {Uint8Array} params.symmetricKey The symmetric key used that will be used to decrypt this.
  * @returns {Promise<Object>} A promise containing the decrypted file.  The file is an ArrayBuffer.
  */
 export async function decryptFile({ file, symmetricKey }) {
+  // -- validate
+  if (!is(file, "Blob", "file", "decryptFile", false)) {
+    // if it's a file, we don't have to do anything, because a file is a subclass of Blob and it will just work.
+    if (!is(file, "File", "file", "decryptFile", false)) {
+      // so, check if it's a file above, and if not, then run the blob check again but this time throw an error.
+      is(file, "Blob", "file", "decryptFile", true);
+    }
+  }
+  if (!is(symmetricKey, "Uint8Array", "symmetricKey", "decryptFile")) return;
+
   const importedSymmKey = await importSymmetricKey(symmetricKey);
 
   // decrypt the file
@@ -673,6 +761,8 @@ export async function toggleLock() {
  * @returns {promise} A promise that will resolve when the LIT is unlocked
  */
 export async function unlockLitWithKey({ symmetricKey }) {
+  if (!is(symmetricKey, "Uint8Array", "symmetricKey", "unlockLitWithKey"))
+    return;
   const mediaGridHolder = document.getElementById("mediaGridHolder");
   const lockedHeader = document.getElementById("lockedHeader");
 
@@ -694,6 +784,7 @@ export async function unlockLitWithKey({ symmetricKey }) {
  * @returns {Object} An object with 4 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.  "signature": A uint8array that represents the raw  signature of the JWT.
  */
 export function verifyJwt({ jwt }) {
+  if (!is(jwt, "string", "jwt", "verifyJwt")) return;
   log("verifyJwt", jwt);
   // verify that the wasm was loaded
   if (!globalThis.wasmExports) {
@@ -788,6 +879,9 @@ function humanizeComparator(comparator) {
  * The human readable name for an access control condition
  * @param {Object} params
  * @param {Array} params.accessControlConditions The array of access control conditions that you want to humanize
+ * @param {Array} params.evmContractConditions The array of evm contract conditions that you want to humanize
+ * @param {Array} params.solRpcConditions The array of Solana RPC conditions that you want to humanize
+ * @param {Array} params.unifiedAccessControlConditions The array of unified access control conditions that you want to humanize
  * @returns {Promise<string>} A promise containing a human readable description of the access control conditions
  */
 export async function humanizeAccessControlConditions({
