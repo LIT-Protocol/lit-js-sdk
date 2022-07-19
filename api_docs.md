@@ -262,7 +262,7 @@ Encrypt a file without doing any zipping or packing.  This is useful for large f
 
 *   `params` **[Object][116]** 
 
-    *   `params.file` **File** The file you wish to encrypt
+    *   `params.file` **([Blob][129] | File)** The file you wish to encrypt
 
 Returns **[Promise][128]<[Object][116]>** A promise containing an object with keys encryptedFile and symmetricKey.  encryptedFile is a Blob, and symmetricKey is a Uint8Array that can be used to decrypt the file.
 
@@ -274,7 +274,7 @@ Decrypt a file that was encrypted with the encryptFile function, without doing a
 
 *   `params` **[Object][116]** 
 
-    *   `params.file` **File** The file you wish to decrypt
+    *   `params.file` **([Blob][129] | File)** The file you wish to decrypt
     *   `params.symmetricKey` **[Uint8Array][127]** The symmetric key used that will be used to decrypt this.
 
 Returns **[Promise][128]<[Object][116]>** A promise containing the decrypted file.  The file is an ArrayBuffer.
@@ -328,7 +328,7 @@ Given a zip file with metadata inside it, unzip, load the metadata, and return t
 *   `params` **[Object][116]** 
 
     *   `params.authSig` **[Object][116]** The authSig of the user.  Returned via the checkAndSignAuthMessage function
-    *   `params.file` **File** The zip file with metadata inside it and the encrypted asset
+    *   `params.file` **[Blob][129]** The zip file blob with metadata inside it and the encrypted asset
     *   `params.litNodeClient` **[LitNodeClient][130]** An instance of LitNodeClient that is already connected
     *   `params.additionalAccessControlConditions`  
 
@@ -727,6 +727,9 @@ If not, throw `invalidParamType` error
 
 *   `value` **any** 
 *   `type` **[string][121]** 
+*   `paramName` **[string][121]** 
+*   `functionName` **[string][121]** 
+*   `throwOnError`   (optional, default `true`)
 
 Returns **[Boolean][117]** true/false
 
