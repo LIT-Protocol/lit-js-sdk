@@ -90,10 +90,13 @@ export async function encryptString(str) {
     await crypto.subtle.exportKey("raw", symmKey)
   );
 
+  const encryptedBuffer = await encryptedString.arrayBuffer();
+
   return {
     symmetricKey: exportedSymmKey,
     encryptedString,
     encryptedData: encryptedString,
+    encryptedBuffer
   };
 }
 
