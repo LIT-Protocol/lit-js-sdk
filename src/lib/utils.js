@@ -1,4 +1,3 @@
-import { constants } from "buffer";
 import { LIT_AUTH_SIG_CHAIN_KEYS } from "./constants.js";
 
 export const printError = (e) => {
