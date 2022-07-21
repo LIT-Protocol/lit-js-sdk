@@ -10,7 +10,7 @@ import {
   mostCommonString,
   throwError,
   log,
-  is,
+  checkType,
   checkIfAuthSigRequiresChainParam,
 } from "../lib/utils";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
@@ -518,41 +518,62 @@ export default class LitNodeClient {
     // -- validate
     if (
       accessControlConditions &&
-      !is(
-        accessControlConditions,
-        "Array",
-        "accessControlConditions",
-        "getEncryptionKey"
-      )
+      !checkType({
+        value: accessControlConditions,
+        allowedTypes: ["Array"],
+        paramName: "accessControlConditions",
+        functionName: "getEncryptionKey",
+      })
     )
       return;
     if (
       evmContractConditions &&
-      !is(
-        evmContractConditions,
-        "Array",
-        "evmContractConditions",
-        "getEncryptionKey"
-      )
+      !checkType({
+        value: evmContractConditions,
+        allowedTypes: ["Array"],
+        paramName: "evmContractConditions",
+        functionName: "getEncryptionKey",
+      })
     )
       return;
     if (
       solRpcConditions &&
-      !is(solRpcConditions, "Array", "solRpcConditions", "getEncryptionKey")
+      !checkType({
+        value: solRpcConditions,
+        allowedTypes: ["Array"],
+        paramName: "solRpcConditions",
+        functionName: "getEncryptionKey",
+      })
     )
       return;
     if (
       unifiedAccessControlConditions &&
-      !is(
-        unifiedAccessControlConditions,
-        "Array",
-        "unifiedAccessControlConditions",
-        "getEncryptionKey"
-      )
+      !checkType({
+        value: unifiedAccessControlConditions,
+        allowedTypes: ["Array"],
+        paramName: "unifiedAccessControlConditions",
+        functionName: "getEncryptionKey",
+      })
     )
       return;
-    if (!is(toDecrypt, "string", "toDecrypt", "getEncryptionKey")) return;
-    if (!is(authSig, "Object", "authSig", "getEncryptionKey")) return;
+    if (
+      !checkType({
+        value: toDecrypt,
+        allowedTypes: ["String"],
+        paramName: "toDecrypt",
+        functionName: "getEncryptionKey",
+      })
+    )
+      return;
+    if (
+      !checkType({
+        value: authSig,
+        allowedTypes: ["Object"],
+        paramName: "authSig",
+        functionName: "getEncryptionKey",
+      })
+    )
+      return;
     if (!checkIfAuthSigRequiresChainParam(authSig, chain, "getEncryptionKey"))
       return;
 
@@ -700,56 +721,74 @@ export default class LitNodeClient {
     // -- validate
     if (
       accessControlConditions &&
-      !is(
-        accessControlConditions,
-        "Array",
-        "accessControlConditions",
-        "saveEncryptionKey"
-      )
+      !checkType({
+        value: accessControlConditions,
+        allowedTypes: ["Array"],
+        paramName: "accessControlConditions",
+        functionName: "saveEncryptionKey",
+      })
     )
       return;
     if (
       evmContractConditions &&
-      !is(
-        evmContractConditions,
-        "Array",
-        "evmContractConditions",
-        "saveEncryptionKey"
-      )
+      !checkType({
+        value: evmContractConditions,
+        allowedTypes: ["Array"],
+        paramName: "evmContractConditions",
+        functionName: "saveEncryptionKey",
+      })
     )
       return;
     if (
       solRpcConditions &&
-      !is(solRpcConditions, "Array", "solRpcConditions", "saveEncryptionKey")
+      !checkType({
+        value: solRpcConditions,
+        allowedTypes: ["Array"],
+        paramName: "solRpcConditions",
+        functionName: "saveEncryptionKey",
+      })
     )
       return;
     if (
       unifiedAccessControlConditions &&
-      !is(
-        unifiedAccessControlConditions,
-        "Array",
-        "unifiedAccessControlConditions",
-        "saveEncryptionKey"
-      )
+      !checkType({
+        value: unifiedAccessControlConditions,
+        allowedTypes: ["Array"],
+        paramName: "unifiedAccessControlConditions",
+        functionName: "saveEncryptionKey",
+      })
     )
       return;
 
-    if (!is(authSig, "Object", "authSig", "saveEncryptionKey")) return;
+    if (
+      !checkType({
+        value: authSig,
+        allowedTypes: ["Object"],
+        paramName: "authSig",
+        functionName: "saveEncryptionKey",
+      })
+    )
+      return;
     if (!checkIfAuthSigRequiresChainParam(authSig, chain, "saveEncryptionKey"))
       return;
     if (
       symmetricKey &&
-      !is(symmetricKey, "Uint8Array", "symmetricKey", "saveEncryptionKey")
+      !checkType({
+        value: symmetricKey,
+        allowedTypes: ["Uint8Array"],
+        paramName: "symmetricKey",
+        functionName: "saveEncryptionKey",
+      })
     )
       return;
     if (
       encryptedSymmetricKey &&
-      !is(
-        encryptedSymmetricKey,
-        "Uint8Array",
-        "encryptedSymmetricKey",
-        "saveEncryptionKey"
-      )
+      !checkType({
+        value: encryptedSymmetricKey,
+        allowedTypes: ["Uint8Array"],
+        paramName: "encryptedSymmetricKey",
+        functionName: "saveEncryptionKey",
+      })
     )
       return;
 

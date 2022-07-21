@@ -67,6 +67,7 @@
         "/" +
         Math.random().toString(36).substring(2, 15) +
         Math.random().toString(36).substring(2, 15);
+
       var testProvisoningAndSigning = async ({
         accessControlConditions,
         testName,
@@ -228,6 +229,7 @@
         await testProvisoningAndSigning({
           accessControlConditions,
           testName: "ERC1155",
+          authSig,
         });
       };
 

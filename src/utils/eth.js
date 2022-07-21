@@ -552,7 +552,10 @@ export const signMessageAsync = async (signer, address, message) => {
 export async function mintLIT({ chain, quantity }) {
   log(`minting ${quantity} tokens on ${chain}`);
   try {
-    const authSig = await checkAndSignEVMAuthMessage({ chain });
+    const authSig = await checkAndSignEVMAuthMessage({
+      chain,
+      switchChain: true,
+    });
     if (authSig.errorCode) {
       return authSig;
     }
