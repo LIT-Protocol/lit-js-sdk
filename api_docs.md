@@ -407,6 +407,7 @@ Check for an existing cryptographic authentication signature and create one of i
 
     *   `params.chain` **[string][121]** The chain you want to use.  Find the supported list of chains here: [https://developer.litprotocol.com/docs/supportedChains][131]
     *   `params.resources` **[Array][119]<[string][121]>** Optional and only used with EVM chains.  A list of resources to be passed to Sign In with Ethereum.  These resources will be part of the Sign in with Ethereum signed message presented to the user.
+    *   `params.switchChain` **[Array][119]<[boolean][117]>** Optional and only used with EVM chains right now.  Set to true by default.  Whether or not to ask Metamask or the user's wallet to switch chains before signing.  This may be desired if you're going to have the user send a txn on that chain.  On the other hand, if all you care about is the user's wallet signature, then you probably don't want to make them switch chains for no reason.  Pass false here to disable this chain switching behavior. (optional, default `true`)
 
 Returns **[AuthSig][125]** The AuthSig created or retrieved
 
