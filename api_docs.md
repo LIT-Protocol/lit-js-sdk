@@ -100,7 +100,7 @@
 *   [ALL_LIT_CHAINS][96]
 *   [getVarType][97]
     *   [Parameters][98]
-*   [is][99]
+*   [checkType][99]
     *   [Parameters][100]
 *   [downloadFile][101]
     *   [Parameters][102]
@@ -249,7 +249,7 @@ Decrypt a string that was encrypted with the encryptString function.
 
 ### Parameters
 
-*   `encryptedStringBlob` **[Blob][129]** The encrypted string as a Blob
+*   `encryptedStringBlob` **([Blob][129] | File)** The encrypted string as a Blob
 *   `symmKey` **[Uint8Array][127]** The symmetric key used that will be used to decrypt this.
 
 Returns **[Promise][128]<[string][121]>** A promise containing the decrypted string
@@ -295,7 +295,7 @@ Zip and encrypt multiple files.
 
 ### Parameters
 
-*   `files` **[array][119]** An array of the files you wish to zip and encrypt
+*   `files` **[Array][119]\<File>** An array of the files you wish to zip and encrypt
 
 Returns **[Promise][128]<[Object][116]>** A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
 
@@ -328,7 +328,7 @@ Given a zip file with metadata inside it, unzip, load the metadata, and return t
 *   `params` **[Object][116]** 
 
     *   `params.authSig` **[Object][116]** The authSig of the user.  Returned via the checkAndSignAuthMessage function
-    *   `params.file` **[Blob][129]** The zip file blob with metadata inside it and the encrypted asset
+    *   `params.file` **([Blob][129] | File)** The zip file blob with metadata inside it and the encrypted asset
     *   `params.litNodeClient` **[LitNodeClient][130]** An instance of LitNodeClient that is already connected
     *   `params.additionalAccessControlConditions`  
 
@@ -350,7 +350,7 @@ Decrypt and unzip a zip that was created using encryptZip, zipAndEncryptString, 
 
 ### Parameters
 
-*   `encryptedZipBlob` **[Blob][129]** The encrypted zip as a Blob
+*   `encryptedZipBlob` **([Blob][129] | File)** The encrypted zip as a Blob
 *   `symmKey` **[Uint8Array][127]** The symmetric key used that will be used to decrypt this zip.
 
 Returns **[Promise][128]<[Object][116]>** A promise containing a JSZip object indexed by the filenames of the zipped files.  For example, if you have a file called "meow.jpg" in the root of your zip, you could get it from the JSZip object by doing this: const imageBlob = await decryptedZip\['meow.jpg'].async('blob')
@@ -719,18 +719,25 @@ or simply a`string`or`int\` type
 
 Returns **[String][121]** type
 
-## is
+## checkType
 
 Check if the given value is the given type
 If not, throw `invalidParamType` error
 
 ### Parameters
 
+*   `$0` **[Object][116]** 
+
+    *   `$0.value`  
+    *   `$0.allowedTypes`  
+    *   `$0.paramName`  
+    *   `$0.functionName`  
+    *   `$0.throwOnError`   (optional, default `true`)
 *   `value` **any** 
-*   `type` **[string][121]** 
+*   `allowedTypes` **[Array][119]<[String][121]>** 
 *   `paramName` **[string][121]** 
 *   `functionName` **[string][121]** 
-*   `throwOnError`   (optional, default `true`)
+*   `throwOnError` **[boolean][117]** 
 
 Returns **[Boolean][117]** true/false
 
@@ -1025,7 +1032,7 @@ Type: [Object][116]
 
 [98]: #parameters-30
 
-[99]: #is
+[99]: #checktype
 
 [100]: #parameters-31
 
