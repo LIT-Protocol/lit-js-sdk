@@ -1,0 +1,6 @@
+{
+  "name": "@lit-protocol/sdk-nodejs",
+  "version": "1.2.3",
+  "main": "build/index.node.js",
+  "license": "MIT"
+}
