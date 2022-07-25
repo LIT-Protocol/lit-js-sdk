@@ -7,7 +7,7 @@ import { formatEther, formatUnits } from "@ethersproject/units";
 import {
   throwError,
   log,
-  is,
+  checkType,
   checkIfAuthSigRequiresChainParam,
 } from "../lib/utils";
 
@@ -38,9 +38,14 @@ const PACKAGE_CACHE = {};
  * @param {Object} params
  * @param {string} params.chain The chain you want to use.  Find the supported list of chains here: https://developer.litprotocol.com/docs/supportedChains
  * @param {Array<string>} params.resources Optional and only used with EVM chains.  A list of resources to be passed to Sign In with Ethereum.  These resources will be part of the Sign in with Ethereum signed message presented to the user.
+ * @param {Array<boolean>} params.switchChain Optional and only used with EVM chains right now.  Set to true by default.  Whether or not to ask Metamask or the user's wallet to switch chains before signing.  This may be desired if you're going to have the user send a txn on that chain.  On the other hand, if all you care about is the user's wallet signature, then you probably don't want to make them switch chains for no reason.  Pass false here to disable this chain switching behavior.
  * @returns {AuthSig} The AuthSig created or retrieved
  */
-export async function checkAndSignAuthMessage({ chain, resources }) {
+export async function checkAndSignAuthMessage({
+  chain,
+  resources,
+  switchChain = true,
+}) {
   const chainInfo = ALL_LIT_CHAINS[chain];
   if (!chainInfo) {
     throwError({
@@ -53,7 +58,7 @@ export async function checkAndSignAuthMessage({ chain, resources }) {
   }
 
   if (chainInfo.vmType === "EVM") {
-    return checkAndSignEVMAuthMessage({ chain, resources });
+    return checkAndSignEVMAuthMessage({ chain, resources, switchChain });
   } else if (chainInfo.vmType === "SVM") {
     return checkAndSignSolAuthMessage({ chain });
   } else if (chainInfo.vmType === "CVM") {
@@ -76,7 +81,15 @@ export async function checkAndSignAuthMessage({ chain, resources }) {
  */
 export async function encryptString(str) {
   // -- validate
-  if (!is(str, "string", "str", "encryptString")) return;
+  if (
+    !checkType({
+      value: str,
+      allowedTypes: ["String"],
+      paramName: "str",
+      functionName: "encryptString",
+    })
+  )
+    return;
 
   const encodedString = uint8arrayFromString(str, "utf8");
 
@@ -99,15 +112,30 @@ export async function encryptString(str) {
 
 /**
  * Decrypt a string that was encrypted with the encryptString function.
- * @param {Blob} encryptedStringBlob The encrypted string as a Blob
+ * @param {Blob|File} encryptedStringBlob The encrypted string as a Blob
  * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this.
  * @returns {Promise<string>} A promise containing the decrypted string
  */
 export async function decryptString(encryptedStringBlob, symmKey) {
   // -- validate
-  if (!is(encryptedStringBlob, "Blob", "encryptedStringBlob", "decryptString"))
+  if (
+    !checkType({
+      value: encryptedStringBlob,
+      allowedTypes: ["Blob", "File"],
+      paramName: "encryptedStringBlob",
+      functionName: "decryptString",
+    })
+  )
     return;
-  if (!is(symmKey, "Uint8Array", "symmKey", "decryptString")) return;
+  if (
+    !checkType({
+      value: symmKey,
+      allowedTypes: ["Uint8Array"],
+      paramName: ["symmKey"],
+      functionName: ["decryptString"],
+    })
+  )
+    return;
 
   // import the decrypted symm key
   const importedSymmKey = await importSymmetricKey(symmKey);
@@ -126,7 +154,15 @@ export async function decryptString(encryptedStringBlob, symmKey) {
  * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a single file called "string.txt"
  */
 export async function zipAndEncryptString(string) {
-  if (!is(string, "string", "string", "zipAndEncryptString")) return;
+  if (
+    !checkType({
+      value: string,
+      allowedTypes: ["String"],
+      paramName: "string",
+      functionName: "zipAndEncryptString",
+    })
+  )
+    return;
 
   const zip = new JSZip();
   zip.file("string.txt", string);
@@ -135,14 +171,22 @@ export async function zipAndEncryptString(string) {
 
 /**
  * Zip and encrypt multiple files.
- * @param {array} files An array of the files you wish to zip and encrypt
+ * @param {Array<File>} files An array of the files you wish to zip and encrypt
  * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
  */
 export async function zipAndEncryptFiles(files) {
   // let's zip em
   const zip = new JSZip();
   for (let i = 0; i < files.length; i++) {
-    if (!is(files[i], "File", `files[${i}]`, "zipAndEncryptFiles")) return;
+    if (
+      !checkType({
+        value: files[i],
+        allowedTypes: ["File"],
+        paramName: `files[${i}]`,
+        functionName: "zipAndEncryptFiles",
+      })
+    )
+      return;
     zip.folder("encryptedAssets").file(files[i].name, files[i]);
   }
   return encryptZip(zip);
@@ -150,13 +194,29 @@ export async function zipAndEncryptFiles(files) {
 
 /**
  * Decrypt and unzip a zip that was created using encryptZip, zipAndEncryptString, or zipAndEncryptFiles.
- * @param {Blob} encryptedZipBlob The encrypted zip as a Blob
+ * @param {Blob|File} encryptedZipBlob The encrypted zip as a Blob
  * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this zip.
  * @returns {Promise<Object>} A promise containing a JSZip object indexed by the filenames of the zipped files.  For example, if you have a file called "meow.jpg" in the root of your zip, you could get it from the JSZip object by doing this: const imageBlob = await decryptedZip['meow.jpg'].async('blob')
  */
 export async function decryptZip(encryptedZipBlob, symmKey) {
-  if (!is(encryptedZipBlob, "Blob", "encryptedZipBlob", "decryptZip")) return;
-  if (!is(symmKey, "Uint8Array", "symmKey", "decryptZip")) return;
+  if (
+    !checkType({
+      value: encryptedZipBlob,
+      allowedTypes: ["Blob", "File"],
+      paramName: "encryptedZipBlob",
+      functionName: "decryptZip",
+    })
+  )
+    return;
+  if (
+    !checkType({
+      value: symmKey,
+      allowedTypes: ["Uint8Array"],
+      paramName: "symmKey",
+      functionName: "decryptZip",
+    })
+  )
+    return;
   // const keypair = await checkAndDeriveKeypair()
 
   // log('Got keypair out of localstorage: ' + keypair)
@@ -295,46 +355,53 @@ export async function encryptFileAndZipWithMetadata({
   readme,
 }) {
   // -- validate
-  if (!is(authSig, "Object", "authSig", "encryptFileAndZipWithMetadata"))
+  if (
+    !checkType({
+      value: authSig,
+      allowedTypes: ["Object"],
+      paramName: "authSig",
+      functionName: "encryptFileAndZipWithMetadata",
+    })
+  )
     return;
   if (
     accessControlConditions &&
-    !is(
-      accessControlConditions,
-      "Array",
-      "accessControlConditions",
-      "encryptFileAndZipWithMetadata"
-    )
+    !checkType({
+      value: accessControlConditions,
+      allowedTypes: ["Array"],
+      paramName: "accessControlConditions",
+      functionName: "encryptFileAndZipWithMetadata",
+    })
   )
     return;
   if (
     evmContractConditions &&
-    !is(
-      evmContractConditions,
-      "Array",
-      "evmContractConditions",
-      "encryptFileAndZipWithMetadata"
-    )
+    !checkType({
+      value: evmContractConditions,
+      allowedTypes: ["Array"],
+      paramName: "evmContractConditions",
+      functionName: "encryptFileAndZipWithMetadata",
+    })
   )
     return;
   if (
     solRpcConditions &&
-    !is(
-      solRpcConditions,
-      "Array",
-      "solRpcConditions",
-      "encryptFileAndZipWithMetadata"
-    )
+    !checkType({
+      value: solRpcConditions,
+      allowedTypes: ["Array"],
+      paramName: "solRpcConditions",
+      functionName: "encryptFileAndZipWithMetadata",
+    })
   )
     return;
   if (
     unifiedAccessControlConditions &&
-    !is(
-      unifiedAccessControlConditions,
-      "Array",
-      "unifiedAccessControlConditions",
-      "encryptFileAndZipWithMetadata"
-    )
+    !checkType({
+      value: unifiedAccessControlConditions,
+      allowedTypes: ["Array"],
+      paramName: "unifiedAccessControlConditions",
+      functionName: "encryptFileAndZipWithMetadata",
+    })
   )
     return;
   if (
@@ -345,10 +412,23 @@ export async function encryptFileAndZipWithMetadata({
     )
   )
     return;
-  if (!is(file, "File", "file", "encryptFileAndZipWithMetadata")) return;
+  if (
+    !checkType({
+      value: file,
+      allowedTypes: ["File"],
+      paramName: "file",
+      functionName: "encryptFileAndZipWithMetadata",
+    })
+  )
+    return;
   if (
     readme &&
-    !is(readme, "string", "readme", "encryptFileAndZipWithMetadata")
+    !checkType({
+      value: readme,
+      allowedTypes: ["String"],
+      paramName: "readme",
+      functionName: "encryptFileAndZipWithMetadata",
+    })
   )
     return;
 
@@ -404,7 +484,7 @@ export async function encryptFileAndZipWithMetadata({
  * Given a zip file with metadata inside it, unzip, load the metadata, and return the decrypted file and the metadata.  This zip file would have been created with the encryptFileAndZipWithMetadata function.
  * @param {Object} params
  * @param {Object} params.authSig The authSig of the user.  Returned via the checkAndSignAuthMessage function
- * @param {Blob} params.file The zip file blob with metadata inside it and the encrypted asset
+ * @param {Blob|File} params.file The zip file blob with metadata inside it and the encrypted asset
  * @param {LitNodeClient} params.litNodeClient An instance of LitNodeClient that is already connected
  * @returns {Promise<Object>} A promise containing an object that contains decryptedFile and metadata properties.  The decryptedFile is an ArrayBuffer that is ready to use, and metadata is an object that contains all the properties of the file like it's name and size and type.
  */
@@ -415,8 +495,24 @@ export async function decryptZipFileWithMetadata({
   additionalAccessControlConditions,
 }) {
   // -- validate
-  if (!is(authSig, "Object", "authSig", "decryptZipFileWithMetadata")) return;
-  if (!is(file, "Blob", "file", "decryptZipFileWithMetadata")) return;
+  if (
+    !checkType({
+      value: authSig,
+      allowedTypes: ["Object"],
+      paramName: "authSig",
+      functionName: "decryptZipFileWithMetadata",
+    })
+  )
+    return;
+  if (
+    !checkType({
+      value: file,
+      allowedTypes: ["Blob", "File"],
+      paramName: "file",
+      functionName: "decryptZipFileWithMetadata",
+    })
+  )
+    return;
 
   const zip = await JSZip.loadAsync(file);
   const metadata = JSON.parse(
@@ -503,13 +599,16 @@ export async function decryptZipFileWithMetadata({
  * @returns {Promise<Object>} A promise containing an object with keys encryptedFile and symmetricKey.  encryptedFile is a Blob, and symmetricKey is a Uint8Array that can be used to decrypt the file.
  */
 export async function encryptFile({ file }) {
-  if (!is(file, "Blob", "file", "decryptFile", false)) {
-    // if it's a file, we don't have to do anything, because a file is a subclass of Blob and it will just work.
-    if (!is(file, "File", "file", "decryptFile", false)) {
-      // so, check if it's a file above, and if not, then run the blob check again but this time throw an error.
-      is(file, "Blob", "file", "decryptFile", true);
-    }
-  }
+  if (
+    !checkType({
+      value: file,
+      allowedTypes: ["Blob", "File"],
+      paramName: "file",
+      functionName: "encryptFile",
+    })
+  )
+    return;
+
   // generate a random symmetric key
   const symmetricKey = await generateSymmetricKey();
   const exportedSymmKey = new Uint8Array(
@@ -535,14 +634,25 @@ export async function encryptFile({ file }) {
  */
 export async function decryptFile({ file, symmetricKey }) {
   // -- validate
-  if (!is(file, "Blob", "file", "decryptFile", false)) {
-    // if it's a file, we don't have to do anything, because a file is a subclass of Blob and it will just work.
-    if (!is(file, "File", "file", "decryptFile", false)) {
-      // so, check if it's a file above, and if not, then run the blob check again but this time throw an error.
-      is(file, "Blob", "file", "decryptFile", true);
-    }
-  }
-  if (!is(symmetricKey, "Uint8Array", "symmetricKey", "decryptFile")) return;
+  if (
+    !checkType({
+      value: file,
+      allowedTypes: ["Blob", "File"],
+      paramName: "file",
+      functionName: "decryptFile",
+    })
+  )
+    return;
+
+  if (
+    !checkType({
+      value: symmetricKey,
+      allowedTypes: ["Uint8Array"],
+      paramName: "symmetricKey",
+      functionName: "decryptFile",
+    })
+  )
+    return;
 
   const importedSymmKey = await importSymmetricKey(symmetricKey);
 
@@ -761,7 +871,14 @@ export async function toggleLock() {
  * @returns {promise} A promise that will resolve when the LIT is unlocked
  */
 export async function unlockLitWithKey({ symmetricKey }) {
-  if (!is(symmetricKey, "Uint8Array", "symmetricKey", "unlockLitWithKey"))
+  if (
+    !checkType({
+      value: symmetricKey,
+      allowedTypes: ["Uint8Array"],
+      paramName: "symmetricKey",
+      functionName: "unlockLitWithKey",
+    })
+  )
     return;
   const mediaGridHolder = document.getElementById("mediaGridHolder");
   const lockedHeader = document.getElementById("lockedHeader");
@@ -784,7 +901,15 @@ export async function unlockLitWithKey({ symmetricKey }) {
  * @returns {Object} An object with 4 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.  "signature": A uint8array that represents the raw  signature of the JWT.
  */
 export function verifyJwt({ jwt }) {
-  if (!is(jwt, "string", "jwt", "verifyJwt")) return;
+  if (
+    !checkType({
+      value: jwt,
+      allowedTypes: ["String"],
+      paraamName: "jwt",
+      functionName: "verifyJwt",
+    })
+  )
+    return;
   log("verifyJwt", jwt);
   // verify that the wasm was loaded
   if (!globalThis.wasmExports) {

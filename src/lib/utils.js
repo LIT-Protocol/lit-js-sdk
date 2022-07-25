@@ -45,16 +45,17 @@ export const log = (...args) => {
  * @returns { String } type
  */
 export const getVarType = (value) => {
-  // if it's an object
-  if (value instanceof Object) {
-    if (value.constructor.name == "Object") {
-      return "Object";
-    }
-    return value.constructor.name;
-  }
+  return Object.prototype.toString.call(value).slice(8, -1);
+  // // if it's an object
+  // if (value instanceof Object) {
+  //   if (value.constructor.name == "Object") {
+  //     return "Object";
+  //   }
+  //   return value.constructor.name;
+  // }
 
-  // if it's other type, like string and int
-  return typeof value;
+  // // if it's other type, like string and int
+  // return typeof value;
 };
 
 /**
@@ -63,20 +64,23 @@ export const getVarType = (value) => {
  *  If not, throw `invalidParamType` error
  *
  * @param { * } value
- * @param { string } type
+ * @param { Array<String> } allowedTypes
  * @param { string } paramName
  * @param { string } functionName
+ * @param { boolean } throwOnError
  * @returns { Boolean } true/false
  */
-export const is = (
+export const checkType = ({
   value,
-  type,
+  allowedTypes,
   paramName,
   functionName,
-  throwOnError = true
-) => {
-  if (getVarType(value) !== type) {
-    let message = `Expecting "${type}" type for parameter named ${paramName} in Lit-JS-SDK function ${functionName}(), but received "${getVarType(
+  throwOnError = true,
+}) => {
+  if (!allowedTypes.includes(getVarType(value))) {
+    let message = `Expecting ${allowedTypes.join(
+      " or "
+    )} type for parameter named ${paramName} in Lit-JS-SDK function ${functionName}(), but received "${getVarType(
       value
     )}" type instead. value: ${
       value instanceof Object ? JSON.stringify(value) : value
@@ -107,7 +111,15 @@ export const checkIfAuthSigRequiresChainParam = (
   }
 
   // if we're here, then we need the chain param
-  if (!is(chain, "string", "chain", functionName)) return false;
+  if (
+    !checkType({
+      value: chain,
+      allowedTypes: ["String"],
+      paramName: "chain",
+      functionName,
+    })
+  )
+    return false;
 
   return true;
 };

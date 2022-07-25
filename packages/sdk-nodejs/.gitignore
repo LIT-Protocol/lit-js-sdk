@@ -25,5 +25,3 @@ yarn-debug.log*
 yarn-error.log*
 
 .idea
-
-packages/sdk-nodejs/node_modules

@@ -27,4 +27,11 @@ case $BRANCH in
 esac
 
 
+# copy the nodejs build
+cp build/index.node.js packages/sdk-nodejs/build/
+# don't copy the source map because it's huge, like 4.5MB.  
+# cp build/index.node.js.map packages/sdk-nodejs/build/
+cd packages/sdk-nodejs
+yarn publish --new-version $VERSION
+
 echo "Don't forget to git push to get this running on the netlify cdn"

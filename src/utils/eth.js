@@ -162,7 +162,11 @@ export async function disconnectWeb3() {
 //   return keypair
 // }
 
-export async function checkAndSignEVMAuthMessage({ chain, resources }) {
+export async function checkAndSignEVMAuthMessage({
+  chain,
+  resources,
+  switchChain,
+}) {
   const selectedChain = LIT_CHAINS[chain];
   const { web3, account } = await connectWeb3({
     chainId: selectedChain.chainId,
@@ -188,7 +192,7 @@ export async function checkAndSignEVMAuthMessage({ chain, resources }) {
     `checkAndSignAuthMessage with chainId ${chainId} and chain set to ${chain} and selectedChain is `,
     selectedChain
   );
-  if (chainId !== selectedChain.chainId) {
+  if (chainId !== selectedChain.chainId && switchChain) {
     if (web3.provider instanceof WalletConnectProvider) {
       // this chain switching won't work.  alert the user that they need to switch chains manually
       throwError({
@@ -252,6 +256,8 @@ export async function checkAndSignEVMAuthMessage({ chain, resources }) {
         }
       }
     }
+    // we may have switched the chain to the selected chain.  set the chainId accordingly
+    chainId = selectedChain.chainId;
   }
   log("checking if sig is in local storage");
   let authSig = localStorage.getItem("lit-auth-signature");
@@ -260,7 +266,7 @@ export async function checkAndSignEVMAuthMessage({ chain, resources }) {
     await signAndSaveAuthMessage({
       web3,
       account,
-      chainId: selectedChain.chainId,
+      chainId,
       resources,
     });
     authSig = localStorage.getItem("lit-auth-signature");
@@ -546,7 +552,10 @@ export const signMessageAsync = async (signer, address, message) => {
 export async function mintLIT({ chain, quantity }) {
   log(`minting ${quantity} tokens on ${chain}`);
   try {
-    const authSig = await checkAndSignEVMAuthMessage({ chain });
+    const authSig = await checkAndSignEVMAuthMessage({
+      chain,
+      switchChain: true,
+    });
     if (authSig.errorCode) {
       return authSig;
     }

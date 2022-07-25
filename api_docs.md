@@ -84,6 +84,7 @@
     *   [Properties][80]
 *   [SolRpcCondition][81]
     *   [Properties][82]
+<<<<<<< HEAD
 *   [CosmosCondition][83]
     *   [Properties][84]
 *   [ResourceId][85]
@@ -105,6 +106,29 @@
 *   [LIT_COSMOS_CHAINS][101]
 *   [ALL_LIT_CHAINS][102]
 *   [getVarType][103]
+=======
+*   [Chain Info][83]
+*   [LITChain][84]
+    *   [Properties][85]
+*   [LITEVMChain][86]
+    *   [Properties][87]
+*   [LITSVMChain][88]
+    *   [Properties][89]
+*   [Misc][90]
+*   [LITCosmosChain][91]
+    *   [Properties][92]
+*   [LIT_CHAINS][93]
+*   [LIT_SVM_CHAINS][94]
+*   [LIT_COSMOS_CHAINS][95]
+*   [ALL_LIT_CHAINS][96]
+*   [getVarType][97]
+    *   [Parameters][98]
+*   [checkType][99]
+    *   [Parameters][100]
+*   [downloadFile][101]
+    *   [Parameters][102]
+*   [encryptWithPubKey][103]
+>>>>>>> main
     *   [Parameters][104]
 *   [is][105]
     *   [Parameters][106]
@@ -301,8 +325,13 @@ Decrypt a string that was encrypted with the encryptString function.
 
 ### Parameters
 
+<<<<<<< HEAD
 *   `encryptedStringBlob` **[Blob][137]** The encrypted string as a Blob
 *   `symmKey` **[Uint8Array][135]** The symmetric key used that will be used to decrypt this.
+=======
+*   `encryptedStringBlob` **([Blob][129] | File)** The encrypted string as a Blob
+*   `symmKey` **[Uint8Array][127]** The symmetric key used that will be used to decrypt this.
+>>>>>>> main
 
 Returns **[Promise][136]<[string][127]>** A promise containing the decrypted string
 
@@ -347,7 +376,11 @@ Zip and encrypt multiple files.
 
 ### Parameters
 
+<<<<<<< HEAD
 *   `files` **[array][129]** An array of the files you wish to zip and encrypt
+=======
+*   `files` **[Array][119]\<File>** An array of the files you wish to zip and encrypt
+>>>>>>> main
 
 Returns **[Promise][136]<[Object][124]>** A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
 
@@ -379,9 +412,15 @@ Given a zip file with metadata inside it, unzip, load the metadata, and return t
 
 *   `params` **[Object][124]** 
 
+<<<<<<< HEAD
     *   `params.authSig` **[Object][124]** The authSig of the user.  Returned via the checkAndSignAuthMessage function
     *   `params.file` **[Blob][137]** The zip file blob with metadata inside it and the encrypted asset
     *   `params.litNodeClient` **[LitNodeClient][138]** An instance of LitNodeClient that is already connected
+=======
+    *   `params.authSig` **[Object][116]** The authSig of the user.  Returned via the checkAndSignAuthMessage function
+    *   `params.file` **([Blob][129] | File)** The zip file blob with metadata inside it and the encrypted asset
+    *   `params.litNodeClient` **[LitNodeClient][130]** An instance of LitNodeClient that is already connected
+>>>>>>> main
     *   `params.additionalAccessControlConditions`  
 
 Returns **[Promise][136]<[Object][124]>** A promise containing an object that contains decryptedFile and metadata properties.  The decryptedFile is an ArrayBuffer that is ready to use, and metadata is an object that contains all the properties of the file like it's name and size and type.
@@ -402,8 +441,13 @@ Decrypt and unzip a zip that was created using encryptZip, zipAndEncryptString, 
 
 ### Parameters
 
+<<<<<<< HEAD
 *   `encryptedZipBlob` **[Blob][137]** The encrypted zip as a Blob
 *   `symmKey` **[Uint8Array][135]** The symmetric key used that will be used to decrypt this zip.
+=======
+*   `encryptedZipBlob` **([Blob][129] | File)** The encrypted zip as a Blob
+*   `symmKey` **[Uint8Array][127]** The symmetric key used that will be used to decrypt this zip.
+>>>>>>> main
 
 Returns **[Promise][136]<[Object][124]>** A promise containing a JSZip object indexed by the filenames of the zipped files.  For example, if you have a file called "meow.jpg" in the root of your zip, you could get it from the JSZip object by doing this: const imageBlob = await decryptedZip\['meow.jpg'].async('blob')
 
@@ -457,8 +501,14 @@ Check for an existing cryptographic authentication signature and create one of i
 
 *   `params` **[Object][124]** 
 
+<<<<<<< HEAD
     *   `params.chain` **[string][127]** The chain you want to use.  Find the supported list of chains here: [https://developer.litprotocol.com/docs/supportedChains][139]
     *   `params.resources` **[Array][129]<[string][127]>** Optional and only used with EVM chains.  A list of resources to be passed to Sign In with Ethereum.  These resources will be part of the Sign in with Ethereum signed message presented to the user.
+=======
+    *   `params.chain` **[string][121]** The chain you want to use.  Find the supported list of chains here: [https://developer.litprotocol.com/docs/supportedChains][131]
+    *   `params.resources` **[Array][119]<[string][121]>** Optional and only used with EVM chains.  A list of resources to be passed to Sign In with Ethereum.  These resources will be part of the Sign in with Ethereum signed message presented to the user.
+    *   `params.switchChain` **[Array][119]<[boolean][117]>** Optional and only used with EVM chains right now.  Set to true by default.  Whether or not to ask Metamask or the user's wallet to switch chains before signing.  This may be desired if you're going to have the user send a txn on that chain.  On the other hand, if all you care about is the user's wallet signature, then you probably don't want to make them switch chains for no reason.  Pass false here to disable this chain switching behavior. (optional, default `true`)
+>>>>>>> main
 
 Returns **[AuthSig][128]** The AuthSig created or retrieved
 
@@ -770,18 +820,32 @@ or simply a`string`or`int\` type
 
 Returns **[String][127]** type
 
-## is
+## checkType
 
 Check if the given value is the given type
 If not, throw `invalidParamType` error
 
 ### Parameters
 
+*   `$0` **[Object][116]** 
+
+    *   `$0.value`  
+    *   `$0.allowedTypes`  
+    *   `$0.paramName`  
+    *   `$0.functionName`  
+    *   `$0.throwOnError`   (optional, default `true`)
 *   `value` **any** 
+<<<<<<< HEAD
 *   `type` **[string][127]** 
 *   `paramName` **[string][127]** 
 *   `functionName` **[string][127]** 
 *   `throwOnError`   (optional, default `true`)
+=======
+*   `allowedTypes` **[Array][119]<[String][121]>** 
+*   `paramName` **[string][121]** 
+*   `functionName` **[string][121]** 
+*   `throwOnError` **[boolean][117]** 
+>>>>>>> main
 
 Returns **[Boolean][125]** true/false
 
@@ -1086,7 +1150,11 @@ Type: [Object][124]
 
 [98]: #properties-9
 
+<<<<<<< HEAD
 [99]: #lit_chains
+=======
+[99]: #checktype
+>>>>>>> main
 
 [100]: #lit_svm_chains
 
