@@ -21,6 +21,7 @@ import {
   canonicalSolRpcConditionFormatter,
   canonicalUnifiedAccessControlConditionFormatter,
 } from "./crypto";
+import nacl from "tweetnacl";
 
 import { checkAndSignEVMAuthMessage, decimalPlaces } from "./eth";
 import { checkAndSignSolAuthMessage } from "./sol";
@@ -45,6 +46,7 @@ export async function checkAndSignAuthMessage({
   chain,
   resources,
   switchChain = true,
+  expiration,
 }) {
   const chainInfo = ALL_LIT_CHAINS[chain];
   if (!chainInfo) {
@@ -57,12 +59,35 @@ export async function checkAndSignAuthMessage({
     });
   }
 
+  const sessionKey = getSessionKey({ createNew: false });
+
+  if (!expiration) {
+    // set default of 1 week
+    expiration = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
+  }
+
   if (chainInfo.vmType === "EVM") {
-    return checkAndSignEVMAuthMessage({ chain, resources, switchChain });
+    return checkAndSignEVMAuthMessage({
+      chain,
+      resources,
+      switchChain,
+      sessionKey,
+      expiration,
+    });
   } else if (chainInfo.vmType === "SVM") {
-    return checkAndSignSolAuthMessage({ chain });
+    return checkAndSignSolAuthMessage({
+      chain,
+      resources,
+      sessionKey,
+      expiration,
+    });
   } else if (chainInfo.vmType === "CVM") {
-    return checkAndSignCosmosAuthMessage({ chain });
+    return checkAndSignCosmosAuthMessage({
+      chain,
+      resources,
+      sessionKey,
+      expiration,
+    });
   } else {
     throwError({
       message: `vmType not found for this chain: ${chain}.  This should not happen.  Unsupported chain selected.  Please select one of: ${Object.keys(
@@ -1475,4 +1500,24 @@ export async function getTokenList() {
 
 export const sendMessageToFrameParent = (data) => {
   window.parent.postMessage(data, "*");
+};
+
+const getSessionKey = ({ createNew = false }) => {
+  let sessionKey = localStorage.getItem("lit-session-key");
+  if (sessionKey && !createNew) {
+    sessionKey = JSON.parse(sessionKey);
+    sessionKey.publicKey = uint8arrayFromString(sessionKey.publicKey, "base16");
+    sessionKey.secretKey = uint8arrayFromString(sessionKey.secretKey, "base16");
+    return sessionKey;
+  }
+  // generate a random keypair
+  sessionKey = nacl.sign.keyPair();
+  localStorage.setItem(
+    "lit-session-key",
+    JSON.stringify({
+      publicKey: uint8arrayToString(sessionKey.publicKey, "base16"),
+      secretKey: uint8arrayToString(sessionKey.secretKey, "base16"),
+    })
+  );
+  return sessionKey;
 };

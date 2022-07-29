@@ -45,6 +45,7 @@
     "@ethersproject/strings": "^5.5.0",
     "@ethersproject/units": "^5.4.0",
     "@ethersproject/wallet": "^5.2.0",
+    "@noble/secp256k1": "^1.6.3",
     "@walletconnect/ethereum-provider": "^1.7.8",
     "buffer": "^6.0.3",
     "bufferutil": "^4.0.6",

@@ -11,6 +11,10 @@ import { getAddress } from "@ethersproject/address";
 import WalletConnectProvider from "@walletconnect/ethereum-provider";
 import LitConnectModal from "lit-connect-modal";
 import { SiweMessage } from "lit-siwe";
+import {
+  fromString as uint8arrayFromString,
+  toString as uint8arrayToString,
+} from "uint8arrays";
 
 import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
@@ -107,6 +111,8 @@ export async function disconnectWeb3() {
   localStorage.removeItem("lit-auth-sol-signature");
   localStorage.removeItem("lit-auth-cosmos-signature");
   localStorage.removeItem("lit-web3-provider");
+  localStorage.removeItem("lit-session-key");
+  localStorage.removeItem("lit-comms-keypair");
 }
 
 // taken from the excellent repo https://github.com/zmitton/eth-proof
@@ -166,6 +172,8 @@ export async function checkAndSignEVMAuthMessage({
   chain,
   resources,
   switchChain,
+  sessionKey,
+  expiration,
 }) {
   const selectedChain = LIT_CHAINS[chain];
   const { web3, account } = await connectWeb3({
@@ -268,6 +276,8 @@ export async function checkAndSignEVMAuthMessage({
       account,
       chainId,
       resources,
+      sessionKey,
+      expiration,
     });
     authSig = localStorage.getItem("lit-auth-signature");
   }
@@ -277,11 +287,13 @@ export async function checkAndSignEVMAuthMessage({
     log(
       "signing auth message because account is not the same as the address in the auth sig"
     );
-    await signAndSaveAuthMessage({
+    authSig = await signAndSaveAuthMessage({
       web3,
       account,
       chainId: selectedChain.chainId,
       resources,
+      sessionKey,
+      expiration,
     });
     authSig = localStorage.getItem("lit-auth-signature");
     authSig = JSON.parse(authSig);
@@ -313,6 +325,8 @@ export async function checkAndSignEVMAuthMessage({
         account,
         chainId: selectedChain.chainId,
         resources,
+        sessionKey,
+        expiration,
       });
       authSig = localStorage.getItem("lit-auth-signature");
       authSig = JSON.parse(authSig);
@@ -334,15 +348,18 @@ export async function signAndSaveAuthMessage({
   account,
   chainId,
   resources,
+  sessionKey,
+  expiration,
 }) {
   // const { chainId } = await web3.getNetwork();
 
   const preparedMessage = {
     domain: globalThis.location.host,
     address: getAddress(account), // convert to EIP-55 format or else SIWE complains
-    uri: globalThis.location.origin,
+    uri: uint8arrayToString(sessionKey.publicKey, "base16"),
     version: "1",
     chainId,
+    expirationTime: expiration.toISOString(),
   };
 
   if (resources && resources.length > 0) {
