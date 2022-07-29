@@ -376,15 +376,14 @@ export async function signAndSaveAuthMessage({
     account,
   });
 
-  localStorage.setItem(
-    "lit-auth-signature",
-    JSON.stringify({
-      sig: signedResult.signature,
-      derivedVia: "web3.eth.personal.sign",
-      signedMessage: body,
-      address: signedResult.address,
-    })
-  );
+  const authSig = {
+    sig: signedResult.signature,
+    derivedVia: "web3.eth.personal.sign",
+    signedMessage: body,
+    address: signedResult.address,
+  };
+
+  localStorage.setItem("lit-auth-signature", JSON.stringify(authSig));
   // store a keypair in localstorage for communication with sgx
   const commsKeyPair = nacl.box.keyPair();
   localStorage.setItem(
@@ -395,6 +394,7 @@ export async function signAndSaveAuthMessage({
     })
   );
   log("generated and saved lit-comms-keypair");
+  return authSig;
 }
 
 /**
