@@ -67,6 +67,7 @@ import {
   encryptWithSymmetricKey,
   decryptWithSymmetricKey,
   generateSymmetricKey,
+  importSymmetricKey,
 } from "./utils/crypto";
 
 import {
@@ -144,6 +145,7 @@ const functions = {
   wasmBlsSdkHelpers,
   initWasmBlsSdk,
   generateSymmetricKey,
+  importSymmetricKey,
 };
 
 module.exports = functions;
