@@ -97,7 +97,7 @@ export async function connectWeb3({ chainId = 1 } = {}) {
   //   params: [],
   // });
   log("accounts", accounts);
-  const account = accounts[0].toLowerCase();
+  const account = accounts[0];
 
   return { web3, account };
 }
@@ -179,7 +179,18 @@ export async function checkAndSignEVMAuthMessage({
   const { web3, account } = await connectWeb3({
     chainId: selectedChain.chainId,
   });
-  log(`got web3 and account: ${account}`);
+  log(
+    `got web3 and account: ${account} and sessionPubkey ${sessionKey.publicKey}`
+  );
+
+  if (!resources) {
+    resources = [];
+  }
+  // append session key resources.  This will let only the session key use these resources.
+  resources.push("litEncryptionConditionSessionKey://*");
+  resources.push("litSigningConditionSessionKey://*");
+  resources.push("litPKPSessionKey://*");
+  resources.push("litRLISessionKey://*");
 
   let chainId;
   try {
@@ -271,7 +282,7 @@ export async function checkAndSignEVMAuthMessage({
   let authSig = localStorage.getItem("lit-auth-signature");
   if (!authSig) {
     log("signing auth message because sig is not in local storage");
-    await signAndSaveAuthMessage({
+    authSig = await signAndSaveAuthMessage({
       web3,
       account,
       chainId,
@@ -279,13 +290,13 @@ export async function checkAndSignEVMAuthMessage({
       sessionKey,
       expiration,
     });
-    authSig = localStorage.getItem("lit-auth-signature");
+  } else {
+    authSig = JSON.parse(authSig);
   }
-  authSig = JSON.parse(authSig);
   // make sure we are on the right account
   if (account !== authSig.address) {
     log(
-      "signing auth message because account is not the same as the address in the auth sig"
+      `signing auth message because account is not the same as the address in the auth sig.  address: ${account} and auth sig address: ${authSig.address}`
     );
     authSig = await signAndSaveAuthMessage({
       web3,
@@ -295,10 +306,8 @@ export async function checkAndSignEVMAuthMessage({
       sessionKey,
       expiration,
     });
-    authSig = localStorage.getItem("lit-auth-signature");
-    authSig = JSON.parse(authSig);
   } else {
-    // check the resources of the sig and re-sign if they don't match
+    // check the resources, expiration, and URI of the sig and re-sign if they don't match
     let mustResign = false;
     try {
       const parsedSiwe = new SiweMessage(authSig.signedMessage);
@@ -314,13 +323,26 @@ export async function checkAndSignEVMAuthMessage({
           "signing auth message because parsedSig.address is not equal to the same address but checksummed.  This usually means the user had a non-checksummed address saved and so they need to re-sign."
         );
         mustResign = true;
+      } else if (Date.parse(parsedSiwe.expirationTime) < Date.now()) {
+        // it's expired.  we should generate a new session key
+        sessionKey = generateSessionKey();
+        log(
+          "signing auth message because it's expired.  also generated new session pubkey which is ",
+          sessionKey.publicKey
+        );
+        mustResign = true;
+      } else if (parsedSiwe.uri !== "key:" + sessionKey.publicKey) {
+        log(
+          "signing auth message because the uri in the auth sig does not match the session pubkey"
+        );
+        mustResign = true;
       }
     } catch (e) {
       log("error parsing siwe sig.  making the user sign again: ", e);
       mustResign = true;
     }
     if (mustResign) {
-      await signAndSaveAuthMessage({
+      authSig = await signAndSaveAuthMessage({
         web3,
         account,
         chainId: selectedChain.chainId,
@@ -328,8 +350,6 @@ export async function checkAndSignEVMAuthMessage({
         sessionKey,
         expiration,
       });
-      authSig = localStorage.getItem("lit-auth-signature");
-      authSig = JSON.parse(authSig);
     }
   }
   log("got auth sig", authSig);
@@ -356,7 +376,7 @@ export async function signAndSaveAuthMessage({
   const preparedMessage = {
     domain: globalThis.location.host,
     address: getAddress(account), // convert to EIP-55 format or else SIWE complains
-    uri: uint8arrayToString(sessionKey.publicKey, "base16"),
+    uri: "sessionKey:" + uint8arrayToString(sessionKey.publicKey, "base16"),
     version: "1",
     chainId,
     expirationTime: expiration.toISOString(),
@@ -381,6 +401,7 @@ export async function signAndSaveAuthMessage({
     derivedVia: "web3.eth.personal.sign",
     signedMessage: body,
     address: signedResult.address,
+    sessionKey,
   };
 
   localStorage.setItem("lit-auth-signature", JSON.stringify(authSig));
@@ -418,7 +439,7 @@ export async function signMessage({ body, web3, account }) {
   // const signature = await web3.getSigner().signMessage(body);
   const signature = await signMessageAsync(web3.getSigner(), account, body);
   //.request({ method: 'personal_sign', params: [account, body] })
-  const address = verifyMessage(body, signature).toLowerCase();
+  const address = verifyMessage(body, signature);
 
   log("Signature: ", signature);
   log("recovered address: ", address);
@@ -444,7 +465,7 @@ export const signMessageAsync = async (signer, address, message) => {
       log("Signing with personal_sign");
       const signature = await signer.provider.send("personal_sign", [
         hexlify(messageBytes),
-        address.toLowerCase(),
+        address,
       ]);
       return signature;
     } catch (e) {

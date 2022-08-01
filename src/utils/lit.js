@@ -1502,22 +1502,11 @@ export const sendMessageToFrameParent = (data) => {
   window.parent.postMessage(data, "*");
 };
 
-const getSessionKey = ({ createNew = false }) => {
-  let sessionKey = localStorage.getItem("lit-session-key");
-  if (sessionKey && !createNew) {
-    sessionKey = JSON.parse(sessionKey);
-    sessionKey.publicKey = uint8arrayFromString(sessionKey.publicKey, "base16");
-    sessionKey.secretKey = uint8arrayFromString(sessionKey.secretKey, "base16");
-    return sessionKey;
-  }
+const getSessionKey = () => {
   // generate a random keypair
-  sessionKey = nacl.sign.keyPair();
-  localStorage.setItem(
-    "lit-session-key",
-    JSON.stringify({
-      publicKey: uint8arrayToString(sessionKey.publicKey, "base16"),
-      secretKey: uint8arrayToString(sessionKey.secretKey, "base16"),
-    })
-  );
-  return sessionKey;
+  const sessionKey = nacl.sign.keyPair();
+  return {
+    publicKey: uint8arrayToString(sessionKey.publicKey, "base16"),
+    secretKey: uint8arrayToString(sessionKey.secretKey, "base16"),
+  };
 };
