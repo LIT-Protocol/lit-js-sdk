@@ -356,6 +356,11 @@ export function compareArrayBuffers(buf1, buf2) {
   return true;
 }
 
+/**
+ * Import a symmetric key from a Uint8Array to a webcrypto key.  You should only use this if you're handling your own key generation and management with Lit.  Typically, Lit handles this internally for you.
+ * @param {Uint8Array} symmKey The symmetric key to import
+ * @returns {Promise<CryptoKey>} A promise that resolves to the imported key
+ */
 export async function importSymmetricKey(symmKey) {
   const importedSymmKey = await crypto.subtle.importKey(
     "raw",
@@ -366,6 +371,11 @@ export async function importSymmetricKey(symmKey) {
   );
   return importedSymmKey;
 }
+
+/**
+ * Generate a new random symmetric key using WebCrypto subtle API.  You should only use this if you're handling your own key generation and management with Lit.  Typically, Lit handles this internally for you.
+ * @returns {Promise<CryptoKey>} A promise that resolves to the generated key
+ */
 export async function generateSymmetricKey() {
   const symmKey = await crypto.subtle.generateKey(SYMM_KEY_ALGO_PARAMS, true, [
     "encrypt",

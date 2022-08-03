@@ -66,6 +66,8 @@ import {
   hashUnifiedAccessControlConditions,
   encryptWithSymmetricKey,
   decryptWithSymmetricKey,
+  generateSymmetricKey,
+  importSymmetricKey,
 } from "./utils/crypto";
 
 import {
@@ -142,6 +144,8 @@ const functions = {
   signMessageAsync,
   wasmBlsSdkHelpers,
   initWasmBlsSdk,
+  generateSymmetricKey,
+  importSymmetricKey,
 };
 
 module.exports = functions;
