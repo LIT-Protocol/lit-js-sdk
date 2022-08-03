@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset='utf-8'>
-  <title>lit-js-sdk 1.1.206 | Documentation</title>
+  <title>lit-js-sdk 1.1.207 | Documentation</title>
   <meta name='description' content='LIT Javascript SDK'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' rel='stylesheet'>
@@ -15,7 +15,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>lit-js-sdk</h3>
-          <div class='mb1'><code>1.1.206</code></div>
+          <div class='mb1'><code>1.1.207</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -600,6 +600,26 @@
                   href='#downloadfile'
                   class="">
                   downloadFile
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#importsymmetrickey'
+                  class="">
+                  importSymmetricKey
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#generatesymmetrickey'
+                  class="">
+                  generateSymmetricKey
                   
                 </a>
                 
@@ -5635,6 +5655,136 @@ If not, throw <code>invalidParamType</code> error</p>
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>:
         The data URL.  This is a string representation that can be used anywhere the original file would be used.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='importsymmetrickey'>
+      importSymmetricKey
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Import a symmetric key from a Uint8Array to a webcrypto key.  You should only use this if you're handling your own key generation and management with Lit.  Typically, Lit handles this internally for you.</p>
+
+    <div class='pre p1 fill-light mt0'>importSymmetricKey(symmKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array">Uint8Array</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;CryptoKey></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>symmKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array">Uint8Array</a>)</code>
+	    The symmetric key to import
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;CryptoKey></code>:
+        A promise that resolves to the imported key
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='generatesymmetrickey'>
+      generateSymmetricKey
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Generate a new random symmetric key using WebCrypto subtle API.  You should only use this if you're handling your own key generation and management with Lit.  Typically, Lit handles this internally for you.</p>
+
+    <div class='pre p1 fill-light mt0'>generateSymmetricKey(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;CryptoKey></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;CryptoKey></code>:
+        A promise that resolves to the generated key
 
       
     
