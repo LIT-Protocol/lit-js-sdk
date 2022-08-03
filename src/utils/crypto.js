@@ -530,3 +530,11 @@ export function decryptWithPrivKey(encryptedData, receiverPrivateKey) {
       throw new Error("Encryption type/version not supported.");
   }
 }
+
+export function generateSessionKeyPair() {
+  const keyPair = nacl.sign.keyPair();
+  return {
+    publicKey: uint8arrayToString(keyPair.publicKey, "base16"),
+    secretKey: uint8arrayToString(keyPair.secretKey, "base16"),
+  };
+}
