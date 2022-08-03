@@ -401,7 +401,6 @@ export async function signAndSaveAuthMessage({
     derivedVia: "web3.eth.personal.sign",
     signedMessage: body,
     address: signedResult.address,
-    sessionKey,
   };
 
   localStorage.setItem("lit-auth-signature", JSON.stringify(authSig));
