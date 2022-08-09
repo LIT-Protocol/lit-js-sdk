@@ -1,4 +1,5 @@
 import JSZip from "jszip";
+import nacl from "tweetnacl";
 import {
   fromString as uint8arrayFromString,
   toString as uint8arrayToString,
@@ -20,7 +21,7 @@ import {
   canonicalEVMContractConditionFormatter,
   canonicalSolRpcConditionFormatter,
   canonicalUnifiedAccessControlConditionFormatter,
-  getSessionKeyUri,
+  generateSessionKeyPair,
 } from "./crypto";
 
 import { checkAndSignEVMAuthMessage, decimalPlaces } from "./eth";
@@ -106,11 +107,10 @@ export async function getSessionSigs({
   if (!sessionKey || sessionKey === "") {
     // if not, generate one
     sessionKey = generateSessionKeyPair();
-    localStorage.setItem(`lit-session-key`, JSON.stringify(newSessionKey));
+    localStorage.setItem(`lit-session-key`, JSON.stringify(sessionKey));
   } else {
     sessionKey = JSON.parse(sessionKey);
   }
-
   let sessionKeyUri = getSessionKeyUri({ publicKey: sessionKey.publicKey });
 
   // if the user passed no sessionCapabilities, let's create them for them
@@ -186,7 +186,7 @@ export async function getSessionSigs({
 
   // okay great, now we have a valid signed session key
   // let's sign the resources with the session key
-  // 5 minutes is the default expiration for a session key
+  // 5 minutes is the default expiration for a session signature
   let sessionExpiration = new Date(Date.now() + 1000 * 60 * 5);
   const signingTemplate = {
     sessionKey: sessionKey.publicKey,
@@ -201,7 +201,9 @@ export async function getSessionSigs({
       nodeAddress,
     };
     let signedMessage = JSON.stringify(toSign);
-    let signature = nacl.sign(signedMessage, sessionKey.privateKey);
+    const uint8arrayKey = uint8arrayFromString(sessionKey.secretKey, "base16");
+    const uint8arrayMessage = uint8arrayFromString(signedMessage, "utf8");
+    let signature = nacl.sign(uint8arrayMessage, uint8arrayKey);
     return {
       sig: uint8arrayToString(signature, "base16"),
       derivedVia: "litSessionSignViaNacl",

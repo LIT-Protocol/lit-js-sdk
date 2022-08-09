@@ -196,6 +196,11 @@ export function hashResourceId(resourceId) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
+export async function hashResourceIdForSigning(resourceId) {
+  const hashed = await hashResourceId(resourceId);
+  return uint8arrayToString(new Uint8Array(hashed), "base16");
+}
+
 function canonicalAbiParams(params) {
   return params.map((param) => ({
     name: param.name,

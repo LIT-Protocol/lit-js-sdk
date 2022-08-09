@@ -37,7 +37,10 @@
           extraData: "",
         };
 
-        let hashedResourceId = await LitJsSdk.hashResourceId(resourceId);
+        let hashedResourceId = await LitJsSdk.hashResourceIdForSigning(
+          resourceId
+        );
+        console.log("hashedResourceId", hashedResourceId);
 
         var sessionSigs = await LitJsSdk.getSessionSigs({
           chain: "ethereum",

@@ -179,9 +179,7 @@ export async function checkAndSignEVMAuthMessage({
   const { web3, account } = await connectWeb3({
     chainId: selectedChain.chainId,
   });
-  log(
-    `got web3 and account: ${account} and sessionPubkey ${sessionKey.publicKey}`
-  );
+  log(`got web3 and account: ${account}`);
 
   let chainId;
   try {
@@ -312,19 +310,6 @@ export async function checkAndSignEVMAuthMessage({
       } else if (parsedSiwe.address !== getAddress(parsedSiwe.address)) {
         log(
           "signing auth message because parsedSig.address is not equal to the same address but checksummed.  This usually means the user had a non-checksummed address saved and so they need to re-sign."
-        );
-        mustResign = true;
-      } else if (Date.parse(parsedSiwe.expirationTime) < Date.now()) {
-        // it's expired.  we should generate a new session key
-        sessionKey = generateSessionKey();
-        log(
-          "signing auth message because it's expired.  also generated new session pubkey which is ",
-          sessionKey.publicKey
-        );
-        mustResign = true;
-      } else if (parsedSiwe.uri !== "key:" + sessionKey.publicKey) {
-        log(
-          "signing auth message because the uri in the auth sig does not match the session pubkey"
         );
         mustResign = true;
       }

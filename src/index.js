@@ -39,6 +39,7 @@ import {
   humanizeAccessControlConditions,
   getTokenList,
   checkAndSignAuthMessage,
+  getSessionSigs,
 } from "./utils/lit";
 
 import {
@@ -64,10 +65,12 @@ import {
   hashAccessControlConditions,
   hashEVMContractConditions,
   hashUnifiedAccessControlConditions,
+  hashResourceId,
   encryptWithSymmetricKey,
   decryptWithSymmetricKey,
   generateSymmetricKey,
   importSymmetricKey,
+  hashResourceIdForSigning,
 } from "./utils/crypto";
 
 import {
@@ -130,6 +133,7 @@ const functions = {
   hashAccessControlConditions,
   hashEVMContractConditions,
   hashUnifiedAccessControlConditions,
+  hashResourceId,
   decryptZipFileWithMetadata,
   downloadFile,
   decimalPlaces,
@@ -146,6 +150,8 @@ const functions = {
   initWasmBlsSdk,
   generateSymmetricKey,
   importSymmetricKey,
+  getSessionSigs,
+  hashResourceIdForSigning,
 };
 
 module.exports = functions;
