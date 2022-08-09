@@ -187,6 +187,8 @@ export async function getSessionSigs({
   // okay great, now we have a valid signed session key
   // let's sign the resources with the session key
   // 5 minutes is the default expiration for a session signature
+  // because we can generate a new session sig every time the user wants to access a resource
+  // without prompting them to sign with their wallet
   let sessionExpiration = new Date(Date.now() + 1000 * 60 * 5);
   const signingTemplate = {
     sessionKey: sessionKey.publicKey,
