@@ -448,7 +448,7 @@ Delete any saved AuthSigs from local storage.  Takes no params and returns nothi
 
 ## blobToBase64String
 
-Convert a Blob to a base64 string.  Note: This function returns a promise.
+Convert a Blob to a base64urlpad string.  Note: This function returns a promise.
 
 ### Parameters
 
@@ -458,7 +458,7 @@ Returns **[Promise][140]<[String][133]>** A promise that resolves to the base64 
 
 ## base64StringToBlob
 
-Convert a base64 string to a Blob.  Note: This function DOES NOT return a promise
+Convert a base64urlpad string to a Blob.  Note: This function DOES NOT return a promise
 
 ### Parameters
 
