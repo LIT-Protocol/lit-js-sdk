@@ -253,6 +253,7 @@ export default class LitNodeClient {
     chain,
     authSig,
     resourceId,
+    sessionSigs,
   }) {
     if (!this.ready) {
       throwError({
@@ -320,6 +321,18 @@ export default class LitNodeClient {
     // ask each node to sign the content
     const nodePromises = [];
     for (const url of this.connectedNodes) {
+      let sigToPassToNode = authSig;
+      if (sessionSigs) {
+        // find the sessionSig for this node
+        sigToPassToNode = sessionSigs.find((s) => s.nodeAddress === url);
+        if (!sigToPassToNode) {
+          throwError({
+            message: `You passed sessionSigs but we could not find session sig for node ${url}`,
+            name: "InvalidArgumentException",
+            errorCode: "invalid_argument",
+          });
+        }
+      }
       nodePromises.push(
         this.getSigningShare({
           url,
@@ -329,7 +342,7 @@ export default class LitNodeClient {
           unifiedAccessControlConditions:
             formattedUnifiedAccessControlConditions,
           resourceId: formattedResourceId,
-          authSig,
+          authSig: sigToPassToNode,
           chain,
           iat,
           exp,

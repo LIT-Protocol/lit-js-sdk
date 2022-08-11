@@ -49,23 +49,16 @@
         });
 
         console.log("sessionSigs", sessionSigs);
-        return;
 
         await litNodeClient.saveSigningCondition({
           unifiedAccessControlConditions,
-          authSig: {
-            solana: solAuthSig,
-            ethereum: ethAuthSig,
-          },
+          sessionSigs,
           resourceId,
         });
 
         let jwt = await litNodeClient.getSignedToken({
           unifiedAccessControlConditions,
-          authSig: {
-            solana: solAuthSig,
-            ethereum: ethAuthSig,
-          },
+          sessionSigs,
           resourceId,
         });
         console.log("jwt", jwt);
