@@ -336,6 +336,7 @@ export default class LitNodeClient {
         })
       );
     }
+
     const res = await this.handleNodePromises(nodePromises);
     if (res.success === false) {
       this.throwNodeError(res);

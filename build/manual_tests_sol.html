@@ -370,6 +370,25 @@
         });
       };
 
+      var SolPDABalance = async () => {
+        var solRpcConditions = [
+          {
+            method: "getBalance(getPDA)",
+            pda_params: ["<program_id>", "delegate-wallet", ":userAddress"],
+            chain: "solana",
+            returnValueTest: {
+              key: "",
+              comparator: ">=",
+              value: "100000000", // equals 0.1 SOL
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          testName: "SolBalanceOfToken",
+        });
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
