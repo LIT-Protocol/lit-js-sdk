@@ -761,7 +761,7 @@ Convert a Blob to a base64 string
 *   `blob`  
 *   `file` **([Blob][140] | File)** The Blob or File to turn into a base64 string
 
-Returns **[Promise][139]<[String][132]>** A promise that resolved to the base64 string
+Returns **[Promise][139]<[String][132]>** A promise that resolves to the base64 string
 
 ## base64StringToBlob
 
