@@ -1,6 +1,6 @@
 {
   "name": "@lit-protocol/sdk-nodejs",
-  "version": "1.1.208",
+  "version": "1.1.209",
   "main": "build/index.node.js",
   "license": "MIT"
 }
