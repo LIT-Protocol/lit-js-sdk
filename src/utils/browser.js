@@ -3,8 +3,8 @@ import {
   toString as uint8arrayToStringFromLib,
 } from "uint8arrays";
 
-/** Convert a Blob to a base64 string
- * @param {Blob | File} file The Blob or File to turn into a base64 string
+/** Convert a Blob to a base64urlpad string.  Note: This function returns a promise.
+ * @param {Blob | File} blob The Blob or File to turn into a base64 string
  * @returns {Promise<String>} A promise that resolves to the base64 string
  */
 export async function blobToBase64String(blob) {
@@ -12,8 +12,8 @@ export async function blobToBase64String(blob) {
   return uint8arrayToString(new Uint8Array(ab), "base64urlpad");
 }
 
-/** Convert a base64 string to a Blob
- * @param {String} file The base64 string that to turn into a Blob
+/** Convert a base64urlpad string to a Blob.  Note: This function DOES NOT return a promise
+ * @param {String} base64String The base64 string that to turn into a Blob
  * @returns {Blob}  A blob that contains the decoded base64 data
  */
 export function base64StringToBlob(base64String) {

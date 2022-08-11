@@ -22,8 +22,13 @@ toc:
   - checkAndSignAuthMessage
   - signAndSaveAuthMessage
   - disconnectWeb3
-  - name: Other Utilities
+  - name: Conversion Utilities
+  - blobToBase64String
+  - base64StringToBlob
+  - uint8arrayToString
+  - uint8arrayFromString
   - fileToDataUrl
+  - name: Other Utilities
   - humanizeAccessControlConditions
   - hashUnifiedAccessControlConditions
   - name: HTML NFT Utilities
