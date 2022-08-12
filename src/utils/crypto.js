@@ -133,13 +133,26 @@ export function hashSolRpcConditions(solRpcConditions) {
 }
 
 export function canonicalSolRpcConditionFormatter(cond) {
-  // need to return in the exact format below:
+  // need to return in the exact format below
+  // but make sure we don't include the optional fields:
   /*
-  pub struct SolRpcCondition {
-      pub method: String,
-      pub params: Vec<String>,
-      pub return_value_test: JsonReturnValueTestV2,
-  }
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct SolRpcCondition {
+    pub method: String,
+    pub params: Vec<serde_json::Value>,
+    pub pda_params: Option<Vec<serde_json::Value>>,
+    pub pda_interface: Option<SolPdaInterface>,
+    pub chain: String,
+    pub return_value_test: JsonReturnValueTestV2,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct SolPdaInterface {
+    pub offset: u64,
+    pub fields: serde_json::Value,
+}
   */
 
   if (Array.isArray(cond)) {
@@ -161,9 +174,30 @@ export function canonicalSolRpcConditionFormatter(cond) {
       value: returnValueTest.value,
     };
 
+    if (
+      !("pdaParams" in cond) ||
+      !("pdaInterface" in cond) ||
+      !("offset" in cond.pdaInterface) ||
+      !("fields" in cond.pdaInterface)
+    ) {
+      throwError({
+        message: `Solana RPC Conditions have changed and there are some new fields you must include in your condition.  Check the docs here: https://developer.litprotocol.com/AccessControlConditions/solRpcConditions`,
+        name: "InvalidAccessControlCondition",
+        errorCode: "invalid_access_control_condition",
+      });
+    }
+
+    const canonicalPdaInterface = {
+      offset: cond.pdaInterface.offset,
+      fields: cond.pdaInterface.fields,
+    };
+
     return {
       method: cond.method,
       params: cond.params,
+      pdaParams: cond.pdaParams,
+      pdaInterface: canonicalPdaInterface,
+      pdaKey: cond.pdaKey,
       chain: cond.chain,
       returnValueTest: canonicalReturnValueTest,
     };

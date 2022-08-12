@@ -131,6 +131,9 @@
           {
             method: "getBalance",
             params: [":userAddress"],
+            pdaParams: [],
+            pdaInterface: { offset: 0, fields: {} },
+            pdaKey: "",
             chain,
             returnValueTest: {
               key: "",
@@ -150,6 +153,9 @@
           {
             method: "getBalance",
             params: [":userAddress"],
+            pdaParams: [],
+            pdaInterface: { offset: 0, fields: {} },
+            pdaKey: "",
             chain,
             returnValueTest: {
               key: "",
@@ -170,6 +176,9 @@
           {
             method: "getBalance",
             params: [":userAddress"],
+            pdaParams: [],
+            pdaInterface: { offset: 0, fields: {} },
+            pdaKey: "",
             chain,
             returnValueTest: {
               key: "",
@@ -191,6 +200,9 @@
           {
             method: "getBalance",
             params: [":userAddress"],
+            pdaParams: [],
+            pdaInterface: { offset: 0, fields: {} },
+            pdaKey: "",
             chain,
             returnValueTest: {
               key: "",
@@ -212,6 +224,9 @@
           {
             method: "",
             params: [":userAddress"],
+            pdaParams: [],
+            pdaInterface: { offset: 0, fields: {} },
+            pdaKey: "",
             chain,
             returnValueTest: {
               key: "",
@@ -232,6 +247,9 @@
           {
             method: "",
             params: [":userAddress"],
+            pdaParams: [],
+            pdaInterface: { offset: 0, fields: {} },
+            pdaKey: "",
             chain,
             returnValueTest: {
               key: "",
@@ -251,6 +269,9 @@
           {
             method: "getTokenAccountBalance",
             params: ["tn2WEWk4Kqj157XsSdmBBcjWumVhkyJECXCKPq9ReL9"],
+            pdaParams: [],
+            pdaInterface: { offset: 0, fields: {} },
+            pdaKey: "",
             chain,
             returnValueTest: {
               key: "$.amount",
@@ -270,6 +291,9 @@
           {
             method: "getTokenAccountBalance",
             params: ["tn2WEWk4Kqj157XsSdmBBcjWumVhkyJECXCKPq9ReL9"],
+            pdaParams: [],
+            pdaInterface: { offset: 0, fields: {} },
+            pdaKey: "",
             chain,
             returnValueTest: {
               key: "$.amount",
@@ -297,6 +321,9 @@
                 encoding: "jsonParsed",
               },
             ],
+            pdaParams: [],
+            pdaInterface: { offset: 0, fields: {} },
+            pdaKey: "",
             chain,
             returnValueTest: {
               key: '$[?(@.account.data.parsed.info.mint == "FrYwrqLcGfmXrgJKcZfrzoWsZ3pqQB9pjjUC9PxSq3xT")].account.data.parsed.info.tokenAmount.amount',
@@ -316,6 +343,9 @@
           {
             method: "balanceOfMetaplexCollection",
             params: ["FfyafED6kiJUFwEhogyTRQHiL6NguqNg9xcdeoyyJs33"],
+            pdaParams: [],
+            pdaInterface: { offset: 0, fields: {} },
+            pdaKey: "",
             chain,
             returnValueTest: {
               key: "",
@@ -336,6 +366,9 @@
             {
               method: "balanceOfMetaplexCollection",
               params: ["SMBH3wF6baUj6JWtzYvqcKuj2XCKWDqQxzspY12xPND"],
+              pdaParams: [],
+              pdaInterface: { offset: 0, fields: {} },
+              pdaKey: "",
               chain: "solana",
               returnValueTest: {
                 key: "",
@@ -356,6 +389,9 @@
           {
             method: "balanceOfToken",
             params: ["FrYwrqLcGfmXrgJKcZfrzoWsZ3pqQB9pjjUC9PxSq3xT"],
+            pdaParams: [],
+            pdaInterface: { offset: 0, fields: {} },
+            pdaKey: "",
             chain,
             returnValueTest: {
               key: "$.amount",
@@ -374,7 +410,14 @@
         var solRpcConditions = [
           {
             method: "getBalance(getPDA)",
-            pda_params: ["<program_id>", "delegate-wallet", ":userAddress"],
+            params: [],
+            pdaParams: [
+              "chatGL6yNgZT2Z3BeMYGcgdMpcBKdmxko4C5UhEX4To",
+              "delegate-wallet",
+              ":userAddress",
+            ],
+            pdaInterface: { offset: 8, fields: { owner_wallet: 32 } },
+            pdaKey: "owner_wallet",
             chain: "solana",
             returnValueTest: {
               key: "",
@@ -385,7 +428,7 @@
         ];
         await testProvisoningEncryptingAndDecrypting({
           solRpcConditions,
-          testName: "SolBalanceOfToken",
+          testName: "SolPDABalance",
         });
       };
 
@@ -475,6 +518,10 @@
     <br />
 
     <button onclick="SolBalanceOfToken()">SolBalanceOfToken</button>
+    <br />
+    <br />
+
+    <button onclick="SolPDABalance()">SolPDABalance</button>
     <br />
     <br />
 
