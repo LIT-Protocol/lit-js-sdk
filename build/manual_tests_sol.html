@@ -126,14 +126,11 @@
       };
 
       // Actual tests are below here
-      var SolBalanceSigning = async () => {
+      var SolBalanceSigningV1Cond = async () => {
         var solRpcConditions = [
           {
             method: "getBalance",
             params: [":userAddress"],
-            pdaParams: [],
-            pdaInterface: { offset: 0, fields: {} },
-            pdaKey: "",
             chain,
             returnValueTest: {
               key: "",
@@ -144,18 +141,15 @@
         ];
         await testProvisoningAndSigning({
           solRpcConditions,
-          testName: "SolBalanceSigning",
+          testName: "SolBalanceSigningV1Cond",
         });
       };
 
-      var SolBalanceEncrypt = async () => {
+      var SolBalanceEncryptV1Cond = async () => {
         var solRpcConditions = [
           {
             method: "getBalance",
             params: [":userAddress"],
-            pdaParams: [],
-            pdaInterface: { offset: 0, fields: {} },
-            pdaKey: "",
             chain,
             returnValueTest: {
               key: "",
@@ -166,7 +160,7 @@
         ];
         await testProvisoningEncryptingAndDecrypting({
           solRpcConditions,
-          testName: "SolBalanceEncrypt",
+          testName: "SolBalanceEncryptV1Cond",
         });
       };
 
@@ -462,10 +456,10 @@
     <div id="networkStatus">Connecting to Lit Protocol Network...</div>
     <br />
     <br />
-    <button onclick="SolBalanceSigning()">SolBalanceSigning</button>
+    <button onclick="SolBalanceSigningV1Cond()">SolBalanceSigningV1Cond</button>
     <br />
     <br />
-    <button onclick="SolBalanceEncrypt()">SolBalanceEncrypt</button>
+    <button onclick="SolBalanceEncryptV1Cond()">SolBalanceEncryptV1Cond</button>
     <br />
     <br />
 

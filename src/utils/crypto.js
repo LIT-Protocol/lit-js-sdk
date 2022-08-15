@@ -174,33 +174,44 @@ pub struct SolPdaInterface {
       value: returnValueTest.value,
     };
 
-    if (
-      !("pdaParams" in cond) ||
-      !("pdaInterface" in cond) ||
-      !("offset" in cond.pdaInterface) ||
-      !("fields" in cond.pdaInterface)
-    ) {
-      throwError({
-        message: `Solana RPC Conditions have changed and there are some new fields you must include in your condition.  Check the docs here: https://developer.litprotocol.com/AccessControlConditions/solRpcConditions`,
-        name: "InvalidAccessControlCondition",
-        errorCode: "invalid_access_control_condition",
-      });
+    // check if this is a sol v1 or v2 condition
+    // v1 conditions didn't have any pda params or pda interface or pda key
+    if ("pdaParams" in cond) {
+      if (
+        !("pdaInterface" in cond) ||
+        !("offset" in cond.pdaInterface) ||
+        !("fields" in cond.pdaInterface) ||
+        !("pdaKey" in cond)
+      ) {
+        throwError({
+          message: `Solana RPC Conditions have changed and there are some new fields you must include in your condition.  Check the docs here: https://developer.litprotocol.com/AccessControlConditions/solRpcConditions`,
+          name: "InvalidAccessControlCondition",
+          errorCode: "invalid_access_control_condition",
+        });
+      }
+
+      const canonicalPdaInterface = {
+        offset: cond.pdaInterface.offset,
+        fields: cond.pdaInterface.fields,
+      };
+
+      return {
+        method: cond.method,
+        params: cond.params,
+        pdaParams: cond.pdaParams,
+        pdaInterface: canonicalPdaInterface,
+        pdaKey: cond.pdaKey,
+        chain: cond.chain,
+        returnValueTest: canonicalReturnValueTest,
+      };
+    } else {
+      return {
+        method: cond.method,
+        params: cond.params,
+        chain: cond.chain,
+        returnValueTest: canonicalReturnValueTest,
+      };
     }
-
-    const canonicalPdaInterface = {
-      offset: cond.pdaInterface.offset,
-      fields: cond.pdaInterface.fields,
-    };
-
-    return {
-      method: cond.method,
-      params: cond.params,
-      pdaParams: cond.pdaParams,
-      pdaInterface: canonicalPdaInterface,
-      pdaKey: cond.pdaKey,
-      chain: cond.chain,
-      returnValueTest: canonicalReturnValueTest,
-    };
   }
 
   throwError({
