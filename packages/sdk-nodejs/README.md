@@ -1,1 +1,1 @@
-This package is simply the standalone version of lit-js-sdk/build/index.node.js which is the nodejs build of the Lit-JS-SDK
+This package is simply the nodejs build of the Lit-JS-SDK. Importing this package is the same as importing the nodejs Lit-JS-SDK package (`import LitJsSdk from 'lit-js-sdk/build/index.node.js'`) except this package has less extra stuff you don't need.
