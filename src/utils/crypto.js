@@ -44,7 +44,7 @@ export function canonicalUnifiedAccessControlConditionFormatter(cond) {
 
   if ("returnValueTest" in cond) {
     if (cond.conditionType === "solRpc") {
-      return canonicalSolRpcConditionFormatter(cond);
+      return canonicalSolRpcConditionFormatter(cond, true);
     } else if (cond.conditionType === "evmBasic") {
       return canonicalAccessControlConditionFormatter(cond);
     } else if (cond.conditionType === "evmContract") {
@@ -134,18 +134,36 @@ export function hashSolRpcConditions(solRpcConditions) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
-export function canonicalSolRpcConditionFormatter(cond) {
-  // need to return in the exact format below:
+export function canonicalSolRpcConditionFormatter(
+  cond,
+  requireV2Conditions = false
+) {
+  // need to return in the exact format below
+  // but make sure we don't include the optional fields:
   /*
-  pub struct SolRpcCondition {
-      pub method: String,
-      pub params: Vec<String>,
-      pub return_value_test: JsonReturnValueTestV2,
-  }
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct SolRpcCondition {
+    pub method: String,
+    pub params: Vec<serde_json::Value>,
+    pub pda_params: Option<Vec<serde_json::Value>>,
+    pub pda_interface: Option<SolPdaInterface>,
+    pub chain: String,
+    pub return_value_test: JsonReturnValueTestV2,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct SolPdaInterface {
+    pub offset: u64,
+    pub fields: serde_json::Value,
+}
   */
 
   if (Array.isArray(cond)) {
-    return cond.map((c) => canonicalSolRpcConditionFormatter(c));
+    return cond.map((c) =>
+      canonicalSolRpcConditionFormatter(c, requireV2Conditions)
+    );
   }
 
   if ("operator" in cond) {
@@ -163,12 +181,44 @@ export function canonicalSolRpcConditionFormatter(cond) {
       value: returnValueTest.value,
     };
 
-    return {
-      method: cond.method,
-      params: cond.params,
-      chain: cond.chain,
-      returnValueTest: canonicalReturnValueTest,
-    };
+    // check if this is a sol v1 or v2 condition
+    // v1 conditions didn't have any pda params or pda interface or pda key
+    if ("pdaParams" in cond || requireV2Conditions) {
+      if (
+        !("pdaInterface" in cond) ||
+        !("offset" in cond.pdaInterface) ||
+        !("fields" in cond.pdaInterface) ||
+        !("pdaKey" in cond)
+      ) {
+        throwError({
+          message: `Solana RPC Conditions have changed and there are some new fields you must include in your condition.  Check the docs here: https://developer.litprotocol.com/AccessControlConditions/solRpcConditions`,
+          name: "InvalidAccessControlCondition",
+          errorCode: "invalid_access_control_condition",
+        });
+      }
+
+      const canonicalPdaInterface = {
+        offset: cond.pdaInterface.offset,
+        fields: cond.pdaInterface.fields,
+      };
+
+      return {
+        method: cond.method,
+        params: cond.params,
+        pdaParams: cond.pdaParams,
+        pdaInterface: canonicalPdaInterface,
+        pdaKey: cond.pdaKey,
+        chain: cond.chain,
+        returnValueTest: canonicalReturnValueTest,
+      };
+    } else {
+      return {
+        method: cond.method,
+        params: cond.params,
+        chain: cond.chain,
+        returnValueTest: canonicalReturnValueTest,
+      };
+    }
   }
 
   throwError({
@@ -365,6 +415,11 @@ export function encryptWithBlsPubkey({ pubkey, data }) {
   );
 }
 
+/**
+ * Import a symmetric key from a Uint8Array to a webcrypto key.  You should only use this if you're handling your own key generation and management with Lit.  Typically, Lit handles this internally for you.
+ * @param {Uint8Array} symmKey The symmetric key to import
+ * @returns {Promise<CryptoKey>} A promise that resolves to the imported key
+ */
 export async function importSymmetricKey(symmKey) {
   const importedSymmKey = await crypto.subtle.importKey(
     "raw",
@@ -375,6 +430,11 @@ export async function importSymmetricKey(symmKey) {
   );
   return importedSymmKey;
 }
+
+/**
+ * Generate a new random symmetric key using WebCrypto subtle API.  You should only use this if you're handling your own key generation and management with Lit.  Typically, Lit handles this internally for you.
+ * @returns {Promise<CryptoKey>} A promise that resolves to the generated key
+ */
 export async function generateSymmetricKey() {
   const symmKey = await crypto.subtle.generateKey(SYMM_KEY_ALGO_PARAMS, true, [
     "encrypt",

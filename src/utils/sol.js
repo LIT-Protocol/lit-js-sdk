@@ -79,4 +79,5 @@ export async function signAndSaveAuthMessage({ provider, account }) {
   };
 
   localStorage.setItem("lit-auth-sol-signature", JSON.stringify(authSig));
+  return authSig;
 }
