@@ -30,22 +30,61 @@ esac
 # copy the nodejs build
 cp build/index.node.js packages/sdk-nodejs/build/
 cd packages/sdk-nodejs
-yarn publish --new-version $VERSION --no-git-tag-version
+case $BRANCH in
+  "main")
+    yarn publish --new-version $VERSION --no-git-tag-version
+    ;;
 
+  "serrano")
+    yarn publish --new-version $VERSION --no-git-tag-version --tag serrano
+    ;;
+
+  *)
+    echo -n "Invalid branch.  Only main and serrano supported for publishing."
+    exit
+    ;;
+esac
 cd ../..
 
 
 # copy the browser build
 cp build/index.js packages/sdk-browser/build/
 cd packages/sdk-browser
-yarn publish --new-version $VERSION --no-git-tag-version
+case $BRANCH in
+  "main")
+    yarn publish --new-version $VERSION --no-git-tag-version
+    ;;
+
+  "serrano")
+    yarn publish --new-version $VERSION --no-git-tag-version --tag serrano
+    ;;
+
+  *)
+    echo -n "Invalid branch.  Only main and serrano supported for publishing."
+    exit
+    ;;
+esac
 
 cd ../..
 
 # copy the browser-standalone build
 cp build/index.web.js packages/sdk-browser-standalone/build/
 cd packages/sdk-browser-standalone
-yarn publish --new-version $VERSION --no-git-tag-version
+case $BRANCH in
+  "main")
+    yarn publish --new-version $VERSION --no-git-tag-version
+    ;;
+
+  "serrano")
+    yarn publish --new-version $VERSION --no-git-tag-version --tag serrano
+    ;;
+
+  *)
+    echo -n "Invalid branch.  Only main and serrano supported for publishing."
+    exit
+    ;;
+esac
+
 
 
 echo "Don't forget to git push to get this running on the netlify cdn"
