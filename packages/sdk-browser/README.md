@@ -1,4 +1,4 @@
-This package is simply the nodejs build of the Lit-JS-SDK. Importing this package is the same as importing the nodejs Lit-JS-SDK package (`import LitJsSdk from 'lit-js-sdk/build/index.node.js'`) except this package has less extra stuff you don't need.
+This package is simply the browser build of the Lit-JS-SDK. Importing this package is the same as importing the main Lit-JS-SDK package (`import LitJsSdk from 'lit-js-sdk'`) except this package has less extra stuff you don't need.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->

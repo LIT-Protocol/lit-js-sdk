@@ -17,11 +17,6 @@ if (typeof window !== "undefined") {
 }
 
 import {
-  fromString as uint8arrayFromString,
-  toString as uint8arrayToString,
-} from "uint8arrays";
-
-import {
   encryptString,
   decryptString,
   zipAndEncryptString,
@@ -77,6 +72,10 @@ import {
   fileToDataUrl,
   injectViewerIFrame,
   downloadFile,
+  uint8arrayFromString,
+  uint8arrayToString,
+  blobToBase64String,
+  base64StringToBlob,
 } from "./utils/browser";
 
 import { LIT_CHAINS, LIT_SVM_CHAINS, ALL_LIT_CHAINS } from "./lib/constants";
@@ -152,6 +151,8 @@ const functions = {
   importSymmetricKey,
   getSessionSigs,
   hashResourceIdForSigning,
+  blobToBase64String,
+  base64StringToBlob,
 };
 
 module.exports = functions;
