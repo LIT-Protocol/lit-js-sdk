@@ -425,6 +425,7 @@ export default class LitNodeClient {
     resourceId,
     permanant,
     permanent = true,
+    sessionSigs,
   }) {
     log("saveSigningCondition");
 
@@ -478,12 +479,17 @@ export default class LitNodeClient {
     // create access control conditions on lit nodes
     const nodePromises = [];
     for (const url of this.connectedNodes) {
+      let authSigToSend = authSig;
+      if (sessionSigs) {
+        // use a separate authSig for each node
+        authSigToSend = sessionSigs[url];
+      }
       nodePromises.push(
         this.storeSigningConditionWithNode({
           url,
           key: hashOfResourceIdStr,
           val: hashOfConditionsStr,
-          authSig,
+          authSig: authSigToSend,
           chain,
           permanent: permanent ? 1 : 0,
         })

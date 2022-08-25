@@ -197,7 +197,9 @@ export async function getSessionSigs({
     issuedAt: new Date().toISOString(),
     expiration: sessionExpiration.toISOString(),
   };
-  const signatures = [...litNodeClient.connectedNodes].map((nodeAddress) => {
+  const signatures = {};
+
+  litNodeClient.connectedNodes.forEach((nodeAddress) => {
     const toSign = {
       ...signingTemplate,
       nodeAddress,
@@ -206,11 +208,11 @@ export async function getSessionSigs({
     const uint8arrayKey = uint8arrayFromString(sessionKey.secretKey, "base16");
     const uint8arrayMessage = uint8arrayFromString(signedMessage, "utf8");
     let signature = nacl.sign(uint8arrayMessage, uint8arrayKey);
-    return {
+    signatures[nodeAddress] = {
       sig: uint8arrayToString(signature, "base16"),
       derivedVia: "litSessionSignViaNacl",
       signedMessage,
-      publicKey: sessionKey.publicKey,
+      address: sessionKey.publicKey,
     };
   });
 
