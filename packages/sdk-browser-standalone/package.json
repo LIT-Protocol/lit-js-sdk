@@ -1,6 +1,6 @@
 {
   "name": "@lit-protocol/sdk-browser-standalone",
-  "version": "1.2.9",
+  "version": "1.2.10",
   "main": "build/index.web.js",
   "license": "MIT"
 }
