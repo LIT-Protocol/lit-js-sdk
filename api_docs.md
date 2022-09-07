@@ -257,7 +257,7 @@ Securely save the association between access control conditions and something th
     *   `params.permanent` **[boolean][137]** Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default. (optional, default `true`)
     *   `params.permanant`  
 
-Returns **[Uint8Array][147]** The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will neeed it to decrypt the content in the future.
+Returns **[Uint8Array][147]** The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will need it to decrypt the content in the future.
 
 ### signWithEcdsa
 
