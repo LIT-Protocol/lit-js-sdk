@@ -207,12 +207,14 @@ export async function getSessionSigs({
     let signedMessage = JSON.stringify(toSign);
     const uint8arrayKey = uint8arrayFromString(sessionKey.secretKey, "base16");
     const uint8arrayMessage = uint8arrayFromString(signedMessage, "utf8");
-    let signature = nacl.sign(uint8arrayMessage, uint8arrayKey);
+    let signature = nacl.sign.detached(uint8arrayMessage, uint8arrayKey);
+    // console.log("signature", signature);
     signatures[nodeAddress] = {
       sig: uint8arrayToString(signature, "base16"),
       derivedVia: "litSessionSignViaNacl",
       signedMessage,
       address: sessionKey.publicKey,
+      algo: "ed25519",
     };
   });
 

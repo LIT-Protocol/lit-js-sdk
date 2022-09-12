@@ -324,7 +324,7 @@ export default class LitNodeClient {
       let sigToPassToNode = authSig;
       if (sessionSigs) {
         // find the sessionSig for this node
-        sigToPassToNode = sessionSigs.find((s) => s.nodeAddress === url);
+        sigToPassToNode = sessionSigs[url];
         if (!sigToPassToNode) {
           throwError({
             message: `You passed sessionSigs but we could not find session sig for node ${url}`,
