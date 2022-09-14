@@ -77,6 +77,10 @@ export const checkType = ({
   functionName,
   throwOnError = true,
 }) => {
+  if (globalThis.litConfig.checkTypes === false) {
+    return true;
+  }
+
   if (!allowedTypes.includes(getVarType(value))) {
     let message = `Expecting ${allowedTypes.join(
       " or "

@@ -103,6 +103,7 @@ export default class LitNodeClient {
         "https://node2.litgateway.com:7378",
         "https://node2.litgateway.com:7379",
       ],
+      checkTypes: true,
     };
     if (config) {
       this.config = { ...this.config, ...config };
