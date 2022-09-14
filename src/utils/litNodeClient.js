@@ -838,7 +838,10 @@ export default class LitNodeClient {
       );
     }
     // hash the encrypted pubkey
-    const hashOfKey = await crypto.subtle.digest("SHA-256", encryptedKey);
+    const hashOfKey = await crypto.subtle.digest(
+      { name: "SHA-256" },
+      encryptedKey
+    );
     const hashOfKeyStr = uint8arrayToString(
       new Uint8Array(hashOfKey),
       "base16"
@@ -1115,7 +1118,7 @@ export default class LitNodeClient {
           );
           this.ready = true;
           log("lit is ready");
-          if (typeof document !== "undefined") {
+          if (typeof document !== "undefined" && typeof Event !== "undefined") {
             document.dispatchEvent(new Event("lit-ready"));
           }
 

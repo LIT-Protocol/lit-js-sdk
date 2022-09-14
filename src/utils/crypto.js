@@ -26,7 +26,7 @@ export function hashUnifiedAccessControlConditions(
   log("Hashing unified access control conditions: ", toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
-  return crypto.subtle.digest("SHA-256", data);
+  return crypto.subtle.digest({ name: "SHA-256" }, data);
 }
 
 export function canonicalUnifiedAccessControlConditionFormatter(cond) {
@@ -75,7 +75,7 @@ export function hashCosmosConditions(cosmosConditions) {
   log("Hashing cosmos conditions: ", toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
-  return crypto.subtle.digest("SHA-256", data);
+  return crypto.subtle.digest({ name: "SHA-256" }, data);
 }
 
 export function canonicalCosmosConditionFormatter(cond) {
@@ -129,7 +129,7 @@ export function hashSolRpcConditions(solRpcConditions) {
   log("Hashing sol rpc conditions: ", toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
-  return crypto.subtle.digest("SHA-256", data);
+  return crypto.subtle.digest({ name: "SHA-256" }, data);
 }
 
 export function canonicalSolRpcConditionFormatter(
@@ -243,7 +243,7 @@ export function hashResourceId(resourceId) {
   const toHash = JSON.stringify(resId);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
-  return crypto.subtle.digest("SHA-256", data);
+  return crypto.subtle.digest({ name: "SHA-256" }, data);
 }
 
 function canonicalAbiParams(params) {
@@ -338,7 +338,7 @@ export function hashEVMContractConditions(accessControlConditions) {
   log("Hashing evm contract conditions: ", toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
-  return crypto.subtle.digest("SHA-256", data);
+  return crypto.subtle.digest({ name: "SHA-256" }, data);
 }
 
 export function canonicalAccessControlConditionFormatter(cond) {
@@ -393,7 +393,7 @@ export function hashAccessControlConditions(accessControlConditions) {
   log("Hashing access control conditions: ", toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
-  return crypto.subtle.digest("SHA-256", data);
+  return crypto.subtle.digest({ name: "SHA-256" }, data);
 }
 
 export function compareArrayBuffers(buf1, buf2) {
@@ -412,6 +412,15 @@ export function compareArrayBuffers(buf1, buf2) {
  * @returns {Promise<CryptoKey>} A promise that resolves to the imported key
  */
 export async function importSymmetricKey(symmKey) {
+  log(
+    "Importing symmetric key with params before toUpperCase",
+    SYMM_KEY_ALGO_PARAMS
+  );
+  SYMM_KEY_ALGO_PARAMS.name = SYMM_KEY_ALGO_PARAMS.name.toUpperCase();
+  log(
+    "Importing symmetric key with params after toUpperCase",
+    SYMM_KEY_ALGO_PARAMS
+  );
   const importedSymmKey = await crypto.subtle.importKey(
     "raw",
     symmKey,

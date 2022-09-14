@@ -139,6 +139,7 @@ export async function decryptString(encryptedStringBlob, symmKey) {
 
   // import the decrypted symm key
   const importedSymmKey = await importSymmetricKey(symmKey);
+  console.log("imported symm key!");
 
   const decryptedStringArrayBuffer = await decryptWithSymmetricKey(
     encryptedStringBlob,
