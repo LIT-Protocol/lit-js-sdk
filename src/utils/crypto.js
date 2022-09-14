@@ -42,7 +42,7 @@ export function canonicalUnifiedAccessControlConditionFormatter(cond) {
 
   if ("returnValueTest" in cond) {
     if (cond.conditionType === "solRpc") {
-      return canonicalSolRpcConditionFormatter(cond);
+      return canonicalSolRpcConditionFormatter(cond, true);
     } else if (cond.conditionType === "evmBasic") {
       return canonicalAccessControlConditionFormatter(cond);
     } else if (cond.conditionType === "evmContract") {
@@ -132,7 +132,10 @@ export function hashSolRpcConditions(solRpcConditions) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
-export function canonicalSolRpcConditionFormatter(cond) {
+export function canonicalSolRpcConditionFormatter(
+  cond,
+  requireV2Conditions = false
+) {
   // need to return in the exact format below
   // but make sure we don't include the optional fields:
   /*
@@ -156,7 +159,9 @@ pub struct SolPdaInterface {
   */
 
   if (Array.isArray(cond)) {
-    return cond.map((c) => canonicalSolRpcConditionFormatter(c));
+    return cond.map((c) =>
+      canonicalSolRpcConditionFormatter(c, requireV2Conditions)
+    );
   }
 
   if ("operator" in cond) {
@@ -176,7 +181,7 @@ pub struct SolPdaInterface {
 
     // check if this is a sol v1 or v2 condition
     // v1 conditions didn't have any pda params or pda interface or pda key
-    if ("pdaParams" in cond) {
+    if ("pdaParams" in cond || requireV2Conditions) {
       if (
         !("pdaInterface" in cond) ||
         !("offset" in cond.pdaInterface) ||

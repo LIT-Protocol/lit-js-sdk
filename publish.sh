@@ -12,11 +12,27 @@ yarn buildNode
 
 yarn publish --new-version $VERSION
 
+./create_subpackage_packagejson.sh
+
 # copy the nodejs build
 cp build/index.node.js packages/sdk-nodejs/build/
-# don't copy the source map because it's huge, like 4.5MB.  
-# cp build/index.node.js.map packages/sdk-nodejs/build/
 cd packages/sdk-nodejs
-yarn publish --new-version $VERSION
+yarn publish --new-version $VERSION --no-git-tag-version
+
+cd ../..
+
+
+# copy the browser build
+cp build/index.js packages/sdk-browser/build/
+cd packages/sdk-browser
+yarn publish --new-version $VERSION --no-git-tag-version
+
+cd ../..
+
+# copy the browser-standalone build
+cp build/index.web.js packages/sdk-browser-standalone/build/
+cd packages/sdk-browser-standalone
+yarn publish --new-version $VERSION --no-git-tag-version
+
 
 echo "Don't forget to git push to get this running on the netlify cdn"

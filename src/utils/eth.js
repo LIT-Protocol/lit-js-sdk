@@ -63,7 +63,7 @@ export async function connectWeb3({ chainId = 1 } = {}) {
     walletconnect: {
       package: WalletConnectProvider, // required
       options: {
-        // infuraId: "cd614bfa5c2f4703b7ab0ec0547d9f81",
+        infuraId: "cd614bfa5c2f4703b7ab0ec0547d9f81",
         rpc: rpcUrls,
         chainId,
       },

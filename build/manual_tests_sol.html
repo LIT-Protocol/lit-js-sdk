@@ -426,6 +426,28 @@
         });
       };
 
+      var SolUserTest = async () => {
+        var solRpcConditions = [
+          {
+            method: "balanceOfToken",
+            params: ["SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y"],
+            pdaParams: [],
+            pdaInterface: { offset: 0, fields: {} },
+            pdaKey: "",
+            chain: "solana",
+            returnValueTest: {
+              key: "$.amount",
+              comparator: ">",
+              value: "100000000",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          solRpcConditions,
+          testName: "SolUserTest",
+        });
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -516,6 +538,10 @@
     <br />
 
     <button onclick="SolPDABalance()">SolPDABalance</button>
+    <br />
+    <br />
+
+    <button onclick="SolUserTest()">SolUserTest</button>
     <br />
     <br />
 
