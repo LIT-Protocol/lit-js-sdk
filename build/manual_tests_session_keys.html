@@ -89,6 +89,7 @@
         var sessionSigs = await LitJsSdk.getSessionSigs({
           chain: "ethereum",
           litNodeClient,
+          resources: [`litEncryptionCondition://*`],
         });
 
         document.getElementById(
