@@ -4,6 +4,7 @@
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
   "main": "build/index.js",
+  "types": "build/index.d.js",
   "scripts": {
     "start": "concurrently \"microbundle watch -o build/index.js -f cjs\" \"nodemon -i build esbuild-nodejs.js\" \"nodemon -i build esbuild-web.js\" \"serve -p 3050 build\" \"sleep 3; open http://localhost:3050/manual_tests.html\" \"sleep 3; open http://localhost:3050/manual_tests_evm_contract_conditions.html\"",
     "startNoCompressUseThisIfYouGetATerserErrorMaximumCallStackSizeExceeded": "microbundle watch --no-compress ",
@@ -35,7 +36,8 @@
     "genversion": "^3.0.1",
     "microbundle": "^0.13.0",
     "semver-bump": "^1.0.0",
-    "standard": "^16.0.3"
+    "standard": "^16.0.3",
+    "ts-migrate": "^0.1.33"
   },
   "dependencies": {
     "@ethersproject/bytes": "^5.5.0",
@@ -57,6 +59,7 @@
     "tslib": "^2.3.1",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
+    "typescript": "^4.8.3",
     "uint8arrays": "^3.0.0",
     "utf-8-validate": "^5.0.8"
   }
