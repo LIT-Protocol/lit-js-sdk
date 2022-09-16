@@ -670,6 +670,8 @@ export function combineBlsDecryptionShares(
   );
   // log("decrypted is ", uint8arrayToString(decrypted, "base16"));
   return decrypted;
+}
+
 export function generateSessionKeyPair() {
   const keyPair = nacl.sign.keyPair();
   return {
