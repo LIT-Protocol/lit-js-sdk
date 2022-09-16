@@ -9,7 +9,7 @@ export const AUTH_SIGNATURE_BODY =
 
 function getProvider() {
   if ("solana" in window) {
-    return window.solana;
+    return (window as any).solana;
     // const provider = window.solana;
     // if (provider.isPhantom) {
     //   return provider;
@@ -31,7 +31,9 @@ export async function connectSolProvider() {
   return { provider, account };
 }
 
-export async function checkAndSignSolAuthMessage({ chain }) {
+export async function checkAndSignSolAuthMessage({
+  chain
+}: any) {
   // Connect to cluster
   // const connection = new solWeb3.Connection(
   //   solWeb3.clusterApiUrl("devnet"),
@@ -46,14 +48,16 @@ export async function checkAndSignSolAuthMessage({ chain }) {
     await signAndSaveAuthMessage({ provider, account });
     authSig = localStorage.getItem("lit-auth-sol-signature");
   }
+  // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
   authSig = JSON.parse(authSig);
 
-  if (account !== authSig.address) {
+  if (account !== (authSig as any).address) {
     log(
       "signing auth message because account is not the same as the address in the auth sig"
     );
     await signAndSaveAuthMessage({ provider, account });
     authSig = localStorage.getItem("lit-auth-sol-signature");
+    // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
     authSig = JSON.parse(authSig);
   }
 
@@ -62,7 +66,10 @@ export async function checkAndSignSolAuthMessage({ chain }) {
   return authSig;
 }
 
-export async function signAndSaveAuthMessage({ provider, account }) {
+export async function signAndSaveAuthMessage({
+  provider,
+  account
+}: any) {
   const now = new Date().toISOString();
   const body = AUTH_SIGNATURE_BODY.replace("{{timestamp}}", now);
 

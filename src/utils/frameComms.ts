@@ -3,28 +3,22 @@ import { unlockLitWithKey } from "./lit";
 export const listenForChildFrameMessages = async () => {
   console.log("calling listenForChildFrameMessages from " + window.origin);
   // listen for requests from child frames
-  window.addEventListener(
-    "message",
-    async (event) => {
-      // console.log('onMessage in sdk: ', event)
-
-      let childFrameThatSentMessageIndex = false;
-      for (let i = 0; i < frames.length; i++) {
+window.addEventListener("message", async (event) => {
+    // console.log('onMessage in sdk: ', event)
+    let childFrameThatSentMessageIndex = false;
+    for (let i = 0; i < frames.length; i++) {
         if (frames[i] === event.source) {
-          childFrameThatSentMessageIndex = i;
+            // @ts-expect-error TS(2322): Type 'number' is not assignable to type 'boolean'.
+            childFrameThatSentMessageIndex = i;
         }
-      }
-
-      if (childFrameThatSentMessageIndex !== false) {
+    }
+    if (childFrameThatSentMessageIndex !== false) {
         console.log("onMessage in parent: ", event);
-
         const { command, params } = event.data;
         if (command === "LIT_SYN") {
-          window.frames[childFrameThatSentMessageIndex].postMessage(
-            { response: "LIT_ACK" },
-            "*"
-          );
-          return;
+            // @ts-expect-error TS(2538): Type 'true' cannot be used as an index type.
+            window.frames[childFrameThatSentMessageIndex].postMessage({ response: "LIT_ACK" }, "*");
+            return;
         }
         //       if (command === 'signAndGetEncryptionKey') {
         //         authSig = await checkAndSignAuthMessage({ chain: params.chain })
@@ -48,54 +42,43 @@ export const listenForChildFrameMessages = async () => {
         //         return
         //       }
         if (event.data.target === "LitNodeClient") {
-          // forward this on to the nodes
-          if (command === "getEncryptionKey") {
-            const encryptionKey = await window.litNodeClient.getEncryptionKey({
-              ...params,
-            });
-            window.frames[childFrameThatSentMessageIndex].postMessage(
-              { respondingToCommand: command, encryptionKey },
-              "*"
-            );
-          }
+            // forward this on to the nodes
+            if (command === "getEncryptionKey") {
+                const encryptionKey = await (window as any).litNodeClient.getEncryptionKey({
+                    ...params,
+                });
+                // @ts-expect-error TS(2538): Type 'true' cannot be used as an index type.
+                window.frames[childFrameThatSentMessageIndex].postMessage({ respondingToCommand: command, encryptionKey }, "*");
+            }
         }
-      }
-    },
-    false
-  );
+    }
+}, false);
 };
 
 export const listenForFrameParentMessages = async () => {
   console.log("calling listenForFrameParentMessages from " + window.origin);
   // listen for requests from child frames
-  window.addEventListener(
-    "message",
-    async (event) => {
-      const messageIsFromFrameParent = event.source === window.parent;
-
-      if (messageIsFromFrameParent) {
+window.addEventListener("message", async (event) => {
+    const messageIsFromFrameParent = event.source === window.parent;
+    if (messageIsFromFrameParent) {
         console.log("onMessage in frame: ", event);
-      }
-
-      // console.log('messageIsFromFrameParent: ', messageIsFromFrameParent)
-
-      if (messageIsFromFrameParent) {
+    }
+    // console.log('messageIsFromFrameParent: ', messageIsFromFrameParent)
+    if (messageIsFromFrameParent) {
         const { response, respondingToCommand } = event.data;
         if (response === "LIT_ACK") {
-          window.useLitPostMessageProxy = true;
-          if (typeof document !== "undefined") {
-            document.dispatchEvent(new Event("lit-ready"));
-          }
-          return;
+            (window as any).useLitPostMessageProxy = true;
+            if (typeof document !== "undefined") {
+                document.dispatchEvent(new Event("lit-ready"));
+            }
+            return;
         }
         if (respondingToCommand === "getEncryptionKey") {
-          const { encryptionKey } = event.data;
-          unlockLitWithKey({ symmetricKey: encryptionKey });
+            const { encryptionKey } = event.data;
+            unlockLitWithKey({ symmetricKey: encryptionKey });
         }
-      }
-    },
-    false
-  );
+    }
+}, false);
 };
 
 export const inIframe = () => {

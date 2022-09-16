@@ -17,10 +17,9 @@ const SYMM_KEY_ALGO_PARAMS = {
  * @returns {Promise<ArrayBuffer>} A promise that resolves to an ArrayBuffer that contains the hash
  */
 export function hashUnifiedAccessControlConditions(
-  unifiedAccessControlConditions
+  unifiedAccessControlConditions: any
 ) {
-  const conds = unifiedAccessControlConditions.map((c) =>
-    canonicalUnifiedAccessControlConditionFormatter(c)
+  const conds = unifiedAccessControlConditions.map((c: any) => canonicalUnifiedAccessControlConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
   log("Hashing unified access control conditions: ", toHash);
@@ -29,7 +28,8 @@ export function hashUnifiedAccessControlConditions(
   return crypto.subtle.digest("SHA-256", data);
 }
 
-export function canonicalUnifiedAccessControlConditionFormatter(cond) {
+// @ts-expect-error TS(7023): 'canonicalUnifiedAccessControlConditionFormatter' ... Remove this comment to see the full error message
+export function canonicalUnifiedAccessControlConditionFormatter(cond: any) {
   if (Array.isArray(cond)) {
     return cond.map((c) => canonicalUnifiedAccessControlConditionFormatter(c));
   }
@@ -67,9 +67,8 @@ export function canonicalUnifiedAccessControlConditionFormatter(cond) {
   });
 }
 
-export function hashCosmosConditions(cosmosConditions) {
-  const conds = cosmosConditions.map((c) =>
-    canonicalCosmosConditionFormatter(c)
+export function hashCosmosConditions(cosmosConditions: any) {
+  const conds = cosmosConditions.map((c: any) => canonicalCosmosConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
   log("Hashing cosmos conditions: ", toHash);
@@ -78,7 +77,8 @@ export function hashCosmosConditions(cosmosConditions) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
-export function canonicalCosmosConditionFormatter(cond) {
+// @ts-expect-error TS(7023): 'canonicalCosmosConditionFormatter' implicitly has... Remove this comment to see the full error message
+export function canonicalCosmosConditionFormatter(cond: any) {
   // need to return in the exact format below:
   /*
   pub struct CosmosCondition {
@@ -121,9 +121,8 @@ export function canonicalCosmosConditionFormatter(cond) {
   });
 }
 
-export function hashSolRpcConditions(solRpcConditions) {
-  const conds = solRpcConditions.map((c) =>
-    canonicalSolRpcConditionFormatter(c)
+export function hashSolRpcConditions(solRpcConditions: any) {
+  const conds = solRpcConditions.map((c: any) => canonicalSolRpcConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
   log("Hashing sol rpc conditions: ", toHash);
@@ -132,8 +131,9 @@ export function hashSolRpcConditions(solRpcConditions) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
+// @ts-expect-error TS(7023): 'canonicalSolRpcConditionFormatter' implicitly has... Remove this comment to see the full error message
 export function canonicalSolRpcConditionFormatter(
-  cond,
+  cond: any,
   requireV2Conditions = false
 ) {
   // need to return in the exact format below
@@ -226,7 +226,7 @@ pub struct SolPdaInterface {
   });
 }
 
-export function canonicalResourceIdFormatter(resId) {
+export function canonicalResourceIdFormatter(resId: any) {
   // need to return in the exact format below:
 
   return {
@@ -238,7 +238,7 @@ export function canonicalResourceIdFormatter(resId) {
   };
 }
 
-export function hashResourceId(resourceId) {
+export function hashResourceId(resourceId: any) {
   const resId = canonicalResourceIdFormatter(resourceId);
   const toHash = JSON.stringify(resId);
   const encoder = new TextEncoder();
@@ -246,14 +246,15 @@ export function hashResourceId(resourceId) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
-function canonicalAbiParams(params) {
-  return params.map((param) => ({
+function canonicalAbiParams(params: any) {
+  return params.map((param: any) => ({
     name: param.name,
-    type: param.type,
+    type: param.type
   }));
 }
 
-export function canonicalEVMContractConditionFormatter(cond) {
+// @ts-expect-error TS(7023): 'canonicalEVMContractConditionFormatter' implicitl... Remove this comment to see the full error message
+export function canonicalEVMContractConditionFormatter(cond: any) {
   // need to return in the exact format below:
   /*
   pub struct JsonAccessControlCondition {
@@ -330,9 +331,8 @@ export function canonicalEVMContractConditionFormatter(cond) {
   });
 }
 
-export function hashEVMContractConditions(accessControlConditions) {
-  const conds = accessControlConditions.map((c) =>
-    canonicalEVMContractConditionFormatter(c)
+export function hashEVMContractConditions(accessControlConditions: any) {
+  const conds = accessControlConditions.map((c: any) => canonicalEVMContractConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
   log("Hashing evm contract conditions: ", toHash);
@@ -341,7 +341,8 @@ export function hashEVMContractConditions(accessControlConditions) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
-export function canonicalAccessControlConditionFormatter(cond) {
+// @ts-expect-error TS(7023): 'canonicalAccessControlConditionFormatter' implici... Remove this comment to see the full error message
+export function canonicalAccessControlConditionFormatter(cond: any) {
   // need to return in the exact format below:
   /*
   pub struct JsonAccessControlCondition {
@@ -385,9 +386,8 @@ export function canonicalAccessControlConditionFormatter(cond) {
   });
 }
 
-export function hashAccessControlConditions(accessControlConditions) {
-  const conds = accessControlConditions.map((c) =>
-    canonicalAccessControlConditionFormatter(c)
+export function hashAccessControlConditions(accessControlConditions: any) {
+  const conds = accessControlConditions.map((c: any) => canonicalAccessControlConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
   log("Hashing access control conditions: ", toHash);
@@ -396,7 +396,7 @@ export function hashAccessControlConditions(accessControlConditions) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
-export function compareArrayBuffers(buf1, buf2) {
+export function compareArrayBuffers(buf1: any, buf2: any) {
   if (buf1.byteLength !== buf2.byteLength) return false;
   const dv1 = new Uint8Array(buf1);
   const dv2 = new Uint8Array(buf2);
@@ -411,7 +411,7 @@ export function compareArrayBuffers(buf1, buf2) {
  * @param {Uint8Array} symmKey The symmetric key to import
  * @returns {Promise<CryptoKey>} A promise that resolves to the imported key
  */
-export async function importSymmetricKey(symmKey) {
+export async function importSymmetricKey(symmKey: any) {
   const importedSymmKey = await crypto.subtle.importKey(
     "raw",
     symmKey,
@@ -440,7 +440,7 @@ export async function generateSymmetricKey() {
  * @param {Object} symmKey The symmetric key
  * @returns {Blob} The decrypted blob
  */
-export async function decryptWithSymmetricKey(encryptedBlob, symmKey) {
+export async function decryptWithSymmetricKey(encryptedBlob: any, symmKey: any) {
   const recoveredIv = await encryptedBlob.slice(0, 16).arrayBuffer();
   const encryptedZipArrayBuffer = await encryptedBlob.slice(16).arrayBuffer();
   const decryptedZip = await crypto.subtle.decrypt(
@@ -462,7 +462,7 @@ export async function decryptWithSymmetricKey(encryptedBlob, symmKey) {
  * @param {Blob} data The blob to encrypt
  * @returns {Blob} The encrypted blob
  */
-export async function encryptWithSymmetricKey(symmKey, data) {
+export async function encryptWithSymmetricKey(symmKey: any, data: any) {
   // encrypt the zip with symmetric key
   const iv = crypto.getRandomValues(new Uint8Array(16));
 
@@ -488,7 +488,7 @@ export async function encryptWithSymmetricKey(symmKey, data) {
  * @param {string} version The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
  * @returns {Blob} The encrypted blob
  */
-export function encryptWithPubKey(receiverPublicKey, data, version) {
+export function encryptWithPubKey(receiverPublicKey: any, data: any, version: any) {
   switch (version) {
     case "x25519-xsalsa20-poly1305": {
       // generate ephemeral keypair
@@ -541,7 +541,7 @@ export function encryptWithPubKey(receiverPublicKey, data, version) {
  * @param {string} version The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
  * @returns {Blob} The decrypted blob
  */
-export function decryptWithPrivKey(encryptedData, receiverPrivateKey) {
+export function decryptWithPrivKey(encryptedData: any, receiverPrivateKey: any) {
   switch (encryptedData.version) {
     case "x25519-xsalsa20-poly1305": {
       const recieverEncryptionPrivateKey =
@@ -565,6 +565,7 @@ export function decryptWithPrivKey(encryptedData, receiverPrivateKey) {
       // return decrypted msg data
       let output;
       try {
+        // @ts-expect-error TS(2345): Argument of type 'Uint8Array | null' is not assign... Remove this comment to see the full error message
         output = naclUtil.encodeUTF8(decryptedMessage);
       } catch (err) {
         throw new Error("Decryption failed.  Could not encode result as utf8");

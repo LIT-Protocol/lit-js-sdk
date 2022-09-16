@@ -10,6 +10,7 @@ export const AUTH_SIGNATURE_BODY =
 
 function getProvider() {
   if ("keplr" in window) {
+    // @ts-expect-error TS(2304): Cannot find name 'keplr'.
     return keplr;
   } else {
     throwError({
@@ -21,7 +22,10 @@ function getProvider() {
   }
 }
 
-export async function connectCosmosProvider({ chain }) {
+export async function connectCosmosProvider({
+  chain
+}: any) {
+  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   const chainId = LIT_COSMOS_CHAINS[chain].chainId;
 
   const keplr = getProvider();
@@ -51,7 +55,9 @@ export async function connectCosmosProvider({ chain }) {
   return { provider: keplr, account: accounts[0].address, chainId };
 }
 
-export async function checkAndSignCosmosAuthMessage({ chain }) {
+export async function checkAndSignCosmosAuthMessage({
+  chain
+}: any) {
   const { provider, account, chainId } = await connectCosmosProvider({ chain });
 
   let authSig = localStorage.getItem("lit-auth-cosmos-signature");
@@ -60,14 +66,16 @@ export async function checkAndSignCosmosAuthMessage({ chain }) {
     await signAndSaveAuthMessage({ provider, account, chainId });
     authSig = localStorage.getItem("lit-auth-cosmos-signature");
   }
+  // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
   authSig = JSON.parse(authSig);
 
-  if (account !== authSig.address) {
+  if (account !== (authSig as any).address) {
     log(
       "signing auth message because account is not the same as the address in the auth sig"
     );
     await signAndSaveAuthMessage({ provider, account, chainId });
     authSig = localStorage.getItem("lit-auth-cosmos-signature");
+    // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
     authSig = JSON.parse(authSig);
   }
 
@@ -76,7 +84,11 @@ export async function checkAndSignCosmosAuthMessage({ chain }) {
   return authSig;
 }
 
-export async function signAndSaveAuthMessage({ provider, account, chainId }) {
+export async function signAndSaveAuthMessage({
+  provider,
+  account,
+  chainId
+}: any) {
   const now = new Date().toISOString();
   const body = AUTH_SIGNATURE_BODY.replace("{{timestamp}}", now);
 
@@ -129,7 +141,8 @@ export async function signAndSaveAuthMessage({ provider, account, chainId }) {
   localStorage.setItem("lit-auth-cosmos-signature", JSON.stringify(authSig));
 }
 
-function sortedObject(obj) {
+// @ts-expect-error TS(7023): 'sortedObject' implicitly has return type 'any' be... Remove this comment to see the full error message
+function sortedObject(obj: any) {
   if (typeof obj !== "object" || obj === null) {
     return obj;
   }
@@ -140,12 +153,13 @@ function sortedObject(obj) {
   const result = {};
   // NOTE: Use forEach instead of reduce for performance with large objects eg Wasm code
   sortedKeys.forEach((key) => {
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     result[key] = sortedObject(obj[key]);
   });
   return result;
 }
 
-export function serializeSignDoc(signDoc) {
+export function serializeSignDoc(signDoc: any) {
   const sorted = JSON.stringify(sortedObject(signDoc));
   return uint8arrayFromString(sorted, "utf8");
 }

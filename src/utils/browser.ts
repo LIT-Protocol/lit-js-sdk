@@ -7,7 +7,7 @@ import {
  * @param {Blob | File} blob The Blob or File to turn into a base64 string
  * @returns {Promise<String>} A promise that resolves to the base64 string
  */
-export async function blobToBase64String(blob) {
+export async function blobToBase64String(blob: any) {
   let ab = await blob.arrayBuffer();
   return uint8arrayToString(new Uint8Array(ab), "base64urlpad");
 }
@@ -16,7 +16,7 @@ export async function blobToBase64String(blob) {
  * @param {String} base64String The base64 string that to turn into a Blob
  * @returns {Blob}  A blob that contains the decoded base64 data
  */
-export function base64StringToBlob(base64String) {
+export function base64StringToBlob(base64String: any) {
   return new Blob([uint8arrayFromString(base64String, "base64urlpad")]);
 }
 
@@ -25,7 +25,7 @@ export function base64StringToBlob(base64String) {
  * @param {String} encoding The encoding to use when converting the Uint8Array to a string.
  * @returns {String} The string representation of the Uint8Array
  */
-export function uint8arrayToString(uint8array, encoding) {
+export function uint8arrayToString(uint8array: any, encoding: any) {
   return uint8arrayToStringFromLib(uint8array, encoding);
 }
 
@@ -34,7 +34,7 @@ export function uint8arrayToString(uint8array, encoding) {
  * @param {String} encoding The encoding to use when converting the string to a Uint8Array.
  * @returns {String} The Uint8Array representation of the data from the string
  */
-export function uint8arrayFromString(str, encoding) {
+export function uint8arrayFromString(str: any, encoding: any) {
   return uint8arrayFromStringFromLib(str, encoding);
 }
 
@@ -43,7 +43,7 @@ export function uint8arrayFromString(str, encoding) {
  * @param {File} file The file to turn into a data url
  * @returns {string} The data URL.  This is a string representation that can be used anywhere the original file would be used.
  */
-export function fileToDataUrl(file) {
+export function fileToDataUrl(file: any) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -61,7 +61,11 @@ export function fileToDataUrl(file) {
  * @param {string} params.mimetype The mime type of the file
  * @returns {string} The data URL.  This is a string representation that can be used anywhere the original file would be used.
  */
-export function downloadFile({ filename, data, mimetype }) {
+export function downloadFile({
+  filename,
+  data,
+  mimetype
+}: any) {
   var element = document.createElement("a");
   element.setAttribute(
     "href",
@@ -89,8 +93,8 @@ export function injectViewerIFrame({
   destinationId,
   title,
   fileUrl,
-  className,
-}) {
+  className
+}: any) {
   if (fileUrl.includes("data:")) {
     // data urls are not safe, refuse to do this
     throw new Error(
@@ -108,13 +112,15 @@ export function injectViewerIFrame({
   const iframe = document.createElement("iframe");
   iframe.src = fileUrl;
   iframe.title = title;
+  // @ts-expect-error TS(2540): Cannot assign to 'sandbox' because it is a read-on... Remove this comment to see the full error message
   iframe.sandbox =
     "allow-forms allow-scripts allow-popups  allow-modals allow-popups-to-escape-sandbox allow-same-origin";
-  iframe.loading = "lazy";
+  (iframe as any).loading = "lazy";
   iframe.allow =
     "accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; encrypted-media; fullscreen; geolocation; gyroscope; layout-animations; legacy-image-formats; magnetometer; microphone; midi; payment; picture-in-picture; publickey-credentials-get; sync-xhr; usb; vr; screen-wake-lock; web-share; xr-spatial-tracking";
   if (className) {
     iframe.className = className;
   }
+  // @ts-expect-error TS(2531): Object is possibly 'null'.
   document.getElementById(destinationId).appendChild(iframe);
 }

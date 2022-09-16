@@ -86,7 +86,14 @@ import {
  * @param {boolean} [config.debug=true] Whether or not to show debug messages.
  */
 export default class LitNodeClient {
-  constructor(config) {
+  config: any;
+  connectedNodes: any;
+  networkPubKey: any;
+  networkPubKeySet: any;
+  ready: any;
+  serverKeys: any;
+  subnetPubKey: any;
+  constructor(config: any) {
     this.config = {
       alertWhenUnauthorized: true,
       minNodeCount: 6,
@@ -120,6 +127,7 @@ export default class LitNodeClient {
         let configOverride = window.localStorage.getItem("LitNodeClientConfig");
         if (configOverride) {
           configOverride = JSON.parse(configOverride);
+          // @ts-expect-error TS(2698): Spread types may only be created from object types... Remove this comment to see the full error message
           this.config = { ...this.config, ...configOverride };
         }
       }
@@ -127,6 +135,7 @@ export default class LitNodeClient {
       console.log("Error accessing local storage", e);
     }
 
+    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     globalThis.litConfig = this.config;
   }
 
@@ -137,7 +146,10 @@ export default class LitNodeClient {
    * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
    * @returns {Object} A signed JWT that proves the response to the function call is genuine. You may present this to a smart contract, or a server for authorization, and it can be verified using the verifyJwt function.
    */
-  async getSignedChainDataToken({ callRequests, chain }) {
+  async getSignedChainDataToken({
+    callRequests,
+    chain
+  }: any) {
     if (!this.ready) {
       throwError({
         message:
@@ -252,8 +264,8 @@ export default class LitNodeClient {
     unifiedAccessControlConditions,
     chain,
     authSig,
-    resourceId,
-  }) {
+    resourceId
+  }: any) {
     if (!this.ready) {
       throwError({
         message:
@@ -275,24 +287,21 @@ export default class LitNodeClient {
     let formattedSolRpcConditions;
     let formattedUnifiedAccessControlConditions;
     if (accessControlConditions) {
-      formattedAccessControlConditions = accessControlConditions.map((c) =>
-        canonicalAccessControlConditionFormatter(c)
+      formattedAccessControlConditions = accessControlConditions.map((c: any) => canonicalAccessControlConditionFormatter(c)
       );
       log(
         "formattedAccessControlConditions",
         JSON.stringify(formattedAccessControlConditions)
       );
     } else if (evmContractConditions) {
-      formattedEVMContractConditions = evmContractConditions.map((c) =>
-        canonicalEVMContractConditionFormatter(c)
+      formattedEVMContractConditions = evmContractConditions.map((c: any) => canonicalEVMContractConditionFormatter(c)
       );
       log(
         "formattedEVMContractConditions",
         JSON.stringify(formattedEVMContractConditions)
       );
     } else if (solRpcConditions) {
-      formattedSolRpcConditions = solRpcConditions.map((c) =>
-        canonicalSolRpcConditionFormatter(c)
+      formattedSolRpcConditions = solRpcConditions.map((c: any) => canonicalSolRpcConditionFormatter(c)
       );
       log(
         "formattedSolRpcConditions",
@@ -300,8 +309,7 @@ export default class LitNodeClient {
       );
     } else if (unifiedAccessControlConditions) {
       formattedUnifiedAccessControlConditions =
-        unifiedAccessControlConditions.map((c) =>
-          canonicalUnifiedAccessControlConditionFormatter(c)
+        unifiedAccessControlConditions.map((c: any) => canonicalUnifiedAccessControlConditionFormatter(c)
         );
       log(
         "formattedUnifiedAccessControlConditions",
@@ -347,6 +355,7 @@ export default class LitNodeClient {
 
     // sanity check
     if (
+      // @ts-expect-error TS(2532): Object is possibly 'undefined'.
       !signatureShares.every(
         (val, i, arr) => val.unsignedJwt === arr[0].unsignedJwt
       )
@@ -358,6 +367,7 @@ export default class LitNodeClient {
     }
 
     // sort the sig shares by share index.  this is important when combining the shares.
+    // @ts-expect-error TS(2532): Object is possibly 'undefined'.
     signatureShares.sort((a, b) => a.shareIndex - b.shareIndex);
 
     // combine the signature shares
@@ -365,6 +375,7 @@ export default class LitNodeClient {
     const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, "base16");
     log("pkSetAsBytes", pkSetAsBytes);
 
+    // @ts-expect-error TS(2532): Object is possibly 'undefined'.
     const sigShares = signatureShares.map((s) => ({
       shareHex: s.signatureShare,
       shareIndex: s.shareIndex,
@@ -377,6 +388,7 @@ export default class LitNodeClient {
     log("signature is ", uint8arrayToString(signature, "base16"));
 
     const unsignedJwt = mostCommonString(
+      // @ts-expect-error TS(2532): Object is possibly 'undefined'.
       signatureShares.map((s) => s.unsignedJwt)
     );
 
@@ -411,8 +423,8 @@ export default class LitNodeClient {
     authSig,
     resourceId,
     permanant,
-    permanent = true,
-  }) {
+    permanent = true
+  }: any) {
     log("saveSigningCondition");
 
     if (!this.ready) {
@@ -459,6 +471,7 @@ export default class LitNodeClient {
     }
 
     const hashOfConditionsStr = uint8arrayToString(
+      // @ts-expect-error TS(2769): No overload matches this call.
       new Uint8Array(hashOfConditions),
       "base16"
     );
@@ -505,8 +518,8 @@ export default class LitNodeClient {
     unifiedAccessControlConditions,
     toDecrypt,
     chain,
-    authSig,
-  }) {
+    authSig
+  }: any) {
     if (!this.ready) {
       throwError({
         message:
@@ -583,24 +596,21 @@ export default class LitNodeClient {
     let formattedSolRpcConditions;
     let formattedUnifiedAccessControlConditions;
     if (accessControlConditions) {
-      formattedAccessControlConditions = accessControlConditions.map((c) =>
-        canonicalAccessControlConditionFormatter(c)
+      formattedAccessControlConditions = accessControlConditions.map((c: any) => canonicalAccessControlConditionFormatter(c)
       );
       log(
         "formattedAccessControlConditions: ",
         JSON.stringify(formattedAccessControlConditions)
       );
     } else if (evmContractConditions) {
-      formattedEVMContractConditions = evmContractConditions.map((c) =>
-        canonicalEVMContractConditionFormatter(c)
+      formattedEVMContractConditions = evmContractConditions.map((c: any) => canonicalEVMContractConditionFormatter(c)
       );
       log(
         "formattedEVMContractConditions",
         JSON.stringify(formattedEVMContractConditions)
       );
     } else if (solRpcConditions) {
-      formattedSolRpcConditions = solRpcConditions.map((c) =>
-        canonicalSolRpcConditionFormatter(c)
+      formattedSolRpcConditions = solRpcConditions.map((c: any) => canonicalSolRpcConditionFormatter(c)
       );
       log(
         "formattedSolRpcConditions",
@@ -608,8 +618,7 @@ export default class LitNodeClient {
       );
     } else if (unifiedAccessControlConditions) {
       formattedUnifiedAccessControlConditions =
-        unifiedAccessControlConditions.map((c) =>
-          canonicalUnifiedAccessControlConditionFormatter(c)
+        unifiedAccessControlConditions.map((c: any) => canonicalUnifiedAccessControlConditionFormatter(c)
         );
       log(
         "formattedUnifiedAccessControlConditions",
@@ -649,15 +658,19 @@ export default class LitNodeClient {
     log("decryptionShares", decryptionShares);
 
     // sort the decryption shares by share index.  this is important when combining the shares.
+    // @ts-expect-error TS(2532): Object is possibly 'undefined'.
     decryptionShares.sort((a, b) => a.shareIndex - b.shareIndex);
 
     // combine the decryption shares
 
     // set decryption shares bytes in wasm
+    // @ts-expect-error TS(2532): Object is possibly 'undefined'.
     decryptionShares.forEach((s, idx) => {
+      // @ts-expect-error TS(2304): Cannot find name 'wasmExports'.
       wasmExports.set_share_indexes(idx, s.shareIndex);
       const shareAsBytes = uint8arrayFromString(s.decryptionShare, "base16");
       for (let i = 0; i < shareAsBytes.length; i++) {
+        // @ts-expect-error TS(2304): Cannot find name 'wasmExports'.
         wasmExports.set_decryption_shares_byte(i, idx, shareAsBytes[i]);
       }
     });
@@ -669,10 +682,12 @@ export default class LitNodeClient {
     // set the ciphertext bytes
     const ciphertextAsBytes = uint8arrayFromString(toDecrypt, "base16");
     for (let i = 0; i < ciphertextAsBytes.length; i++) {
+      // @ts-expect-error TS(2304): Cannot find name 'wasmExports'.
       wasmExports.set_ct_byte(i, ciphertextAsBytes[i]);
     }
 
     const decrypted = wasmBlsSdkHelpers.combine_decryption_shares(
+      // @ts-expect-error TS(2532): Object is possibly 'undefined'.
       decryptionShares.length,
       pkSetAsBytes.length,
       ciphertextAsBytes.length
@@ -706,8 +721,8 @@ export default class LitNodeClient {
     symmetricKey,
     encryptedSymmetricKey,
     permanant,
-    permanent = true,
-  }) {
+    permanent = true
+  }: any) {
     log("LitNodeClient.saveEncryptionKey");
 
     if (!this.ready) {
@@ -867,6 +882,7 @@ export default class LitNodeClient {
     }
 
     const hashOfConditionsStr = uint8arrayToString(
+      // @ts-expect-error TS(2769): No overload matches this call.
       new Uint8Array(hashOfConditions),
       "base16"
     );
@@ -901,8 +917,8 @@ export default class LitNodeClient {
     val,
     authSig,
     chain,
-    permanent,
-  }) {
+    permanent
+  }: any) {
     log("storeSigningConditionWithNode");
     const urlWithPath = `${url}/web/signing/store`;
     const data = {
@@ -921,8 +937,8 @@ export default class LitNodeClient {
     val,
     authSig,
     chain,
-    permanent,
-  }) {
+    permanent
+  }: any) {
     log("storeEncryptionConditionWithNode");
     const urlWithPath = `${url}/web/encryption/store`;
     const data = {
@@ -935,7 +951,13 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
-  async getChainDataSigningShare({ url, callRequests, chain, iat, exp }) {
+  async getChainDataSigningShare({
+    url,
+    callRequests,
+    chain,
+    iat,
+    exp
+  }: any) {
     log("getChainDataSigningShare");
     const urlWithPath = `${url}/web/signing/sign_chain_data`;
     const data = {
@@ -957,8 +979,8 @@ export default class LitNodeClient {
     authSig,
     chain,
     iat,
-    exp,
-  }) {
+    exp
+  }: any) {
     log("getSigningShare");
     const urlWithPath = `${url}/web/signing/retrieve`;
     const data = {
@@ -983,8 +1005,8 @@ export default class LitNodeClient {
     unifiedAccessControlConditions,
     toDecrypt,
     authSig,
-    chain,
-  }) {
+    chain
+  }: any) {
     log("getDecryptionShare");
     const urlWithPath = `${url}/web/encryption/retrieve`;
     const data = {
@@ -999,7 +1021,9 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
-  async handshakeWithSgx({ url }) {
+  async handshakeWithSgx({
+    url
+  }: any) {
     const urlWithPath = `${url}/web/handshake`;
     log(`handshakeWithSgx ${urlWithPath}`);
     const data = {
@@ -1008,7 +1032,10 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
-  sendCommandToNode({ url, data }) {
+  sendCommandToNode({
+    url,
+    data
+  }: any) {
     log(`sendCommandToNode with url ${url} and data`, data);
     return fetch(url, {
       method: "POST",
@@ -1033,22 +1060,20 @@ export default class LitNodeClient {
     });
   }
 
-  async handleNodePromises(promises) {
+  async handleNodePromises(promises: any) {
     const responses = await Promise.allSettled(promises);
     log("responses", responses);
     const successes = responses.filter((r) => r.status === "fulfilled");
     if (successes.length >= this.config.minNodeCount) {
       return {
-        success: true,
-        values: successes.map((r) => r.value),
-      };
+    success: true,
+    values: successes.map((r) => (r as any).value),
+};
     }
 
     // if we're here, then we did not succeed.  time to handle and report errors.
     const rejected = responses.filter((r) => r.status === "rejected");
-    const mostCommonError = JSON.parse(
-      mostCommonString(rejected.map((r) => JSON.stringify(r.reason)))
-    );
+    const mostCommonError = JSON.parse(mostCommonString(rejected.map((r) => JSON.stringify((r as any).reason))));
     log(`most common error: ${JSON.stringify(mostCommonError)}`);
     return {
       success: false,
@@ -1056,7 +1081,7 @@ export default class LitNodeClient {
     };
   }
 
-  throwNodeError(res) {
+  throwNodeError(res: any) {
     if (res.error && res.error.errorCode) {
       if (
         res.error.errorCode === "not_authorized" &&
@@ -1097,27 +1122,16 @@ export default class LitNodeClient {
         if (Object.keys(this.serverKeys).length >= this.config.minNodeCount) {
           clearInterval(interval);
           // pick the most common public keys for the subnet and network from the bunch, in case some evil node returned a bad key
-          this.subnetPubKey = mostCommonString(
-            Object.values(this.serverKeys).map(
-              (keysFromSingleNode) => keysFromSingleNode.subnetPubKey
-            )
-          );
-          this.networkPubKey = mostCommonString(
-            Object.values(this.serverKeys).map(
-              (keysFromSingleNode) => keysFromSingleNode.networkPubKey
-            )
-          );
-          this.networkPubKeySet = mostCommonString(
-            Object.values(this.serverKeys).map(
-              (keysFromSingleNode) => keysFromSingleNode.networkPubKeySet
-            )
-          );
+this.subnetPubKey = mostCommonString(Object.values(this.serverKeys).map((keysFromSingleNode) => (keysFromSingleNode as any).subnetPubKey));
+          this.networkPubKey = mostCommonString(Object.values(this.serverKeys).map((keysFromSingleNode) => (keysFromSingleNode as any).networkPubKey));
+          this.networkPubKeySet = mostCommonString(Object.values(this.serverKeys).map((keysFromSingleNode) => (keysFromSingleNode as any).networkPubKeySet));
           this.ready = true;
           log("lit is ready");
           if (typeof document !== "undefined") {
             document.dispatchEvent(new Event("lit-ready"));
           }
 
+          // @ts-expect-error TS(2794): Expected 1 arguments, but got 0. Did you forget to... Remove this comment to see the full error message
           resolve();
         }
       }, 500);

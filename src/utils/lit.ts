@@ -44,8 +44,9 @@ const PACKAGE_CACHE = {};
 export async function checkAndSignAuthMessage({
   chain,
   resources,
-  switchChain = true,
-}) {
+  switchChain = true
+}: any) {
+  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   const chainInfo = ALL_LIT_CHAINS[chain];
   if (!chainInfo) {
     throwError({
@@ -79,7 +80,7 @@ export async function checkAndSignAuthMessage({
  * @param {string} str The string to encrypt
  * @returns {Promise<Object>} A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
  */
-export async function encryptString(str) {
+export async function encryptString(str: any) {
   // -- validate
   if (
     !checkType({
@@ -116,7 +117,7 @@ export async function encryptString(str) {
  * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this.
  * @returns {Promise<string>} A promise containing the decrypted string
  */
-export async function decryptString(encryptedStringBlob, symmKey) {
+export async function decryptString(encryptedStringBlob: any, symmKey: any) {
   // -- validate
   if (
     !checkType({
@@ -153,7 +154,7 @@ export async function decryptString(encryptedStringBlob, symmKey) {
  * @param {string} string The string to zip and encrypt
  * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a single file called "string.txt"
  */
-export async function zipAndEncryptString(string) {
+export async function zipAndEncryptString(string: any) {
   if (
     !checkType({
       value: string,
@@ -174,7 +175,7 @@ export async function zipAndEncryptString(string) {
  * @param {Array<File>} files An array of the files you wish to zip and encrypt
  * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
  */
-export async function zipAndEncryptFiles(files) {
+export async function zipAndEncryptFiles(files: any) {
   // let's zip em
   const zip = new JSZip();
   for (let i = 0; i < files.length; i++) {
@@ -187,6 +188,7 @@ export async function zipAndEncryptFiles(files) {
       })
     )
       return;
+    // @ts-expect-error TS(2531): Object is possibly 'null'.
     zip.folder("encryptedAssets").file(files[i].name, files[i]);
   }
   return encryptZip(zip);
@@ -198,7 +200,7 @@ export async function zipAndEncryptFiles(files) {
  * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this zip.
  * @returns {Promise<Object>} A promise containing a JSZip object indexed by the filenames of the zipped files.  For example, if you have a file called "meow.jpg" in the root of your zip, you could get it from the JSZip object by doing this: const imageBlob = await decryptedZip['meow.jpg'].async('blob')
  */
-export async function decryptZip(encryptedZipBlob, symmKey) {
+export async function decryptZip(encryptedZipBlob: any, symmKey: any) {
   if (
     !checkType({
       value: encryptedZipBlob,
@@ -260,7 +262,7 @@ export async function decryptZip(encryptedZipBlob, symmKey) {
  * @param {JSZip} zip The JSZip instance to encrypt
  * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array string.
  */
-export async function encryptZip(zip) {
+export async function encryptZip(zip: any) {
   const zipBlob = await zip.generateAsync({ type: "blob" });
   const zipBlobArrayBuffer = await zipBlob.arrayBuffer();
   // log('blob', zipBlob)
@@ -352,8 +354,8 @@ export async function encryptFileAndZipWithMetadata({
   chain,
   file,
   litNodeClient,
-  readme,
-}) {
+  readme
+}: any) {
   // -- validate
   if (
     !checkType({
@@ -473,6 +475,7 @@ export async function encryptFileAndZipWithMetadata({
   if (readme) {
     zip.file("readme.txt", readme);
   }
+  // @ts-expect-error TS(2531): Object is possibly 'null'.
   zip.folder("encryptedAssets").file(file.name, encryptedZipBlob);
 
   const zipBlob = await zip.generateAsync({ type: "blob" });
@@ -492,8 +495,8 @@ export async function decryptZipFileWithMetadata({
   authSig,
   file,
   litNodeClient,
-  additionalAccessControlConditions,
-}) {
+  additionalAccessControlConditions
+}: any) {
   // -- validate
   if (
     !checkType({
@@ -516,6 +519,7 @@ export async function decryptZipFileWithMetadata({
 
   const zip = await JSZip.loadAsync(file);
   const metadata = JSON.parse(
+    // @ts-expect-error TS(2531): Object is possibly 'null'.
     await zip.file("lit_protocol_metadata.json").async("string")
   );
   log("zip metadata", metadata);
@@ -532,7 +536,7 @@ export async function decryptZipFileWithMetadata({
       authSig,
     });
   } catch (e) {
-    if (e.errorCode === "not_authorized") {
+    if ((e as any).errorCode === "not_authorized") {
       // try more additionalAccessControlConditions
       if (!additionalAccessControlConditions) {
         throw e;
@@ -559,7 +563,7 @@ export async function decryptZipFileWithMetadata({
           break; // it worked, we can leave the loop and stop checking additional access control conditions
         } catch (e) {
           // swallow not_authorized because we are gonna try some more accessControlConditions
-          if (e.errorCode !== "not_authorized") {
+          if ((e as any).errorCode !== "not_authorized") {
             throw e;
           }
         }
@@ -576,6 +580,7 @@ export async function decryptZipFileWithMetadata({
 
   // log('symmetricKey', importedSymmKey)
 
+  // @ts-expect-error TS(2531): Object is possibly 'null'.
   const encryptedFile = await zip
     .folder("encryptedAssets")
     .file(metadata.name)
@@ -598,7 +603,9 @@ export async function decryptZipFileWithMetadata({
  * @param {Blob|File} params.file The file you wish to encrypt
  * @returns {Promise<Object>} A promise containing an object with keys encryptedFile and symmetricKey.  encryptedFile is a Blob, and symmetricKey is a Uint8Array that can be used to decrypt the file.
  */
-export async function encryptFile({ file }) {
+export async function encryptFile({
+  file
+}: any) {
   if (
     !checkType({
       value: file,
@@ -632,7 +639,10 @@ export async function encryptFile({ file }) {
  * @param {Uint8Array} params.symmetricKey The symmetric key used that will be used to decrypt this.
  * @returns {Promise<Object>} A promise containing the decrypted file.  The file is an ArrayBuffer.
  */
-export async function decryptFile({ file, symmetricKey }) {
+export async function decryptFile({
+  file,
+  symmetricKey
+}: any) {
   // -- validate
   if (
     !checkType({
@@ -662,10 +672,12 @@ export async function decryptFile({ file, symmetricKey }) {
   return decryptedFile;
 }
 
-async function getNpmPackage(packageName) {
+async function getNpmPackage(packageName: any) {
   // log('getting npm package: ' + packageName)
+  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   if (PACKAGE_CACHE[packageName]) {
     // log('found in cache')
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     return PACKAGE_CACHE[packageName];
   }
 
@@ -678,6 +690,7 @@ async function getNpmPackage(packageName) {
   // log('got blob', blob)
   const dataUrl = await fileToDataUrl(blob);
   // log('got dataUrl', dataUrl)
+  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   PACKAGE_CACHE[packageName] = dataUrl;
   return dataUrl;
 }
@@ -703,8 +716,8 @@ export async function createHtmlLIT({
   accessControlConditions,
   encryptedSymmetricKey,
   chain,
-  npmPackages = [],
-}) {
+  npmPackages = []
+}: any) {
   // uncomment this to embed the LIT JS SDK directly instead of retrieving it from unpkg when a user views the LIT
   // npmPackages.push('lit-js-sdk')
   // log('createHtmlLIT with npmPackages', npmPackages)
@@ -715,8 +728,7 @@ export async function createHtmlLIT({
     scriptTags += tag;
   }
 
-  const formattedAccessControlConditions = accessControlConditions.map((c) =>
-    canonicalAccessControlConditionFormatter(c)
+  const formattedAccessControlConditions = accessControlConditions.map((c: any) => canonicalAccessControlConditionFormatter(c)
   );
 
   // log('scriptTags: ', scriptTags)
@@ -796,24 +808,24 @@ export async function toggleLock() {
   const mediaGridHolder = document.getElementById("mediaGridHolder");
   const lockedHeader = document.getElementById("lockedHeader");
 
+  // @ts-expect-error TS(2551): Property 'locked' does not exist on type 'Window &... Remove this comment to see the full error message
   if (window.locked) {
     // save public content before decryption, so we can toggle back to the
-    // locked state in the future
-    window.publicContent = mediaGridHolder.innerHTML;
+// locked state in the future
+// @ts-expect-error TS(2531): Object is possibly 'null'.
+(window as any).publicContent = mediaGridHolder.innerHTML;
 
-    if (!window.useLitPostMessageProxy && !window.litNodeClient.ready) {
+    if (!(window as any).useLitPostMessageProxy && !(window as any).litNodeClient.ready) {
       alert(
         "The LIT network is still connecting.  Please try again in about 10 seconds."
       );
       return;
     }
 
-    const authSig = await checkAndSignAuthMessage({ chain: window.chain });
-    if (authSig.errorCode && authSig.errorCode === "wrong_chain") {
-      alert(
-        "You are connected to the wrong blockchain.  Please switch your metamask to " +
-          window.chain
-      );
+    const authSig = await checkAndSignAuthMessage({ chain: (window as any).chain });
+    if ((authSig as any).errorCode && (authSig as any).errorCode === "wrong_chain") {
+      alert("You are connected to the wrong blockchain.  Please switch your metamask to " +
+    (window as any).chain);
       return;
     }
 
@@ -828,29 +840,29 @@ export async function toggleLock() {
     //   return
     // }
 
-    if (window.useLitPostMessageProxy) {
+    if ((window as any).useLitPostMessageProxy) {
       // instead of asking the network for the key part, ask the parent frame
-      // the parentframe will then call unlockLit() with the encryption key
-      sendMessageToFrameParent({
-        command: "getEncryptionKey",
-        target: "LitNodeClient",
-        params: {
-          accessControlConditions: window.accessControlConditions,
-          toDecrypt: window.encryptedSymmetricKey,
-          authSig,
-          chain: window.chain,
-        },
-      });
+// the parentframe will then call unlockLit() with the encryption key
+sendMessageToFrameParent({
+    command: "getEncryptionKey",
+    target: "LitNodeClient",
+    params: {
+        accessControlConditions: (window as any).accessControlConditions,
+        toDecrypt: (window as any).encryptedSymmetricKey,
+        authSig,
+        chain: (window as any).chain,
+    },
+});
       return;
     }
 
     // get the encryption key
-    const symmetricKey = await window.litNodeClient.getEncryptionKey({
-      accessControlConditions: window.accessControlConditions,
-      toDecrypt: window.encryptedSymmetricKey,
-      authSig,
-      chain: window.chain,
-    });
+const symmetricKey = await (window as any).litNodeClient.getEncryptionKey({
+    accessControlConditions: (window as any).accessControlConditions,
+    toDecrypt: (window as any).encryptedSymmetricKey,
+    authSig,
+    chain: (window as any).chain,
+});
 
     if (!symmetricKey) {
       return; // something went wrong, maybe user is unauthorized
@@ -858,8 +870,11 @@ export async function toggleLock() {
 
     await unlockLitWithKey({ symmetricKey });
   } else {
-    mediaGridHolder.innerHTML = window.publicContent;
+    // @ts-expect-error TS(2531): Object is possibly 'null'.
+    mediaGridHolder.innerHTML = (window as any).publicContent;
+    // @ts-expect-error TS(2531): Object is possibly 'null'.
     lockedHeader.innerText = "LOCKED";
+    // @ts-expect-error TS(2551): Property 'locked' does not exist on type 'Window &... Remove this comment to see the full error message
     window.locked = true;
   }
 }
@@ -870,7 +885,9 @@ export async function toggleLock() {
  * @param {Uint8Array} params.symmetricKey The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
  * @returns {promise} A promise that will resolve when the LIT is unlocked
  */
-export async function unlockLitWithKey({ symmetricKey }) {
+export async function unlockLitWithKey({
+  symmetricKey
+}: any) {
   if (
     !checkType({
       value: symmetricKey,
@@ -884,13 +901,15 @@ export async function unlockLitWithKey({ symmetricKey }) {
   const lockedHeader = document.getElementById("lockedHeader");
 
   // convert data url to blob
-  const encryptedZipBlob = await (
-    await fetch(window.encryptedZipDataUrl)
-  ).blob();
+const encryptedZipBlob = await (await fetch((window as any).encryptedZipDataUrl)).blob();
   const decryptedFiles = await decryptZip(encryptedZipBlob, symmetricKey);
+  // @ts-expect-error TS(2532): Object is possibly 'undefined'.
   const mediaGridHtmlBody = await decryptedFiles["string.txt"].async("text");
+  // @ts-expect-error TS(2531): Object is possibly 'null'.
   mediaGridHolder.innerHTML = mediaGridHtmlBody;
+  // @ts-expect-error TS(2531): Object is possibly 'null'.
   lockedHeader.innerText = "UNLOCKED";
+  // @ts-expect-error TS(2551): Property 'locked' does not exist on type 'Window &... Remove this comment to see the full error message
   window.locked = false;
 }
 
@@ -900,7 +919,9 @@ export async function unlockLitWithKey({ symmetricKey }) {
  * @param {string} params.jwt A JWT signed by the LIT network using the BLS12-381 algorithm
  * @returns {Object} An object with 4 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.  "signature": A uint8array that represents the raw  signature of the JWT.
  */
-export function verifyJwt({ jwt }) {
+export function verifyJwt({
+  jwt
+}: any) {
   if (
     !checkType({
       value: jwt,
@@ -912,6 +933,7 @@ export function verifyJwt({ jwt }) {
     return;
   log("verifyJwt", jwt);
   // verify that the wasm was loaded
+  // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
   if (!globalThis.wasmExports) {
     log("wasmExports is not loaded.");
     // initWasmBlsSdk().then((exports) => {
@@ -969,8 +991,8 @@ function metadataForFile({
   solRpcConditions,
   unifiedAccessControlConditions,
   chain,
-  encryptedSymmetricKey,
-}) {
+  encryptedSymmetricKey
+}: any) {
   return {
     name,
     type,
@@ -984,7 +1006,7 @@ function metadataForFile({
   };
 }
 
-function humanizeComparator(comparator) {
+function humanizeComparator(comparator: any) {
   if (comparator === ">") {
     return "more than";
   } else if (comparator === ">=") {
@@ -1015,8 +1037,8 @@ export async function humanizeAccessControlConditions({
   solRpcConditions,
   unifiedAccessControlConditions,
   tokenList,
-  myWalletAddress,
-}) {
+  myWalletAddress
+}: any) {
   if (accessControlConditions) {
     return humanizeEvmBasicAccessControlConditions({
       accessControlConditions,
@@ -1047,10 +1069,10 @@ export async function humanizeAccessControlConditions({
 async function humanizeUnifiedAccessControlConditions({
   unifiedAccessControlConditions,
   tokenList,
-  myWalletAddress,
-}) {
+  myWalletAddress
+}: any) {
   const promises = await Promise.all(
-    unifiedAccessControlConditions.map(async (acc) => {
+    unifiedAccessControlConditions.map(async (acc: any) => {
       if (Array.isArray(acc)) {
         // this is a group.  recurse.
         const group = await humanizeUnifiedAccessControlConditions({
@@ -1108,8 +1130,8 @@ async function humanizeUnifiedAccessControlConditions({
 async function humanizeEvmBasicAccessControlConditions({
   accessControlConditions,
   tokenList,
-  myWalletAddress,
-}) {
+  myWalletAddress
+}: any) {
   log("humanizing evm basic access control conditions");
   log("myWalletAddress", myWalletAddress);
   log("accessControlConditions", accessControlConditions);
@@ -1142,7 +1164,7 @@ async function humanizeEvmBasicAccessControlConditions({
   }
 
   const promises = await Promise.all(
-    fixedConditions.map(async (acc) => {
+    fixedConditions.map(async (acc: any) => {
       if (Array.isArray(acc)) {
         // this is a group.  recurse.
         const group = await humanizeEvmBasicAccessControlConditions({
@@ -1238,7 +1260,7 @@ async function humanizeEvmBasicAccessControlConditions({
         let tokenFromList;
         if (tokenList) {
           tokenFromList = tokenList.find(
-            (t) => t.address === acc.contractAddress
+            (t: any) => t.address === acc.contractAddress
           );
         }
         let decimals, name;
@@ -1283,14 +1305,14 @@ async function humanizeEvmBasicAccessControlConditions({
 async function humanizeSolRpcConditions({
   solRpcConditions,
   tokenList,
-  myWalletAddress,
-}) {
+  myWalletAddress
+}: any) {
   log("humanizing sol rpc conditions");
   log("myWalletAddress", myWalletAddress);
   log("solRpcConditions", solRpcConditions);
 
   const promises = await Promise.all(
-    solRpcConditions.map(async (acc) => {
+    solRpcConditions.map(async (acc: any) => {
       if (Array.isArray(acc)) {
         // this is a group.  recurse.
         const group = await humanizeSolRpcConditions({
@@ -1342,14 +1364,14 @@ async function humanizeSolRpcConditions({
 async function humanizeEvmContractConditions({
   evmContractConditions,
   tokenList,
-  myWalletAddress,
-}) {
+  myWalletAddress
+}: any) {
   log("humanizing evm contract conditions");
   log("myWalletAddress", myWalletAddress);
   log("evmContractConditions", evmContractConditions);
 
   const promises = await Promise.all(
-    evmContractConditions.map(async (acc) => {
+    evmContractConditions.map(async (acc: any) => {
       if (Array.isArray(acc)) {
         // this is a group.  recurse.
         const group = await humanizeEvmContractConditions({
@@ -1387,14 +1409,14 @@ async function humanizeEvmContractConditions({
 async function humanizeCosmosConditions({
   cosmosConditions,
   tokenList,
-  myWalletAddress,
-}) {
+  myWalletAddress
+}: any) {
   log("humanizing cosmos conditions");
   log("myWalletAddress", myWalletAddress);
   log("cosmosConditions", cosmosConditions);
 
   const promises = await Promise.all(
-    cosmosConditions.map(async (acc) => {
+    cosmosConditions.map(async (acc: any) => {
       if (Array.isArray(acc)) {
         // this is a group.  recurse.
         const group = await humanizeCosmosConditions({
@@ -1448,11 +1470,11 @@ async function humanizeCosmosConditions({
   return promises.join("");
 }
 
-function formatSol(amount) {
+function formatSol(amount: any) {
   return formatUnits(amount, 9);
 }
 
-function formatAtom(amount) {
+function formatAtom(amount: any) {
   return formatUnits(amount, 6);
 }
 
@@ -1473,6 +1495,6 @@ export async function getTokenList() {
   return sorted;
 }
 
-export const sendMessageToFrameParent = (data) => {
+export const sendMessageToFrameParent = (data: any) => {
   window.parent.postMessage(data, "*");
 };

@@ -15,14 +15,17 @@ import { SiweMessage } from "lit-siwe";
 import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
 
+// @ts-expect-error TS(2732): Cannot find module '../abis/LIT.json'. Consider us... Remove this comment to see the full error message
 import LIT from "../abis/LIT.json";
+// @ts-expect-error TS(2732): Cannot find module '../abis/ERC20.json'. Consider ... Remove this comment to see the full error message
 import ERC20 from "../abis/ERC20.json";
 import { LIT_CHAINS } from "../lib/constants";
 import { throwError, log } from "../lib/utils";
 
-function chainHexIdToChainName(chainHexId) {
+function chainHexIdToChainName(chainHexId: any) {
   for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
     const chainName = Object.keys(LIT_CHAINS)[i];
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     const litChainHexId = "0x" + LIT_CHAINS[chainName].chainId.toString("16");
     if (litChainHexId === chainHexId) {
       return chainName;
@@ -30,13 +33,23 @@ function chainHexIdToChainName(chainHexId) {
   }
 }
 
-export function encodeCallData({ abi, functionName, functionParams }) {
+export function encodeCallData({
+  abi,
+  functionName,
+  functionParams
+}: any) {
+  // @ts-expect-error TS(2304): Cannot find name 'ethers'.
   const iface = new ethers.utils.Interface(abi);
   const callData = iface.encodeFunctionData(functionName, functionParams);
   return callData;
 }
 
-export function decodeCallResult({ abi, functionName, data }) {
+export function decodeCallResult({
+  abi,
+  functionName,
+  data
+}: any) {
+  // @ts-expect-error TS(2304): Cannot find name 'ethers'.
   const iface = new ethers.utils.Interface(abi);
   const decoded = iface.decodeFunctionResult(functionName, data);
   return decoded;
@@ -54,8 +67,11 @@ export async function connectWeb3({ chainId = 1 } = {}) {
 
   for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
     const chainName = Object.keys(LIT_CHAINS)[i];
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     const chainId = LIT_CHAINS[chainName].chainId;
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     const rpcUrl = LIT_CHAINS[chainName].rpcUrls[0];
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     rpcUrls[chainId] = rpcUrl;
   }
 
@@ -165,8 +181,9 @@ export async function disconnectWeb3() {
 export async function checkAndSignEVMAuthMessage({
   chain,
   resources,
-  switchChain,
-}) {
+  switchChain
+}: any) {
+  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   const selectedChain = LIT_CHAINS[chain];
   const { web3, account } = await connectWeb3({
     chainId: selectedChain.chainId,
@@ -204,6 +221,7 @@ export async function checkAndSignEVMAuthMessage({
     }
     try {
       log("trying to switch to chainId", selectedChainId);
+      // @ts-expect-error TS(2722): Cannot invoke an object which is possibly 'undefin... Remove this comment to see the full error message
       await web3.provider.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: selectedChainId }],
@@ -211,7 +229,7 @@ export async function checkAndSignEVMAuthMessage({
     } catch (switchError) {
       log("error switching to chainId", switchError);
       // This error code indicates that the chain has not been added to MetaMask.
-      if (switchError.code === 4902) {
+      if ((switchError as any).code === 4902) {
         try {
           const data = [
             {
@@ -226,13 +244,14 @@ export async function checkAndSignEVMAuthMessage({
               blockExplorerUrls: selectedChain.blockExplorerUrls,
             },
           ];
+          // @ts-expect-error TS(2722): Cannot invoke an object which is possibly 'undefin... Remove this comment to see the full error message
           await web3.provider.request({
             method: "wallet_addEthereumChain",
             params: data,
           });
         } catch (addError) {
           // handle "add" error
-          if (addError.code === -32601) {
+          if ((addError as any).code === -32601) {
             // metamask code indicating "no such method"
             throwError({
               message: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
@@ -244,7 +263,7 @@ export async function checkAndSignEVMAuthMessage({
           }
         }
       } else {
-        if (switchError.code === -32601) {
+        if ((switchError as any).code === -32601) {
           // metamask code indicating "no such method"
           throwError({
             message: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
@@ -271,9 +290,10 @@ export async function checkAndSignEVMAuthMessage({
     });
     authSig = localStorage.getItem("lit-auth-signature");
   }
+  // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
   authSig = JSON.parse(authSig);
   // make sure we are on the right account
-  if (account !== authSig.address) {
+  if (account !== (authSig as any).address) {
     log(
       "signing auth message because account is not the same as the address in the auth sig"
     );
@@ -284,12 +304,13 @@ export async function checkAndSignEVMAuthMessage({
       resources,
     });
     authSig = localStorage.getItem("lit-auth-signature");
+    // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
     authSig = JSON.parse(authSig);
   } else {
     // check the resources of the sig and re-sign if they don't match
     let mustResign = false;
     try {
-      const parsedSiwe = new SiweMessage(authSig.signedMessage);
+      const parsedSiwe = new SiweMessage((authSig as any).signedMessage);
       log("parsedSiwe.resources", parsedSiwe.resources);
 
       if (JSON.stringify(parsedSiwe.resources) !== JSON.stringify(resources)) {
@@ -315,6 +336,7 @@ export async function checkAndSignEVMAuthMessage({
         resources,
       });
       authSig = localStorage.getItem("lit-auth-signature");
+      // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
       authSig = JSON.parse(authSig);
     }
   }
@@ -333,8 +355,8 @@ export async function signAndSaveAuthMessage({
   web3,
   account,
   chainId,
-  resources,
-}) {
+  resources
+}: any) {
   // const { chainId } = await web3.getNetwork();
 
   const preparedMessage = {
@@ -346,7 +368,7 @@ export async function signAndSaveAuthMessage({
   };
 
   if (resources && resources.length > 0) {
-    preparedMessage.resources = resources;
+    (preparedMessage as any).resources = resources;
   }
 
   const message = new SiweMessage(preparedMessage);
@@ -388,7 +410,11 @@ export async function signAndSaveAuthMessage({
  * @property {string} address - The crypto wallet address that signed the message
  */
 
-export async function signMessage({ body, web3, account }) {
+export async function signMessage({
+  body,
+  web3,
+  account
+}: any) {
   if (!web3 || !account) {
     let resp = await connectWeb3();
     web3 = resp.web3;
@@ -420,7 +446,7 @@ export async function signMessage({ body, web3, account }) {
 
 // wrapper around signMessage that tries personal_sign first.  this is to fix a
 // bug with walletconnect where just using signMessage was failing
-export const signMessageAsync = async (signer, address, message) => {
+export const signMessageAsync = async (signer: any, address: any, message: any) => {
   const messageBytes = toUtf8Bytes(message);
   if (signer instanceof JsonRpcSigner) {
     try {
@@ -434,7 +460,7 @@ export const signMessageAsync = async (signer, address, message) => {
       log(
         "Signing with personal_sign failed, trying signMessage as a fallback"
       );
-      if (e.message.includes("personal_sign")) {
+      if ((e as any).message.includes("personal_sign")) {
         return await signer.signMessage(messageBytes);
       }
       throw e;
@@ -549,17 +575,21 @@ export const signMessageAsync = async (signer, address, message) => {
  * @param {number} params.quantity The number of tokens to mint.  Note that these will be fungible, so they will not have serial numbers.
  * @returns {Object} The txHash, tokenId, tokenAddress, mintingAddress, and authSig.
  */
-export async function mintLIT({ chain, quantity }) {
+export async function mintLIT({
+  chain,
+  quantity
+}: any) {
   log(`minting ${quantity} tokens on ${chain}`);
   try {
     const authSig = await checkAndSignEVMAuthMessage({
       chain,
       switchChain: true,
     });
-    if (authSig.errorCode) {
+    if ((authSig as any).errorCode) {
       return authSig;
     }
     const { web3, account } = await connectWeb3();
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     const tokenAddress = LIT_CHAINS[chain].contractAddress;
     if (!tokenAddress) {
       log("No token address for this chain.  It's not supported via MintLIT.");
@@ -586,7 +616,7 @@ export async function mintLIT({ chain, quantity }) {
     };
   } catch (error) {
     log(error);
-    if (error.code === 4001) {
+    if ((error as any).code === 4001) {
       // EIP-1193 userRejectedRequest error
       log("User rejected request");
       return { errorCode: "user_rejected_request" };
@@ -610,9 +640,11 @@ export async function findLITs() {
   try {
     const { web3, account } = await connectWeb3();
     const { chainId } = await web3.getNetwork();
+    // @ts-expect-error TS(2345): Argument of type 'string' is not assignable to par... Remove this comment to see the full error message
     const chainHexId = "0x" + chainId.toString("16");
     // const chainHexId = await web3.request({ method: 'eth_chainId', params: [] })
     const chain = chainHexIdToChainName(chainHexId);
+    // @ts-expect-error TS(2538): Type 'undefined' cannot be used as an index type.
     const tokenAddress = LIT_CHAINS[chain].contractAddress;
     const contract = new Contract(tokenAddress, LIT.abi, web3.getSigner());
     log("getting maxTokenid");
@@ -627,12 +659,12 @@ export async function findLITs() {
     const balances = await contract.balanceOfBatch(accounts, tokenIds);
     // log('balances', balances)
     const tokenIdsWithNonzeroBalances = balances
-      .map((b, i) => (b.toNumber() === 0 ? null : i))
-      .filter((b) => b !== null);
+      .map((b: any, i: any) => (b.toNumber() === 0 ? null : i))
+      .filter((b: any) => b !== null);
     return { tokenIds: tokenIdsWithNonzeroBalances, chain };
   } catch (error) {
     log(error);
-    if (error.code === 4001) {
+    if ((error as any).code === 4001) {
       // EIP-1193 userRejectedRequest error
       log("User rejected request");
       return { errorCode: "user_rejected_request" };
@@ -650,7 +682,10 @@ export async function findLITs() {
  * @param {number} params.to The account address to send the token to
  * @returns {Object} Success or error
  */
-export async function sendLIT({ tokenMetadata, to }) {
+export async function sendLIT({
+  tokenMetadata,
+  to
+}: any) {
   log("sendLIT for ", tokenMetadata);
 
   try {
@@ -669,7 +704,7 @@ export async function sendLIT({ tokenMetadata, to }) {
     return { success: true };
   } catch (error) {
     log(error);
-    if (error.code === 4001) {
+    if ((error as any).code === 4001) {
       // EIP-1193 userRejectedRequest error
       log("User rejected request");
       return { errorCode: "user_rejected_request" };
@@ -687,11 +722,15 @@ export async function sendLIT({ tokenMetadata, to }) {
  * @param {string} params.chain The chain on which the token is deployed
  * @returns {number} The number of decimal places in the token
  */
-export async function decimalPlaces({ contractAddress, chain }) {
+export async function decimalPlaces({
+  contractAddress,
+  chain
+}: any) {
   // if (chain) {
   //   await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
   // }
   // const { web3, account } = await connectWeb3();
+  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   const rpcUrl = LIT_CHAINS[chain].rpcUrls[0];
   const web3 = new JsonRpcProvider(rpcUrl);
   const contract = new Contract(contractAddress, ERC20.abi, web3);
@@ -705,9 +744,13 @@ export async function decimalPlaces({ contractAddress, chain }) {
  * @param {string} params.name The name to resolve
  * @returns {string} The resolved eth address
  */
-export async function lookupNameServiceAddress({ chain, name }) {
+export async function lookupNameServiceAddress({
+  chain,
+  name
+}: any) {
   // await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
   // const { web3, account } = await connectWeb3();
+  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   const rpcUrl = LIT_CHAINS[chain].rpcUrls[0];
   const web3 = new JsonRpcProvider(rpcUrl);
 
