@@ -27,6 +27,8 @@ case $BRANCH in
 esac
 
 
+./create_subpackage_packagejson.sh
+
 # copy the nodejs build
 cp build/index.node.js packages/sdk-nodejs/build/
 cd packages/sdk-nodejs

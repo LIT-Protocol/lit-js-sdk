@@ -2,5 +2,36 @@
   "name": "@lit-protocol/sdk-nodejs",
   "version": "1.2.11",
   "main": "build/index.node.js",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@ethersproject/bytes": "^5.5.0",
+    "@ethersproject/contracts": "^5.2.0",
+    "@ethersproject/hash": "^5.4.0",
+    "@ethersproject/providers": "^5.2.0",
+    "@ethersproject/strings": "^5.5.0",
+    "@ethersproject/units": "^5.4.0",
+    "@ethersproject/wallet": "^5.2.0",
+    "@walletconnect/ethereum-provider": "^1.7.8",
+    "buffer": "^6.0.3",
+    "bufferutil": "^4.0.6",
+    "cross-blob": "^3.0.1",
+    "jszip": "^3.6.0",
+    "lit-connect-modal": "^0.1.8",
+    "lit-siwe": "^1.1.8",
+    "node-fetch": "^3.2.3",
+    "pako": "^2.0.4",
+    "tslib": "^2.3.1",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1",
+    "uint8arrays": "^3.0.0",
+    "utf-8-validate": "^5.0.8"
+  },
+  "devDependencies": {
+    "esbuild": "^0.14.25",
+    "esbuild-node-builtins": "^0.1.0",
+    "genversion": "^3.0.1",
+    "microbundle": "^0.13.0",
+    "semver-bump": "^1.0.0",
+    "standard": "^16.0.3"
+  }
 }
