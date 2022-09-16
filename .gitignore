@@ -1,5 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+build-dist
+
 # dependencies
 node_modules
 /.pnp
@@ -12,7 +14,6 @@ node_modules
 # production
 /build/index*.js
 /build/index*.js.map
-build-dist
 # misc
 .DS_Store
 .env.local
