@@ -60,7 +60,7 @@ const poly_sizes_by_threshold = [
 // Encoding conversions
 
 // modified from https://stackoverflow.com/a/11058858
-function asciiToUint8Array(a) {
+function asciiToUint8Array(a: any) {
   let b = new Uint8Array(a.length);
   for (let i = 0; i < a.length; i++) {
     b[i] = a.charCodeAt(i);
@@ -69,20 +69,21 @@ function asciiToUint8Array(a) {
 }
 // https://stackoverflow.com/a/19102224
 // TODO resolve RangeError possibility here, see SO comments
-function uint8ArrayToAscii(a) {
+function uint8ArrayToAscii(a: any) {
   return String.fromCharCode.apply(null, a);
 }
 // https://stackoverflow.com/a/50868276
-function hexToUint8Array(h) {
+function hexToUint8Array(h: any) {
   if (h.length == 0) {
+    // @ts-expect-error TS(2554): Expected 1-3 arguments, but got 0.
     return new Uint8Array();
   }
-  return new Uint8Array(h.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
+  return new Uint8Array(h.match(/.{1,2}/g).map((byte: any) => parseInt(byte, 16)));
 }
-function uint8ArrayToHex(a) {
-  return a.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
+function uint8ArrayToHex(a: any) {
+  return a.reduce((str: any, byte: any) => str + byte.toString(16).padStart(2, "0"), "");
 }
-function uint8ArrayToByteStr(a) {
+function uint8ArrayToByteStr(a: any) {
   return "[" + a.join(", ") + "]";
 }
 
@@ -213,7 +214,7 @@ const base64codes = [
   33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
 ];
 
-function getBase64Code(charCode) {
+function getBase64Code(charCode: any) {
   if (charCode >= base64codes.length) {
     throw new Error("Unable to parse base64 string.");
   }
@@ -224,7 +225,7 @@ function getBase64Code(charCode) {
   return code;
 }
 
-export function uint8ArrayToBase64(bytes) {
+export function uint8ArrayToBase64(bytes: any) {
   let result = "",
     i,
     l = bytes.length;
@@ -250,7 +251,7 @@ export function uint8ArrayToBase64(bytes) {
   return result;
 }
 
-export function base64ToUint8Array(str) {
+export function base64ToUint8Array(str: any) {
   if (str.length % 4 !== 0) {
     throw new Error("Unable to parse base64 string.");
   }
@@ -297,20 +298,24 @@ export function base64ToUint8Array(str) {
 // it's handy to have helpers to do the required looping.
 
 let isWasming = false;
-export const wasmBlsSdkHelpers = new (function () {
+// @ts-expect-error TS(7009): 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
+export const wasmBlsSdkHelpers = new ((function(this: any) {
   // s is secret key unit8array
-  this.sk_bytes_to_pk_bytes = function (s) {
+  this.sk_bytes_to_pk_bytes = function (s: any) {
     isWasming = true;
     const pkBytes = [];
     try {
       // set sk bytes
       for (let i = 0; i < s.length; i++) {
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_sk_byte(i, s[i]);
       }
       // convert into pk bytes
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       globalThis.wasmExports.derive_pk_from_sk();
       // read pk bytes
       for (let i = 0; i < pkLen; i++) {
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         const pkByte = globalThis.wasmExports.get_pk_byte(i);
         pkBytes.push(pkByte);
       }
@@ -324,22 +329,26 @@ export const wasmBlsSdkHelpers = new (function () {
 
   // s is secret key uint8array
   // m is message uint8array
-  this.sign_msg = function (s, m) {
+  this.sign_msg = function (s: any, m: any) {
     isWasming = true;
     const sigBytes = [];
     try {
       // set secret key bytes
       for (let i = 0; i < s.length; i++) {
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_sk_byte(i, s[i]);
       }
       // set message bytes
       for (let i = 0; i < m.length; i++) {
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_msg_byte(i, m[i]);
       }
       // sign message
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       globalThis.wasmExports.sign_msg(m.length);
       // get signature bytes
       for (let i = 0; i < sigLen; i++) {
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         const sigByte = globalThis.wasmExports.get_sig_byte(i);
         sigBytes.push(sigByte);
       }
@@ -355,22 +364,26 @@ export const wasmBlsSdkHelpers = new (function () {
   // p is public key uint8array
   // s is signature uint8array
   // m is message uint8array
-  this.verify = function (p, s, m) {
+  this.verify = function (p: any, s: any, m: any) {
     isWasming = true;
     let verified = false;
     try {
       // set public key bytes
       for (let i = 0; i < p.length; i++) {
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_pk_byte(i, p[i]);
       }
       // set signature bytes
       for (let i = 0; i < s.length; i++) {
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_sig_byte(i, s[i]);
       }
       // set message bytes
       for (let i = 0; i < m.length; i++) {
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_msg_byte(i, m[i]);
       }
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       verified = globalThis.wasmExports.verify(m.length);
     } catch (e) {
       console.log("error verifying sig in bls-sdk.js:");
@@ -390,34 +403,40 @@ export const wasmBlsSdkHelpers = new (function () {
       console.log(msg);
       return;
     }
+    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     const RNG_VALUES_SIZE = globalThis.wasmExports.get_rng_values_size();
     const rngValues = new Uint32Array(RNG_VALUES_SIZE);
     globalThis.crypto.getRandomValues(rngValues);
     for (let i = 0; i < rngValues.length; i++) {
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       globalThis.wasmExports.set_rng_value(i, rngValues[i]);
     }
   };
 
   // p is public key uint8array
   // m is message uint8array
-  this.encrypt = function (p, m) {
+  this.encrypt = function (p: any, m: any) {
     isWasming = true;
     const ctBytes = [];
     try {
       wasmBlsSdkHelpers.set_rng_values();
       // set public key bytes
       for (let i = 0; i < p.length; i++) {
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_pk_byte(i, p[i]);
       }
       // set message bytes
       for (let i = 0; i < m.length; i++) {
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_msg_byte(i, m[i]);
       }
       // generate strong random u64 used by encrypt
       // encrypt the message
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const ctSize = globalThis.wasmExports.encrypt(m.length);
       // get ciphertext bytes
       for (let i = 0; i < ctSize; i++) {
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         const ctByte = globalThis.wasmExports.get_ct_byte(i);
         ctBytes.push(ctByte);
       }
@@ -432,21 +451,25 @@ export const wasmBlsSdkHelpers = new (function () {
 
   // s is secret key uint8array
   // c is message uint8array
-  this.decrypt = function (s, c) {
+  this.decrypt = function (s: any, c: any) {
     isWasming = true;
     const msgBytes = [];
     try {
       // set secret key bytes
       for (let i = 0; i < s.length; i++) {
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_sk_byte(i, s[i]);
       }
       // set ciphertext bytes
       for (let i = 0; i < c.length; i++) {
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_ct_byte(i, c[i]);
       }
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const msgSize = globalThis.wasmExports.decrypt(c.length);
       // get message bytes
       for (let i = 0; i < msgSize; i++) {
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         const msgByte = globalThis.wasmExports.get_msg_byte(i);
         msgBytes.push(msgByte);
       }
@@ -459,12 +482,14 @@ export const wasmBlsSdkHelpers = new (function () {
     return Uint8Array.from(msgBytes);
   };
 
-  this.generate_poly = function (threshold) {
+  this.generate_poly = function (threshold: any) {
     wasmBlsSdkHelpers.set_rng_values();
     const polySize = poly_sizes_by_threshold[threshold];
+    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     globalThis.wasmExports.generate_poly(threshold);
     const polyBytes = [];
     for (let i = 0; i < polySize; i++) {
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const polyByte = globalThis.wasmExports.get_poly_byte(i);
       polyBytes.push(polyByte);
     }
@@ -474,6 +499,7 @@ export const wasmBlsSdkHelpers = new (function () {
   this.get_msk_bytes = function () {
     const mskBytes = [];
     for (let i = 0; i < skLen; i++) {
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const mskByte = globalThis.wasmExports.get_msk_byte(i);
       mskBytes.push(mskByte);
     }
@@ -483,26 +509,29 @@ export const wasmBlsSdkHelpers = new (function () {
   this.get_mpk_bytes = function () {
     const mpkBytes = [];
     for (let i = 0; i < pkLen; i++) {
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const mpkByte = globalThis.wasmExports.get_mpk_byte(i);
       mpkBytes.push(mpkByte);
     }
     return mpkBytes;
   };
 
-  this.get_mc_bytes = function (threshold) {
+  this.get_mc_bytes = function (threshold: any) {
     const mcBytes = [];
     const mcSize = commitment_sizes_by_threshold[threshold];
     for (let i = 0; i < mcSize; i++) {
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const mcByte = globalThis.wasmExports.get_mc_byte(i);
       mcBytes.push(mcByte);
     }
     return mcBytes;
   };
 
-  this.set_mc_bytes = function (mcBytes) {
+  this.set_mc_bytes = function (mcBytes: any) {
     // set master commitment in wasm
     for (let i = 0; i < mcBytes.length; i++) {
       const v = mcBytes[i];
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       globalThis.wasmExports.set_mc_byte(i, v);
     }
   };
@@ -510,6 +539,7 @@ export const wasmBlsSdkHelpers = new (function () {
   this.get_skshare = function () {
     const skshareBytes = [];
     for (let i = 0; i < skLen; i++) {
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const skshareByte = globalThis.wasmExports.get_skshare_byte(i);
       skshareBytes.push(skshareByte);
     }
@@ -519,13 +549,14 @@ export const wasmBlsSdkHelpers = new (function () {
   this.get_pkshare = function () {
     const pkshareBytes = [];
     for (let i = 0; i < pkLen; i++) {
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const pkshareByte = globalThis.wasmExports.get_pkshare_byte(i);
       pkshareBytes.push(pkshareByte);
     }
     return pkshareBytes;
   };
 
-  this.combine_signatures = function (mcBytes, sigshares) {
+  this.combine_signatures = function (mcBytes: any, sigshares: any) {
     // set master commitment in wasm
     wasmBlsSdkHelpers.set_mc_bytes(mcBytes);
     // set the signature shares
@@ -541,15 +572,18 @@ export const wasmBlsSdkHelpers = new (function () {
         // SHARE_INDEXES[i]
         // and
         // SIGNATURE_SHARE_BYTES[i*96:(i+1)*96]
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_signature_share_byte(
           byteIndex,
           shareIndex,
           sigByte
         );
+        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_share_indexes(shareIndex, sigIndex);
       }
     }
     // combine the signatures
+    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     globalThis.wasmExports.combine_signature_shares(
       sigshares.length,
       mcBytes.length
@@ -557,6 +591,7 @@ export const wasmBlsSdkHelpers = new (function () {
     // read the combined signature
     const sigBytes = [];
     for (let i = 0; i < sigLen; i++) {
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const sigByte = globalThis.wasmExports.get_sig_byte(i);
       sigBytes.push(sigByte);
     }
@@ -568,29 +603,34 @@ export const wasmBlsSdkHelpers = new (function () {
   // uiShareIndex is the index of the share as it appears in the UI
   // derivedShareIndex is the index of the share when derived from the poly
   this.create_decryption_share = function (
-    s,
-    uiShareIndex,
-    derivedShareIndex,
-    ct
+    s: any,
+    uiShareIndex: any,
+    derivedShareIndex: any,
+    ct: any
   ) {
     // set ct bytes
     for (let i = 0; i < ct.length; i++) {
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       globalThis.wasmExports.set_ct_byte(i, ct[i]);
     }
     // set secret key share
     for (let i = 0; i < s.length; i++) {
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       globalThis.wasmExports.set_sk_byte(i, s[i]);
     }
     // create decryption share
+    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     const dshareSize = globalThis.wasmExports.create_decryption_share(
       uiShareIndex,
       ct.length
     );
     // set derivedShareIndex
+    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     globalThis.wasmExports.set_share_indexes(uiShareIndex, derivedShareIndex);
     // read decryption share
     const dshareBytes = [];
     for (let i = 0; i < decryptionShareLen; i++) {
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const dshareByte = globalThis.wasmExports.get_decryption_shares_byte(
         i,
         uiShareIndex
@@ -605,8 +645,9 @@ export const wasmBlsSdkHelpers = new (function () {
   // Which means ciphertext is already set
   // and decryption shares are already set
   // and share_indexes is already set
-  this.combine_decryption_shares = function (totalShares, mcSize, ctSize) {
+  this.combine_decryption_shares = function (totalShares: any, mcSize: any, ctSize: any) {
     // combine decryption shares
+    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     const msgSize = globalThis.wasmExports.combine_decryption_shares(
       totalShares,
       mcSize,
@@ -615,14 +656,15 @@ export const wasmBlsSdkHelpers = new (function () {
     // read msg
     const msgBytes = [];
     for (let i = 0; i < msgSize; i++) {
+      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const msgByte = globalThis.wasmExports.get_msg_byte(i);
       msgBytes.push(msgByte);
     }
     return Uint8Array.from(msgBytes);
   };
-})();
+}))();
 
-let wasm;
+let wasm: any;
 
 let cachedTextDecoder = new TextDecoder("utf-8", {
   ignoreBOM: true,
@@ -631,7 +673,7 @@ let cachedTextDecoder = new TextDecoder("utf-8", {
 
 cachedTextDecoder.decode();
 
-let cachegetUint8Memory0 = null;
+let cachegetUint8Memory0: any = null;
 function getUint8Memory0() {
   if (
     cachegetUint8Memory0 === null ||
@@ -642,7 +684,7 @@ function getUint8Memory0() {
   return cachegetUint8Memory0;
 }
 
-function getStringFromWasm0(ptr, len) {
+function getStringFromWasm0(ptr: any, len: any) {
   return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
 }
 /**
@@ -659,7 +701,7 @@ export function get_rng_values_size() {
  * @param {number} i
  * @param {number} v
  */
-export function set_rng_value(i, v) {
+export function set_rng_value(i: any, v: any) {
   wasm.set_rng_value(i, v);
 }
 
@@ -668,7 +710,7 @@ export function set_rng_value(i, v) {
  * @param {number} i
  * @param {number} v
  */
-export function set_sk_byte(i, v) {
+export function set_sk_byte(i: any, v: any) {
   wasm.set_sk_byte(i, v);
 }
 
@@ -677,7 +719,7 @@ export function set_sk_byte(i, v) {
  * @param {number} i
  * @returns {number}
  */
-export function get_sk_byte(i) {
+export function get_sk_byte(i: any) {
   var ret = wasm.get_sk_byte(i);
   return ret;
 }
@@ -687,7 +729,7 @@ export function get_sk_byte(i) {
  * @param {number} i
  * @param {number} v
  */
-export function set_pk_byte(i, v) {
+export function set_pk_byte(i: any, v: any) {
   wasm.set_pk_byte(i, v);
 }
 
@@ -696,7 +738,7 @@ export function set_pk_byte(i, v) {
  * @param {number} i
  * @returns {number}
  */
-export function get_pk_byte(i) {
+export function get_pk_byte(i: any) {
   var ret = wasm.get_pk_byte(i);
   return ret;
 }
@@ -706,7 +748,7 @@ export function get_pk_byte(i) {
  * @param {number} i
  * @param {number} v
  */
-export function set_sig_byte(i, v) {
+export function set_sig_byte(i: any, v: any) {
   wasm.set_sig_byte(i, v);
 }
 
@@ -715,7 +757,7 @@ export function set_sig_byte(i, v) {
  * @param {number} i
  * @returns {number}
  */
-export function get_sig_byte(i) {
+export function get_sig_byte(i: any) {
   var ret = wasm.get_sig_byte(i);
   return ret;
 }
@@ -725,7 +767,7 @@ export function get_sig_byte(i) {
  * @param {number} i
  * @param {number} v
  */
-export function set_msg_byte(i, v) {
+export function set_msg_byte(i: any, v: any) {
   wasm.set_msg_byte(i, v);
 }
 
@@ -734,7 +776,7 @@ export function set_msg_byte(i, v) {
  * @param {number} i
  * @returns {number}
  */
-export function get_msg_byte(i) {
+export function get_msg_byte(i: any) {
   var ret = wasm.get_msg_byte(i);
   return ret;
 }
@@ -744,7 +786,7 @@ export function get_msg_byte(i) {
  * @param {number} i
  * @param {number} v
  */
-export function set_ct_byte(i, v) {
+export function set_ct_byte(i: any, v: any) {
   wasm.set_ct_byte(i, v);
 }
 
@@ -753,7 +795,7 @@ export function set_ct_byte(i, v) {
  * @param {number} i
  * @returns {number}
  */
-export function get_ct_byte(i) {
+export function get_ct_byte(i: any) {
   var ret = wasm.get_ct_byte(i);
   return ret;
 }
@@ -772,7 +814,7 @@ export function get_rng_next_count() {
  * @param {number} i
  * @param {number} v
  */
-export function set_poly_byte(i, v) {
+export function set_poly_byte(i: any, v: any) {
   wasm.set_poly_byte(i, v);
 }
 
@@ -781,7 +823,7 @@ export function set_poly_byte(i, v) {
  * @param {number} i
  * @returns {number}
  */
-export function get_poly_byte(i) {
+export function get_poly_byte(i: any) {
   var ret = wasm.get_poly_byte(i);
   return ret;
 }
@@ -791,7 +833,7 @@ export function get_poly_byte(i) {
  * @param {number} i
  * @param {number} v
  */
-export function set_msk_byte(i, v) {
+export function set_msk_byte(i: any, v: any) {
   wasm.set_msk_byte(i, v);
 }
 
@@ -800,7 +842,7 @@ export function set_msk_byte(i, v) {
  * @param {number} i
  * @returns {number}
  */
-export function get_msk_byte(i) {
+export function get_msk_byte(i: any) {
   var ret = wasm.get_msk_byte(i);
   return ret;
 }
@@ -810,7 +852,7 @@ export function get_msk_byte(i) {
  * @param {number} i
  * @param {number} v
  */
-export function set_mpk_byte(i, v) {
+export function set_mpk_byte(i: any, v: any) {
   wasm.set_mpk_byte(i, v);
 }
 
@@ -819,7 +861,7 @@ export function set_mpk_byte(i, v) {
  * @param {number} i
  * @returns {number}
  */
-export function get_mpk_byte(i) {
+export function get_mpk_byte(i: any) {
   var ret = wasm.get_mpk_byte(i);
   return ret;
 }
@@ -829,7 +871,7 @@ export function get_mpk_byte(i) {
  * @param {number} i
  * @param {number} v
  */
-export function set_mc_byte(i, v) {
+export function set_mc_byte(i: any, v: any) {
   wasm.set_mc_byte(i, v);
 }
 
@@ -838,7 +880,7 @@ export function set_mc_byte(i, v) {
  * @param {number} i
  * @returns {number}
  */
-export function get_mc_byte(i) {
+export function get_mc_byte(i: any) {
   var ret = wasm.get_mc_byte(i);
   return ret;
 }
@@ -848,7 +890,7 @@ export function get_mc_byte(i) {
  * @param {number} i
  * @param {number} v
  */
-export function set_skshare_byte(i, v) {
+export function set_skshare_byte(i: any, v: any) {
   wasm.set_skshare_byte(i, v);
 }
 
@@ -857,7 +899,7 @@ export function set_skshare_byte(i, v) {
  * @param {number} i
  * @returns {number}
  */
-export function get_skshare_byte(i) {
+export function get_skshare_byte(i: any) {
   var ret = wasm.get_skshare_byte(i);
   return ret;
 }
@@ -867,7 +909,7 @@ export function get_skshare_byte(i) {
  * @param {number} i
  * @param {number} v
  */
-export function set_pkshare_byte(i, v) {
+export function set_pkshare_byte(i: any, v: any) {
   wasm.set_pkshare_byte(i, v);
 }
 
@@ -876,7 +918,7 @@ export function set_pkshare_byte(i, v) {
  * @param {number} i
  * @returns {number}
  */
-export function get_pkshare_byte(i) {
+export function get_pkshare_byte(i: any) {
   var ret = wasm.get_pkshare_byte(i);
   return ret;
 }
@@ -888,7 +930,7 @@ export function get_pkshare_byte(i) {
  * @param {number} to_node
  * @param {number} v
  */
-export function set_bivar_row_byte(i, from_node, to_node, v) {
+export function set_bivar_row_byte(i: any, from_node: any, to_node: any, v: any) {
   wasm.set_bivar_row_byte(i, from_node, to_node, v);
 }
 
@@ -899,7 +941,7 @@ export function set_bivar_row_byte(i, from_node, to_node, v) {
  * @param {number} to_node
  * @returns {number}
  */
-export function get_bivar_row_byte(i, from_node, to_node) {
+export function get_bivar_row_byte(i: any, from_node: any, to_node: any) {
   var ret = wasm.get_bivar_row_byte(i, from_node, to_node);
   return ret;
 }
@@ -910,7 +952,7 @@ export function get_bivar_row_byte(i, from_node, to_node) {
  * @param {number} from_node
  * @param {number} v
  */
-export function set_bivar_commitments_byte(i, from_node, v) {
+export function set_bivar_commitments_byte(i: any, from_node: any, v: any) {
   wasm.set_bivar_commitments_byte(i, from_node, v);
 }
 
@@ -920,7 +962,7 @@ export function set_bivar_commitments_byte(i, from_node, v) {
  * @param {number} from_node
  * @returns {number}
  */
-export function get_bivar_commitments_byte(i, from_node) {
+export function get_bivar_commitments_byte(i: any, from_node: any) {
   var ret = wasm.get_bivar_commitments_byte(i, from_node);
   return ret;
 }
@@ -931,7 +973,7 @@ export function get_bivar_commitments_byte(i, from_node) {
  * @param {number} node_index
  * @param {number} v
  */
-export function set_bivar_sks_byte(i, node_index, v) {
+export function set_bivar_sks_byte(i: any, node_index: any, v: any) {
   wasm.set_bivar_sks_byte(i, node_index, v);
 }
 
@@ -941,7 +983,7 @@ export function set_bivar_sks_byte(i, node_index, v) {
  * @param {number} node_index
  * @returns {number}
  */
-export function get_bivar_sks_byte(i, node_index) {
+export function get_bivar_sks_byte(i: any, node_index: any) {
   var ret = wasm.get_bivar_sks_byte(i, node_index);
   return ret;
 }
@@ -952,7 +994,7 @@ export function get_bivar_sks_byte(i, node_index) {
  * @param {number} node_index
  * @param {number} v
  */
-export function set_bivar_pks_byte(i, node_index, v) {
+export function set_bivar_pks_byte(i: any, node_index: any, v: any) {
   wasm.set_bivar_pks_byte(i, node_index, v);
 }
 
@@ -962,7 +1004,7 @@ export function set_bivar_pks_byte(i, node_index, v) {
  * @param {number} node_index
  * @returns {number}
  */
-export function get_bivar_pks_byte(i, node_index) {
+export function get_bivar_pks_byte(i: any, node_index: any) {
   var ret = wasm.get_bivar_pks_byte(i, node_index);
   return ret;
 }
@@ -973,7 +1015,7 @@ export function get_bivar_pks_byte(i, node_index) {
  * @param {number} sig_index
  * @param {number} v
  */
-export function set_signature_share_byte(i, sig_index, v) {
+export function set_signature_share_byte(i: any, sig_index: any, v: any) {
   wasm.set_signature_share_byte(i, sig_index, v);
 }
 
@@ -983,7 +1025,7 @@ export function set_signature_share_byte(i, sig_index, v) {
  * @param {number} sig_index
  * @returns {number}
  */
-export function get_signature_share_byte(i, sig_index) {
+export function get_signature_share_byte(i: any, sig_index: any) {
   var ret = wasm.get_signature_share_byte(i, sig_index);
   return ret;
 }
@@ -993,7 +1035,7 @@ export function get_signature_share_byte(i, sig_index) {
  * @param {number} i
  * @param {number} v
  */
-export function set_share_indexes(i, v) {
+export function set_share_indexes(i: any, v: any) {
   wasm.set_share_indexes(i, v);
 }
 
@@ -1002,7 +1044,7 @@ export function set_share_indexes(i, v) {
  * @param {number} i
  * @returns {number}
  */
-export function get_share_indexes(i) {
+export function get_share_indexes(i: any) {
   var ret = wasm.get_share_indexes(i);
   return ret >>> 0;
 }
@@ -1013,7 +1055,7 @@ export function get_share_indexes(i) {
  * @param {number} share_index
  * @param {number} v
  */
-export function set_decryption_shares_byte(i, share_index, v) {
+export function set_decryption_shares_byte(i: any, share_index: any, v: any) {
   wasm.set_decryption_shares_byte(i, share_index, v);
 }
 
@@ -1023,7 +1065,7 @@ export function set_decryption_shares_byte(i, share_index, v) {
  * @param {number} share_index
  * @returns {number}
  */
-export function get_decryption_shares_byte(i, share_index) {
+export function get_decryption_shares_byte(i: any, share_index: any) {
   var ret = wasm.get_decryption_shares_byte(i, share_index);
   return ret;
 }
@@ -1039,7 +1081,7 @@ export function derive_pk_from_sk() {
  * @private
  * @param {number} msg_size
  */
-export function sign_msg(msg_size) {
+export function sign_msg(msg_size: any) {
   wasm.sign_msg(msg_size);
 }
 
@@ -1048,7 +1090,7 @@ export function sign_msg(msg_size) {
  * @param {number} msg_size
  * @returns {boolean}
  */
-export function verify(msg_size) {
+export function verify(msg_size: any) {
   var ret = wasm.verify(msg_size);
   return ret !== 0;
 }
@@ -1058,7 +1100,7 @@ export function verify(msg_size) {
  * @param {number} msg_size
  * @returns {number}
  */
-export function encrypt(msg_size) {
+export function encrypt(msg_size: any) {
   var ret = wasm.encrypt(msg_size);
   return ret >>> 0;
 }
@@ -1068,7 +1110,7 @@ export function encrypt(msg_size) {
  * @param {number} ct_size
  * @returns {number}
  */
-export function decrypt(ct_size) {
+export function decrypt(ct_size: any) {
   var ret = wasm.decrypt(ct_size);
   return ret >>> 0;
 }
@@ -1077,7 +1119,7 @@ export function decrypt(ct_size) {
  * @private
  * @param {number} threshold
  */
-export function generate_poly(threshold) {
+export function generate_poly(threshold: any) {
   wasm.generate_poly(threshold);
 }
 
@@ -1086,7 +1128,7 @@ export function generate_poly(threshold) {
  * @param {number} poly_size
  * @returns {number}
  */
-export function get_poly_degree(poly_size) {
+export function get_poly_degree(poly_size: any) {
   var ret = wasm.get_poly_degree(poly_size);
   return ret >>> 0;
 }
@@ -1096,7 +1138,7 @@ export function get_poly_degree(poly_size) {
  * @param {number} mc_size
  * @returns {number}
  */
-export function get_mc_degree(mc_size) {
+export function get_mc_degree(mc_size: any) {
   var ret = wasm.get_mc_degree(mc_size);
   return ret >>> 0;
 }
@@ -1105,7 +1147,7 @@ export function get_mc_degree(mc_size) {
  * @private
  * @param {number} poly_size
  */
-export function derive_master_key(poly_size) {
+export function derive_master_key(poly_size: any) {
   wasm.derive_master_key(poly_size);
 }
 
@@ -1114,7 +1156,7 @@ export function derive_master_key(poly_size) {
  * @param {number} i
  * @param {number} poly_size
  */
-export function derive_key_share(i, poly_size) {
+export function derive_key_share(i: any, poly_size: any) {
   wasm.derive_key_share(i, poly_size);
 }
 
@@ -1123,7 +1165,7 @@ export function derive_key_share(i, poly_size) {
  * @param {number} threshold
  * @param {number} total_nodes
  */
-export function generate_bivars(threshold, total_nodes) {
+export function generate_bivars(threshold: any, total_nodes: any) {
   wasm.generate_bivars(threshold, total_nodes);
 }
 
@@ -1132,7 +1174,7 @@ export function generate_bivars(threshold, total_nodes) {
  * @param {number} total_signatures
  * @param {number} commitment_size
  */
-export function combine_signature_shares(total_signatures, commitment_size) {
+export function combine_signature_shares(total_signatures: any, commitment_size: any) {
   wasm.combine_signature_shares(total_signatures, commitment_size);
 }
 
@@ -1142,7 +1184,7 @@ export function combine_signature_shares(total_signatures, commitment_size) {
  * @param {number} ct_size
  * @returns {number}
  */
-export function create_decryption_share(share_index, ct_size) {
+export function create_decryption_share(share_index: any, ct_size: any) {
   var ret = wasm.create_decryption_share(share_index, ct_size);
   return ret >>> 0;
 }
@@ -1155,9 +1197,9 @@ export function create_decryption_share(share_index, ct_size) {
  * @returns {number}
  */
 export function combine_decryption_shares(
-  total_decryption_shares,
-  commitment_size,
-  ct_size
+  total_decryption_shares: any,
+  commitment_size: any,
+  ct_size: any
 ) {
   var ret = wasm.combine_decryption_shares(
     total_decryption_shares,
@@ -1167,7 +1209,7 @@ export function combine_decryption_shares(
   return ret >>> 0;
 }
 
-async function load(module, imports) {
+async function load(module: any, imports: any) {
   if (typeof Response === "function" && module instanceof Response) {
     if (typeof WebAssembly.instantiateStreaming === "function") {
       try {
@@ -1197,17 +1239,17 @@ async function load(module, imports) {
   }
 }
 
-async function init(input) {
+async function init(input: any) {
   const imports = {};
-  imports.wbg = {};
-  imports.wbg.__wbindgen_throw = function (arg0, arg1) {
+  (imports as any).wbg = {};
+  (imports as any).wbg.__wbindgen_throw = function (arg0: any, arg1: any) {
     throw new Error(getStringFromWasm0(arg0, arg1));
-  };
+};
 
   const { instance, module } = await load(await input, imports);
 
   wasm = instance.exports;
-  init.__wbindgen_wasm_module = module;
+  (init as any).__wbindgen_wasm_module = module;
 
   return wasm;
 }
@@ -1215,6 +1257,7 @@ async function init(input) {
 export default init;
 
 export async function initWasmBlsSdk() {
+  // @ts-expect-error TS(2563): The containing function or module body is too larg... Remove this comment to see the full error message
   var b = "";
 
   b +=

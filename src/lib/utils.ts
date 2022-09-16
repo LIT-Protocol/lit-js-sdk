@@ -1,32 +1,39 @@
 import { LIT_AUTH_SIG_CHAIN_KEYS } from "./constants.js";
 
-export const printError = (e) => {
+export const printError = (e: any) => {
   console.log("Error Stack", e.stack);
   console.log("Error Name", e.name);
   console.log("Error Message", e.message);
 };
 
-export const mostCommonString = (arr) => {
+export const mostCommonString = (arr: any) => {
   return arr
     .sort(
-      (a, b) =>
-        arr.filter((v) => v === a).length - arr.filter((v) => v === b).length
+      (a: any, b: any) =>
+        arr.filter((v: any) => v === a).length - arr.filter((v: any) => v === b).length
     )
     .pop();
 };
 
-export const throwError = ({ message, name, errorCode }) => {
-  throw new (function () {
+export const throwError = ({
+  message,
+  name,
+  errorCode
+}: any) => {
+  // @ts-expect-error TS(7009): 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
+  throw new ((function(this: any) {
     this.message = message;
     this.name = name;
     this.errorCode = errorCode;
-  })();
+  }))();
 };
 
-export const log = (...args) => {
+export const log = (...args: any[]) => {
   if (
     globalThis &&
+    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     globalThis.litConfig &&
+    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     globalThis.litConfig.debug === false
   ) {
     return;
@@ -44,7 +51,7 @@ export const log = (...args) => {
  * @param { * } value
  * @returns { String } type
  */
-export const getVarType = (value) => {
+export const getVarType = (value: any) => {
   return Object.prototype.toString.call(value).slice(8, -1);
   // // if it's an object
   // if (value instanceof Object) {
@@ -75,8 +82,8 @@ export const checkType = ({
   allowedTypes,
   paramName,
   functionName,
-  throwOnError = true,
-}) => {
+  throwOnError = true
+}: any) => {
   if (!allowedTypes.includes(getVarType(value))) {
     let message = `Expecting ${allowedTypes.join(
       " or "
@@ -100,9 +107,9 @@ export const checkType = ({
 };
 
 export const checkIfAuthSigRequiresChainParam = (
-  authSig,
-  chain,
-  functionName
+  authSig: any,
+  chain: any,
+  functionName: any
 ) => {
   for (const key of LIT_AUTH_SIG_CHAIN_KEYS) {
     if (key in authSig) {
