@@ -248,6 +248,11 @@ export function hashResourceId(resourceId) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
+export async function hashResourceIdForSigning(resourceId) {
+  const hashed = await hashResourceId(resourceId);
+  return uint8arrayToString(new Uint8Array(hashed), "base16");
+}
+
 function canonicalAbiParams(params) {
   return params.map((param) => ({
     name: param.name,
@@ -665,4 +670,19 @@ export function combineBlsDecryptionShares(
   );
   // log("decrypted is ", uint8arrayToString(decrypted, "base16"));
   return decrypted;
+export function generateSessionKeyPair() {
+  const keyPair = nacl.sign.keyPair();
+  return {
+    publicKey: uint8arrayToString(keyPair.publicKey, "base16"),
+    secretKey: uint8arrayToString(keyPair.secretKey, "base16"),
+  };
+}
+
+export async function hashEncryptionKey({ encryptedSymmetricKey }) {
+  const hashOfKey = await crypto.subtle.digest(
+    "SHA-256",
+    encryptedSymmetricKey
+  );
+  const hashOfKeyStr = uint8arrayToString(new Uint8Array(hashOfKey), "base16");
+  return hashOfKeyStr;
 }

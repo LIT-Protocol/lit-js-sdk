@@ -40,6 +40,7 @@ import {
   humanizeAccessControlConditions,
   getTokenList,
   checkAndSignAuthMessage,
+  getSessionSigs,
 } from "./utils/lit";
 
 import {
@@ -65,11 +66,14 @@ import {
   hashAccessControlConditions,
   hashEVMContractConditions,
   hashUnifiedAccessControlConditions,
+  hashResourceId,
   encryptWithSymmetricKey,
   decryptWithSymmetricKey,
   encryptWithBlsPubkey,
   generateSymmetricKey,
   importSymmetricKey,
+  hashResourceIdForSigning,
+  hashEncryptionKey,
 } from "./utils/crypto";
 
 import {
@@ -141,6 +145,7 @@ const functions = {
   hashAccessControlConditions,
   hashEVMContractConditions,
   hashUnifiedAccessControlConditions,
+  hashResourceId,
   decryptZipFileWithMetadata,
   downloadFile,
   decimalPlaces,
@@ -159,8 +164,11 @@ const functions = {
   encryptWithBlsPubkey,
   generateSymmetricKey,
   importSymmetricKey,
+  getSessionSigs,
+  hashResourceIdForSigning,
   blobToBase64String,
   base64StringToBlob,
+  hashEncryptionKey,
 };
 
 module.exports = functions;

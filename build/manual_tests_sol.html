@@ -429,17 +429,13 @@
       var SolUserTest = async () => {
         var solRpcConditions = [
           {
-            method: "balanceOfToken",
-            params: ["SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y"],
+            method: "balanceOfMetaplexCollection",
+            params: ["XXvLhyHFR8M2er6ZSUxjX9j8qWaXcvAx5DgawosUX8v"],
             pdaParams: [],
             pdaInterface: { offset: 0, fields: {} },
             pdaKey: "",
             chain: "solana",
-            returnValueTest: {
-              key: "$.amount",
-              comparator: ">",
-              value: "100000000",
-            },
+            returnValueTest: { key: "", comparator: ">=", value: "0" },
           },
         ];
         await testProvisoningEncryptingAndDecrypting({

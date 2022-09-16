@@ -11,6 +11,10 @@ import { getAddress } from "@ethersproject/address";
 import WalletConnectProvider from "@walletconnect/ethereum-provider";
 import LitConnectModal from "lit-connect-modal";
 import { SiweMessage } from "lit-siwe";
+import {
+  fromString as uint8arrayFromString,
+  toString as uint8arrayToString,
+} from "uint8arrays";
 
 import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
@@ -93,7 +97,7 @@ export async function connectWeb3({ chainId = 1 } = {}) {
   //   params: [],
   // });
   log("accounts", accounts);
-  const account = accounts[0].toLowerCase();
+  const account = accounts[0];
 
   return { web3, account };
 }
@@ -107,6 +111,8 @@ export async function disconnectWeb3() {
   localStorage.removeItem("lit-auth-sol-signature");
   localStorage.removeItem("lit-auth-cosmos-signature");
   localStorage.removeItem("lit-web3-provider");
+  localStorage.removeItem("lit-session-key");
+  localStorage.removeItem("lit-comms-keypair");
 }
 
 // taken from the excellent repo https://github.com/zmitton/eth-proof
@@ -166,6 +172,8 @@ export async function checkAndSignEVMAuthMessage({
   chain,
   resources,
   switchChain,
+  uri,
+  expiration,
 }) {
   const selectedChain = LIT_CHAINS[chain];
   const { web3, account } = await connectWeb3({
@@ -263,30 +271,32 @@ export async function checkAndSignEVMAuthMessage({
   let authSig = localStorage.getItem("lit-auth-signature");
   if (!authSig) {
     log("signing auth message because sig is not in local storage");
-    await signAndSaveAuthMessage({
+    authSig = await signAndSaveAuthMessage({
       web3,
       account,
       chainId,
       resources,
+      uri,
+      expiration,
     });
-    authSig = localStorage.getItem("lit-auth-signature");
+  } else {
+    authSig = JSON.parse(authSig);
   }
-  authSig = JSON.parse(authSig);
   // make sure we are on the right account
   if (account !== authSig.address) {
     log(
-      "signing auth message because account is not the same as the address in the auth sig"
+      `signing auth message because account is not the same as the address in the auth sig.  address: ${account} and auth sig address: ${authSig.address}`
     );
-    await signAndSaveAuthMessage({
+    authSig = await signAndSaveAuthMessage({
       web3,
       account,
       chainId: selectedChain.chainId,
       resources,
+      uri,
+      expiration,
     });
-    authSig = localStorage.getItem("lit-auth-signature");
-    authSig = JSON.parse(authSig);
   } else {
-    // check the resources of the sig and re-sign if they don't match
+    // check the resources, expiration, and URI of the sig and re-sign if they don't match
     let mustResign = false;
     try {
       const parsedSiwe = new SiweMessage(authSig.signedMessage);
@@ -308,14 +318,14 @@ export async function checkAndSignEVMAuthMessage({
       mustResign = true;
     }
     if (mustResign) {
-      await signAndSaveAuthMessage({
+      authSig = await signAndSaveAuthMessage({
         web3,
         account,
         chainId: selectedChain.chainId,
         resources,
+        uri,
+        expiration,
       });
-      authSig = localStorage.getItem("lit-auth-signature");
-      authSig = JSON.parse(authSig);
     }
   }
   log("got auth sig", authSig);
@@ -334,19 +344,27 @@ export async function signAndSaveAuthMessage({
   account,
   chainId,
   resources,
+  uri,
+  expiration,
 }) {
   // const { chainId } = await web3.getNetwork();
 
   const preparedMessage = {
     domain: globalThis.location.host,
     address: getAddress(account), // convert to EIP-55 format or else SIWE complains
-    uri: globalThis.location.origin,
     version: "1",
     chainId,
+    expirationTime: expiration.toISOString(),
   };
 
   if (resources && resources.length > 0) {
     preparedMessage.resources = resources;
+  }
+
+  if (uri) {
+    preparedMessage.uri = uri;
+  } else {
+    preparedMessage.uri = globalThis.location.href;
   }
 
   const message = new SiweMessage(preparedMessage);
@@ -401,7 +419,7 @@ export async function signMessage({ body, web3, account }) {
   // const signature = await web3.getSigner().signMessage(body);
   const signature = await signMessageAsync(web3.getSigner(), account, body);
   //.request({ method: 'personal_sign', params: [account, body] })
-  const address = verifyMessage(body, signature).toLowerCase();
+  const address = verifyMessage(body, signature);
 
   log("Signature: ", signature);
   log("recovered address: ", address);
@@ -427,7 +445,7 @@ export const signMessageAsync = async (signer, address, message) => {
       log("Signing with personal_sign");
       const signature = await signer.provider.send("personal_sign", [
         hexlify(messageBytes),
-        address.toLowerCase(),
+        address,
       ]);
       return signature;
     } catch (e) {

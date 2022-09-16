@@ -1,4 +1,5 @@
 import JSZip from "jszip";
+import nacl from "tweetnacl";
 import {
   fromString as uint8arrayFromString,
   toString as uint8arrayToString,
@@ -20,6 +21,7 @@ import {
   canonicalEVMContractConditionFormatter,
   canonicalSolRpcConditionFormatter,
   canonicalUnifiedAccessControlConditionFormatter,
+  generateSessionKeyPair,
 } from "./crypto";
 
 import { checkAndSignEVMAuthMessage, decimalPlaces } from "./eth";
@@ -30,6 +32,7 @@ import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 
 import { fileToDataUrl } from "./browser";
 import { ALL_LIT_CHAINS, NETWORK_PUB_KEY } from "../lib/constants";
+import { SiweMessage } from "lit-siwe";
 
 const PACKAGE_CACHE = {};
 
@@ -45,6 +48,8 @@ export async function checkAndSignAuthMessage({
   chain,
   resources,
   switchChain = true,
+  expiration,
+  uri,
 }) {
   const chainInfo = ALL_LIT_CHAINS[chain];
   if (!chainInfo) {
@@ -57,12 +62,23 @@ export async function checkAndSignAuthMessage({
     });
   }
 
+  if (!expiration) {
+    // set default of 1 week
+    expiration = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
+  }
+
   if (chainInfo.vmType === "EVM") {
-    return checkAndSignEVMAuthMessage({ chain, resources, switchChain });
+    return checkAndSignEVMAuthMessage({
+      chain,
+      resources,
+      switchChain,
+      expiration,
+      uri,
+    });
   } else if (chainInfo.vmType === "SVM") {
-    return checkAndSignSolAuthMessage({ chain });
+    return checkAndSignSolAuthMessage({ chain, resources, expiration, uri });
   } else if (chainInfo.vmType === "CVM") {
-    return checkAndSignCosmosAuthMessage({ chain });
+    return checkAndSignCosmosAuthMessage({ chain, resources, expiration, uri });
   } else {
     throwError({
       message: `vmType not found for this chain: ${chain}.  This should not happen.  Unsupported chain selected.  Please select one of: ${Object.keys(
@@ -72,6 +88,137 @@ export async function checkAndSignAuthMessage({
       errorCode: "unsupported_chain",
     });
   }
+}
+
+// high level, how this works:
+// generate or retrieve session key
+// generate or retrieve the wallet signature of the session key
+// sign the specific resources with the session key
+export async function getSessionSigs({
+  expiration,
+  chain,
+  resources = [],
+  sessionCapabilities,
+  switchChain,
+  litNodeClient,
+}) {
+  // check if we already have a session key + signature for this chain
+  let sessionKey = localStorage.getItem(`lit-session-key`);
+  if (!sessionKey || sessionKey === "") {
+    // if not, generate one
+    sessionKey = generateSessionKeyPair();
+    localStorage.setItem(`lit-session-key`, JSON.stringify(sessionKey));
+  } else {
+    sessionKey = JSON.parse(sessionKey);
+  }
+  let sessionKeyUri = getSessionKeyUri({ publicKey: sessionKey.publicKey });
+
+  // if the user passed no sessionCapabilities, let's create them for them
+  // with wildcards so the user doesn't have to sign every time
+  if (!sessionCapabilities || sessionCapabilities.length === 0) {
+    sessionCapabilities = resources.map((resource) => {
+      const { protocol, resourceId } = parseResource({ resource });
+      return `${protocol}Capability://*`;
+    });
+  }
+
+  // check if we already have a wallet sig from the user
+  // and then check a few things, including that:
+  // 1. the sig isn't expired
+  // 2. the sig is for the correct session key
+  // 3. the sig has the sessionCapabilities requires to fulfill the resources requested
+
+  let walletSig = localStorage.getItem(`lit-wallet-sig`);
+  if (!walletSig || walletSig == "") {
+    walletSig = await checkAndSignAuthMessage({
+      chain,
+      resources: sessionCapabilities,
+      switchChain,
+      expiration,
+      uri: sessionKeyUri,
+    });
+  } else {
+    walletSig = JSON.parse(walletSig);
+  }
+
+  const siweMessage = new SiweMessage(walletSig.signedMessage);
+  let needToReSignSessionKey = false;
+  try {
+    // make sure it's legit
+    await siweMessage.verify({ signature: walletSig.sig });
+  } catch (e) {
+    needToReSignSessionKey = true;
+  }
+
+  // make sure the sig is for the correct session key
+  if (siweMessage.uri !== sessionKeyUri) {
+    needToReSignSessionKey = true;
+  }
+
+  // make sure the sig has the session capabilities required to fulfill the resources requested
+  for (let i = 0; i < resources.length; i++) {
+    const resource = resources[i];
+    const { protocol, resourceId } = parseResource({ resource });
+
+    // check if we have blanket permissions or if we authed the specific resource for the protocol
+    const permissionsFound = sessionCapabilities.some((capability) => {
+      const capabilityParts = parseResource({ resource: capability });
+      return (
+        capabilityParts.protocol === protocol &&
+        (capabilityParts.resourceId === "*" ||
+          capabilityParts.resourceId === resourceId)
+      );
+    });
+    if (!permissionsFound) {
+      needToReSignSessionKey = true;
+    }
+  }
+
+  if (needToReSignSessionKey) {
+    waletSig = await checkAndSignAuthMessage({
+      chain,
+      resources: sessionCapabilities,
+      switchChain,
+      expiration,
+      uri: sessionKeyUri,
+    });
+  }
+
+  // okay great, now we have a valid signed session key
+  // let's sign the resources with the session key
+  // 5 minutes is the default expiration for a session signature
+  // because we can generate a new session sig every time the user wants to access a resource
+  // without prompting them to sign with their wallet
+  let sessionExpiration = new Date(Date.now() + 1000 * 60 * 5);
+  const signingTemplate = {
+    sessionKey: sessionKey.publicKey,
+    resources,
+    capabilities: [walletSig],
+    issuedAt: new Date().toISOString(),
+    expiration: sessionExpiration.toISOString(),
+  };
+  const signatures = {};
+
+  litNodeClient.connectedNodes.forEach((nodeAddress) => {
+    const toSign = {
+      ...signingTemplate,
+      nodeAddress,
+    };
+    let signedMessage = JSON.stringify(toSign);
+    const uint8arrayKey = uint8arrayFromString(sessionKey.secretKey, "base16");
+    const uint8arrayMessage = uint8arrayFromString(signedMessage, "utf8");
+    let signature = nacl.sign.detached(uint8arrayMessage, uint8arrayKey);
+    // console.log("signature", signature);
+    signatures[nodeAddress] = {
+      sig: uint8arrayToString(signature, "base16"),
+      derivedVia: "litSessionSignViaNacl",
+      signedMessage,
+      address: sessionKey.publicKey,
+      algo: "ed25519",
+    };
+  });
+
+  return signatures;
 }
 
 /**
@@ -1476,3 +1623,12 @@ export async function getTokenList() {
 export const sendMessageToFrameParent = (data) => {
   window.parent.postMessage(data, "*");
 };
+
+export function getSessionKeyUri({ publicKey }) {
+  return "lit:session:" + publicKey;
+}
+
+export function parseResource({ resource }) {
+  const [protocol, resourceId] = resource.split("://");
+  return { protocol, resourceId };
+}
