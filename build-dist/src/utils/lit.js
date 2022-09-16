@@ -1,0 +1,1241 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sendMessageToFrameParent = exports.getTokenList = exports.humanizeAccessControlConditions = exports.verifyJwt = exports.unlockLitWithKey = exports.toggleLock = exports.createHtmlLIT = exports.decryptFile = exports.encryptFile = exports.decryptZipFileWithMetadata = exports.encryptFileAndZipWithMetadata = exports.encryptZip = exports.decryptZip = exports.zipAndEncryptFiles = exports.zipAndEncryptString = exports.decryptString = exports.encryptString = exports.checkAndSignAuthMessage = void 0;
+const jszip_1 = __importDefault(require("jszip"));
+const uint8arrays_1 = require("uint8arrays");
+const units_1 = require("@ethersproject/units");
+const utils_1 = require("../lib/utils");
+const crypto_1 = require("./crypto");
+const eth_1 = require("./eth");
+const sol_1 = require("./sol");
+const cosmos_1 = require("./cosmos");
+const bls_sdk_1 = require("../lib/bls-sdk");
+const browser_1 = require("./browser");
+const constants_1 = require("../lib/constants");
+const PACKAGE_CACHE = {};
+/**
+ * Check for an existing cryptographic authentication signature and create one of it does not exist.  This is used to prove ownership of a given crypto wallet address to the Lit nodes.  The result is stored in LocalStorage so the user doesn't have to sign every time they perform an operation.
+ * @param {Object} params
+ * @param {string} params.chain The chain you want to use.  Find the supported list of chains here: https://developer.litprotocol.com/docs/supportedChains
+ * @param {Array<string>} params.resources Optional and only used with EVM chains.  A list of resources to be passed to Sign In with Ethereum.  These resources will be part of the Sign in with Ethereum signed message presented to the user.
+ * @param {Array<boolean>} params.switchChain Optional and only used with EVM chains right now.  Set to true by default.  Whether or not to ask Metamask or the user's wallet to switch chains before signing.  This may be desired if you're going to have the user send a txn on that chain.  On the other hand, if all you care about is the user's wallet signature, then you probably don't want to make them switch chains for no reason.  Pass false here to disable this chain switching behavior.
+ * @returns {AuthSig} The AuthSig created or retrieved
+ */
+function checkAndSignAuthMessage({ chain, resources, switchChain = true }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+        const chainInfo = constants_1.ALL_LIT_CHAINS[chain];
+        if (!chainInfo) {
+            (0, utils_1.throwError)({
+                message: `Unsupported chain selected.  Please select one of: ${Object.keys(constants_1.ALL_LIT_CHAINS)}`,
+                name: "UnsupportedChainException",
+                errorCode: "unsupported_chain",
+            });
+        }
+        if (chainInfo.vmType === "EVM") {
+            return (0, eth_1.checkAndSignEVMAuthMessage)({ chain, resources, switchChain });
+        }
+        else if (chainInfo.vmType === "SVM") {
+            return (0, sol_1.checkAndSignSolAuthMessage)({ chain });
+        }
+        else if (chainInfo.vmType === "CVM") {
+            return (0, cosmos_1.checkAndSignCosmosAuthMessage)({ chain });
+        }
+        else {
+            (0, utils_1.throwError)({
+                message: `vmType not found for this chain: ${chain}.  This should not happen.  Unsupported chain selected.  Please select one of: ${Object.keys(constants_1.ALL_LIT_CHAINS)}`,
+                name: "UnsupportedChainException",
+                errorCode: "unsupported_chain",
+            });
+        }
+    });
+}
+exports.checkAndSignAuthMessage = checkAndSignAuthMessage;
+/**
+ * Encrypt a string.  This is used to encrypt any string that is to be locked via the Lit Protocol.
+ * @param {string} str The string to encrypt
+ * @returns {Promise<Object>} A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
+ */
+function encryptString(str) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // -- validate
+        if (!(0, utils_1.checkType)({
+            value: str,
+            allowedTypes: ["String"],
+            paramName: "str",
+            functionName: "encryptString",
+        }))
+            return;
+        const encodedString = (0, uint8arrays_1.fromString)(str, "utf8");
+        const symmKey = yield (0, crypto_1.generateSymmetricKey)();
+        const encryptedString = yield (0, crypto_1.encryptWithSymmetricKey)(symmKey, encodedString.buffer);
+        const exportedSymmKey = new Uint8Array(yield crypto.subtle.exportKey("raw", symmKey));
+        return {
+            symmetricKey: exportedSymmKey,
+            encryptedString,
+            encryptedData: encryptedString,
+        };
+    });
+}
+exports.encryptString = encryptString;
+/**
+ * Decrypt a string that was encrypted with the encryptString function.
+ * @param {Blob|File} encryptedStringBlob The encrypted string as a Blob
+ * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this.
+ * @returns {Promise<string>} A promise containing the decrypted string
+ */
+function decryptString(encryptedStringBlob, symmKey) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // -- validate
+        if (!(0, utils_1.checkType)({
+            value: encryptedStringBlob,
+            allowedTypes: ["Blob", "File"],
+            paramName: "encryptedStringBlob",
+            functionName: "decryptString",
+        }))
+            return;
+        if (!(0, utils_1.checkType)({
+            value: symmKey,
+            allowedTypes: ["Uint8Array"],
+            paramName: ["symmKey"],
+            functionName: ["decryptString"],
+        }))
+            return;
+        // import the decrypted symm key
+        const importedSymmKey = yield (0, crypto_1.importSymmetricKey)(symmKey);
+        const decryptedStringArrayBuffer = yield (0, crypto_1.decryptWithSymmetricKey)(encryptedStringBlob, importedSymmKey);
+        return (0, uint8arrays_1.toString)(new Uint8Array(decryptedStringArrayBuffer), "utf8");
+    });
+}
+exports.decryptString = decryptString;
+/**
+ * Zip and encrypt a string.  This is used to encrypt any string that is to be locked via the Lit Protocol.
+ * @param {string} string The string to zip and encrypt
+ * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a single file called "string.txt"
+ */
+function zipAndEncryptString(string) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!(0, utils_1.checkType)({
+            value: string,
+            allowedTypes: ["String"],
+            paramName: "string",
+            functionName: "zipAndEncryptString",
+        }))
+            return;
+        const zip = new jszip_1.default();
+        zip.file("string.txt", string);
+        return encryptZip(zip);
+    });
+}
+exports.zipAndEncryptString = zipAndEncryptString;
+/**
+ * Zip and encrypt multiple files.
+ * @param {Array<File>} files An array of the files you wish to zip and encrypt
+ * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
+ */
+function zipAndEncryptFiles(files) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // let's zip em
+        const zip = new jszip_1.default();
+        for (let i = 0; i < files.length; i++) {
+            if (!(0, utils_1.checkType)({
+                value: files[i],
+                allowedTypes: ["File"],
+                paramName: `files[${i}]`,
+                functionName: "zipAndEncryptFiles",
+            }))
+                return;
+            // @ts-expect-error TS(2531): Object is possibly 'null'.
+            zip.folder("encryptedAssets").file(files[i].name, files[i]);
+        }
+        return encryptZip(zip);
+    });
+}
+exports.zipAndEncryptFiles = zipAndEncryptFiles;
+/**
+ * Decrypt and unzip a zip that was created using encryptZip, zipAndEncryptString, or zipAndEncryptFiles.
+ * @param {Blob|File} encryptedZipBlob The encrypted zip as a Blob
+ * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this zip.
+ * @returns {Promise<Object>} A promise containing a JSZip object indexed by the filenames of the zipped files.  For example, if you have a file called "meow.jpg" in the root of your zip, you could get it from the JSZip object by doing this: const imageBlob = await decryptedZip['meow.jpg'].async('blob')
+ */
+function decryptZip(encryptedZipBlob, symmKey) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!(0, utils_1.checkType)({
+            value: encryptedZipBlob,
+            allowedTypes: ["Blob", "File"],
+            paramName: "encryptedZipBlob",
+            functionName: "decryptZip",
+        }))
+            return;
+        if (!(0, utils_1.checkType)({
+            value: symmKey,
+            allowedTypes: ["Uint8Array"],
+            paramName: "symmKey",
+            functionName: "decryptZip",
+        }))
+            return;
+        // const keypair = await checkAndDeriveKeypair()
+        // log('Got keypair out of localstorage: ' + keypair)
+        // const privkey = keypair.secretKey
+        // let decryptedSymmKey = await decryptWithWeb3PrivateKey(symmKey)
+        // if (!decryptedSymmKey) {
+        //   // fallback to trying the private derived via signature
+        //   log('probably not metamask')
+        //   decryptedSymmKey = decryptWithPrivkey(symmKey, privkey)
+        // }
+        // log('decrypted', decryptedSymmKey)
+        // import the decrypted symm key
+        const importedSymmKey = yield (0, crypto_1.importSymmetricKey)(symmKey);
+        const decryptedZipArrayBuffer = yield (0, crypto_1.decryptWithSymmetricKey)(encryptedZipBlob, importedSymmKey);
+        // unpack the zip
+        const zip = new jszip_1.default();
+        const unzipped = yield zip.loadAsync(decryptedZipArrayBuffer);
+        // load the files into data urls with the metadata attached
+        // const files = await Promise.all(unzipped.files.map(async f => {
+        //   // const dataUrl = await fileToDataUrl(f)
+        //   return {
+        //     type: f.type,
+        //     name: f.name,
+        //     file: f
+        //   }
+        // }))
+        return unzipped.files;
+    });
+}
+exports.decryptZip = decryptZip;
+/**
+ * Encrypt a zip file created with JSZip using a new random symmetric key via WebCrypto.
+ * @param {JSZip} zip The JSZip instance to encrypt
+ * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array string.
+ */
+function encryptZip(zip) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const zipBlob = yield zip.generateAsync({ type: "blob" });
+        const zipBlobArrayBuffer = yield zipBlob.arrayBuffer();
+        // log('blob', zipBlob)
+        const symmKey = yield (0, crypto_1.generateSymmetricKey)();
+        const encryptedZipBlob = yield (0, crypto_1.encryptWithSymmetricKey)(symmKey, zipBlobArrayBuffer);
+        // to download the encrypted zip file for testing, uncomment this
+        // saveAs(encryptedZipBlob, 'encrypted.bin')
+        const exportedSymmKey = new Uint8Array(yield crypto.subtle.exportKey("raw", symmKey));
+        // log('exportedSymmKey in hex', uint8arrayToString(exportedSymmKey, 'base16'))
+        // encrypt the symmetric key with the
+        // public key derived from the eth wallet
+        // const keypair = await checkAndDeriveKeypair()
+        // const pubkey = keypair.publicKey
+        // const privkey = keypair.secretKey
+        // encrypt symm key
+        // const encryptedSymmKeyData = encryptWithPubkey(pubkey, JSON.stringify(exportedSymmKey), 'x25519-xsalsa20-poly1305')
+        // const packed = JSON.stringify(encryptedSymmKeyData)
+        //   log('packed symmetric key ', packed)
+        //   const unpacked = JSON.parse(packed)
+        //   // test decrypt
+        //   const decryptedSymmKey = decryptWithPrivkey(unpacked, privkey)
+        //   log('decrypted', decryptedSymmKey)
+        //
+        //   // import the decrypted symm key
+        //   const importedSymmKey = await importSymmetricKey(decryptedSymmKey)
+        //
+        //   const decryptedZipArrayBuffer = await decryptWithSymmetricKey(
+        //     encryptedZipBlob,
+        //     importedSymmKey
+        //   )
+        //
+        //   // compare zip before and after as a sanity check
+        //   const isEqual = compareArrayBuffers(
+        //     zipBlobArrayBuffer,
+        //     decryptedZipArrayBuffer
+        //   )
+        //   log('Zip before and after decryption are equal: ', isEqual)
+        //   if (!isEqual) {
+        //     throw new Error('Decrypted zip does not match original zip.  Something is wrong.')
+        //   }
+        // to download the zip, for testing, uncomment this
+        //   const decryptedBlob = new Blob(
+        //     [decryptedZipArrayBuffer],
+        //     { type: 'application/zip' }
+        //   )
+        //   log('decrypted blob', decryptedBlob)
+        //
+        //   saveAs(decryptedBlob, 'decrypted.zip')
+        // log('saved')
+        return {
+            symmetricKey: exportedSymmKey,
+            encryptedZip: encryptedZipBlob,
+        };
+    });
+}
+exports.encryptZip = encryptZip;
+/**
+ * Encrypt a single file, save the key to the Lit network, and then zip it up with the metadata.
+ * @param {Object} params
+ * @param {Object} params.authSig The authSig of the user.  Returned via the checkAndSignAuthMessage function
+ * @param {Array.<AccessControlCondition>} params.accessControlConditions The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+ * @param {Array.<EVMContractCondition>} params.evmContractConditions  EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+ * @param {Array.<SolRpcCondition>} params.solRpcConditions  Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+ * @param {Array.<AccessControlCondition|EVMContractCondition|SolRpcCondition>} params.unifiedAccessControlConditions  An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+ * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+ * @param {File} params.file The file you wish to encrypt
+ * @param {LitNodeClient} params.litNodeClient An instance of LitNodeClient that is already connected
+ * @param {string} params.readme An optional readme text that will be inserted into readme.txt in the final zip file.  This is useful in case someone comes across this zip file and wants to know how to decrypt it.  This file could contain instructions and a URL to use to decrypt the file.
+ * @returns {Promise<Object>} A promise containing an object with 3 keys: zipBlob, encryptedSymmetricKey, and symmetricKey.  zipBlob is a zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network.  encryptedSymmetricKey is the symmetric key needed to decrypt the content, encrypted with the Lit network public key.  You may wish to store encryptedSymmetricKey in your own database to support quicker re-encryption operations when adding additional access control conditions in the future, but this is entirely optional, and this key is already stored inside the zipBlob.  symmetricKey is the raw symmetric key used to encrypt the files.  DO NOT STORE IT.  It is provided in case you wish to create additional "OR" access control conditions for the same file.
+ */
+function encryptFileAndZipWithMetadata({ authSig, accessControlConditions, evmContractConditions, solRpcConditions, unifiedAccessControlConditions, chain, file, litNodeClient, readme }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // -- validate
+        if (!(0, utils_1.checkType)({
+            value: authSig,
+            allowedTypes: ["Object"],
+            paramName: "authSig",
+            functionName: "encryptFileAndZipWithMetadata",
+        }))
+            return;
+        if (accessControlConditions &&
+            !(0, utils_1.checkType)({
+                value: accessControlConditions,
+                allowedTypes: ["Array"],
+                paramName: "accessControlConditions",
+                functionName: "encryptFileAndZipWithMetadata",
+            }))
+            return;
+        if (evmContractConditions &&
+            !(0, utils_1.checkType)({
+                value: evmContractConditions,
+                allowedTypes: ["Array"],
+                paramName: "evmContractConditions",
+                functionName: "encryptFileAndZipWithMetadata",
+            }))
+            return;
+        if (solRpcConditions &&
+            !(0, utils_1.checkType)({
+                value: solRpcConditions,
+                allowedTypes: ["Array"],
+                paramName: "solRpcConditions",
+                functionName: "encryptFileAndZipWithMetadata",
+            }))
+            return;
+        if (unifiedAccessControlConditions &&
+            !(0, utils_1.checkType)({
+                value: unifiedAccessControlConditions,
+                allowedTypes: ["Array"],
+                paramName: "unifiedAccessControlConditions",
+                functionName: "encryptFileAndZipWithMetadata",
+            }))
+            return;
+        if (!(0, utils_1.checkIfAuthSigRequiresChainParam)(authSig, chain, "encryptFileAndZipWithMetadata"))
+            return;
+        if (!(0, utils_1.checkType)({
+            value: file,
+            allowedTypes: ["File"],
+            paramName: "file",
+            functionName: "encryptFileAndZipWithMetadata",
+        }))
+            return;
+        if (readme &&
+            !(0, utils_1.checkType)({
+                value: readme,
+                allowedTypes: ["String"],
+                paramName: "readme",
+                functionName: "encryptFileAndZipWithMetadata",
+            }))
+            return;
+        const symmetricKey = yield (0, crypto_1.generateSymmetricKey)();
+        const exportedSymmKey = new Uint8Array(yield crypto.subtle.exportKey("raw", symmetricKey));
+        // log('exportedSymmKey in hex', uint8arrayToString(exportedSymmKey, 'base16'))
+        const encryptedSymmetricKey = yield litNodeClient.saveEncryptionKey({
+            accessControlConditions,
+            evmContractConditions,
+            solRpcConditions,
+            unifiedAccessControlConditions,
+            symmetricKey: exportedSymmKey,
+            authSig,
+            chain,
+        });
+        (0, utils_1.log)("encrypted key saved to Lit", encryptedSymmetricKey);
+        // encrypt the file
+        var fileAsArrayBuffer = yield file.arrayBuffer();
+        const encryptedZipBlob = yield (0, crypto_1.encryptWithSymmetricKey)(symmetricKey, fileAsArrayBuffer);
+        const zip = new jszip_1.default();
+        const metadata = metadataForFile({
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            encryptedSymmetricKey,
+            accessControlConditions,
+            evmContractConditions,
+            solRpcConditions,
+            unifiedAccessControlConditions,
+            chain,
+        });
+        zip.file("lit_protocol_metadata.json", JSON.stringify(metadata));
+        if (readme) {
+            zip.file("readme.txt", readme);
+        }
+        // @ts-expect-error TS(2531): Object is possibly 'null'.
+        zip.folder("encryptedAssets").file(file.name, encryptedZipBlob);
+        const zipBlob = yield zip.generateAsync({ type: "blob" });
+        return { zipBlob, encryptedSymmetricKey, symmetricKey: exportedSymmKey };
+    });
+}
+exports.encryptFileAndZipWithMetadata = encryptFileAndZipWithMetadata;
+/**
+ * Given a zip file with metadata inside it, unzip, load the metadata, and return the decrypted file and the metadata.  This zip file would have been created with the encryptFileAndZipWithMetadata function.
+ * @param {Object} params
+ * @param {Object} params.authSig The authSig of the user.  Returned via the checkAndSignAuthMessage function
+ * @param {Blob|File} params.file The zip file blob with metadata inside it and the encrypted asset
+ * @param {LitNodeClient} params.litNodeClient An instance of LitNodeClient that is already connected
+ * @returns {Promise<Object>} A promise containing an object that contains decryptedFile and metadata properties.  The decryptedFile is an ArrayBuffer that is ready to use, and metadata is an object that contains all the properties of the file like it's name and size and type.
+ */
+function decryptZipFileWithMetadata({ authSig, file, litNodeClient, additionalAccessControlConditions }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // -- validate
+        if (!(0, utils_1.checkType)({
+            value: authSig,
+            allowedTypes: ["Object"],
+            paramName: "authSig",
+            functionName: "decryptZipFileWithMetadata",
+        }))
+            return;
+        if (!(0, utils_1.checkType)({
+            value: file,
+            allowedTypes: ["Blob", "File"],
+            paramName: "file",
+            functionName: "decryptZipFileWithMetadata",
+        }))
+            return;
+        const zip = yield jszip_1.default.loadAsync(file);
+        const metadata = JSON.parse(
+        // @ts-expect-error TS(2531): Object is possibly 'null'.
+        yield zip.file("lit_protocol_metadata.json").async("string"));
+        (0, utils_1.log)("zip metadata", metadata);
+        let symmKey;
+        try {
+            symmKey = yield litNodeClient.getEncryptionKey({
+                accessControlConditions: metadata.accessControlConditions,
+                evmContractConditions: metadata.evmContractConditions,
+                solRpcConditions: metadata.solRpcConditions,
+                unifiedAccessControlConditions: metadata.unifiedAccessControlConditions,
+                toDecrypt: metadata.encryptedSymmetricKey,
+                chain: metadata.chain,
+                authSig,
+            });
+        }
+        catch (e) {
+            if (e.errorCode === "not_authorized") {
+                // try more additionalAccessControlConditions
+                if (!additionalAccessControlConditions) {
+                    throw e;
+                }
+                (0, utils_1.log)("trying additionalAccessControlConditions");
+                for (let i = 0; i < additionalAccessControlConditions.length; i++) {
+                    const accessControlConditions = additionalAccessControlConditions[i].accessControlConditions;
+                    (0, utils_1.log)("trying additional condition", accessControlConditions);
+                    try {
+                        symmKey = yield litNodeClient.getEncryptionKey({
+                            accessControlConditions: accessControlConditions,
+                            toDecrypt: additionalAccessControlConditions[i].encryptedSymmetricKey,
+                            chain: metadata.chain,
+                            authSig,
+                        });
+                        // // okay we got the additional symmkey, now we need to decrypt the symmkey and then use it to decrypt the original symmkey
+                        // const importedAdditionalSymmKey = await importSymmetricKey(symmKey)
+                        // symmKey = await decryptWithSymmetricKey(additionalAccessControlConditions[i].encryptedSymmetricKey, importedAdditionalSymmKey)
+                        break; // it worked, we can leave the loop and stop checking additional access control conditions
+                    }
+                    catch (e) {
+                        // swallow not_authorized because we are gonna try some more accessControlConditions
+                        if (e.errorCode !== "not_authorized") {
+                            throw e;
+                        }
+                    }
+                }
+                if (!symmKey) {
+                    // we tried all the access control conditions and none worked
+                    throw e;
+                }
+            }
+            else {
+                throw e;
+            }
+        }
+        const importedSymmKey = yield (0, crypto_1.importSymmetricKey)(symmKey);
+        // log('symmetricKey', importedSymmKey)
+        // @ts-expect-error TS(2531): Object is possibly 'null'.
+        const encryptedFile = yield zip
+            .folder("encryptedAssets")
+            .file(metadata.name)
+            .async("blob");
+        // log('encryptedFile', encryptedFile)
+        const decryptedFile = yield (0, crypto_1.decryptWithSymmetricKey)(encryptedFile, importedSymmKey);
+        // log('decryptedFile', decryptedFile)
+        return { decryptedFile, metadata };
+    });
+}
+exports.decryptZipFileWithMetadata = decryptZipFileWithMetadata;
+/**
+ * Encrypt a file without doing any zipping or packing.  This is useful for large files.  A 1gb file can be encrypted in only 2 seconds, for example.  A new random symmetric key will be created and returned along with the encrypted file.
+ * @param {Object} params
+ * @param {Blob|File} params.file The file you wish to encrypt
+ * @returns {Promise<Object>} A promise containing an object with keys encryptedFile and symmetricKey.  encryptedFile is a Blob, and symmetricKey is a Uint8Array that can be used to decrypt the file.
+ */
+function encryptFile({ file }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!(0, utils_1.checkType)({
+            value: file,
+            allowedTypes: ["Blob", "File"],
+            paramName: "file",
+            functionName: "encryptFile",
+        }))
+            return;
+        // generate a random symmetric key
+        const symmetricKey = yield (0, crypto_1.generateSymmetricKey)();
+        const exportedSymmKey = new Uint8Array(yield crypto.subtle.exportKey("raw", symmetricKey));
+        // encrypt the file
+        var fileAsArrayBuffer = yield file.arrayBuffer();
+        const encryptedFile = yield (0, crypto_1.encryptWithSymmetricKey)(symmetricKey, fileAsArrayBuffer);
+        return { encryptedFile, symmetricKey: exportedSymmKey };
+    });
+}
+exports.encryptFile = encryptFile;
+/**
+ * Decrypt a file that was encrypted with the encryptFile function, without doing any unzipping or unpacking.  This is useful for large files.  A 1gb file can be decrypted in only 1 second, for example.
+ * @param {Object} params
+ * @param {Blob|File} params.file The file you wish to decrypt
+ * @param {Uint8Array} params.symmetricKey The symmetric key used that will be used to decrypt this.
+ * @returns {Promise<Object>} A promise containing the decrypted file.  The file is an ArrayBuffer.
+ */
+function decryptFile({ file, symmetricKey }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // -- validate
+        if (!(0, utils_1.checkType)({
+            value: file,
+            allowedTypes: ["Blob", "File"],
+            paramName: "file",
+            functionName: "decryptFile",
+        }))
+            return;
+        if (!(0, utils_1.checkType)({
+            value: symmetricKey,
+            allowedTypes: ["Uint8Array"],
+            paramName: "symmetricKey",
+            functionName: "decryptFile",
+        }))
+            return;
+        const importedSymmKey = yield (0, crypto_1.importSymmetricKey)(symmetricKey);
+        // decrypt the file
+        const decryptedFile = yield (0, crypto_1.decryptWithSymmetricKey)(file, importedSymmKey);
+        return decryptedFile;
+    });
+}
+exports.decryptFile = decryptFile;
+function getNpmPackage(packageName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // log('getting npm package: ' + packageName)
+        // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+        if (PACKAGE_CACHE[packageName]) {
+            // log('found in cache')
+            // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+            return PACKAGE_CACHE[packageName];
+        }
+        const resp = yield fetch("https://unpkg.com/" + packageName);
+        if (!resp.ok) {
+            (0, utils_1.log)("error with response: ", resp);
+            throw Error(resp.statusText);
+        }
+        const blob = yield resp.blob();
+        // log('got blob', blob)
+        const dataUrl = yield (0, browser_1.fileToDataUrl)(blob);
+        // log('got dataUrl', dataUrl)
+        // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+        PACKAGE_CACHE[packageName] = dataUrl;
+        return dataUrl;
+    });
+}
+/**
+ * Create a ready-to-go LIT using provided HTML/CSS body and an encrypted zip data url.  You need to design your LIT with HTML and CSS, and provide an unlock button with the id "unlockButton" inside your HTML.  This function will handle the rest.
+ * @param {Object} params
+ * @param {string} params.title The title that will be used for the title tag in the outputted HTML
+ * @param {number} params.htmlBody The HTML body for the locked state of the LIT.  All users will be able to see this HTML.  This HTML must have a button with an id of "unlockButton" which will be automatically set up to decrypt and load the encryptedZipDataUrl
+ * @param {string} params.css Any CSS you would like to include in the outputted HTML
+ * @param {number} params.encryptedZipDataUrl a data URL of the encrypted zip that contains the locked content that only token holders will be able to view.
+ * @param {string} params.tokenAddress The token address of the corresponding NFT for this LIT.  ERC721 and ERC 1155 tokens are currently supported.
+ * @param {number} params.tokenId The ID of the token of the corresponding NFT for this LIT.  Only holders of this token ID will be able to unlock and decrypt this LIT.
+ * @param {string} params.chain The chain that the corresponding NFT was minted on.  "ethereum" and "polygon" are currently supported.
+ * @param {Array} [params.npmPackages=[]] An array of strings of NPM package names that should be embedded into this LIT.  These packages will be pulled down via unpkg, converted to data URLs, and embedded in the LIT HTML.  You can include any packages from npmjs.com.
+ * @returns {Promise<string>} A promise containing the HTML string that is now a LIT.  You can send this HTML around and only token holders will be able to unlock and decrypt the content inside it.  Included in the HTML is this LIT JS SDK itself, the encrypted locked content, an automatic connection to the LIT nodes network, and a handler for a button with id "unlockButton" which will perform the unlock operation when clicked.
+ */
+function createHtmlLIT({ title, htmlBody, css, encryptedZipDataUrl, accessControlConditions, encryptedSymmetricKey, chain, npmPackages = [] }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // uncomment this to embed the LIT JS SDK directly instead of retrieving it from unpkg when a user views the LIT
+        // npmPackages.push('lit-js-sdk')
+        // log('createHtmlLIT with npmPackages', npmPackages)
+        let scriptTags = "";
+        for (let i = 0; i < npmPackages.length; i++) {
+            const scriptDataUrl = yield getNpmPackage(npmPackages[i]);
+            const tag = `<script src="${scriptDataUrl}"></script>\n`;
+            scriptTags += tag;
+        }
+        const formattedAccessControlConditions = accessControlConditions.map((c) => (0, crypto_1.canonicalAccessControlConditionFormatter)(c));
+        // log('scriptTags: ', scriptTags)
+        return `
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>${title}</title>
+    <style>
+      html, body, #root {
+        height: 100%;
+      }
+    </style>
+    <style id="jss-server-side">${css}</style>
+    ${scriptTags}
+    <script>
+      var encryptedZipDataUrl = "${encryptedZipDataUrl}"
+      var accessControlConditions = ${JSON.stringify(formattedAccessControlConditions)}
+      var chain = "${chain}"
+      var encryptedSymmetricKey = "${(0, uint8arrays_1.toString)(encryptedSymmetricKey, "base16")}"
+      var locked = true
+      var useLitPostMessageProxy = false
+      var sandboxed = false
+
+      document.addEventListener('lit-ready', function(){
+        var unlockButton = document.getElementById('unlockButton')
+        if (unlockButton) {
+          unlockButton.disabled = false
+        }
+
+        var loadingSpinner = document.getElementById('loadingSpinner')
+        if (loadingSpinner) {
+          loadingSpinner.style = 'display: none;'
+        }
+
+        var loadingText = document.getElementById('loadingText')
+        if (loadingText){
+          loadingText.innerText = ''
+        }
+      })
+    </script>
+    <script onload='LitJsSdk.litJsSdkLoadedInALIT()' src="https://jscdn.litgateway.com/index.web.js"></script>
+  </head>
+  <body>
+    <div id="root">${htmlBody}</div>
+    <script>
+      var unlockButton = document.getElementById('unlockButton')
+      unlockButton.onclick = function() {
+        if (window.sandboxed) {
+          var loadingText = document.getElementById('loadingText')
+          if (loadingText){
+            loadingText.innerText = 'Could not unlock because OpenSea does not allow wallet access.  Click the arrow icon "View on Lit Protocol" in the top right to open this in a new window.'
+            loadingText.style = 'color: rgba(255,100,100,1);'
+          }
+        } else {
+          LitJsSdk.toggleLock()
+        }
+      }
+      unlockButton.disabled = true
+    </script>
+  </body>
+</html>
+  `;
+    });
+}
+exports.createHtmlLIT = createHtmlLIT;
+/**
+ * Lock and unlock the encrypted content inside a LIT.  This content is only viewable by holders of the NFT that corresponds to this LIT.  Locked content will be decrypted and placed into the HTML element with id "mediaGridHolder".  The HTML element with the id "lockedHeader" will have it's text automatically changed to LOCKED or UNLOCKED to denote the state of the LIT.  Note that if you're creating a LIT using the createHtmlLIT function, you do not need to use this function, because this function is automatically bound to any button in your HTML with the id "unlockButton".
+ * @returns {Promise} the promise will resolve when the LIT has been unlocked or an error message has been shown informing the user that they are not authorized to unlock the LIT
+ */
+function toggleLock() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const mediaGridHolder = document.getElementById("mediaGridHolder");
+        const lockedHeader = document.getElementById("lockedHeader");
+        // @ts-expect-error TS(2551): Property 'locked' does not exist on type 'Window &... Remove this comment to see the full error message
+        if (window.locked) {
+            // save public content before decryption, so we can toggle back to the
+            // locked state in the future
+            // @ts-expect-error TS(2531): Object is possibly 'null'.
+            window.publicContent = mediaGridHolder.innerHTML;
+            if (!window.useLitPostMessageProxy && !window.litNodeClient.ready) {
+                alert("The LIT network is still connecting.  Please try again in about 10 seconds.");
+                return;
+            }
+            const authSig = yield checkAndSignAuthMessage({ chain: window.chain });
+            if (authSig.errorCode && authSig.errorCode === "wrong_chain") {
+                alert("You are connected to the wrong blockchain.  Please switch your metamask to " +
+                    window.chain);
+                return;
+            }
+            // get the merkle proof
+            // const { balanceStorageSlot } = LIT_CHAINS[window.chain]
+            // let merkleProof = null
+            // try {
+            //   merkleProof = await getMerkleProof({ tokenAddress: window.tokenAddress, balanceStorageSlot, tokenId: window.tokenId })
+            // } catch (e) {
+            //   log(e)
+            //   alert('Error - could not obtain merkle proof.  Some nodes do not support this operation yet.  Please try another ETH node.')
+            //   return
+            // }
+            if (window.useLitPostMessageProxy) {
+                // instead of asking the network for the key part, ask the parent frame
+                // the parentframe will then call unlockLit() with the encryption key
+                (0, exports.sendMessageToFrameParent)({
+                    command: "getEncryptionKey",
+                    target: "LitNodeClient",
+                    params: {
+                        accessControlConditions: window.accessControlConditions,
+                        toDecrypt: window.encryptedSymmetricKey,
+                        authSig,
+                        chain: window.chain,
+                    },
+                });
+                return;
+            }
+            // get the encryption key
+            const symmetricKey = yield window.litNodeClient.getEncryptionKey({
+                accessControlConditions: window.accessControlConditions,
+                toDecrypt: window.encryptedSymmetricKey,
+                authSig,
+                chain: window.chain,
+            });
+            if (!symmetricKey) {
+                return; // something went wrong, maybe user is unauthorized
+            }
+            yield unlockLitWithKey({ symmetricKey });
+        }
+        else {
+            // @ts-expect-error TS(2531): Object is possibly 'null'.
+            mediaGridHolder.innerHTML = window.publicContent;
+            // @ts-expect-error TS(2531): Object is possibly 'null'.
+            lockedHeader.innerText = "LOCKED";
+            // @ts-expect-error TS(2551): Property 'locked' does not exist on type 'Window &... Remove this comment to see the full error message
+            window.locked = true;
+        }
+    });
+}
+exports.toggleLock = toggleLock;
+/**
+ * Manually unlock a LIT with a symmetric key.  You can obtain this key by calling "checkAndSignAuthMessage" to get an authSig, then calling "LitNodeClient.getEncryptionKey" to get the key.  If you want to see an example, check out the implementation of "toggleLock" which does all those operations and then calls this function at the end (unlockLitWithKey)
+ * @param {Object} params
+ * @param {Uint8Array} params.symmetricKey The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
+ * @returns {promise} A promise that will resolve when the LIT is unlocked
+ */
+function unlockLitWithKey({ symmetricKey }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!(0, utils_1.checkType)({
+            value: symmetricKey,
+            allowedTypes: ["Uint8Array"],
+            paramName: "symmetricKey",
+            functionName: "unlockLitWithKey",
+        }))
+            return;
+        const mediaGridHolder = document.getElementById("mediaGridHolder");
+        const lockedHeader = document.getElementById("lockedHeader");
+        // convert data url to blob
+        const encryptedZipBlob = yield (yield fetch(window.encryptedZipDataUrl)).blob();
+        const decryptedFiles = yield decryptZip(encryptedZipBlob, symmetricKey);
+        // @ts-expect-error TS(2532): Object is possibly 'undefined'.
+        const mediaGridHtmlBody = yield decryptedFiles["string.txt"].async("text");
+        // @ts-expect-error TS(2531): Object is possibly 'null'.
+        mediaGridHolder.innerHTML = mediaGridHtmlBody;
+        // @ts-expect-error TS(2531): Object is possibly 'null'.
+        lockedHeader.innerText = "UNLOCKED";
+        // @ts-expect-error TS(2551): Property 'locked' does not exist on type 'Window &... Remove this comment to see the full error message
+        window.locked = false;
+    });
+}
+exports.unlockLitWithKey = unlockLitWithKey;
+/**
+ * Verify a JWT from the LIT network.  Use this for auth on your server.  For some background, users can define resources (URLs) for authorization via on-chain conditions using the saveSigningCondition function.  Other users can then request a signed JWT proving that their ETH account meets those on-chain conditions using the getSignedToken function.  Then, servers can verify that JWT using this function.  A successful verification proves that the user meets the on-chain conditions defined in the saveSigningCondition step.  For example, the on-chain condition could be posession of a specific NFT.
+ * @param {Object} params
+ * @param {string} params.jwt A JWT signed by the LIT network using the BLS12-381 algorithm
+ * @returns {Object} An object with 4 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.  "signature": A uint8array that represents the raw  signature of the JWT.
+ */
+function verifyJwt({ jwt }) {
+    if (!(0, utils_1.checkType)({
+        value: jwt,
+        allowedTypes: ["String"],
+        paraamName: "jwt",
+        functionName: "verifyJwt",
+    }))
+        return;
+    (0, utils_1.log)("verifyJwt", jwt);
+    // verify that the wasm was loaded
+    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+    if (!globalThis.wasmExports) {
+        (0, utils_1.log)("wasmExports is not loaded.");
+        // initWasmBlsSdk().then((exports) => {
+        //   // log('wtf, window? ', typeof window !== 'undefined')
+        //   window.wasmExports = exports;
+        // });
+    }
+    const pubKey = (0, uint8arrays_1.fromString)(constants_1.NETWORK_PUB_KEY, "base16");
+    // log("pubkey is ", pubKey);
+    const jwtParts = jwt.split(".");
+    const sig = (0, uint8arrays_1.fromString)(jwtParts[2], "base64url");
+    // log("sig is ", uint8arrayToString(sig, "base16"));
+    const unsignedJwt = `${jwtParts[0]}.${jwtParts[1]}`;
+    // log("unsignedJwt is ", unsignedJwt);
+    const message = (0, uint8arrays_1.fromString)(unsignedJwt);
+    // log("message is ", message);
+    // TODO check for expiration
+    // p is public key uint8array
+    // s is signature uint8array
+    // m is message uint8array
+    // function is: function (p, s, m)
+    const verified = Boolean(bls_sdk_1.wasmBlsSdkHelpers.verify(pubKey, sig, message));
+    return {
+        verified,
+        header: JSON.parse((0, uint8arrays_1.toString)((0, uint8arrays_1.fromString)(jwtParts[0], "base64url"))),
+        payload: JSON.parse((0, uint8arrays_1.toString)((0, uint8arrays_1.fromString)(jwtParts[1], "base64url"))),
+        signature: sig,
+    };
+}
+exports.verifyJwt = verifyJwt;
+/**
+ * Get all the metadata needed to decrypt something in the future.  If you're encrypting files with Lit and storing them in IPFS or Arweave, then this function will provide you with a properly formatted metadata object that you should save alongside the files.
+ * @param {Object} params
+ * @param {string} params.objectUrl The url to the object, like an IPFS or Arweave url.
+ * @param {Array} params.accessControlConditions The array of access control conditions defined for the object
+ * @param {string} params.chain The blockchain on which the access control conditions should be checked
+ * @param {Uint8Array} params.encryptedSymmetricKey The encrypted symmetric key that was returned by the LitNodeClient.saveEncryptionKey function
+ * @returns {Object} An object with 3 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.
+ */
+function metadataForFile({ name, type, size, accessControlConditions, evmContractConditions, solRpcConditions, unifiedAccessControlConditions, chain, encryptedSymmetricKey }) {
+    return {
+        name,
+        type,
+        size,
+        accessControlConditions,
+        evmContractConditions,
+        solRpcConditions,
+        unifiedAccessControlConditions,
+        chain,
+        encryptedSymmetricKey: (0, uint8arrays_1.toString)(encryptedSymmetricKey, "base16"),
+    };
+}
+function humanizeComparator(comparator) {
+    if (comparator === ">") {
+        return "more than";
+    }
+    else if (comparator === ">=") {
+        return "at least";
+    }
+    else if (comparator === "=") {
+        return "exactly";
+    }
+    else if (comparator === "<") {
+        return "less than";
+    }
+    else if (comparator === "<=") {
+        return "at most";
+    }
+    else if (comparator === "contains") {
+        return "contains";
+    }
+}
+/**
+ * The human readable name for an access control condition
+ * @param {Object} params
+ * @param {Array} params.accessControlConditions The array of access control conditions that you want to humanize
+ * @param {Array} params.evmContractConditions The array of evm contract conditions that you want to humanize
+ * @param {Array} params.solRpcConditions The array of Solana RPC conditions that you want to humanize
+ * @param {Array} params.unifiedAccessControlConditions The array of unified access control conditions that you want to humanize
+ * @returns {Promise<string>} A promise containing a human readable description of the access control conditions
+ */
+function humanizeAccessControlConditions({ accessControlConditions, evmContractConditions, solRpcConditions, unifiedAccessControlConditions, tokenList, myWalletAddress }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (accessControlConditions) {
+            return humanizeEvmBasicAccessControlConditions({
+                accessControlConditions,
+                tokenList,
+                myWalletAddress,
+            });
+        }
+        else if (evmContractConditions) {
+            return humanizeEvmContractConditions({
+                evmContractConditions,
+                tokenList,
+                myWalletAddress,
+            });
+        }
+        else if (solRpcConditions) {
+            return humanizeSolRpcConditions({
+                solRpcConditions,
+                tokenList,
+                myWalletAddress,
+            });
+        }
+        else if (unifiedAccessControlConditions) {
+            return humanizeUnifiedAccessControlConditions({
+                unifiedAccessControlConditions,
+                tokenList,
+                myWalletAddress,
+            });
+        }
+    });
+}
+exports.humanizeAccessControlConditions = humanizeAccessControlConditions;
+function humanizeUnifiedAccessControlConditions({ unifiedAccessControlConditions, tokenList, myWalletAddress }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const promises = yield Promise.all(unifiedAccessControlConditions.map((acc) => __awaiter(this, void 0, void 0, function* () {
+            if (Array.isArray(acc)) {
+                // this is a group.  recurse.
+                const group = yield humanizeUnifiedAccessControlConditions({
+                    unifiedAccessControlConditions: acc,
+                    tokenList,
+                    myWalletAddress,
+                });
+                return `( ${group} )`;
+            }
+            if (acc.operator) {
+                if (acc.operator.toLowerCase() === "and") {
+                    return " and ";
+                }
+                else if (acc.operator.toLowerCase() === "or") {
+                    return " or ";
+                }
+            }
+            if (acc.conditionType === "evmBasic") {
+                return humanizeEvmBasicAccessControlConditions({
+                    accessControlConditions: [acc],
+                    tokenList,
+                    myWalletAddress,
+                });
+            }
+            else if (acc.conditionType === "evmContract") {
+                return humanizeEvmContractConditions({
+                    evmContractConditions: [acc],
+                    tokenList,
+                    myWalletAddress,
+                });
+            }
+            else if (acc.conditionType === "solRpc") {
+                return humanizeSolRpcConditions({
+                    solRpcConditions: [acc],
+                    tokenList,
+                    myWalletAddress,
+                });
+            }
+            else if (acc.conditionType === "cosmos") {
+                return humanizeCosmosConditions({
+                    cosmosConditions: [acc],
+                    tokenList,
+                    myWalletAddress,
+                });
+            }
+            else {
+                (0, utils_1.throwError)({
+                    message: `Unrecognized condition type: ${acc.conditionType}`,
+                    name: "InvalidUnifiedConditionType",
+                    errorCode: "invalid_unified_condition_type",
+                });
+            }
+        })));
+        return promises.join("");
+    });
+}
+function humanizeEvmBasicAccessControlConditions({ accessControlConditions, tokenList, myWalletAddress }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        (0, utils_1.log)("humanizing evm basic access control conditions");
+        (0, utils_1.log)("myWalletAddress", myWalletAddress);
+        (0, utils_1.log)("accessControlConditions", accessControlConditions);
+        let fixedConditions = accessControlConditions;
+        // inject and operator if needed
+        // this is done because before we supported operators,
+        // we let users specify an entire array of conditions
+        // that would be "AND"ed together.  this injects those ANDs
+        if (accessControlConditions.length > 1) {
+            let containsOperator = false;
+            for (let i = 0; i < accessControlConditions.length; i++) {
+                if (accessControlConditions[i].operator) {
+                    containsOperator = true;
+                }
+            }
+            if (!containsOperator) {
+                fixedConditions = [];
+                // insert ANDs between conditions
+                for (let i = 0; i < accessControlConditions.length; i++) {
+                    fixedConditions.push(accessControlConditions[i]);
+                    if (i < accessControlConditions.length - 1) {
+                        fixedConditions.push({
+                            operator: "and",
+                        });
+                    }
+                }
+            }
+        }
+        const promises = yield Promise.all(fixedConditions.map((acc) => __awaiter(this, void 0, void 0, function* () {
+            if (Array.isArray(acc)) {
+                // this is a group.  recurse.
+                const group = yield humanizeEvmBasicAccessControlConditions({
+                    accessControlConditions: acc,
+                    tokenList,
+                    myWalletAddress,
+                });
+                return `( ${group} )`;
+            }
+            if (acc.operator) {
+                if (acc.operator.toLowerCase() === "and") {
+                    return " and ";
+                }
+                else if (acc.operator.toLowerCase() === "or") {
+                    return " or ";
+                }
+            }
+            if (acc.standardContractType === "timestamp" &&
+                acc.method === "eth_getBlockByNumber") {
+                return `Latest mined block must be past the unix timestamp ${acc.returnValueTest.value}`;
+            }
+            else if (acc.standardContractType === "MolochDAOv2.1" &&
+                acc.method === "members") {
+                // molochDAOv2.1 membership
+                return `Is a member of the DAO at ${acc.contractAddress}`;
+            }
+            else if (acc.standardContractType === "ERC1155" &&
+                acc.method === "balanceOf") {
+                // erc1155 owns an amount of specific tokens
+                return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${acc.returnValueTest.value} of ${acc.contractAddress} tokens with token id ${acc.parameters[1]}`;
+            }
+            else if (acc.standardContractType === "ERC1155" &&
+                acc.method === "balanceOfBatch") {
+                // erc1155 owns an amount of specific tokens from a batch of token ids
+                return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${acc.returnValueTest.value} of ${acc.contractAddress} tokens with token id ${acc.parameters[1]
+                    .split(",")
+                    .join(" or ")}`;
+            }
+            else if (acc.standardContractType === "ERC721" &&
+                acc.method === "ownerOf") {
+                // specific erc721
+                return `Owner of tokenId ${acc.parameters[0]} from ${acc.contractAddress}`;
+            }
+            else if (acc.standardContractType === "ERC721" &&
+                acc.method === "balanceOf" &&
+                acc.contractAddress === "0x22C1f6050E56d2876009903609a2cC3fEf83B415" &&
+                acc.returnValueTest.comparator === ">" &&
+                acc.returnValueTest.value === "0") {
+                // for POAP main contract where the user owns at least 1 poap
+                return `Owns any POAP`;
+            }
+            else if (acc.standardContractType === "POAP" &&
+                acc.method === "tokenURI") {
+                // owns a POAP
+                return `Owner of a ${acc.returnValueTest.value} POAP on ${acc.chain}`;
+            }
+            else if (acc.standardContractType === "POAP" &&
+                acc.method === "eventId") {
+                // owns a POAP
+                return `Owner of a POAP from event ID ${acc.returnValueTest.value} on ${acc.chain}`;
+            }
+            else if (acc.standardContractType === "CASK" &&
+                acc.method === "getActiveSubscriptionCount") {
+                // Cask powered subscription
+                return `Cask subscriber to provider ${acc.parameters[1]} for plan ${acc.parameters[2]} on ${acc.chain}`;
+            }
+            else if (acc.standardContractType === "ERC721" &&
+                acc.method === "balanceOf") {
+                // any erc721 in collection
+                return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${acc.returnValueTest.value} of ${acc.contractAddress} tokens`;
+            }
+            else if (acc.standardContractType === "ERC20" &&
+                acc.method === "balanceOf") {
+                let tokenFromList;
+                if (tokenList) {
+                    tokenFromList = tokenList.find((t) => t.address === acc.contractAddress);
+                }
+                let decimals, name;
+                if (tokenFromList) {
+                    decimals = tokenFromList.decimals;
+                    name = tokenFromList.symbol;
+                }
+                else {
+                    decimals = yield (0, eth_1.decimalPlaces)({
+                        contractAddress: acc.contractAddress,
+                        chain: acc.chain,
+                    });
+                }
+                (0, utils_1.log)("decimals", decimals);
+                return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${(0, units_1.formatUnits)(acc.returnValueTest.value, decimals)} of ${name || acc.contractAddress} tokens`;
+            }
+            else if (acc.standardContractType === "" &&
+                acc.method === "eth_getBalance") {
+                return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${(0, units_1.formatEther)(acc.returnValueTest.value)} ETH`;
+            }
+            else if (acc.standardContractType === "" && acc.method === "") {
+                if (myWalletAddress &&
+                    acc.returnValueTest.value.toLowerCase() ===
+                        myWalletAddress.toLowerCase()) {
+                    return `Controls your wallet (${myWalletAddress})`;
+                }
+                else {
+                    return `Controls wallet with address ${acc.returnValueTest.value}`;
+                }
+            }
+        })));
+        return promises.join("");
+    });
+}
+function humanizeSolRpcConditions({ solRpcConditions, tokenList, myWalletAddress }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        (0, utils_1.log)("humanizing sol rpc conditions");
+        (0, utils_1.log)("myWalletAddress", myWalletAddress);
+        (0, utils_1.log)("solRpcConditions", solRpcConditions);
+        const promises = yield Promise.all(solRpcConditions.map((acc) => __awaiter(this, void 0, void 0, function* () {
+            if (Array.isArray(acc)) {
+                // this is a group.  recurse.
+                const group = yield humanizeSolRpcConditions({
+                    solRpcConditions: acc,
+                    tokenList,
+                    myWalletAddress,
+                });
+                return `( ${group} )`;
+            }
+            if (acc.operator) {
+                if (acc.operator.toLowerCase() === "and") {
+                    return " and ";
+                }
+                else if (acc.operator.toLowerCase() === "or") {
+                    return " or ";
+                }
+            }
+            if (acc.method === "getBalance") {
+                return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${formatSol(acc.returnValueTest.value)} SOL`;
+            }
+            else if (acc.method === "") {
+                if (myWalletAddress &&
+                    acc.returnValueTest.value.toLowerCase() ===
+                        myWalletAddress.toLowerCase()) {
+                    return `Controls your wallet (${myWalletAddress})`;
+                }
+                else {
+                    return `Controls wallet with address ${acc.returnValueTest.value}`;
+                }
+            }
+            else {
+                let msg = `Solana RPC method ${acc.method}(${acc.params.join(", ")}) should have a result of ${humanizeComparator(acc.returnValueTest.comparator)} ${acc.returnValueTest.value}`;
+                if (acc.returnValueTest.key !== "") {
+                    msg += ` for key ${acc.returnValueTest.key}`;
+                }
+                return msg;
+            }
+        })));
+        return promises.join("");
+    });
+}
+function humanizeEvmContractConditions({ evmContractConditions, tokenList, myWalletAddress }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        (0, utils_1.log)("humanizing evm contract conditions");
+        (0, utils_1.log)("myWalletAddress", myWalletAddress);
+        (0, utils_1.log)("evmContractConditions", evmContractConditions);
+        const promises = yield Promise.all(evmContractConditions.map((acc) => __awaiter(this, void 0, void 0, function* () {
+            if (Array.isArray(acc)) {
+                // this is a group.  recurse.
+                const group = yield humanizeEvmContractConditions({
+                    evmContractConditions: acc,
+                    tokenList,
+                    myWalletAddress,
+                });
+                return `( ${group} )`;
+            }
+            if (acc.operator) {
+                if (acc.operator.toLowerCase() === "and") {
+                    return " and ";
+                }
+                else if (acc.operator.toLowerCase() === "or") {
+                    return " or ";
+                }
+            }
+            let msg = `${acc.functionName}(${acc.functionParams.join(", ")}) on contract address ${acc.contractAddress} should have a result of ${humanizeComparator(acc.returnValueTest.comparator)} ${acc.returnValueTest.value}`;
+            if (acc.returnValueTest.key !== "") {
+                msg += ` for key ${acc.returnValueTest.key}`;
+            }
+            return msg;
+        })));
+        return promises.join("");
+    });
+}
+function humanizeCosmosConditions({ cosmosConditions, tokenList, myWalletAddress }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        (0, utils_1.log)("humanizing cosmos conditions");
+        (0, utils_1.log)("myWalletAddress", myWalletAddress);
+        (0, utils_1.log)("cosmosConditions", cosmosConditions);
+        const promises = yield Promise.all(cosmosConditions.map((acc) => __awaiter(this, void 0, void 0, function* () {
+            if (Array.isArray(acc)) {
+                // this is a group.  recurse.
+                const group = yield humanizeCosmosConditions({
+                    accessControlConditions: acc,
+                    tokenList,
+                    myWalletAddress,
+                });
+                return `( ${group} )`;
+            }
+            if (acc.operator) {
+                if (acc.operator.toLowerCase() === "and") {
+                    return " and ";
+                }
+                else if (acc.operator.toLowerCase() === "or") {
+                    return " or ";
+                }
+            }
+            if (acc.path === "/cosmos/bank/v1beta1/balances/:userAddress") {
+                return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${formatAtom(acc.returnValueTest.value)} ATOM`;
+            }
+            else if (acc.path === ":userAddress") {
+                if (myWalletAddress &&
+                    acc.returnValueTest.value.toLowerCase() ===
+                        myWalletAddress.toLowerCase()) {
+                    return `Controls your wallet (${myWalletAddress})`;
+                }
+                else {
+                    return `Controls wallet with address ${acc.returnValueTest.value}`;
+                }
+            }
+            else if (acc.chain === "kyve" &&
+                acc.path === "/kyve/registry/v1beta1/funders_list/0") {
+                return `Is a current KYVE funder`;
+            }
+            else {
+                let msg = `Cosmos RPC request for ${acc.path} should have a result of ${humanizeComparator(acc.returnValueTest.comparator)} ${acc.returnValueTest.value}`;
+                if (acc.returnValueTest.key !== "") {
+                    msg += ` for key ${acc.returnValueTest.key}`;
+                }
+                return msg;
+            }
+        })));
+        return promises.join("");
+    });
+}
+function formatSol(amount) {
+    return (0, units_1.formatUnits)(amount, 9);
+}
+function formatAtom(amount) {
+    return (0, units_1.formatUnits)(amount, 6);
+}
+function getTokenList() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // erc20
+        const erc20Url = "https://tokens.coingecko.com/uniswap/all.json";
+        const erc20Promise = fetch(erc20Url).then((r) => r.json());
+        // erc721
+        const erc721Url = "https://raw.githubusercontent.com/0xsequence/token-directory/main/index/mainnet/erc721.json";
+        const erc721Promise = fetch(erc721Url).then((r) => r.json());
+        const [erc20s, erc721s] = yield Promise.all([erc20Promise, erc721Promise]);
+        const sorted = [...erc20s.tokens, ...erc721s.tokens].sort((a, b) => a.name > b.name ? 1 : -1);
+        return sorted;
+    });
+}
+exports.getTokenList = getTokenList;
+const sendMessageToFrameParent = (data) => {
+    window.parent.postMessage(data, "*");
+};
+exports.sendMessageToFrameParent = sendMessageToFrameParent;

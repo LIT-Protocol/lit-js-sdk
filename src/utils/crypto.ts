@@ -4,6 +4,9 @@ import {
   fromString as uint8arrayFromString,
   toString as uint8arrayToString,
 } from "uint8arrays";
+
+import Blob from "cross-blob"
+
 import { throwError, log } from "../lib/utils";
 
 const SYMM_KEY_ALGO_PARAMS = {
@@ -18,7 +21,7 @@ const SYMM_KEY_ALGO_PARAMS = {
  */
 export function hashUnifiedAccessControlConditions(
   unifiedAccessControlConditions: any
-) {
+): Promise<ArrayBuffer> {
   const conds = unifiedAccessControlConditions.map((c: any) => canonicalUnifiedAccessControlConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
@@ -411,7 +414,7 @@ export function compareArrayBuffers(buf1: any, buf2: any) {
  * @param {Uint8Array} symmKey The symmetric key to import
  * @returns {Promise<CryptoKey>} A promise that resolves to the imported key
  */
-export async function importSymmetricKey(symmKey: any) {
+export async function importSymmetricKey(symmKey: any): Promise<CryptoKey> {
   const importedSymmKey = await crypto.subtle.importKey(
     "raw",
     symmKey,
@@ -426,7 +429,7 @@ export async function importSymmetricKey(symmKey: any) {
  * Generate a new random symmetric key using WebCrypto subtle API.  You should only use this if you're handling your own key generation and management with Lit.  Typically, Lit handles this internally for you.
  * @returns {Promise<CryptoKey>} A promise that resolves to the generated key
  */
-export async function generateSymmetricKey() {
+export async function generateSymmetricKey(): Promise<CryptoKey> {
   const symmKey = await crypto.subtle.generateKey(SYMM_KEY_ALGO_PARAMS, true, [
     "encrypt",
     "decrypt",
@@ -440,7 +443,7 @@ export async function generateSymmetricKey() {
  * @param {Object} symmKey The symmetric key
  * @returns {Blob} The decrypted blob
  */
-export async function decryptWithSymmetricKey(encryptedBlob: any, symmKey: any) {
+export async function decryptWithSymmetricKey(encryptedBlob: any, symmKey: any): Blob {
   const recoveredIv = await encryptedBlob.slice(0, 16).arrayBuffer();
   const encryptedZipArrayBuffer = await encryptedBlob.slice(16).arrayBuffer();
   const decryptedZip = await crypto.subtle.decrypt(
@@ -462,7 +465,7 @@ export async function decryptWithSymmetricKey(encryptedBlob: any, symmKey: any) 
  * @param {Blob} data The blob to encrypt
  * @returns {Blob} The encrypted blob
  */
-export async function encryptWithSymmetricKey(symmKey: any, data: any) {
+export async function encryptWithSymmetricKey(symmKey: any, data: any): Blob {
   // encrypt the zip with symmetric key
   const iv = crypto.getRandomValues(new Uint8Array(16));
 
@@ -488,7 +491,7 @@ export async function encryptWithSymmetricKey(symmKey: any, data: any) {
  * @param {string} version The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
  * @returns {Blob} The encrypted blob
  */
-export function encryptWithPubKey(receiverPublicKey: any, data: any, version: any) {
+export function encryptWithPubKey(receiverPublicKey: any, data: any, version: any): Blob {
   switch (version) {
     case "x25519-xsalsa20-poly1305": {
       // generate ephemeral keypair
@@ -541,7 +544,7 @@ export function encryptWithPubKey(receiverPublicKey: any, data: any, version: an
  * @param {string} version The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
  * @returns {Blob} The decrypted blob
  */
-export function decryptWithPrivKey(encryptedData: any, receiverPrivateKey: any) {
+export function decryptWithPrivKey(encryptedData: any, receiverPrivateKey: any): Blob {
   switch (encryptedData.version) {
     case "x25519-xsalsa20-poly1305": {
       const recieverEncryptionPrivateKey =

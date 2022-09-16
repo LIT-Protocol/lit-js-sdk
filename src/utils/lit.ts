@@ -45,7 +45,7 @@ export async function checkAndSignAuthMessage({
   chain,
   resources,
   switchChain = true
-}: any) {
+}: any): AuthSig {
   // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   const chainInfo = ALL_LIT_CHAINS[chain];
   if (!chainInfo) {
@@ -80,7 +80,7 @@ export async function checkAndSignAuthMessage({
  * @param {string} str The string to encrypt
  * @returns {Promise<Object>} A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
  */
-export async function encryptString(str: any) {
+export async function encryptString(str: any): Promise<object> {
   // -- validate
   if (
     !checkType({
@@ -117,7 +117,7 @@ export async function encryptString(str: any) {
  * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this.
  * @returns {Promise<string>} A promise containing the decrypted string
  */
-export async function decryptString(encryptedStringBlob: any, symmKey: any) {
+export async function decryptString(encryptedStringBlob: any, symmKey: any): Promise<string> {
   // -- validate
   if (
     !checkType({
@@ -154,7 +154,7 @@ export async function decryptString(encryptedStringBlob: any, symmKey: any) {
  * @param {string} string The string to zip and encrypt
  * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a single file called "string.txt"
  */
-export async function zipAndEncryptString(string: any) {
+export async function zipAndEncryptString(string: any): Promise<object> {
   if (
     !checkType({
       value: string,
@@ -175,7 +175,7 @@ export async function zipAndEncryptString(string: any) {
  * @param {Array<File>} files An array of the files you wish to zip and encrypt
  * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
  */
-export async function zipAndEncryptFiles(files: any) {
+export async function zipAndEncryptFiles(files: any): Promise<object> {
   // let's zip em
   const zip = new JSZip();
   for (let i = 0; i < files.length; i++) {
@@ -200,7 +200,7 @@ export async function zipAndEncryptFiles(files: any) {
  * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this zip.
  * @returns {Promise<Object>} A promise containing a JSZip object indexed by the filenames of the zipped files.  For example, if you have a file called "meow.jpg" in the root of your zip, you could get it from the JSZip object by doing this: const imageBlob = await decryptedZip['meow.jpg'].async('blob')
  */
-export async function decryptZip(encryptedZipBlob: any, symmKey: any) {
+export async function decryptZip(encryptedZipBlob: any, symmKey: any): Promise<object> {
   if (
     !checkType({
       value: encryptedZipBlob,
@@ -262,7 +262,7 @@ export async function decryptZip(encryptedZipBlob: any, symmKey: any) {
  * @param {JSZip} zip The JSZip instance to encrypt
  * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array string.
  */
-export async function encryptZip(zip: any) {
+export async function encryptZip(zip: any): Promise<object> {
   const zipBlob = await zip.generateAsync({ type: "blob" });
   const zipBlobArrayBuffer = await zipBlob.arrayBuffer();
   // log('blob', zipBlob)
@@ -355,7 +355,7 @@ export async function encryptFileAndZipWithMetadata({
   file,
   litNodeClient,
   readme
-}: any) {
+}: any): Promise<object> {
   // -- validate
   if (
     !checkType({
@@ -496,7 +496,7 @@ export async function decryptZipFileWithMetadata({
   file,
   litNodeClient,
   additionalAccessControlConditions
-}: any) {
+}: any): Promise<object> {
   // -- validate
   if (
     !checkType({
@@ -605,7 +605,7 @@ export async function decryptZipFileWithMetadata({
  */
 export async function encryptFile({
   file
-}: any) {
+}: any): Promise<object> {
   if (
     !checkType({
       value: file,
@@ -642,7 +642,7 @@ export async function encryptFile({
 export async function decryptFile({
   file,
   symmetricKey
-}: any) {
+}: any): Promise<object> {
   // -- validate
   if (
     !checkType({
@@ -717,7 +717,7 @@ export async function createHtmlLIT({
   encryptedSymmetricKey,
   chain,
   npmPackages = []
-}: any) {
+}: any): Promise<string> {
   // uncomment this to embed the LIT JS SDK directly instead of retrieving it from unpkg when a user views the LIT
   // npmPackages.push('lit-js-sdk')
   // log('createHtmlLIT with npmPackages', npmPackages)
@@ -804,7 +804,7 @@ export async function createHtmlLIT({
  * Lock and unlock the encrypted content inside a LIT.  This content is only viewable by holders of the NFT that corresponds to this LIT.  Locked content will be decrypted and placed into the HTML element with id "mediaGridHolder".  The HTML element with the id "lockedHeader" will have it's text automatically changed to LOCKED or UNLOCKED to denote the state of the LIT.  Note that if you're creating a LIT using the createHtmlLIT function, you do not need to use this function, because this function is automatically bound to any button in your HTML with the id "unlockButton".
  * @returns {Promise} the promise will resolve when the LIT has been unlocked or an error message has been shown informing the user that they are not authorized to unlock the LIT
  */
-export async function toggleLock() {
+export async function toggleLock(): Promise<any> {
   const mediaGridHolder = document.getElementById("mediaGridHolder");
   const lockedHeader = document.getElementById("lockedHeader");
 
@@ -887,7 +887,7 @@ const symmetricKey = await (window as any).litNodeClient.getEncryptionKey({
  */
 export async function unlockLitWithKey({
   symmetricKey
-}: any) {
+}: any): Promise<any> {
   if (
     !checkType({
       value: symmetricKey,
@@ -921,7 +921,7 @@ const encryptedZipBlob = await (await fetch((window as any).encryptedZipDataUrl)
  */
 export function verifyJwt({
   jwt
-}: any) {
+}: any): object {
   if (
     !checkType({
       value: jwt,
@@ -992,7 +992,7 @@ function metadataForFile({
   unifiedAccessControlConditions,
   chain,
   encryptedSymmetricKey
-}: any) {
+}: any): object {
   return {
     name,
     type,
@@ -1038,7 +1038,7 @@ export async function humanizeAccessControlConditions({
   unifiedAccessControlConditions,
   tokenList,
   myWalletAddress
-}: any) {
+}: any): Promise<string> {
   if (accessControlConditions) {
     return humanizeEvmBasicAccessControlConditions({
       accessControlConditions,

@@ -1,0 +1,17 @@
+declare function toggleSibling(): void;
+declare function showHashTarget(targetId: any): void;
+declare function scrollIntoView(targetId: any): void;
+declare function gotoCurrentTarget(): void;
+declare function preOpen(): void;
+declare function updateState(): void;
+declare function loadState(ev: any): void;
+declare var tocElements: HTMLCollectionOf<HTMLLIElement>;
+declare var items: HTMLCollectionOf<Element>;
+declare var j: number;
+declare var toclinks: HTMLCollectionOf<Element>;
+declare var k: number;
+declare var split_left: Element | null;
+declare var split_right: Element | null;
+declare var split_parent: ParentNode | null;
+declare var cw_with_sb: number;
+declare var cw_without_sb: number;

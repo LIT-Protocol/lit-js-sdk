@@ -15,7 +15,6 @@ import { SiweMessage } from "lit-siwe";
 import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
 
-// @ts-expect-error TS(2732): Cannot find module '../abis/LIT.json'. Consider us... Remove this comment to see the full error message
 import LIT from "../abis/LIT.json";
 // @ts-expect-error TS(2732): Cannot find module '../abis/ERC20.json'. Consider ... Remove this comment to see the full error message
 import ERC20 from "../abis/ERC20.json";
