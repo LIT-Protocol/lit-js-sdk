@@ -85,11 +85,10 @@
         testName,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
-        var solAuthSig = await LitJsSdk.checkAndSignAuthMessage({
-          chain: "solana",
-        });
-        var ethAuthSig = await LitJsSdk.checkAndSignAuthMessage({
+
+        var sessionSigs = await LitJsSdk.getSessionSigs({
           chain: "ethereum",
+          litNodeClient,
         });
 
         document.getElementById(
@@ -104,10 +103,22 @@
         const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
           unifiedAccessControlConditions,
           symmetricKey,
-          authSig: {
-            ethereum: ethAuthSig,
-            solana: solAuthSig,
-          },
+          sessionSigs,
+        });
+
+        const hashOfKey = await crypto.subtle.digest(
+          "SHA-256",
+          encryptedSymmetricKey
+        );
+        const hashOfKeyStr = LitJsSdk.uint8arrayToString(
+          new Uint8Array(hashOfKey),
+          "base16"
+        );
+
+        sessionSigs = await LitJsSdk.getSessionSigs({
+          chain: "ethereum",
+          litNodeClient,
+          resources: [`litEncryptionCondition://${hashOfKeyStr}`],
         });
 
         console.log("encrypted symmetric key", encryptedSymmetricKey);
@@ -121,10 +132,7 @@
                 encryptedSymmetricKey,
                 "base16"
               ),
-              authSig: {
-                ethereum: ethAuthSig,
-                solana: solAuthSig,
-              },
+              sessionSigs,
             });
           } catch (e) {
             console.log("exception thrown when unlocking", e);
@@ -152,10 +160,7 @@
             encryptedSymmetricKey,
             "base16"
           ),
-          authSig: {
-            ethereum: ethAuthSig,
-            solana: solAuthSig,
-          },
+          sessionSigs,
         });
 
         const decryptedFiles = await LitJsSdk.decryptZip(
@@ -197,18 +202,6 @@
       var BalanceEncrypt = async () => {
         var unifiedAccessControlConditions = [
           {
-            conditionType: "solRpc",
-            method: "getBalance",
-            params: [":userAddress"],
-            chain: "solana",
-            returnValueTest: {
-              key: "",
-              comparator: ">=",
-              value: "100000000", // equals 0.1 SOL
-            },
-          },
-          { operator: "or" },
-          {
             conditionType: "evmBasic",
             contractAddress: "",
             standardContractType: "",
@@ -218,43 +211,6 @@
             returnValueTest: {
               comparator: ">=",
               value: "10000000000000",
-            },
-          },
-          { operator: "or" },
-          {
-            conditionType: "evmContract",
-            contractAddress: "0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88",
-            functionName: "balanceOf",
-            functionParams: [":userAddress", "8"],
-            functionAbi: {
-              type: "function",
-              stateMutability: "view",
-              outputs: [
-                {
-                  type: "uint256",
-                  name: "",
-                  internalType: "uint256",
-                },
-              ],
-              name: "balanceOf",
-              inputs: [
-                {
-                  type: "address",
-                  name: "account",
-                  internalType: "address",
-                },
-                {
-                  type: "uint256",
-                  name: "id",
-                  internalType: "uint256",
-                },
-              ],
-            },
-            chain: "polygon",
-            returnValueTest: {
-              key: "",
-              comparator: ">",
-              value: "0",
             },
           },
         ];

@@ -97,7 +97,7 @@ export async function checkAndSignAuthMessage({
 export async function getSessionSigs({
   expiration,
   chain,
-  resources,
+  resources = [],
   sessionCapabilities,
   switchChain,
   litNodeClient,

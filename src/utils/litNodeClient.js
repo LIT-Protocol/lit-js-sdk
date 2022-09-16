@@ -264,6 +264,95 @@ export default class LitNodeClient {
       });
     }
 
+    // -- validate
+    if (
+      accessControlConditions &&
+      !checkType({
+        value: accessControlConditions,
+        allowedTypes: ["Array"],
+        paramName: "accessControlConditions",
+        functionName: "getSignedToken",
+      })
+    )
+      return;
+    if (
+      evmContractConditions &&
+      !checkType({
+        value: evmContractConditions,
+        allowedTypes: ["Array"],
+        paramName: "evmContractConditions",
+        functionName: "getSignedToken",
+      })
+    )
+      return;
+    if (
+      solRpcConditions &&
+      !checkType({
+        value: solRpcConditions,
+        allowedTypes: ["Array"],
+        paramName: "solRpcConditions",
+        functionName: "getSignedToken",
+      })
+    )
+      return;
+    if (
+      unifiedAccessControlConditions &&
+      !checkType({
+        value: unifiedAccessControlConditions,
+        allowedTypes: ["Array"],
+        paramName: "unifiedAccessControlConditions",
+        functionName: "getSignedToken",
+      })
+    )
+      return;
+    if (
+      !checkType({
+        value: resourceId,
+        allowedTypes: ["Object"],
+        paramName: "resourceId",
+        functionName: "getSignedToken",
+      })
+    )
+      return;
+    if (
+      authSig &&
+      !checkType({
+        value: authSig,
+        allowedTypes: ["Object"],
+        paramName: "authSig",
+        functionName: "getSignedToken",
+      })
+    )
+      return;
+
+    console.log("sessionSigs", sessionSigs);
+
+    if (
+      sessionSigs &&
+      !checkType({
+        value: sessionSigs,
+        allowedTypes: ["Object"],
+        paramName: "sessionSigs",
+        functionName: "getSignedToken",
+      })
+    )
+      return;
+
+    if (!sessionSigs && !authSig) {
+      throwError({
+        message: "You must pass either authSig or sessionSigs",
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
+      return;
+    }
+
+    if (
+      authSig &&
+      !checkIfAuthSigRequiresChainParam(authSig, chain, "getSignedToken")
+    )
+      return;
+
     // we need to send jwt params iat (issued at) and exp (expiration)
     // because the nodes may have different wall clock times
     // the nodes will verify that these params are withing a grace period
@@ -438,6 +527,95 @@ export default class LitNodeClient {
       });
     }
 
+    // -- validate
+    if (
+      accessControlConditions &&
+      !checkType({
+        value: accessControlConditions,
+        allowedTypes: ["Array"],
+        paramName: "accessControlConditions",
+        functionName: "getSignedToken",
+      })
+    )
+      return;
+    if (
+      evmContractConditions &&
+      !checkType({
+        value: evmContractConditions,
+        allowedTypes: ["Array"],
+        paramName: "evmContractConditions",
+        functionName: "getSignedToken",
+      })
+    )
+      return;
+    if (
+      solRpcConditions &&
+      !checkType({
+        value: solRpcConditions,
+        allowedTypes: ["Array"],
+        paramName: "solRpcConditions",
+        functionName: "getSignedToken",
+      })
+    )
+      return;
+    if (
+      unifiedAccessControlConditions &&
+      !checkType({
+        value: unifiedAccessControlConditions,
+        allowedTypes: ["Array"],
+        paramName: "unifiedAccessControlConditions",
+        functionName: "getSignedToken",
+      })
+    )
+      return;
+    if (
+      !checkType({
+        value: resourceId,
+        allowedTypes: ["Object"],
+        paramName: "resourceId",
+        functionName: "getSignedToken",
+      })
+    )
+      return;
+    if (
+      authSig &&
+      !checkType({
+        value: authSig,
+        allowedTypes: ["Object"],
+        paramName: "authSig",
+        functionName: "getSignedToken",
+      })
+    )
+      return;
+
+    console.log("sessionSigs", sessionSigs);
+
+    if (
+      sessionSigs &&
+      !checkType({
+        value: sessionSigs,
+        allowedTypes: ["Object"],
+        paramName: "sessionSigs",
+        functionName: "getSignedToken",
+      })
+    )
+      return;
+
+    if (!sessionSigs && !authSig) {
+      throwError({
+        message: "You must pass either authSig or sessionSigs",
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
+      return;
+    }
+
+    if (
+      authSig &&
+      !checkIfAuthSigRequiresChainParam(authSig, chain, "getSignedToken")
+    )
+      return;
+
     // this is to fix my spelling mistake that we must now maintain forever lol
     if (typeof permanant !== "undefined") {
       permanent = permanant;
@@ -525,6 +703,7 @@ export default class LitNodeClient {
     toDecrypt,
     chain,
     authSig,
+    sessionSigs,
   }) {
     if (!this.ready) {
       throwError({
@@ -586,6 +765,7 @@ export default class LitNodeClient {
     )
       return;
     if (
+      authSig &&
       !checkType({
         value: authSig,
         allowedTypes: ["Object"],
@@ -594,7 +774,30 @@ export default class LitNodeClient {
       })
     )
       return;
-    if (!checkIfAuthSigRequiresChainParam(authSig, chain, "getEncryptionKey"))
+    if (
+      sessionSigs &&
+      !checkType({
+        value: sessionSigs,
+        allowedTypes: ["Object"],
+        paramName: "sessionSigs",
+        functionName: "getEncryptionKey",
+      })
+    )
+      return;
+
+    if (!sessionSigs && !authSig) {
+      throwError({
+        message: "You must pass either authSig or sessionSigs",
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
+      return;
+    }
+
+    if (
+      authSig &&
+      !checkIfAuthSigRequiresChainParam(authSig, chain, "getEncryptionKey")
+    )
       return;
 
     let formattedAccessControlConditions;
@@ -645,6 +848,18 @@ export default class LitNodeClient {
     // ask each node to decrypt the content
     const nodePromises = [];
     for (const url of this.connectedNodes) {
+      let sigToPassToNode = authSig;
+      if (sessionSigs) {
+        // find the sessionSig for this node
+        sigToPassToNode = sessionSigs[url];
+        if (!sigToPassToNode) {
+          throwError({
+            message: `You passed sessionSigs but we could not find session sig for node ${url}`,
+            name: "InvalidArgumentException",
+            errorCode: "invalid_argument",
+          });
+        }
+      }
       nodePromises.push(
         this.getDecryptionShare({
           url,
@@ -654,7 +869,7 @@ export default class LitNodeClient {
           unifiedAccessControlConditions:
             formattedUnifiedAccessControlConditions,
           toDecrypt,
-          authSig,
+          authSig: sigToPassToNode,
           chain,
         })
       );
@@ -726,6 +941,7 @@ export default class LitNodeClient {
     encryptedSymmetricKey,
     permanant,
     permanent = true,
+    sessionSigs,
   }) {
     log("LitNodeClient.saveEncryptionKey");
 
@@ -781,6 +997,7 @@ export default class LitNodeClient {
       return;
 
     if (
+      authSig &&
       !checkType({
         value: authSig,
         allowedTypes: ["Object"],
@@ -789,7 +1006,29 @@ export default class LitNodeClient {
       })
     )
       return;
-    if (!checkIfAuthSigRequiresChainParam(authSig, chain, "saveEncryptionKey"))
+
+    if (
+      sessionSigs &&
+      !checkType({
+        value: sessionSigs,
+        allowedTypes: ["Object"],
+        paramName: "sessionSigs",
+        functionName: "saveEncryptionKey",
+      })
+    )
+      return;
+    if (!sessionSigs && !authSig) {
+      throwError({
+        message: "You must pass either authSig or sessionSigs",
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
+      return;
+    }
+    if (
+      authSig &&
+      !checkIfAuthSigRequiresChainParam(authSig, chain, "saveEncryptionKey")
+    )
       return;
     if (
       symmetricKey &&
@@ -836,9 +1075,6 @@ export default class LitNodeClient {
       throw new Error(
         "accessControlConditions and evmContractConditions and solRpcConditions and unifiedAccessControlConditions are blank"
       );
-    }
-    if (!authSig) {
-      throw new Error("authSig is blank");
     }
 
     // encrypt with network pubkey
@@ -893,12 +1129,24 @@ export default class LitNodeClient {
     // create access control conditions on lit nodes
     const nodePromises = [];
     for (const url of this.connectedNodes) {
+      let sigToPassToNode = authSig;
+      if (sessionSigs) {
+        // find the sessionSig for this node
+        sigToPassToNode = sessionSigs[url];
+        if (!sigToPassToNode) {
+          throwError({
+            message: `You passed sessionSigs but we could not find session sig for node ${url}`,
+            name: "InvalidArgumentException",
+            errorCode: "invalid_argument",
+          });
+        }
+      }
       nodePromises.push(
         this.storeEncryptionConditionWithNode({
           url,
           key: hashOfKeyStr,
           val: hashOfConditionsStr,
-          authSig,
+          authSig: sigToPassToNode,
           chain,
           permanent: permanent ? 1 : 0,
         })
