@@ -1,9 +1,5 @@
 import nacl from "tweetnacl";
 import naclUtil from "tweetnacl-util";
-import {
-  fromString as uint8arrayFromString,
-  toString as uint8arrayToString,
-} from "uint8arrays";
 
 import Blob from "cross-blob"
 
@@ -31,8 +27,7 @@ export function hashUnifiedAccessControlConditions(
   return crypto.subtle.digest("SHA-256", data);
 }
 
-// @ts-expect-error TS(7023): 'canonicalUnifiedAccessControlConditionFormatter' ... Remove this comment to see the full error message
-export function canonicalUnifiedAccessControlConditionFormatter(cond: any) {
+export function canonicalUnifiedAccessControlConditionFormatter(cond: any):any{
   if (Array.isArray(cond)) {
     return cond.map((c) => canonicalUnifiedAccessControlConditionFormatter(c));
   }
@@ -440,11 +435,10 @@ export async function generateSymmetricKey(): Promise<CryptoKey> {
 /**
  * Decrypt an encrypted blob with a symmetric key.  Uses AES-CBC via SubtleCrypto
  * @param {Blob} encryptedBlob The encrypted blob that should be decrypted
- * @param {Object} symmKey The symmetric key
+ * @param {CryptoKey} symmKey The symmetric key
  * @returns {Blob} The decrypted blob
  */
-// @ts-expect-error TS(1064): The return type of an async function or method mus... Remove this comment to see the full error message
-export async function decryptWithSymmetricKey(encryptedBlob: any, symmKey: any): Blob {
+export async function decryptWithSymmetricKey(encryptedBlob: Blob, symmKey: CryptoKey): Promise<Blob> {
   const recoveredIv = await encryptedBlob.slice(0, 16).arrayBuffer();
   const encryptedZipArrayBuffer = await encryptedBlob.slice(16).arrayBuffer();
   const decryptedZip = await crypto.subtle.decrypt(
@@ -466,8 +460,7 @@ export async function decryptWithSymmetricKey(encryptedBlob: any, symmKey: any):
  * @param {Blob} data The blob to encrypt
  * @returns {Blob} The encrypted blob
  */
-// @ts-expect-error TS(1064): The return type of an async function or method mus... Remove this comment to see the full error message
-export async function encryptWithSymmetricKey(symmKey: any, data: any): Blob {
+export async function encryptWithSymmetricKey(symmKey: any, data: any): Promise<Blob> {
   // encrypt the zip with symmetric key
   const iv = crypto.getRandomValues(new Uint8Array(16));
 

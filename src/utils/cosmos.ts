@@ -4,6 +4,7 @@ import {
 } from "uint8arrays";
 import { throwError, log } from "../lib/utils";
 import { LIT_COSMOS_CHAINS } from "../lib/constants";
+import { AuthSig } from "../types/types";
 
 export const AUTH_SIGNATURE_BODY =
   "I am creating an account to use Lit Protocol at {{timestamp}}";
@@ -66,22 +67,19 @@ export async function checkAndSignCosmosAuthMessage({
     await signAndSaveAuthMessage({ provider, account, chainId });
     authSig = localStorage.getItem("lit-auth-cosmos-signature");
   }
-  // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
-  authSig = JSON.parse(authSig);
-
-  if (account !== (authSig as any).address) {
+  let authSigObj = JSON.parse(authSig!) as AuthSig;
+  if (account !== authSigObj.address) {
     log(
       "signing auth message because account is not the same as the address in the auth sig"
-    );
-    await signAndSaveAuthMessage({ provider, account, chainId });
-    authSig = localStorage.getItem("lit-auth-cosmos-signature");
-    // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
-    authSig = JSON.parse(authSig);
+      );
+      await signAndSaveAuthMessage({ provider, account, chainId });
+      authSig = localStorage.getItem("lit-auth-cosmos-signature");
+      authSigObj = JSON.parse(authSig!) as AuthSig;
   }
 
-  log("authSig", authSig);
+  log("authSig", authSigObj);
 
-  return authSig;
+  return authSigObj;
 }
 
 export async function signAndSaveAuthMessage({

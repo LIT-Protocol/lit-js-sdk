@@ -19,6 +19,7 @@ import LIT from "../abis/LIT.json";
 import ERC20 from "../abis/ERC20.json";
 import { LIT_CHAINS } from "../lib/constants";
 import { throwError, log } from "../lib/utils";
+import { AuthSig, LitChainsKeys } from "../types/types";
 
 function chainHexIdToChainName(chainHexId: any) {
   for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
@@ -180,8 +181,7 @@ export async function checkAndSignEVMAuthMessage({
   chain,
   resources,
   switchChain
-}: any) {
-  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+}: {chain:LitChainsKeys, resources?:string, switchChain:boolean}) {
   const selectedChain = LIT_CHAINS[chain];
   const { web3, account } = await connectWeb3({
     chainId: selectedChain.chainId,
@@ -201,7 +201,7 @@ export async function checkAndSignEVMAuthMessage({
       errorCode: "wrong_network",
     });
   }
-  let selectedChainId = "0x" + selectedChain.chainId.toString("16");
+  let selectedChainId = "0x" + selectedChain.chainId.toString(16);
   log("chainId from web3", chainId);
   log(
     `checkAndSignAuthMessage with chainId ${chainId} and chain set to ${chain} and selectedChain is `,
@@ -288,10 +288,9 @@ export async function checkAndSignEVMAuthMessage({
     });
     authSig = localStorage.getItem("lit-auth-signature");
   }
-  // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
-  authSig = JSON.parse(authSig);
+  let authSigObj = JSON.parse(authSig!) as AuthSig;
   // make sure we are on the right account
-  if (account !== (authSig as any).address) {
+  if (account !== authSigObj.address) {
     log(
       "signing auth message because account is not the same as the address in the auth sig"
     );
@@ -302,13 +301,12 @@ export async function checkAndSignEVMAuthMessage({
       resources,
     });
     authSig = localStorage.getItem("lit-auth-signature");
-    // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
-    authSig = JSON.parse(authSig);
+    authSigObj = JSON.parse(authSig!) as AuthSig;
   } else {
     // check the resources of the sig and re-sign if they don't match
     let mustResign = false;
     try {
-      const parsedSiwe = new SiweMessage((authSig as any).signedMessage);
+      const parsedSiwe = new SiweMessage(authSigObj.signedMessage);
       log("parsedSiwe.resources", parsedSiwe.resources);
 
       if (JSON.stringify(parsedSiwe.resources) !== JSON.stringify(resources)) {
@@ -334,12 +332,11 @@ export async function checkAndSignEVMAuthMessage({
         resources,
       });
       authSig = localStorage.getItem("lit-auth-signature");
-      // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
-      authSig = JSON.parse(authSig);
+      authSigObj = JSON.parse(authSig!) as AuthSig;
     }
   }
-  log("got auth sig", authSig);
-  return authSig;
+  log("got auth sig", authSigObj);
+  return authSigObj;
 }
 
 /**
@@ -576,7 +573,7 @@ export const signMessageAsync = async (signer: any, address: any, message: any) 
 export async function mintLIT({
   chain,
   quantity
-}: any) {
+}: {chain:LitChainsKeys,quantity: number}) {
   log(`minting ${quantity} tokens on ${chain}`);
   try {
     const authSig = await checkAndSignEVMAuthMessage({
@@ -587,7 +584,6 @@ export async function mintLIT({
       return authSig;
     }
     const { web3, account } = await connectWeb3();
-    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     const tokenAddress = LIT_CHAINS[chain].contractAddress;
     if (!tokenAddress) {
       log("No token address for this chain.  It's not supported via MintLIT.");

@@ -3,6 +3,7 @@ import {
   toString as uint8arrayToString,
 } from "uint8arrays";
 import { throwError, log } from "../lib/utils";
+import { AuthSig, LitSVMChainsKeys } from "../types/types";
 
 export const AUTH_SIGNATURE_BODY =
   "I am creating an account to use Lit Protocol at {{timestamp}}";
@@ -33,7 +34,7 @@ export async function connectSolProvider() {
 
 export async function checkAndSignSolAuthMessage({
   chain
-}: any) {
+}: {chain:LitSVMChainsKeys}) {
   // Connect to cluster
   // const connection = new solWeb3.Connection(
   //   solWeb3.clusterApiUrl("devnet"),
@@ -48,22 +49,21 @@ export async function checkAndSignSolAuthMessage({
     await signAndSaveAuthMessage({ provider, account });
     authSig = localStorage.getItem("lit-auth-sol-signature");
   }
-  // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
-  authSig = JSON.parse(authSig);
+  let authSigObj = JSON.parse(authSig!) as AuthSig;
 
-  if (account !== (authSig as any).address) {
+  if (account !== authSigObj.address) {
     log(
       "signing auth message because account is not the same as the address in the auth sig"
     );
     await signAndSaveAuthMessage({ provider, account });
     authSig = localStorage.getItem("lit-auth-sol-signature");
-    // @ts-expect-error TS(2345): Argument of type 'string | null' is not assignable... Remove this comment to see the full error message
-    authSig = JSON.parse(authSig);
+    authSigObj = JSON.parse(authSig!) as AuthSig;
+
   }
 
-  log("authSig", authSig);
+  log("authSig", authSigObj);
 
-  return authSig;
+  return authSigObj;
 }
 
 export async function signAndSaveAuthMessage({

@@ -17,9 +17,6 @@ import {
   encryptWithSymmetricKey,
   decryptWithSymmetricKey,
   canonicalAccessControlConditionFormatter,
-  canonicalEVMContractConditionFormatter,
-  canonicalSolRpcConditionFormatter,
-  canonicalUnifiedAccessControlConditionFormatter,
 } from "./crypto";
 
 import { checkAndSignEVMAuthMessage, decimalPlaces } from "./eth";
@@ -30,6 +27,10 @@ import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 
 import { fileToDataUrl } from "./browser";
 import { ALL_LIT_CHAINS, NETWORK_PUB_KEY } from "../lib/constants";
+import { AllLitChainsKeys, AuthSig, EncryptedString, LitChainsKeys, LitCosmosChainsKeys, LitSVMChainsKeys } from "../types/types";
+
+import Blob from "cross-blob";
+import LitNodeClient from "./litNodeClient";
 
 const PACKAGE_CACHE = {};
 
@@ -45,9 +46,11 @@ export async function checkAndSignAuthMessage({
   chain,
   resources,
   switchChain = true
-// @ts-expect-error TS(2304): Cannot find name 'AuthSig'.
-}: any): AuthSig {
-  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+}: {
+  chain:AllLitChainsKeys,
+  resources?:string,
+  switchChain?:boolean
+}): Promise<AuthSig | undefined> {
   const chainInfo = ALL_LIT_CHAINS[chain];
   if (!chainInfo) {
     throwError({
@@ -60,11 +63,11 @@ export async function checkAndSignAuthMessage({
   }
 
   if (chainInfo.vmType === "EVM") {
-    return checkAndSignEVMAuthMessage({ chain, resources, switchChain });
+    return checkAndSignEVMAuthMessage({ chain: chain as LitChainsKeys , resources, switchChain });
   } else if (chainInfo.vmType === "SVM") {
-    return checkAndSignSolAuthMessage({ chain });
+    return checkAndSignSolAuthMessage({ chain: chain as LitSVMChainsKeys });
   } else if (chainInfo.vmType === "CVM") {
-    return checkAndSignCosmosAuthMessage({ chain });
+    return checkAndSignCosmosAuthMessage({ chain: chain as LitCosmosChainsKeys });
   } else {
     throwError({
       message: `vmType not found for this chain: ${chain}.  This should not happen.  Unsupported chain selected.  Please select one of: ${Object.keys(
@@ -81,19 +84,17 @@ export async function checkAndSignAuthMessage({
  * @param {string} str The string to encrypt
  * @returns {Promise<Object>} A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
  */
-export async function encryptString(str: any): Promise<object> {
-  // -- validate
-  if (
-    !checkType({
-      value: str,
-      allowedTypes: ["String"],
-      paramName: "str",
-      functionName: "encryptString",
-    })
-  )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
-    return;
-
+export async function encryptString(str: string): Promise<EncryptedString | undefined> {
+ // -- validate
+ if (
+  !checkType({
+    value: str,
+    allowedTypes: ["String"],
+    paramName: "str",
+    functionName: "encryptString",
+  })
+)
+  return;
   const encodedString = uint8arrayFromString(str, "utf8");
 
   const symmKey = await generateSymmetricKey();
@@ -119,7 +120,7 @@ export async function encryptString(str: any): Promise<object> {
  * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this.
  * @returns {Promise<string>} A promise containing the decrypted string
  */
-export async function decryptString(encryptedStringBlob: any, symmKey: any): Promise<string> {
+export async function decryptString(encryptedStringBlob: Blob|File, symmKey: Uint8Array): Promise<string|undefined> {
   // -- validate
   if (
     !checkType({
@@ -129,7 +130,6 @@ export async function decryptString(encryptedStringBlob: any, symmKey: any): Pro
       functionName: "decryptString",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'string... Remove this comment to see the full error message
     return;
   if (
     !checkType({
@@ -139,7 +139,6 @@ export async function decryptString(encryptedStringBlob: any, symmKey: any): Pro
       functionName: ["decryptString"],
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'string... Remove this comment to see the full error message
     return;
 
   // import the decrypted symm key
@@ -513,7 +512,12 @@ export async function decryptZipFileWithMetadata({
   file,
   litNodeClient,
   additionalAccessControlConditions
-}: any): Promise<object> {
+}: {
+  authSig:AuthSig,
+  file:Blob|File,
+  litNodeClient:LitNodeClient,
+  additionalAccessControlConditions:any
+}): Promise<object|undefined> {
   // -- validate
   if (
     !checkType({
@@ -523,7 +527,6 @@ export async function decryptZipFileWithMetadata({
       functionName: "decryptZipFileWithMetadata",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     !checkType({
@@ -533,14 +536,17 @@ export async function decryptZipFileWithMetadata({
       functionName: "decryptZipFileWithMetadata",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
 
   const zip = await JSZip.loadAsync(file);
-  const metadata = JSON.parse(
-    // @ts-expect-error TS(2531): Object is possibly 'null'.
-    await zip.file("lit_protocol_metadata.json").async("string")
-  );
+  const zipMetadata = await zip.file("lit_protocol_metadata.json")?.async("string");
+  let metadata;
+
+  if (zipMetadata){
+    metadata = JSON.parse(
+      zipMetadata
+    );
+  }
   log("zip metadata", metadata);
 
   let symmKey;
@@ -599,17 +605,18 @@ export async function decryptZipFileWithMetadata({
 
   // log('symmetricKey', importedSymmKey)
 
-  // @ts-expect-error TS(2531): Object is possibly 'null'.
   const encryptedFile = await zip
-    .folder("encryptedAssets")
-    .file(metadata.name)
-    .async("blob");
+    .folder("encryptedAssets")?.file(metadata.name)?.async("blob");
   // log('encryptedFile', encryptedFile)
 
-  const decryptedFile = await decryptWithSymmetricKey(
-    encryptedFile,
-    importedSymmKey
-  );
+  let decryptedFile:Blob |undefined;
+
+  if (encryptedFile){
+    decryptedFile = await decryptWithSymmetricKey(
+      encryptedFile,
+      importedSymmKey
+    );
+    }
 
   // log('decryptedFile', decryptedFile)
 
