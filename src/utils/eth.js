@@ -363,6 +363,8 @@ export async function signAndSaveAuthMessage({
 
   if (uri) {
     preparedMessage.uri = uri;
+  } else {
+    preparedMessage.uri = globalThis.location.href;
   }
 
   const message = new SiweMessage(preparedMessage);

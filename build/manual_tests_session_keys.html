@@ -107,19 +107,14 @@
           sessionSigs,
         });
 
-        const hashOfKey = await crypto.subtle.digest(
-          "SHA-256",
-          encryptedSymmetricKey
-        );
-        const hashOfKeyStr = LitJsSdk.uint8arrayToString(
-          new Uint8Array(hashOfKey),
-          "base16"
-        );
+        const hashOfKey = await LitJsSdk.hashEncryptionKey({
+          encryptedSymmetricKey,
+        });
 
         sessionSigs = await LitJsSdk.getSessionSigs({
           chain: "ethereum",
           litNodeClient,
-          resources: [`litEncryptionCondition://${hashOfKeyStr}`],
+          resources: [`litEncryptionCondition://${hashOfKey}`],
         });
 
         console.log("encrypted symmetric key", encryptedSymmetricKey);

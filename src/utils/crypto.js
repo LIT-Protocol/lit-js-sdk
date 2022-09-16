@@ -593,3 +593,12 @@ export function generateSessionKeyPair() {
     secretKey: uint8arrayToString(keyPair.secretKey, "base16"),
   };
 }
+
+export async function hashEncryptionKey({ encryptedSymmetricKey }) {
+  const hashOfKey = await crypto.subtle.digest(
+    "SHA-256",
+    encryptedSymmetricKey
+  );
+  const hashOfKeyStr = uint8arrayToString(new Uint8Array(hashOfKey), "base16");
+  return hashOfKeyStr;
+}
