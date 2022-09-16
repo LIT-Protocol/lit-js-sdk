@@ -45,6 +45,7 @@ export async function checkAndSignAuthMessage({
   chain,
   resources,
   switchChain = true
+// @ts-expect-error TS(2304): Cannot find name 'AuthSig'.
 }: any): AuthSig {
   // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   const chainInfo = ALL_LIT_CHAINS[chain];
@@ -90,6 +91,7 @@ export async function encryptString(str: any): Promise<object> {
       functionName: "encryptString",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
 
   const encodedString = uint8arrayFromString(str, "utf8");
@@ -127,6 +129,7 @@ export async function decryptString(encryptedStringBlob: any, symmKey: any): Pro
       functionName: "decryptString",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'string... Remove this comment to see the full error message
     return;
   if (
     !checkType({
@@ -136,6 +139,7 @@ export async function decryptString(encryptedStringBlob: any, symmKey: any): Pro
       functionName: ["decryptString"],
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'string... Remove this comment to see the full error message
     return;
 
   // import the decrypted symm key
@@ -146,6 +150,7 @@ export async function decryptString(encryptedStringBlob: any, symmKey: any): Pro
     importedSymmKey
   );
 
+  // @ts-expect-error TS(2769): No overload matches this call.
   return uint8arrayToString(new Uint8Array(decryptedStringArrayBuffer), "utf8");
 }
 
@@ -163,6 +168,7 @@ export async function zipAndEncryptString(string: any): Promise<object> {
       functionName: "zipAndEncryptString",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
 
   const zip = new JSZip();
@@ -187,6 +193,7 @@ export async function zipAndEncryptFiles(files: any): Promise<object> {
         functionName: "zipAndEncryptFiles",
       })
     )
+      // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
       return;
     // @ts-expect-error TS(2531): Object is possibly 'null'.
     zip.folder("encryptedAssets").file(files[i].name, files[i]);
@@ -209,6 +216,7 @@ export async function decryptZip(encryptedZipBlob: any, symmKey: any): Promise<o
       functionName: "decryptZip",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     !checkType({
@@ -218,6 +226,7 @@ export async function decryptZip(encryptedZipBlob: any, symmKey: any): Promise<o
       functionName: "decryptZip",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   // const keypair = await checkAndDeriveKeypair()
 
@@ -365,6 +374,7 @@ export async function encryptFileAndZipWithMetadata({
       functionName: "encryptFileAndZipWithMetadata",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     accessControlConditions &&
@@ -375,6 +385,7 @@ export async function encryptFileAndZipWithMetadata({
       functionName: "encryptFileAndZipWithMetadata",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     evmContractConditions &&
@@ -385,6 +396,7 @@ export async function encryptFileAndZipWithMetadata({
       functionName: "encryptFileAndZipWithMetadata",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     solRpcConditions &&
@@ -395,6 +407,7 @@ export async function encryptFileAndZipWithMetadata({
       functionName: "encryptFileAndZipWithMetadata",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     unifiedAccessControlConditions &&
@@ -405,6 +418,7 @@ export async function encryptFileAndZipWithMetadata({
       functionName: "encryptFileAndZipWithMetadata",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     !checkIfAuthSigRequiresChainParam(
@@ -413,6 +427,7 @@ export async function encryptFileAndZipWithMetadata({
       "encryptFileAndZipWithMetadata"
     )
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     !checkType({
@@ -422,6 +437,7 @@ export async function encryptFileAndZipWithMetadata({
       functionName: "encryptFileAndZipWithMetadata",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     readme &&
@@ -432,6 +448,7 @@ export async function encryptFileAndZipWithMetadata({
       functionName: "encryptFileAndZipWithMetadata",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
 
   const symmetricKey = await generateSymmetricKey();
@@ -506,6 +523,7 @@ export async function decryptZipFileWithMetadata({
       functionName: "decryptZipFileWithMetadata",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     !checkType({
@@ -515,6 +533,7 @@ export async function decryptZipFileWithMetadata({
       functionName: "decryptZipFileWithMetadata",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
 
   const zip = await JSZip.loadAsync(file);
@@ -614,6 +633,7 @@ export async function encryptFile({
       functionName: "encryptFile",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
 
   // generate a random symmetric key
@@ -652,6 +672,7 @@ export async function decryptFile({
       functionName: "decryptFile",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
 
   if (
@@ -662,6 +683,7 @@ export async function decryptFile({
       functionName: "decryptFile",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
 
   const importedSymmKey = await importSymmetricKey(symmetricKey);
@@ -903,7 +925,7 @@ export async function unlockLitWithKey({
   // convert data url to blob
 const encryptedZipBlob = await (await fetch((window as any).encryptedZipDataUrl)).blob();
   const decryptedFiles = await decryptZip(encryptedZipBlob, symmetricKey);
-  // @ts-expect-error TS(2532): Object is possibly 'undefined'.
+  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   const mediaGridHtmlBody = await decryptedFiles["string.txt"].async("text");
   // @ts-expect-error TS(2531): Object is possibly 'null'.
   mediaGridHolder.innerHTML = mediaGridHtmlBody;
@@ -930,6 +952,7 @@ export function verifyJwt({
       functionName: "verifyJwt",
     })
   )
+    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   log("verifyJwt", jwt);
   // verify that the wasm was loaded
@@ -1038,6 +1061,7 @@ export async function humanizeAccessControlConditions({
   unifiedAccessControlConditions,
   tokenList,
   myWalletAddress
+// @ts-expect-error TS(2366): Function lacks ending return statement and return ... Remove this comment to see the full error message
 }: any): Promise<string> {
   if (accessControlConditions) {
     return humanizeEvmBasicAccessControlConditions({

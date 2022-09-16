@@ -16,7 +16,6 @@ import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
 
 import LIT from "../abis/LIT.json";
-// @ts-expect-error TS(2732): Cannot find module '../abis/ERC20.json'. Consider ... Remove this comment to see the full error message
 import ERC20 from "../abis/ERC20.json";
 import { LIT_CHAINS } from "../lib/constants";
 import { throwError, log } from "../lib/utils";

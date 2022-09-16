@@ -75,7 +75,6 @@ function uint8ArrayToAscii(a: any) {
 // https://stackoverflow.com/a/50868276
 function hexToUint8Array(h: any) {
   if (h.length == 0) {
-    // @ts-expect-error TS(2554): Expected 1-3 arguments, but got 0.
     return new Uint8Array();
   }
   return new Uint8Array(h.match(/.{1,2}/g).map((byte: any) => parseInt(byte, 16)));

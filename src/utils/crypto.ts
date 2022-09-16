@@ -443,6 +443,7 @@ export async function generateSymmetricKey(): Promise<CryptoKey> {
  * @param {Object} symmKey The symmetric key
  * @returns {Blob} The decrypted blob
  */
+// @ts-expect-error TS(1064): The return type of an async function or method mus... Remove this comment to see the full error message
 export async function decryptWithSymmetricKey(encryptedBlob: any, symmKey: any): Blob {
   const recoveredIv = await encryptedBlob.slice(0, 16).arrayBuffer();
   const encryptedZipArrayBuffer = await encryptedBlob.slice(16).arrayBuffer();
@@ -465,6 +466,7 @@ export async function decryptWithSymmetricKey(encryptedBlob: any, symmKey: any):
  * @param {Blob} data The blob to encrypt
  * @returns {Blob} The encrypted blob
  */
+// @ts-expect-error TS(1064): The return type of an async function or method mus... Remove this comment to see the full error message
 export async function encryptWithSymmetricKey(symmKey: any, data: any): Blob {
   // encrypt the zip with symmetric key
   const iv = crypto.getRandomValues(new Uint8Array(16));
@@ -528,6 +530,7 @@ export function encryptWithPubKey(receiverPublicKey: any, data: any, version: an
         ciphertext: naclUtil.encodeBase64(encryptedMessage),
       };
       // return encrypted msg data
+      // @ts-expect-error TS(2740): Type '{ version: string; nonce: string; ephemPubli... Remove this comment to see the full error message
       return output;
     }
 
@@ -575,6 +578,7 @@ export function decryptWithPrivKey(encryptedData: any, receiverPrivateKey: any):
       }
 
       if (output) {
+        // @ts-expect-error TS(2322): Type 'string' is not assignable to type 'Blob'.
         return output;
       }
       throw new Error("Decryption failed.  Output is falsy");
