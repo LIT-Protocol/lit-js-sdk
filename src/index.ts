@@ -86,12 +86,12 @@ import { litJsSdkLoadedInALIT } from "./utils/init";
 import { version } from "./version";
 
 initWasmBlsSdk().then((exports) => {
-  // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+  // @ts-ignore
   globalThis.wasmExports = exports;
   // console.log("wasmExports loaded");
 });
 
-const functions = {
+export {
   encryptString,
   decryptString,
   zipAndEncryptString,
@@ -149,5 +149,3 @@ const functions = {
   blobToBase64String,
   base64StringToBlob,
 };
-
-module.exports = functions;

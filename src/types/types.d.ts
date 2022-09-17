@@ -1,5 +1,4 @@
-import { LIT_CHAINS, LIT_SVM_CHAINS } from "../../build"
-import { LIT_COSMOS_CHAINS } from "../lib/constants"
+import { LIT_COSMOS_CHAINS, LIT_CHAINS, LIT_SVM_CHAINS } from "../lib/constants"
 
 export type AuthSig  = {
     sig:string

@@ -4,7 +4,7 @@ const { dedupBn } = require("./esbuild-plugins.js");
 
 const go = async () => {
   let result = await build({
-    entryPoints: ["src/index.js"],
+    entryPoints: ["src/index.ts"],
     bundle: true,
     minify: true,
     sourcemap: true,
