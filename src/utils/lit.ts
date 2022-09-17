@@ -149,7 +149,6 @@ export async function decryptString(encryptedStringBlob: Blob|File, symmKey: Uin
     importedSymmKey
   );
 
-  // @ts-expect-error TS(2769): No overload matches this call.
   return uint8arrayToString(new Uint8Array(decryptedStringArrayBuffer), "utf8");
 }
 
@@ -609,7 +608,7 @@ export async function decryptZipFileWithMetadata({
     .folder("encryptedAssets")?.file(metadata.name)?.async("blob");
   // log('encryptedFile', encryptedFile)
 
-  let decryptedFile:Blob |undefined;
+  let decryptedFile:ArrayBuffer |undefined;
 
   if (encryptedFile){
     decryptedFile = await decryptWithSymmetricKey(
@@ -669,7 +668,7 @@ export async function encryptFile({
 export async function decryptFile({
   file,
   symmetricKey
-}: any): Promise<object> {
+}: any): Promise<object | undefined> {
   // -- validate
   if (
     !checkType({
@@ -679,7 +678,6 @@ export async function decryptFile({
       functionName: "decryptFile",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
 
   if (
@@ -690,7 +688,6 @@ export async function decryptFile({
       functionName: "decryptFile",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
 
   const importedSymmKey = await importSymmetricKey(symmetricKey);

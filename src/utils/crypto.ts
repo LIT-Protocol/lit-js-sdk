@@ -438,7 +438,7 @@ export async function generateSymmetricKey(): Promise<CryptoKey> {
  * @param {CryptoKey} symmKey The symmetric key
  * @returns {Blob} The decrypted blob
  */
-export async function decryptWithSymmetricKey(encryptedBlob: Blob, symmKey: CryptoKey): Promise<Blob> {
+export async function decryptWithSymmetricKey(encryptedBlob: Blob, symmKey: CryptoKey): Promise<ArrayBuffer> {
   const recoveredIv = await encryptedBlob.slice(0, 16).arrayBuffer();
   const encryptedZipArrayBuffer = await encryptedBlob.slice(16).arrayBuffer();
   const decryptedZip = await crypto.subtle.decrypt(
