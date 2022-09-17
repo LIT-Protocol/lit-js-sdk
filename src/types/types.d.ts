@@ -42,3 +42,14 @@ export type EncryptedZipWithKey = {
     symmetricKey: Uint8Array,
     encryptedZip: Blob,
 }
+export type EncryptedFileWithKey = {
+    symmetricKey: Uint8Array,
+    encryptedFile: Blob,
+}
+
+export type EncryptedFileZipMetadataKey = { 
+    zipBlob:Blob,
+    encryptedSymmetricKey:string, 
+    symmetricKey:Uint8Array 
+  }
+  

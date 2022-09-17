@@ -27,7 +27,7 @@ import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 
 import { fileToDataUrl } from "./browser";
 import { ALL_LIT_CHAINS, NETWORK_PUB_KEY } from "../lib/constants";
-import { AllLitChainsKeys, AuthSig, EncryptedString, EncryptedZipWithKey, LitChainsKeys, LitCosmosChainsKeys, LitSVMChainsKeys } from "../types/types";
+import { AllLitChainsKeys, AuthSig, EncryptedFileWithKey, EncryptedFileZipMetadataKey, EncryptedString, EncryptedZipWithKey, LitChainsKeys, LitCosmosChainsKeys, LitSVMChainsKeys } from "../types/types";
 
 import Blob from "cross-blob";
 import LitNodeClient from "./litNodeClient";
@@ -76,6 +76,7 @@ export async function checkAndSignAuthMessage({
       name: "UnsupportedChainException",
       errorCode: "unsupported_chain",
     });
+    return
   }
 }
 
@@ -84,17 +85,17 @@ export async function checkAndSignAuthMessage({
  * @param {string} str The string to encrypt
  * @returns {Promise<Object>} A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
  */
-export async function encryptString(str: string): Promise<EncryptedString | undefined> {
+export async function encryptString(str: string): Promise<EncryptedString> {
  // -- validate
- if (
-  !checkType({
-    value: str,
-    allowedTypes: ["String"],
-    paramName: "str",
-    functionName: "encryptString",
-  })
-)
-  return;
+//  if (
+//   !checkType({
+//     value: str,
+//     allowedTypes: ["String"],
+//     paramName: "str",
+//     functionName: "encryptString",
+//   })
+// )
+//   return;
   const encodedString = uint8arrayFromString(str, "utf8");
 
   const symmKey = await generateSymmetricKey();
@@ -120,26 +121,7 @@ export async function encryptString(str: string): Promise<EncryptedString | unde
  * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this.
  * @returns {Promise<string>} A promise containing the decrypted string
  */
-export async function decryptString(encryptedStringBlob: Blob|File, symmKey: Uint8Array): Promise<string|undefined> {
-  // -- validate
-  if (
-    !checkType({
-      value: encryptedStringBlob,
-      allowedTypes: ["Blob", "File"],
-      paramName: "encryptedStringBlob",
-      functionName: "decryptString",
-    })
-  )
-    return;
-  if (
-    !checkType({
-      value: symmKey,
-      allowedTypes: ["Uint8Array"],
-      paramName: ["symmKey"],
-      functionName: ["decryptString"],
-    })
-  )
-    return;
+export async function decryptString(encryptedStringBlob: Blob|File, symmKey: Uint8Array): Promise<string> {
 
   // import the decrypted symm key
   const importedSymmKey = await importSymmetricKey(symmKey);
@@ -157,18 +139,7 @@ export async function decryptString(encryptedStringBlob: Blob|File, symmKey: Uin
  * @param {string} string The string to zip and encrypt
  * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a single file called "string.txt"
  */
-export async function zipAndEncryptString(string: any): Promise<object> {
-  if (
-    !checkType({
-      value: string,
-      allowedTypes: ["String"],
-      paramName: "string",
-      functionName: "zipAndEncryptString",
-    })
-  )
-    
-    return;
-
+export async function zipAndEncryptString(string: string): Promise<EncryptedZipWithKey> {
   const zip = new JSZip();
   zip.file("string.txt", string);
   return encryptZip(zip);
@@ -179,20 +150,10 @@ export async function zipAndEncryptString(string: any): Promise<object> {
  * @param {Array<File>} files An array of the files you wish to zip and encrypt
  * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
  */
-export async function zipAndEncryptFiles(files: any): Promise<EncryptedZipWithKey | undefined> {
+export async function zipAndEncryptFiles(files: File[]): Promise<EncryptedZipWithKey> {
   // let's zip em
   const zip = new JSZip();
   for (let i = 0; i < files.length; i++) {
-    if (
-      !checkType({
-        value: files[i],
-        allowedTypes: ["File"],
-        paramName: `files[${i}]`,
-        functionName: "zipAndEncryptFiles",
-      })
-    )
-      
-      return;
     zip.folder("encryptedAssets")?.file(files[i].name, files[i]);
   }
   return encryptZip(zip);
@@ -204,26 +165,7 @@ export async function zipAndEncryptFiles(files: any): Promise<EncryptedZipWithKe
  * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this zip.
  * @returns {Promise<Object>} A promise containing a JSZip object indexed by the filenames of the zipped files.  For example, if you have a file called "meow.jpg" in the root of your zip, you could get it from the JSZip object by doing this: const imageBlob = await decryptedZip['meow.jpg'].async('blob')
  */
-export async function decryptZip(encryptedZipBlob: any, symmKey: any): Promise<Record<string,JSZipObject>> {
-  if (
-    !checkType({
-      value: encryptedZipBlob,
-      allowedTypes: ["Blob", "File"],
-      paramName: "encryptedZipBlob",
-      functionName: "decryptZip",
-    })
-  )
-    
-    return;
-  if (
-    !checkType({
-      value: symmKey,
-      allowedTypes: ["Uint8Array"],
-      paramName: "symmKey",
-      functionName: "decryptZip",
-    })
-  )
-    return;
+export async function decryptZip(encryptedZipBlob: Blob|File, symmKey: Uint8Array): Promise<Record<string,JSZipObject>> {
   // const keypair = await checkAndDeriveKeypair()
 
   // log('Got keypair out of localstorage: ' + keypair)
@@ -349,8 +291,10 @@ export async function encryptZip(zip: JSZip): Promise<EncryptedZipWithKey> {
  * @param {File} params.file The file you wish to encrypt
  * @param {LitNodeClient} params.litNodeClient An instance of LitNodeClient that is already connected
  * @param {string} params.readme An optional readme text that will be inserted into readme.txt in the final zip file.  This is useful in case someone comes across this zip file and wants to know how to decrypt it.  This file could contain instructions and a URL to use to decrypt the file.
- * @returns {Promise<Object>} A promise containing an object with 3 keys: zipBlob, encryptedSymmetricKey, and symmetricKey.  zipBlob is a zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network.  encryptedSymmetricKey is the symmetric key needed to decrypt the content, encrypted with the Lit network public key.  You may wish to store encryptedSymmetricKey in your own database to support quicker re-encryption operations when adding additional access control conditions in the future, but this is entirely optional, and this key is already stored inside the zipBlob.  symmetricKey is the raw symmetric key used to encrypt the files.  DO NOT STORE IT.  It is provided in case you wish to create additional "OR" access control conditions for the same file.
+ * @returns {Promise<EncryptedFileZipMetadataKey>} A promise containing an object with 3 keys: zipBlob, encryptedSymmetricKey, and symmetricKey.  zipBlob is a zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network.  encryptedSymmetricKey is the symmetric key needed to decrypt the content, encrypted with the Lit network public key.  You may wish to store encryptedSymmetricKey in your own database to support quicker re-encryption operations when adding additional access control conditions in the future, but this is entirely optional, and this key is already stored inside the zipBlob.  symmetricKey is the raw symmetric key used to encrypt the files.  DO NOT STORE IT.  It is provided in case you wish to create additional "OR" access control conditions for the same file.
  */
+
+
 export async function encryptFileAndZipWithMetadata({
   authSig,
   accessControlConditions,
@@ -361,84 +305,25 @@ export async function encryptFileAndZipWithMetadata({
   file,
   litNodeClient,
   readme
-}: any): Promise<object | undefined> {
-  // -- validate
-  if (
-    !checkType({
-      value: authSig,
-      allowedTypes: ["Object"],
-      paramName: "authSig",
-      functionName: "encryptFileAndZipWithMetadata",
-    })
-  )
-    return;
-  if (
-    accessControlConditions &&
-    !checkType({
-      value: accessControlConditions,
-      allowedTypes: ["Array"],
-      paramName: "accessControlConditions",
-      functionName: "encryptFileAndZipWithMetadata",
-    })
-  )
-    return;
-  if (
-    evmContractConditions &&
-    !checkType({
-      value: evmContractConditions,
-      allowedTypes: ["Array"],
-      paramName: "evmContractConditions",
-      functionName: "encryptFileAndZipWithMetadata",
-    })
-  )
-    return;
-  if (
-    solRpcConditions &&
-    !checkType({
-      value: solRpcConditions,
-      allowedTypes: ["Array"],
-      paramName: "solRpcConditions",
-      functionName: "encryptFileAndZipWithMetadata",
-    })
-  )
-    return;
-  if (
-    unifiedAccessControlConditions &&
-    !checkType({
-      value: unifiedAccessControlConditions,
-      allowedTypes: ["Array"],
-      paramName: "unifiedAccessControlConditions",
-      functionName: "encryptFileAndZipWithMetadata",
-    })
-  )
-    return;
-  if (
-    !checkIfAuthSigRequiresChainParam(
-      authSig,
-      chain,
-      "encryptFileAndZipWithMetadata"
-    )
-  )
-    return;
-  if (
-    !checkType({
-      value: file,
-      allowedTypes: ["File"],
-      paramName: "file",
-      functionName: "encryptFileAndZipWithMetadata",
-    })
-  )
-    return;
-  if (
-    readme &&
-    !checkType({
-      value: readme,
-      allowedTypes: ["String"],
-      paramName: "readme",
-      functionName: "encryptFileAndZipWithMetadata",
-    })
-  )
-    return;
+}:{
+  authSig:AuthSig,
+  accessControlConditions:any[],
+  evmContractConditions:any[],
+  solRpcConditions:any[],
+  unifiedAccessControlConditions:any[],
+  chain:LitChainsKeys,
+  file:File,
+  litNodeClient:LitNodeClient,
+  readme:string
+} ): Promise<EncryptedFileZipMetadataKey> {
+  // if (
+  //   !checkIfAuthSigRequiresChainParam(
+  //     authSig,
+  //     chain,
+  //     "encryptFileAndZipWithMetadata"
+  //   )
+  // )
+  //   return;
 
   const symmetricKey = await generateSymmetricKey();
   const exportedSymmKey = new Uint8Array(
@@ -506,26 +391,7 @@ export async function decryptZipFileWithMetadata({
   file:Blob|File,
   litNodeClient:LitNodeClient,
   additionalAccessControlConditions:any
-}): Promise<object|undefined> {
-  // -- validate
-  if (
-    !checkType({
-      value: authSig,
-      allowedTypes: ["Object"],
-      paramName: "authSig",
-      functionName: "decryptZipFileWithMetadata",
-    })
-  )
-    return;
-  if (
-    !checkType({
-      value: file,
-      allowedTypes: ["Blob", "File"],
-      paramName: "file",
-      functionName: "decryptZipFileWithMetadata",
-    })
-  )
-    return;
+}): Promise<object> {
 
   const zip = await JSZip.loadAsync(file);
   const zipMetadata = await zip.file("lit_protocol_metadata.json")?.async("string");
@@ -620,16 +486,7 @@ export async function decryptZipFileWithMetadata({
  */
 export async function encryptFile({
   file
-}: any): Promise<object| undefined> {
-  if (
-    !checkType({
-      value: file,
-      allowedTypes: ["Blob", "File"],
-      paramName: "file",
-      functionName: "encryptFile",
-    })
-  )
-    return;
+}: {file:Blob | File}): Promise<EncryptedFileWithKey> {
 
   // generate a random symmetric key
   const symmetricKey = await generateSymmetricKey();
@@ -657,28 +514,8 @@ export async function encryptFile({
 export async function decryptFile({
   file,
   symmetricKey
-}: any): Promise<object | undefined> {
-  // -- validate
-  if (
-    !checkType({
-      value: file,
-      allowedTypes: ["Blob", "File"],
-      paramName: "file",
-      functionName: "decryptFile",
-    })
-  )
-    return;
-
-  if (
-    !checkType({
-      value: symmetricKey,
-      allowedTypes: ["Uint8Array"],
-      paramName: "symmetricKey",
-      functionName: "decryptFile",
-    })
-  )
-    return;
-
+}: {file:Blob | File, symmetricKey: Uint8Array}): Promise<ArrayBuffer> {
+ 
   const importedSymmKey = await importSymmetricKey(symmetricKey);
 
   // decrypt the file
@@ -687,7 +524,7 @@ export async function decryptFile({
   return decryptedFile;
 }
 
-async function getNpmPackage(packageName: string) {
+async function getNpmPackage(packageName: string) : Promise<string> {
   // log('getting npm package: ' + packageName)
   if (PACKAGE_CACHE[packageName]) {
     // log('found in cache')

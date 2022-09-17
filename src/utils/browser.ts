@@ -113,8 +113,7 @@ export function injectViewerIFrame({
   const iframe = document.createElement("iframe");
   iframe.src = fileUrl;
   iframe.title = title;
-  // @ts-expect-error TS(2540): Cannot assign to 'sandbox' because it is a read-on... Remove this comment to see the full error message
-  iframe.sandbox =
+  (iframe as any).sandbox =
     "allow-forms allow-scripts allow-popups  allow-modals allow-popups-to-escape-sandbox allow-same-origin";
   (iframe as any).loading = "lazy";
   iframe.allow =

@@ -1,3 +1,4 @@
+import { LitChainsKeys } from "../types/types.js";
 import { LIT_AUTH_SIG_CHAIN_KEYS } from "./constants.js";
 
 export const printError = (e: any) => {
@@ -109,7 +110,7 @@ export const checkType = ({
 
 export const checkIfAuthSigRequiresChainParam = (
   authSig: any,
-  chain: any,
+  chain: LitChainsKeys,
   functionName: any
 ) => {
   for (const key of LIT_AUTH_SIG_CHAIN_KEYS) {
@@ -118,16 +119,16 @@ export const checkIfAuthSigRequiresChainParam = (
     }
   }
 
-  // if we're here, then we need the chain param
-  if (
-    !checkType({
-      value: chain,
-      allowedTypes: ["String"],
-      paramName: "chain",
-      functionName,
-    })
-  )
-    return false;
+  // // if we're here, then we need the chain param
+  // if (
+  //   !checkType({
+  //     value: chain,
+  //     allowedTypes: ["String"],
+  //     paramName: "chain",
+  //     functionName,
+  //   })
+  // )
+  //   return false;
 
   return true;
 };
