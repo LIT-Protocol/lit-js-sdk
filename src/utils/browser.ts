@@ -122,6 +122,5 @@ export function injectViewerIFrame({
   if (className) {
     iframe.className = className;
   }
-  // @ts-expect-error TS(2531): Object is possibly 'null'.
-  document.getElementById(destinationId).appendChild(iframe);
+  document.getElementById(destinationId)?.appendChild(iframe);
 }

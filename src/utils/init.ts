@@ -16,15 +16,13 @@ export const litJsSdkLoadedInALIT = () => {
     }, 1000);
     return;
   }
-  // @ts-expect-error TS(2554): Expected 1 arguments, but got 2.
-  sendMessageToFrameParent({ command: "LIT_SYN" }, "*");
+  sendMessageToFrameParent({ command: "LIT_SYN" });
   setTimeout(function () {
     if (!(window as any).useLitPostMessageProxy) {
         // console.log(
         //   "inside lit - no parent frame lit node connection.  connecting ourselves."
         // );
         // we're on our own with no parent frame.  initiate our own connection to lit nodes
-        // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         const litNodeClient = new LitNodeClient();
         litNodeClient.connect();
         (window as any).litNodeClient = litNodeClient;

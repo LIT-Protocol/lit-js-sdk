@@ -75,8 +75,7 @@ export function hashCosmosConditions(cosmosConditions: any) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
-// @ts-expect-error TS(7023): 'canonicalCosmosConditionFormatter' implicitly has... Remove this comment to see the full error message
-export function canonicalCosmosConditionFormatter(cond: any) {
+export function canonicalCosmosConditionFormatter(cond: any):any {
   // need to return in the exact format below:
   /*
   pub struct CosmosCondition {
@@ -129,11 +128,10 @@ export function hashSolRpcConditions(solRpcConditions: any) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
-// @ts-expect-error TS(7023): 'canonicalSolRpcConditionFormatter' implicitly has... Remove this comment to see the full error message
 export function canonicalSolRpcConditionFormatter(
   cond: any,
   requireV2Conditions = false
-) {
+):any {
   // need to return in the exact format below
   // but make sure we don't include the optional fields:
   /*
@@ -251,8 +249,7 @@ function canonicalAbiParams(params: any) {
   }));
 }
 
-// @ts-expect-error TS(7023): 'canonicalEVMContractConditionFormatter' implicitl... Remove this comment to see the full error message
-export function canonicalEVMContractConditionFormatter(cond: any) {
+export function canonicalEVMContractConditionFormatter(cond: any):any {
   // need to return in the exact format below:
   /*
   pub struct JsonAccessControlCondition {
@@ -339,8 +336,7 @@ export function hashEVMContractConditions(accessControlConditions: any) {
   return crypto.subtle.digest("SHA-256", data);
 }
 
-// @ts-expect-error TS(7023): 'canonicalAccessControlConditionFormatter' implici... Remove this comment to see the full error message
-export function canonicalAccessControlConditionFormatter(cond: any) {
+export function canonicalAccessControlConditionFormatter(cond: any):any {
   // need to return in the exact format below:
   /*
   pub struct JsonAccessControlCondition {
@@ -538,9 +534,9 @@ export function encryptWithPubKey(receiverPublicKey: any, data: any, version: an
  * @param {Blob} encryptedData The blob to decrypt
  * @param {string} receiverPrivateKey The base64 encoded 32 byte private key.  The corresponding public key was used to encrypt this blob
  * @param {string} version The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
- * @returns {Blob} The decrypted blob
+ * @returns {string} The decrypted ~blob~
  */
-export function decryptWithPrivKey(encryptedData: any, receiverPrivateKey: any): Blob {
+export function decryptWithPrivKey(encryptedData: any, receiverPrivateKey: any): string {
   switch (encryptedData.version) {
     case "x25519-xsalsa20-poly1305": {
       const recieverEncryptionPrivateKey =
@@ -564,14 +560,12 @@ export function decryptWithPrivKey(encryptedData: any, receiverPrivateKey: any):
       // return decrypted msg data
       let output;
       try {
-        // @ts-expect-error TS(2345): Argument of type 'Uint8Array | null' is not assign... Remove this comment to see the full error message
-        output = naclUtil.encodeUTF8(decryptedMessage);
+        output = naclUtil.encodeUTF8(decryptedMessage!);
       } catch (err) {
         throw new Error("Decryption failed.  Could not encode result as utf8");
       }
 
       if (output) {
-        // @ts-expect-error TS(2322): Type 'string' is not assignable to type 'Blob'.
         return output;
       }
       throw new Error("Decryption failed.  Output is falsy");

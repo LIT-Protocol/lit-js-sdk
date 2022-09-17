@@ -4,6 +4,7 @@ import {
   Web3Provider,
   JsonRpcSigner,
   JsonRpcProvider,
+  EtherscanProvider,
 } from "@ethersproject/providers";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { hexlify } from "@ethersproject/bytes";
@@ -21,11 +22,15 @@ import { LIT_CHAINS } from "../lib/constants";
 import { throwError, log } from "../lib/utils";
 import { AuthSig, LitChainsKeys } from "../types/types";
 
-function chainHexIdToChainName(chainHexId: any) {
+import {
+  BigNumber
+} from "@ethersproject/bignumber";
+
+function chainHexIdToChainName(chainHexId: string) {
   for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
-    const chainName = Object.keys(LIT_CHAINS)[i];
-    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-    const litChainHexId = "0x" + LIT_CHAINS[chainName].chainId.toString("16");
+    const chainName = Object.keys(LIT_CHAINS)[i] as LitChainsKeys;
+    
+    const litChainHexId = "0x" + LIT_CHAINS[chainName].chainId.toString(16);
     if (litChainHexId === chainHexId) {
       return chainName;
     }
@@ -66,11 +71,11 @@ export async function connectWeb3({ chainId = 1 } = {}) {
 
   for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
     const chainName = Object.keys(LIT_CHAINS)[i];
-    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+    
     const chainId = LIT_CHAINS[chainName].chainId;
-    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+    
     const rpcUrl = LIT_CHAINS[chainName].rpcUrls[0];
-    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+    
     rpcUrls[chainId] = rpcUrl;
   }
 
@@ -219,8 +224,7 @@ export async function checkAndSignEVMAuthMessage({
     }
     try {
       log("trying to switch to chainId", selectedChainId);
-      // @ts-expect-error TS(2722): Cannot invoke an object which is possibly 'undefin... Remove this comment to see the full error message
-      await web3.provider.request({
+      await web3.provider.request?.({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: selectedChainId }],
       });
@@ -242,8 +246,7 @@ export async function checkAndSignEVMAuthMessage({
               blockExplorerUrls: selectedChain.blockExplorerUrls,
             },
           ];
-          // @ts-expect-error TS(2722): Cannot invoke an object which is possibly 'undefin... Remove this comment to see the full error message
-          await web3.provider.request({
+          await web3.provider.request?.({
             method: "wallet_addEthereumChain",
             params: data,
           });
@@ -634,27 +637,36 @@ export async function findLITs() {
   try {
     const { web3, account } = await connectWeb3();
     const { chainId } = await web3.getNetwork();
-    // @ts-expect-error TS(2345): Argument of type 'string' is not assignable to par... Remove this comment to see the full error message
-    const chainHexId = "0x" + chainId.toString("16");
+    const chainHexId = "0x" + chainId.toString(16);
     // const chainHexId = await web3.request({ method: 'eth_chainId', params: [] })
     const chain = chainHexIdToChainName(chainHexId);
-    // @ts-expect-error TS(2538): Type 'undefined' cannot be used as an index type.
+    if (!chain){
+      throwError({message:"chainHexId not found in LIST_CHAINS",errorCode:"chain_not_found",name:"Chain_Not_Found"})
+      return;
+    }
     const tokenAddress = LIT_CHAINS[chain].contractAddress;
+
+    if (!tokenAddress){
+      throwError({message:"tokenAddress not found",errorCode:"tokenAddress_not_found",name:"tokenAddress_Not_Found"})
+      return;
+    }
+
     const contract = new Contract(tokenAddress, LIT.abi, web3.getSigner());
     log("getting maxTokenid");
     const maxTokenId = await contract.tokenIds();
-    const accounts = [];
-    const tokenIds = [];
+    const accounts:string[] = [];
+    const tokenIds:number[] = [];
     for (let i = 0; i <= maxTokenId; i++) {
       accounts.push(account);
       tokenIds.push(i);
     }
     log("getting balanceOfBatch");
-    const balances = await contract.balanceOfBatch(accounts, tokenIds);
+    const balances = await contract.balanceOfBatch(accounts, tokenIds) as Array<BigNumber>;
     // log('balances', balances)
     const tokenIdsWithNonzeroBalances = balances
-      .map((b: any, i: any) => (b.toNumber() === 0 ? null : i))
-      .filter((b: any) => b !== null);
+      .filter((b: BigNumber) => b !== null)
+      .map((b: BigNumber, i: number) => (b.toNumber() === 0 ? null : i))
+
     return { tokenIds: tokenIdsWithNonzeroBalances, chain };
   } catch (error) {
     log(error);
@@ -719,12 +731,12 @@ export async function sendLIT({
 export async function decimalPlaces({
   contractAddress,
   chain
-}: any) {
+}: {contractAddress:string,chain:LitChainsKeys}) {
   // if (chain) {
   //   await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
   // }
   // const { web3, account } = await connectWeb3();
-  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+  
   const rpcUrl = LIT_CHAINS[chain].rpcUrls[0];
   const web3 = new JsonRpcProvider(rpcUrl);
   const contract = new Contract(contractAddress, ERC20.abi, web3);
@@ -741,10 +753,9 @@ export async function decimalPlaces({
 export async function lookupNameServiceAddress({
   chain,
   name
-}: any) {
+}: {chain:LitChainsKeys,name:string}) {
   // await checkAndSignEVMAuthMessage({ chain }); // this will switch them to the correct chain
   // const { web3, account } = await connectWeb3();
-  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   const rpcUrl = LIT_CHAINS[chain].rpcUrls[0];
   const web3 = new JsonRpcProvider(rpcUrl);
 

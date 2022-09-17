@@ -297,8 +297,7 @@ export function base64ToUint8Array(str: any) {
 // it's handy to have helpers to do the required looping.
 
 let isWasming = false;
-// @ts-expect-error TS(7009): 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
-export const wasmBlsSdkHelpers = new ((function(this: any) {
+export const wasmBlsSdkHelpers = new (((function(this: any) {
   // s is secret key unit8array
   this.sk_bytes_to_pk_bytes = function (s: any) {
     isWasming = true;
@@ -306,15 +305,12 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
     try {
       // set sk bytes
       for (let i = 0; i < s.length; i++) {
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_sk_byte(i, s[i]);
       }
       // convert into pk bytes
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       globalThis.wasmExports.derive_pk_from_sk();
       // read pk bytes
       for (let i = 0; i < pkLen; i++) {
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         const pkByte = globalThis.wasmExports.get_pk_byte(i);
         pkBytes.push(pkByte);
       }
@@ -334,20 +330,16 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
     try {
       // set secret key bytes
       for (let i = 0; i < s.length; i++) {
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_sk_byte(i, s[i]);
       }
       // set message bytes
       for (let i = 0; i < m.length; i++) {
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_msg_byte(i, m[i]);
       }
       // sign message
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       globalThis.wasmExports.sign_msg(m.length);
       // get signature bytes
       for (let i = 0; i < sigLen; i++) {
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         const sigByte = globalThis.wasmExports.get_sig_byte(i);
         sigBytes.push(sigByte);
       }
@@ -369,20 +361,16 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
     try {
       // set public key bytes
       for (let i = 0; i < p.length; i++) {
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_pk_byte(i, p[i]);
       }
       // set signature bytes
       for (let i = 0; i < s.length; i++) {
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_sig_byte(i, s[i]);
       }
       // set message bytes
       for (let i = 0; i < m.length; i++) {
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_msg_byte(i, m[i]);
       }
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       verified = globalThis.wasmExports.verify(m.length);
     } catch (e) {
       console.log("error verifying sig in bls-sdk.js:");
@@ -402,12 +390,10 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
       console.log(msg);
       return;
     }
-    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     const RNG_VALUES_SIZE = globalThis.wasmExports.get_rng_values_size();
     const rngValues = new Uint32Array(RNG_VALUES_SIZE);
     globalThis.crypto.getRandomValues(rngValues);
     for (let i = 0; i < rngValues.length; i++) {
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       globalThis.wasmExports.set_rng_value(i, rngValues[i]);
     }
   };
@@ -421,21 +407,17 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
       wasmBlsSdkHelpers.set_rng_values();
       // set public key bytes
       for (let i = 0; i < p.length; i++) {
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_pk_byte(i, p[i]);
       }
       // set message bytes
       for (let i = 0; i < m.length; i++) {
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_msg_byte(i, m[i]);
       }
       // generate strong random u64 used by encrypt
       // encrypt the message
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const ctSize = globalThis.wasmExports.encrypt(m.length);
       // get ciphertext bytes
       for (let i = 0; i < ctSize; i++) {
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         const ctByte = globalThis.wasmExports.get_ct_byte(i);
         ctBytes.push(ctByte);
       }
@@ -456,19 +438,15 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
     try {
       // set secret key bytes
       for (let i = 0; i < s.length; i++) {
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_sk_byte(i, s[i]);
       }
       // set ciphertext bytes
       for (let i = 0; i < c.length; i++) {
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         globalThis.wasmExports.set_ct_byte(i, c[i]);
       }
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const msgSize = globalThis.wasmExports.decrypt(c.length);
       // get message bytes
       for (let i = 0; i < msgSize; i++) {
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
         const msgByte = globalThis.wasmExports.get_msg_byte(i);
         msgBytes.push(msgByte);
       }
@@ -484,11 +462,9 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
   this.generate_poly = function (threshold: any) {
     wasmBlsSdkHelpers.set_rng_values();
     const polySize = poly_sizes_by_threshold[threshold];
-    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     globalThis.wasmExports.generate_poly(threshold);
     const polyBytes = [];
     for (let i = 0; i < polySize; i++) {
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const polyByte = globalThis.wasmExports.get_poly_byte(i);
       polyBytes.push(polyByte);
     }
@@ -498,7 +474,6 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
   this.get_msk_bytes = function () {
     const mskBytes = [];
     for (let i = 0; i < skLen; i++) {
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
       const mskByte = globalThis.wasmExports.get_msk_byte(i);
       mskBytes.push(mskByte);
     }
@@ -508,7 +483,7 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
   this.get_mpk_bytes = function () {
     const mpkBytes = [];
     for (let i = 0; i < pkLen; i++) {
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+    
       const mpkByte = globalThis.wasmExports.get_mpk_byte(i);
       mpkBytes.push(mpkByte);
     }
@@ -519,7 +494,7 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
     const mcBytes = [];
     const mcSize = commitment_sizes_by_threshold[threshold];
     for (let i = 0; i < mcSize; i++) {
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+    
       const mcByte = globalThis.wasmExports.get_mc_byte(i);
       mcBytes.push(mcByte);
     }
@@ -530,7 +505,7 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
     // set master commitment in wasm
     for (let i = 0; i < mcBytes.length; i++) {
       const v = mcBytes[i];
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+    
       globalThis.wasmExports.set_mc_byte(i, v);
     }
   };
@@ -538,7 +513,7 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
   this.get_skshare = function () {
     const skshareBytes = [];
     for (let i = 0; i < skLen; i++) {
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+    
       const skshareByte = globalThis.wasmExports.get_skshare_byte(i);
       skshareBytes.push(skshareByte);
     }
@@ -548,7 +523,7 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
   this.get_pkshare = function () {
     const pkshareBytes = [];
     for (let i = 0; i < pkLen; i++) {
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+    
       const pkshareByte = globalThis.wasmExports.get_pkshare_byte(i);
       pkshareBytes.push(pkshareByte);
     }
@@ -571,18 +546,18 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
         // SHARE_INDEXES[i]
         // and
         // SIGNATURE_SHARE_BYTES[i*96:(i+1)*96]
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+      
         globalThis.wasmExports.set_signature_share_byte(
           byteIndex,
           shareIndex,
           sigByte
         );
-        // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+      
         globalThis.wasmExports.set_share_indexes(shareIndex, sigIndex);
       }
     }
     // combine the signatures
-    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+  
     globalThis.wasmExports.combine_signature_shares(
       sigshares.length,
       mcBytes.length
@@ -590,7 +565,7 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
     // read the combined signature
     const sigBytes = [];
     for (let i = 0; i < sigLen; i++) {
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+    
       const sigByte = globalThis.wasmExports.get_sig_byte(i);
       sigBytes.push(sigByte);
     }
@@ -609,27 +584,27 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
   ) {
     // set ct bytes
     for (let i = 0; i < ct.length; i++) {
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+    
       globalThis.wasmExports.set_ct_byte(i, ct[i]);
     }
     // set secret key share
     for (let i = 0; i < s.length; i++) {
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+    
       globalThis.wasmExports.set_sk_byte(i, s[i]);
     }
     // create decryption share
-    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+  
     const dshareSize = globalThis.wasmExports.create_decryption_share(
       uiShareIndex,
       ct.length
     );
     // set derivedShareIndex
-    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+  
     globalThis.wasmExports.set_share_indexes(uiShareIndex, derivedShareIndex);
     // read decryption share
     const dshareBytes = [];
     for (let i = 0; i < decryptionShareLen; i++) {
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+    
       const dshareByte = globalThis.wasmExports.get_decryption_shares_byte(
         i,
         uiShareIndex
@@ -646,7 +621,7 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
   // and share_indexes is already set
   this.combine_decryption_shares = function (totalShares: any, mcSize: any, ctSize: any) {
     // combine decryption shares
-    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+  
     const msgSize = globalThis.wasmExports.combine_decryption_shares(
       totalShares,
       mcSize,
@@ -655,13 +630,13 @@ export const wasmBlsSdkHelpers = new ((function(this: any) {
     // read msg
     const msgBytes = [];
     for (let i = 0; i < msgSize; i++) {
-      // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+    
       const msgByte = globalThis.wasmExports.get_msg_byte(i);
       msgBytes.push(msgByte);
     }
     return Uint8Array.from(msgBytes);
   };
-}))();
+}))as any)();
 
 let wasm: any;
 

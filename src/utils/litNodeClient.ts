@@ -87,7 +87,7 @@ import { LitNodeClientConfig } from "../types/types";
  * @param {boolean} [config.debug=true] Whether or not to show debug messages.
  */
 export default class LitNodeClient {
-  config: any;
+  config: LitNodeClientConfig;
   connectedNodes: any;
   networkPubKey: any;
   networkPubKeySet: any;
@@ -135,7 +135,6 @@ export default class LitNodeClient {
       console.log("Error accessing local storage", e);
     }
 
-    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     globalThis.litConfig = this.config;
   }
 
@@ -346,7 +345,7 @@ export default class LitNodeClient {
     }
 
     const res = await this.handleNodePromises(nodePromises);
-    if (res.success === false) {
+    if (res.success === false || res.values === undefined) {
       this.throwNodeError(res);
       return;
     }
@@ -355,7 +354,6 @@ export default class LitNodeClient {
 
     // sanity check
     if (
-      // @ts-expect-error TS(2532): Object is possibly 'undefined'.
       !signatureShares.every(
         (val, i, arr) => val.unsignedJwt === arr[0].unsignedJwt
       )
@@ -367,7 +365,6 @@ export default class LitNodeClient {
     }
 
     // sort the sig shares by share index.  this is important when combining the shares.
-    // @ts-expect-error TS(2532): Object is possibly 'undefined'.
     signatureShares.sort((a, b) => a.shareIndex - b.shareIndex);
 
     // combine the signature shares
@@ -375,7 +372,6 @@ export default class LitNodeClient {
     const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, "base16");
     log("pkSetAsBytes", pkSetAsBytes);
 
-    // @ts-expect-error TS(2532): Object is possibly 'undefined'.
     const sigShares = signatureShares.map((s) => ({
       shareHex: s.signatureShare,
       shareIndex: s.shareIndex,
@@ -388,7 +384,6 @@ export default class LitNodeClient {
     log("signature is ", uint8arrayToString(signature, "base16"));
 
     const unsignedJwt = mostCommonString(
-      // @ts-expect-error TS(2532): Object is possibly 'undefined'.
       signatureShares.map((s) => s.unsignedJwt)
     );
 
@@ -470,8 +465,16 @@ export default class LitNodeClient {
       });
     }
 
+    if (!hashOfConditions){
+      throwError({
+        message: `hashOfConditions`,
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
+      return
+    }
+
     const hashOfConditionsStr = uint8arrayToString(
-      // @ts-expect-error TS(2769): No overload matches this call.
       new Uint8Array(hashOfConditions),
       "base16"
     );
@@ -650,7 +653,7 @@ export default class LitNodeClient {
       );
     }
     const res = await this.handleNodePromises(nodePromises);
-    if (res.success === false) {
+    if (res.success === false || res.values === undefined) {
       this.throwNodeError(res);
       return;
     }
@@ -658,19 +661,15 @@ export default class LitNodeClient {
     log("decryptionShares", decryptionShares);
 
     // sort the decryption shares by share index.  this is important when combining the shares.
-    // @ts-expect-error TS(2532): Object is possibly 'undefined'.
     decryptionShares.sort((a, b) => a.shareIndex - b.shareIndex);
 
     // combine the decryption shares
 
     // set decryption shares bytes in wasm
-    // @ts-expect-error TS(2532): Object is possibly 'undefined'.
     decryptionShares.forEach((s, idx) => {
-      // @ts-expect-error TS(2304): Cannot find name 'wasmExports'.
       wasmExports.set_share_indexes(idx, s.shareIndex);
       const shareAsBytes = uint8arrayFromString(s.decryptionShare, "base16");
       for (let i = 0; i < shareAsBytes.length; i++) {
-        // @ts-expect-error TS(2304): Cannot find name 'wasmExports'.
         wasmExports.set_decryption_shares_byte(i, idx, shareAsBytes[i]);
       }
     });
@@ -682,12 +681,10 @@ export default class LitNodeClient {
     // set the ciphertext bytes
     const ciphertextAsBytes = uint8arrayFromString(toDecrypt, "base16");
     for (let i = 0; i < ciphertextAsBytes.length; i++) {
-      // @ts-expect-error TS(2304): Cannot find name 'wasmExports'.
       wasmExports.set_ct_byte(i, ciphertextAsBytes[i]);
     }
 
     const decrypted = wasmBlsSdkHelpers.combine_decryption_shares(
-      // @ts-expect-error TS(2532): Object is possibly 'undefined'.
       decryptionShares.length,
       pkSetAsBytes.length,
       ciphertextAsBytes.length
@@ -881,8 +878,16 @@ export default class LitNodeClient {
       });
     }
 
+    if (!hashOfConditions){
+      throwError({
+        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
+      return
+    }
+
     const hashOfConditionsStr = uint8arrayToString(
-      // @ts-expect-error TS(2769): No overload matches this call.
       new Uint8Array(hashOfConditions),
       "base16"
     );

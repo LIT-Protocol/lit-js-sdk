@@ -1,4 +1,4 @@
-import JSZip from "jszip";
+import JSZip, { JSZipObject } from "jszip";
 import {
   fromString as uint8arrayFromString,
   toString as uint8arrayToString,
@@ -27,12 +27,12 @@ import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 
 import { fileToDataUrl } from "./browser";
 import { ALL_LIT_CHAINS, NETWORK_PUB_KEY } from "../lib/constants";
-import { AllLitChainsKeys, AuthSig, EncryptedString, LitChainsKeys, LitCosmosChainsKeys, LitSVMChainsKeys } from "../types/types";
+import { AllLitChainsKeys, AuthSig, EncryptedString, EncryptedZipWithKey, LitChainsKeys, LitCosmosChainsKeys, LitSVMChainsKeys } from "../types/types";
 
 import Blob from "cross-blob";
 import LitNodeClient from "./litNodeClient";
 
-const PACKAGE_CACHE = {};
+const PACKAGE_CACHE = {} as Record<string, string>;
 
 /**
  * Check for an existing cryptographic authentication signature and create one of it does not exist.  This is used to prove ownership of a given crypto wallet address to the Lit nodes.  The result is stored in LocalStorage so the user doesn't have to sign every time they perform an operation.
@@ -166,7 +166,7 @@ export async function zipAndEncryptString(string: any): Promise<object> {
       functionName: "zipAndEncryptString",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
+    
     return;
 
   const zip = new JSZip();
@@ -179,7 +179,7 @@ export async function zipAndEncryptString(string: any): Promise<object> {
  * @param {Array<File>} files An array of the files you wish to zip and encrypt
  * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
  */
-export async function zipAndEncryptFiles(files: any): Promise<object> {
+export async function zipAndEncryptFiles(files: any): Promise<EncryptedZipWithKey | undefined> {
   // let's zip em
   const zip = new JSZip();
   for (let i = 0; i < files.length; i++) {
@@ -191,10 +191,9 @@ export async function zipAndEncryptFiles(files: any): Promise<object> {
         functionName: "zipAndEncryptFiles",
       })
     )
-      // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
+      
       return;
-    // @ts-expect-error TS(2531): Object is possibly 'null'.
-    zip.folder("encryptedAssets").file(files[i].name, files[i]);
+    zip.folder("encryptedAssets")?.file(files[i].name, files[i]);
   }
   return encryptZip(zip);
 }
@@ -205,7 +204,7 @@ export async function zipAndEncryptFiles(files: any): Promise<object> {
  * @param {Uint8Array} symmKey The symmetric key used that will be used to decrypt this zip.
  * @returns {Promise<Object>} A promise containing a JSZip object indexed by the filenames of the zipped files.  For example, if you have a file called "meow.jpg" in the root of your zip, you could get it from the JSZip object by doing this: const imageBlob = await decryptedZip['meow.jpg'].async('blob')
  */
-export async function decryptZip(encryptedZipBlob: any, symmKey: any): Promise<object> {
+export async function decryptZip(encryptedZipBlob: any, symmKey: any): Promise<Record<string,JSZipObject>> {
   if (
     !checkType({
       value: encryptedZipBlob,
@@ -214,7 +213,7 @@ export async function decryptZip(encryptedZipBlob: any, symmKey: any): Promise<o
       functionName: "decryptZip",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
+    
     return;
   if (
     !checkType({
@@ -224,7 +223,6 @@ export async function decryptZip(encryptedZipBlob: any, symmKey: any): Promise<o
       functionName: "decryptZip",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   // const keypair = await checkAndDeriveKeypair()
 
@@ -264,12 +262,13 @@ export async function decryptZip(encryptedZipBlob: any, symmKey: any): Promise<o
   return unzipped.files;
 }
 
+
 /**
  * Encrypt a zip file created with JSZip using a new random symmetric key via WebCrypto.
  * @param {JSZip} zip The JSZip instance to encrypt
  * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array string.
  */
-export async function encryptZip(zip: any): Promise<object> {
+export async function encryptZip(zip: JSZip): Promise<EncryptedZipWithKey> {
   const zipBlob = await zip.generateAsync({ type: "blob" });
   const zipBlobArrayBuffer = await zipBlob.arrayBuffer();
   // log('blob', zipBlob)
@@ -362,7 +361,7 @@ export async function encryptFileAndZipWithMetadata({
   file,
   litNodeClient,
   readme
-}: any): Promise<object> {
+}: any): Promise<object | undefined> {
   // -- validate
   if (
     !checkType({
@@ -372,7 +371,6 @@ export async function encryptFileAndZipWithMetadata({
       functionName: "encryptFileAndZipWithMetadata",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     accessControlConditions &&
@@ -383,7 +381,6 @@ export async function encryptFileAndZipWithMetadata({
       functionName: "encryptFileAndZipWithMetadata",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     evmContractConditions &&
@@ -394,7 +391,6 @@ export async function encryptFileAndZipWithMetadata({
       functionName: "encryptFileAndZipWithMetadata",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     solRpcConditions &&
@@ -405,7 +401,6 @@ export async function encryptFileAndZipWithMetadata({
       functionName: "encryptFileAndZipWithMetadata",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     unifiedAccessControlConditions &&
@@ -416,7 +411,6 @@ export async function encryptFileAndZipWithMetadata({
       functionName: "encryptFileAndZipWithMetadata",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     !checkIfAuthSigRequiresChainParam(
@@ -425,7 +419,6 @@ export async function encryptFileAndZipWithMetadata({
       "encryptFileAndZipWithMetadata"
     )
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     !checkType({
@@ -435,7 +428,6 @@ export async function encryptFileAndZipWithMetadata({
       functionName: "encryptFileAndZipWithMetadata",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   if (
     readme &&
@@ -446,7 +438,6 @@ export async function encryptFileAndZipWithMetadata({
       functionName: "encryptFileAndZipWithMetadata",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
 
   const symmetricKey = await generateSymmetricKey();
@@ -490,8 +481,7 @@ export async function encryptFileAndZipWithMetadata({
   if (readme) {
     zip.file("readme.txt", readme);
   }
-  // @ts-expect-error TS(2531): Object is possibly 'null'.
-  zip.folder("encryptedAssets").file(file.name, encryptedZipBlob);
+  zip.folder("encryptedAssets")?.file(file.name, encryptedZipBlob);
 
   const zipBlob = await zip.generateAsync({ type: "blob" });
 
@@ -630,7 +620,7 @@ export async function decryptZipFileWithMetadata({
  */
 export async function encryptFile({
   file
-}: any): Promise<object> {
+}: any): Promise<object| undefined> {
   if (
     !checkType({
       value: file,
@@ -639,7 +629,6 @@ export async function encryptFile({
       functionName: "encryptFile",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
 
   // generate a random symmetric key
@@ -698,12 +687,10 @@ export async function decryptFile({
   return decryptedFile;
 }
 
-async function getNpmPackage(packageName: any) {
+async function getNpmPackage(packageName: string) {
   // log('getting npm package: ' + packageName)
-  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   if (PACKAGE_CACHE[packageName]) {
     // log('found in cache')
-    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     return PACKAGE_CACHE[packageName];
   }
 
@@ -714,9 +701,9 @@ async function getNpmPackage(packageName: any) {
   }
   const blob = await resp.blob();
   // log('got blob', blob)
-  const dataUrl = await fileToDataUrl(blob);
+  const dataUrl = await fileToDataUrl(blob) as string;
   // log('got dataUrl', dataUrl)
-  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+  
   PACKAGE_CACHE[packageName] = dataUrl;
   return dataUrl;
 }
@@ -834,12 +821,10 @@ export async function toggleLock(): Promise<any> {
   const mediaGridHolder = document.getElementById("mediaGridHolder");
   const lockedHeader = document.getElementById("lockedHeader");
 
-  // @ts-expect-error TS(2551): Property 'locked' does not exist on type 'Window &... Remove this comment to see the full error message
   if (window.locked) {
     // save public content before decryption, so we can toggle back to the
 // locked state in the future
-// @ts-expect-error TS(2531): Object is possibly 'null'.
-(window as any).publicContent = mediaGridHolder.innerHTML;
+(window as any).publicContent = mediaGridHolder?.innerHTML;
 
     if (!(window as any).useLitPostMessageProxy && !(window as any).litNodeClient.ready) {
       alert(
@@ -896,11 +881,8 @@ const symmetricKey = await (window as any).litNodeClient.getEncryptionKey({
 
     await unlockLitWithKey({ symmetricKey });
   } else {
-    // @ts-expect-error TS(2531): Object is possibly 'null'.
-    mediaGridHolder.innerHTML = (window as any).publicContent;
-    // @ts-expect-error TS(2531): Object is possibly 'null'.
-    lockedHeader.innerText = "LOCKED";
-    // @ts-expect-error TS(2551): Property 'locked' does not exist on type 'Window &... Remove this comment to see the full error message
+    if (mediaGridHolder) mediaGridHolder.innerHTML = (window as any).publicContent;
+    if (lockedHeader) lockedHeader.innerText = "LOCKED";
     window.locked = true;
   }
 }
@@ -929,13 +911,13 @@ export async function unlockLitWithKey({
   // convert data url to blob
 const encryptedZipBlob = await (await fetch((window as any).encryptedZipDataUrl)).blob();
   const decryptedFiles = await decryptZip(encryptedZipBlob, symmetricKey);
-  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   const mediaGridHtmlBody = await decryptedFiles["string.txt"].async("text");
-  // @ts-expect-error TS(2531): Object is possibly 'null'.
-  mediaGridHolder.innerHTML = mediaGridHtmlBody;
-  // @ts-expect-error TS(2531): Object is possibly 'null'.
-  lockedHeader.innerText = "UNLOCKED";
-  // @ts-expect-error TS(2551): Property 'locked' does not exist on type 'Window &... Remove this comment to see the full error message
+  if (mediaGridHolder){
+    mediaGridHolder.innerHTML = mediaGridHtmlBody;
+  }
+  if (lockedHeader){
+    lockedHeader.innerText = "UNLOCKED";
+  }
   window.locked = false;
 }
 
@@ -947,7 +929,7 @@ const encryptedZipBlob = await (await fetch((window as any).encryptedZipDataUrl)
  */
 export function verifyJwt({
   jwt
-}: any): object {
+}: any): object | undefined {
   if (
     !checkType({
       value: jwt,
@@ -956,11 +938,10 @@ export function verifyJwt({
       functionName: "verifyJwt",
     })
   )
-    // @ts-expect-error TS(2322): Type 'undefined' is not assignable to type 'object... Remove this comment to see the full error message
     return;
   log("verifyJwt", jwt);
   // verify that the wasm was loaded
-  // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
+  
   if (!globalThis.wasmExports) {
     log("wasmExports is not loaded.");
     // initWasmBlsSdk().then((exports) => {
@@ -1056,7 +1037,7 @@ function humanizeComparator(comparator: any) {
  * @param {Array} params.evmContractConditions The array of evm contract conditions that you want to humanize
  * @param {Array} params.solRpcConditions The array of Solana RPC conditions that you want to humanize
  * @param {Array} params.unifiedAccessControlConditions The array of unified access control conditions that you want to humanize
- * @returns {Promise<string>} A promise containing a human readable description of the access control conditions
+ * @returns {Promise<string | undefined>} A promise containing a human readable description of the access control conditions
  */
 export async function humanizeAccessControlConditions({
   accessControlConditions,
@@ -1065,8 +1046,7 @@ export async function humanizeAccessControlConditions({
   unifiedAccessControlConditions,
   tokenList,
   myWalletAddress
-// @ts-expect-error TS(2366): Function lacks ending return statement and return ... Remove this comment to see the full error message
-}: any): Promise<string> {
+}: any): Promise<string | undefined> {
   if (accessControlConditions) {
     return humanizeEvmBasicAccessControlConditions({
       accessControlConditions,

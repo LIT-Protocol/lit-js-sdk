@@ -26,7 +26,7 @@ function getProvider() {
 export async function connectCosmosProvider({
   chain
 }: any) {
-  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+  
   const chainId = LIT_COSMOS_CHAINS[chain].chainId;
 
   const keplr = getProvider();
@@ -139,8 +139,7 @@ export async function signAndSaveAuthMessage({
   localStorage.setItem("lit-auth-cosmos-signature", JSON.stringify(authSig));
 }
 
-// @ts-expect-error TS(7023): 'sortedObject' implicitly has return type 'any' be... Remove this comment to see the full error message
-function sortedObject(obj: any) {
+function sortedObject(obj: any):any {
   if (typeof obj !== "object" || obj === null) {
     return obj;
   }
@@ -148,10 +147,10 @@ function sortedObject(obj: any) {
     return obj.map(sortedObject);
   }
   const sortedKeys = Object.keys(obj).sort();
-  const result = {};
+  const result = {} as Record<string,any>;
   // NOTE: Use forEach instead of reduce for performance with large objects eg Wasm code
   sortedKeys.forEach((key) => {
-    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+    
     result[key] = sortedObject(obj[key]);
   });
   return result;

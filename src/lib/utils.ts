@@ -19,21 +19,22 @@ export const throwError = ({
   message,
   name,
   errorCode
-}: any) => {
-  // @ts-expect-error TS(7009): 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
-  throw new ((function(this: any) {
+}: {
+  message:string,
+  name:string,
+  errorCode:string
+}) => {
+  throw new (((function(this: any) {
     this.message = message;
     this.name = name;
     this.errorCode = errorCode;
-  }))();
+  })) as any)();
 };
 
 export const log = (...args: any[]) => {
   if (
     globalThis &&
-    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     globalThis.litConfig &&
-    // @ts-expect-error TS(7017): Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     globalThis.litConfig.debug === false
   ) {
     return;
