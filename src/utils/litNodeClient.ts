@@ -26,6 +26,7 @@ import {
   canonicalResourceIdFormatter,
   canonicalUnifiedAccessControlConditionFormatter,
 } from "./crypto";
+import { LitNodeClientConfig } from "../types/types";
 
 /**
  * @typedef {Object} AccessControlCondition
@@ -93,7 +94,7 @@ export default class LitNodeClient {
   ready: any;
   serverKeys: any;
   subnetPubKey: any;
-  constructor(config: any) {
+  constructor(config?: LitNodeClientConfig) {
     this.config = {
       alertWhenUnauthorized: true,
       minNodeCount: 6,
@@ -126,9 +127,8 @@ export default class LitNodeClient {
       if (typeof window !== "undefined" && window && window.localStorage) {
         let configOverride = window.localStorage.getItem("LitNodeClientConfig");
         if (configOverride) {
-          configOverride = JSON.parse(configOverride);
-          // @ts-expect-error TS(2698): Spread types may only be created from object types... Remove this comment to see the full error message
-          this.config = { ...this.config, ...configOverride };
+          const configOverrideObj = JSON.parse(configOverride) as LitNodeClientConfig;
+          this.config = { ...this.config, ...configOverrideObj };
         }
       }
     } catch (e) {
