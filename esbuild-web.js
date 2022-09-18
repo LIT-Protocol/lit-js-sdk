@@ -8,7 +8,7 @@ const go = async () => {
     bundle: true,
     minify: true,
     sourcemap: true,
-    outfile: "build/index.web.js",
+    outfile: "dist/index.web.js",
     loader: {
       ".svg": "dataurl",
       ".css": "text",

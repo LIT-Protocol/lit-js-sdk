@@ -28,7 +28,7 @@ import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import { fileToDataUrl } from "./browser";
 import { ALL_LIT_CHAINS, NETWORK_PUB_KEY } from "../lib/constants";
 
-import Blob from "cross-blob";
+// import Blob from "cross-blob";
 import LitNodeClient from "./litNodeClient";
 import { AllLitChainsKeys, AuthSig, LitChainsKeys, LitSVMChainsKeys, LitCosmosChainsKeys, EncryptedString, EncryptedZipWithKey, EncryptedFileZipMetadataKey, EncryptedFileWithKey } from "../types";
 

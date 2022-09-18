@@ -1,7 +1,7 @@
 import nacl from "tweetnacl";
 import naclUtil from "tweetnacl-util";
 
-import Blob from "cross-blob"
+// import Blob from "cross-blob"
 
 import { throwError, log } from "../lib/utils";
 

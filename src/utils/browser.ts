@@ -2,7 +2,7 @@ import {
   fromString as uint8arrayFromStringFromLib,
   toString as uint8arrayToStringFromLib,
 } from "uint8arrays";
-import Blob from "cross-blob"
+// import Blob from "cross-blob"
 
 /** Convert a Blob to a base64urlpad string.  Note: This function returns a promise.
  * @param {Blob | File} blob The Blob or File to turn into a base64 string
