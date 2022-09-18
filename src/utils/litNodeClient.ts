@@ -26,7 +26,7 @@ import {
   canonicalResourceIdFormatter,
   canonicalUnifiedAccessControlConditionFormatter,
 } from "./crypto";
-import { LitNodeClientConfig } from "../types/types";
+import { LitNodeClientConfig } from "../types";
 
 /**
  * @typedef {Object} AccessControlCondition

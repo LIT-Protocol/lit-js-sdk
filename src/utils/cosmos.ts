@@ -4,7 +4,7 @@ import {
 } from "uint8arrays";
 import { throwError, log } from "../lib/utils";
 import { LIT_COSMOS_CHAINS } from "../lib/constants";
-import { AuthSig } from "../types/types";
+import { AuthSig } from "../types";
 
 export const AUTH_SIGNATURE_BODY =
   "I am creating an account to use Lit Protocol at {{timestamp}}";

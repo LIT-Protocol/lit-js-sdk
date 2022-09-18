@@ -27,10 +27,10 @@ import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 
 import { fileToDataUrl } from "./browser";
 import { ALL_LIT_CHAINS, NETWORK_PUB_KEY } from "../lib/constants";
-import { AllLitChainsKeys, AuthSig, EncryptedFileWithKey, EncryptedFileZipMetadataKey, EncryptedString, EncryptedZipWithKey, LitChainsKeys, LitCosmosChainsKeys, LitSVMChainsKeys } from "../types/types";
 
 import Blob from "cross-blob";
 import LitNodeClient from "./litNodeClient";
+import { AllLitChainsKeys, AuthSig, LitChainsKeys, LitSVMChainsKeys, LitCosmosChainsKeys, EncryptedString, EncryptedZipWithKey, EncryptedFileZipMetadataKey, EncryptedFileWithKey } from "../types";
 
 const PACKAGE_CACHE = {} as Record<string, string>;
 
@@ -70,7 +70,7 @@ export async function checkAndSignAuthMessage({
     return checkAndSignCosmosAuthMessage({ chain: chain as LitCosmosChainsKeys });
   } else {
     throwError({
-      message: `vmType not found for this chain: ${chain}.  This should not happen.  Unsupported chain selected.  Please select one of: ${Object.keys(
+      message: `vmType not found for this chain: ${new String(chain)}.  This should not happen.  Unsupported chain selected.  Please select one of: ${Object.keys(
         ALL_LIT_CHAINS
       )}`,
       name: "UnsupportedChainException",

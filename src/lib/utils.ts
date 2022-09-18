@@ -1,4 +1,4 @@
-import { LitChainsKeys } from "../types/types.js";
+import { LitChainsKeys } from "../types.js";
 import { LIT_AUTH_SIG_CHAIN_KEYS } from "./constants.js";
 
 export const printError = (e: any) => {

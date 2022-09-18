@@ -1,4 +1,4 @@
-import { LIT_COSMOS_CHAINS, LIT_CHAINS, LIT_SVM_CHAINS } from "../lib/constants"
+import { LIT_CHAINS, LIT_SVM_CHAINS, LIT_COSMOS_CHAINS } from "./lib/constants"
 
 export type AuthSig  = {
     sig:string
@@ -20,10 +20,10 @@ export type LitCosmosChainsKeys = keyof typeof LIT_COSMOS_CHAINS;
 export type AllLitChainsKeys = LitChainsKeys | LitSVMChainsKeys | LitCosmosChainsKeys;
 
 export type LitNodeClientConfig = {
-    alertWhenUnauthorized: boolean,
-    minNodeCount: number,
-    debug: boolean,
-    bootstrapUrls:string[]
+    alertWhenUnauthorized?: boolean,
+    minNodeCount?: number,
+    debug?: boolean,
+    bootstrapUrls?:string[]
     // bootstrapUrls: [
     //     "https://node2.litgateway.com:7370",
     //     "https://node2.litgateway.com:7371",

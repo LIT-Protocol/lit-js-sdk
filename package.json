@@ -6,7 +6,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist/**/**"
+    "dist/**/**",
+    "src/types/**"
   ],
   "scripts": {
     "start": "concurrently \"microbundle watch -o build/index.js -f cjs\" \"nodemon -i build esbuild-nodejs.js\" \"nodemon -i build esbuild-web.js\" \"serve -p 3050 build\" \"sleep 3; open http://localhost:3050/manual_tests.html\" \"sleep 3; open http://localhost:3050/manual_tests_evm_contract_conditions.html\"",

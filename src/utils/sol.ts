@@ -3,7 +3,7 @@ import {
   toString as uint8arrayToString,
 } from "uint8arrays";
 import { throwError, log } from "../lib/utils";
-import { AuthSig, LitSVMChainsKeys } from "../types/types";
+import { AuthSig, LitSVMChainsKeys } from "../types";
 
 export const AUTH_SIGNATURE_BODY =
   "I am creating an account to use Lit Protocol at {{timestamp}}";
