@@ -3,7 +3,8 @@
   "version": "2.0.0",
   "description": "LIT Javascript SDK",
   "source": "src/index.ts",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
+  "type": "module",
   "types": "dist/index.d.ts",
   "files": [
     "dist/**/**",
@@ -15,7 +16,7 @@
     "buildWithMicrobundle": "microbundle build -o build/index.js -f cjs",
     "buildWebWithParcel": "parcel build --global LitJsSdk -d build --out-file index.web.js --public-url ./ src/index.js",
     "cdnDeploy": "yarn build; yarn buildWeb; yarn buildNode",
-    "build": "microbundle build",
+    "build": "microbundle build -f cjs",
     "buildWeb": "node esbuild-web.js",
     "buildNode": "node esbuild-nodejs.js",
     "test": "node --experimental-specifier-resolution=node tests/provisioningAndSigning.js",

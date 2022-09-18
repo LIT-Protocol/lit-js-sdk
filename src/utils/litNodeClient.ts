@@ -1106,9 +1106,9 @@ export default class LitNodeClient {
 
   /**
    * Connect to the LIT nodes.
-   * @returns {Promise} A promise that resolves when the nodes are connected.
+   * @returns {Promise<void>} A promise that resolves when the nodes are connected.
    */
-  connect() {
+  async connect(): Promise<void> {
     // handshake with each node
     for (const url of this.config.bootstrapUrls) {
       this.handshakeWithSgx({ url }).then((resp) => {
@@ -1136,7 +1136,6 @@ this.subnetPubKey = mostCommonString(Object.values(this.serverKeys).map((keysFro
             document.dispatchEvent(new Event("lit-ready"));
           }
 
-          // @ts-expect-error TS(2794): Expected 1 arguments, but got 0. Did you forget to... Remove this comment to see the full error message
           resolve();
         }
       }, 500);
