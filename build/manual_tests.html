@@ -1697,85 +1697,75 @@
         ).innerText = `${testName}: Failure.  We updated a condition we shouldn't been able to!  OMG FIX THIS`;
       };
 
+      ///  ECDSA Test function
+      var EcdsaSignMessage = async () => {
+        const testName = "EcdsaSignMessage";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        try {
+          console.log("start signing message with ECDSA");
+          const nodeResponse = await litNodeClient.signWithEcdsa({
+            message: "LitProtocol rocks!",
+            chain,
+          });
 
-  ///  ECDSA Test function
-  var EcdsaSignMessage = async () => {
-    const testName = "EcdsaSignMessage";
-    document.getElementById("status").innerText = `Testing ${testName}...`;
-    try {
-      console.log("start signing message with ECDSA");
-      const nodeResponse = await litNodeClient.signWithEcdsa({
-        message: "LitProtocol rocks!",
-        chain,
-      });
+          console.log("signed message with ECDSA");
+          const vals = JSON.stringify(nodeResponse);
+          document.getElementById(
+            "status"
+          ).innerText = `${testName}: Success. Response:  ${vals}`;
+        } catch (e) {
+          console.log("error signing with ECDSA", e);
+          document.getElementById(
+            "status"
+          ).innerText = `${testName}: Failure.  `;
+          return;
+        }
+      };
 
-      console.log("signed message with ECDSA");
-      const vals = JSON.stringify(nodeResponse);
-      document.getElementById(
-        "status"
-      ).innerText = `${testName}: Success. Response:  ${vals}`;
-    } catch (e) {
-      console.log("error signing with ECDSA", e);
-      document.getElementById(
-        "status"
-      ).innerText = `${testName}: Failure.  `;
-      return;
-    }
-  };
+      var ecdsa_validate_ERC721 = async () => {
+        const chain = "ethereum";
 
-  var ecdsa_validate_ERC721 = async () => {
+        var accessControlConditions = [
+          {
+            contractAddress: "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85",
+            standardContractType: "ERC721",
+            chain,
+            method: "balanceOf",
+            parameters: [":userAddress"],
+            returnValueTest: {
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
 
-    const chain = "ethereum";
+        const testName = "ecdsa_validate_condition";
 
-    var accessControlConditions = [
-      {
-        contractAddress: "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85",
-        standardContractType: "ERC721",
-        chain,
-        method: "balanceOf",
-        parameters: [":userAddress"],
-        returnValueTest: {
-          comparator: ">",
-          value: "0",
-        },
-      },
-    ];
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        try {
+          console.log("validating condition and ecdsa signing ");
 
-    const testName = "ecdsa_validate_condition";
+          var auth_sig = await LitJsSdk.checkAndSignAuthMessage({ chain });
 
-
-    document.getElementById("status").innerText = `Testing ${testName}...`;
-    try {
-      console.log("validating condition and ecdsa signing ");
-
-      var auth_sig = await LitJsSdk.checkAndSignAuthMessage({ chain });
-
-      const nodeResponse = await litNodeClient.validate_and_sign_ecdsa({
-        accessControlConditions,
-        chain,
-        auth_sig,
-      });
-      //          let jwt = await litNodeClient.getSignedToken({
-      console.log("validated & signed message with ECDSA");
-      const vals = JSON.stringify(nodeResponse);
-      document.getElementById(
-        "status"
-      ).innerText = `${testName}: Success. Response:  ${vals}`;
-    } catch (e) {
-      console.log("error validating & signing with ECDSA", e);
-      document.getElementById(
-        "status"
-      ).innerText = `${testName}: Failure.  `;
-      return;
-    }
-
-
-
-
-  };
-
-
-
+          const nodeResponse = await litNodeClient.validate_and_sign_ecdsa({
+            accessControlConditions,
+            chain,
+            auth_sig,
+          });
+          //          let jwt = await litNodeClient.getSignedToken({
+          console.log("validated & signed message with ECDSA");
+          const vals = JSON.stringify(nodeResponse);
+          document.getElementById(
+            "status"
+          ).innerText = `${testName}: Success. Response:  ${vals}`;
+        } catch (e) {
+          console.log("error validating & signing with ECDSA", e);
+          document.getElementById(
+            "status"
+          ).innerText = `${testName}: Failure.  `;
+          return;
+        }
+      };
 
       var EthSignPermanantCondition = async () => {
         const testName = "EthSignPermanantCondition";
@@ -2343,26 +2333,22 @@
     <br />
     <br />
 
+    <button onclick="EcdsaSignMessage()">
+      Nodes sign the message "LitProtocol Rocks!" using ECDSA with default key.
+    </button>
+    <br />
+    <br />
+    <button onclick="ecdsa_validate_ERC721()">
+      Cross chain validation of NFT (ERC721) /w ECDSA signature result.
+    </button>
+    <br />
+    <br /><button onclick="EthSignPermanentCondition()">
+      >>>>>>> Stashed changes JWT request - Set the conditions as permanent (but
+      with the correct spelling), then try to update the conditions
+    </button>
+    <br />
+    <br />
 
-        <button onclick="EcdsaSignMessage()">
-          Nodes sign the message "LitProtocol Rocks!" using ECDSA with default key.
-        </button>
-        <br />
-        <br />
-        <button onclick="ecdsa_validate_ERC721()">
-          Cross chain validation of NFT (ERC721) /w ECDSA signature result.
-        </button>
-        <br />
-        <br /><button onclick="EthSignPermanentCondition()">
-          >>>>>>> Stashed changes
-          JWT request - Set the conditions as permanent (but with the correct
-          spelling), then try to update the conditions
-        </button>
-        <br />
-        <br />
-
-
-        
     <button onclick="NestedGrouping()">NestedGrouping</button>
     <br />
     <br />

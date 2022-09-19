@@ -197,6 +197,7 @@ Request a signed JWT from the LIT network.  Before calling this function, you mu
     *   `params.chain` **[string][139]** The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
     *   `params.authSig` **[AuthSig][140]** The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions.
     *   `params.resourceId` **[ResourceId][146]** The resourceId representing something on the web via a URL
+    *   `params.sessionSigs`  
 
 Returns **[Object][136]** A signed JWT that proves you meet the access control conditions for the given resource id.  You may present this to a server for authorization, and the server can verify it using the verifyJwt function.
 
@@ -217,6 +218,7 @@ Associated access control conditions with a resource on the web.  After calling 
     *   `params.resourceId` **[ResourceId][146]** The resourceId representing something on the web via a URL
     *   `params.permanent` **[boolean][137]** Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default. (optional, default `true`)
     *   `params.permanant`  
+    *   `params.sessionSigs`  
 
 Returns **[boolean][137]** Success
 
@@ -235,6 +237,7 @@ Retrieve the symmetric encryption key from the LIT nodes.  Note that this will o
     *   `params.toDecrypt` **[string][139]** The ciphertext that you wish to decrypt encoded as a hex string
     *   `params.chain` **[string][139]** The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
     *   `params.authSig` **[AuthSig][140]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
+    *   `params.sessionSigs`  
 
 Returns **[Uint8Array][147]** The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
 
@@ -256,8 +259,8 @@ Securely save the association between access control conditions and something th
     *   `params.encryptedSymmetricKey` **[Uint8Array][147]** The encrypted symmetric key of the item you with to update.  You must pass either symmetricKey or encryptedSymmetricKey.
     *   `params.permanent` **[boolean][137]** Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default. (optional, default `true`)
     *   `params.permanant`  
+    *   `params.sessionSigs`  
 
-<<<<<<< HEAD
 Returns **[Uint8Array][147]** The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will need it to decrypt the content in the future.
 
 ### signWithEcdsa
@@ -287,9 +290,6 @@ Validates a condition, and then signs the condition if the validation returns tr
     *   `params.auth_sig`  
 
 Returns **[Object][136]** JSON structure with signed message, signature & public key..
-=======
-Returns **[Uint8Array][139]** The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will need it to decrypt the content in the future.
->>>>>>> main
 
 ### connect
 
@@ -476,6 +476,8 @@ Check for an existing cryptographic authentication signature and create one of i
     *   `params.chain` **[string][139]** The chain you want to use.  Find the supported list of chains here: [https://developer.litprotocol.com/docs/supportedChains][151]
     *   `params.resources` **[Array][141]<[string][139]>** Optional and only used with EVM chains.  A list of resources to be passed to Sign In with Ethereum.  These resources will be part of the Sign in with Ethereum signed message presented to the user.
     *   `params.switchChain` **[Array][141]<[boolean][137]>** Optional and only used with EVM chains right now.  Set to true by default.  Whether or not to ask Metamask or the user's wallet to switch chains before signing.  This may be desired if you're going to have the user send a txn on that chain.  On the other hand, if all you care about is the user's wallet signature, then you probably don't want to make them switch chains for no reason.  Pass false here to disable this chain switching behavior. (optional, default `true`)
+    *   `params.expiration`  
+    *   `params.uri`  
 
 Returns **[AuthSig][140]** The AuthSig created or retrieved
 
@@ -491,6 +493,8 @@ Sign the auth message with the user's wallet, and store it in localStorage.  Cal
     *   `params.account` **[string][139]** The account to sign the message with
     *   `params.chainId`  
     *   `params.resources`  
+    *   `params.uri`  
+    *   `params.expiration`  
 
 Returns **[AuthSig][140]** The AuthSig created or retrieved
 
