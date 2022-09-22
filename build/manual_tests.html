@@ -1047,6 +1047,67 @@
         ).innerText = `${testName}: Success.  Decrypted string is: ${decryptedString}`;
       };
 
+      var EncryptDecryptString = async () => {
+        const testName = "EncryptDecryptString";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+        });
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain,
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { accessControlConditions }
+        )}`;
+
+        const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(
+          "this is a secret message"
+        );
+
+        const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
+          accessControlConditions,
+          symmetricKey,
+          authSig,
+          chain,
+        });
+
+        console.log("encrypted symmetric key", encryptedSymmetricKey);
+
+        const retrievedSymmKey = await litNodeClient.getEncryptionKey({
+          accessControlConditions,
+          toDecrypt: LitJsSdk.uint8arrayToString(
+            encryptedSymmetricKey,
+            "base16"
+          ),
+          chain,
+          authSig,
+        });
+
+        const decryptedString = await LitJsSdk.decryptString(
+          encryptedString,
+          retrievedSymmKey
+        );
+
+        console.log("decrypted string", decryptedString);
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Success.  Decrypted string is: ${decryptedString}`;
+      };
+
       var EncryptDecryptWithAnUpdate = async () => {
         const testName = "EncryptDecryptWithAnUpdate";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -2279,6 +2340,11 @@
     <br />
     <br />
     <button onclick="EncryptDecrypt()">Encrypt then Decrypt</button>
+    <br />
+    <br />
+    <button onclick="EncryptDecryptString()">
+      Encrypt then Decrypt A String
+    </button>
     <br />
     <br />
     <button onclick="EncryptDecryptWithAnUpdate()">
