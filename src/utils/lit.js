@@ -630,7 +630,7 @@ export async function encryptFile({ file }) {
  * @param {Object} params
  * @param {Blob|File} params.file The file you wish to decrypt
  * @param {Uint8Array} params.symmetricKey The symmetric key used that will be used to decrypt this.
- * @returns {Promise<Object>} A promise containing the decrypted file.  The file is an ArrayBuffer.
+ * @returns {Promise<ArrayBuffer>} A promise containing the decrypted file.  The file is an ArrayBuffer.
  */
 export async function decryptFile({ file, symmetricKey }) {
   // -- validate
