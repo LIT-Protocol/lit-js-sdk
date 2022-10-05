@@ -289,7 +289,7 @@ Decrypt a file that was encrypted with the encryptFile function, without doing a
     *   `params.file` **([Blob][141] | File)** The file you wish to decrypt
     *   `params.symmetricKey` **[Uint8Array][139]** The symmetric key used that will be used to decrypt this.
 
-Returns **[Promise][140]<[Object][128]>** A promise containing the decrypted file.  The file is an ArrayBuffer.
+Returns **[Promise][140]<[ArrayBuffer][142]>** A promise containing the decrypted file.  The file is an ArrayBuffer.
 
 ## zipAndEncryptString
 
@@ -326,7 +326,7 @@ Encrypt a single file, save the key to the Lit network, and then zip it up with 
     *   `params.unifiedAccessControlConditions` **[Array][131]<([AccessControlCondition][134] | [EVMContractCondition][135] | [SolRpcCondition][136])>** An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
     *   `params.chain` **[string][133]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
     *   `params.file` **File** The file you wish to encrypt
-    *   `params.litNodeClient` **[LitNodeClient][142]** An instance of LitNodeClient that is already connected
+    *   `params.litNodeClient` **[LitNodeClient][143]** An instance of LitNodeClient that is already connected
     *   `params.readme` **[string][133]** An optional readme text that will be inserted into readme.txt in the final zip file.  This is useful in case someone comes across this zip file and wants to know how to decrypt it.  This file could contain instructions and a URL to use to decrypt the file.
 
 Returns **[Promise][140]<[Object][128]>** A promise containing an object with 3 keys: zipBlob, encryptedSymmetricKey, and symmetricKey.  zipBlob is a zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network.  encryptedSymmetricKey is the symmetric key needed to decrypt the content, encrypted with the Lit network public key.  You may wish to store encryptedSymmetricKey in your own database to support quicker re-encryption operations when adding additional access control conditions in the future, but this is entirely optional, and this key is already stored inside the zipBlob.  symmetricKey is the raw symmetric key used to encrypt the files.  DO NOT STORE IT.  It is provided in case you wish to create additional "OR" access control conditions for the same file.
@@ -341,7 +341,7 @@ Given a zip file with metadata inside it, unzip, load the metadata, and return t
 
     *   `params.authSig` **[Object][128]** The authSig of the user.  Returned via the checkAndSignAuthMessage function
     *   `params.file` **([Blob][141] | File)** The zip file blob with metadata inside it and the encrypted asset
-    *   `params.litNodeClient` **[LitNodeClient][142]** An instance of LitNodeClient that is already connected
+    *   `params.litNodeClient` **[LitNodeClient][143]** An instance of LitNodeClient that is already connected
     *   `params.additionalAccessControlConditions`  
 
 Returns **[Promise][140]<[Object][128]>** A promise containing an object that contains decryptedFile and metadata properties.  The decryptedFile is an ArrayBuffer that is ready to use, and metadata is an object that contains all the properties of the file like it's name and size and type.
@@ -417,7 +417,7 @@ Check for an existing cryptographic authentication signature and create one of i
 
 *   `params` **[Object][128]** 
 
-    *   `params.chain` **[string][133]** The chain you want to use.  Find the supported list of chains here: [https://developer.litprotocol.com/docs/supportedChains][143]
+    *   `params.chain` **[string][133]** The chain you want to use.  Find the supported list of chains here: [https://developer.litprotocol.com/docs/supportedChains][144]
     *   `params.resources` **[Array][131]<[string][133]>** Optional and only used with EVM chains.  A list of resources to be passed to Sign In with Ethereum.  These resources will be part of the Sign in with Ethereum signed message presented to the user.
     *   `params.switchChain` **[Array][131]<[boolean][129]>** Optional and only used with EVM chains right now.  Set to true by default.  Whether or not to ask Metamask or the user's wallet to switch chains before signing.  This may be desired if you're going to have the user send a txn on that chain.  On the other hand, if all you care about is the user's wallet signature, then you probably don't want to make them switch chains for no reason.  Pass false here to disable this chain switching behavior. (optional, default `true`)
 
@@ -468,7 +468,7 @@ Returns **[Blob][141]** A blob that contains the decoded base64 data
 
 ## uint8arrayToString
 
-Convert a Uint8Array to a string.  Supports various encodings.  This is a re-export of [https://www.npmjs.com/package/uint8arrays][144] and you can find the list of supported encodings here [https://github.com/multiformats/multibase/blob/master/multibase.csv][145]
+Convert a Uint8Array to a string.  Supports various encodings.  This is a re-export of [https://www.npmjs.com/package/uint8arrays][145] and you can find the list of supported encodings here [https://github.com/multiformats/multibase/blob/master/multibase.csv][146]
 
 ### Parameters
 
@@ -479,7 +479,7 @@ Returns **[String][133]** The string representation of the Uint8Array
 
 ## uint8arrayFromString
 
-Convert a string to a Uint8Array.  Supports various encodings.  This is a re-export of [https://www.npmjs.com/package/uint8arrays][144] and you can find the list of supported encodings here [https://github.com/multiformats/multibase/blob/master/multibase.csv][145]
+Convert a string to a Uint8Array.  Supports various encodings.  This is a re-export of [https://www.npmjs.com/package/uint8arrays][145] and you can find the list of supported encodings here [https://github.com/multiformats/multibase/blob/master/multibase.csv][146]
 
 ### Parameters
 
@@ -527,7 +527,7 @@ Hash the unified access control conditions using SHA-256 in a deterministic way.
 
 *   `unifiedAccessControlConditions` **[Object][128]** The unified access control conditions to hash.
 
-Returns **[Promise][140]<[ArrayBuffer][146]>** A promise that resolves to an ArrayBuffer that contains the hash
+Returns **[Promise][140]<[ArrayBuffer][142]>** A promise that resolves to an ArrayBuffer that contains the hash
 
 ## HTML NFT Utilities
 
@@ -1192,15 +1192,15 @@ Type: [Object][128]
 
 [141]: https://developer.mozilla.org/docs/Web/API/Blob
 
-[142]: #litnodeclient
+[142]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
 
-[143]: https://developer.litprotocol.com/docs/supportedChains
+[143]: #litnodeclient
 
-[144]: https://www.npmjs.com/package/uint8arrays
+[144]: https://developer.litprotocol.com/docs/supportedChains
 
-[145]: https://github.com/multiformats/multibase/blob/master/multibase.csv
+[145]: https://www.npmjs.com/package/uint8arrays
 
-[146]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
+[146]: https://github.com/multiformats/multibase/blob/master/multibase.csv
 
 [147]: https://docs.solana.com/developing/clients/jsonrpc-api
 
