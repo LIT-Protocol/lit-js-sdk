@@ -426,6 +426,7 @@
         });
       };
 
+      // this test should fail.  that means it worked.  because I only have 1 of the NFTs and this is >1
       var SolUserTest = async () => {
         var solRpcConditions = [
           {
@@ -435,7 +436,7 @@
             pdaInterface: { offset: 0, fields: {} },
             pdaKey: "",
             chain: "solana",
-            returnValueTest: { key: "", comparator: ">=", value: "0" },
+            returnValueTest: { key: "", comparator: ">", value: "1" },
           },
         ];
         await testProvisoningEncryptingAndDecrypting({
