@@ -164,7 +164,7 @@ export default class LitNodeClient {
    * @param {Boolean} params.debug A boolean that defines if debug info will be returned or not.
    * @returns {Object} An object containing the resulting signatures.  Each signature comes with the public key and the data signed.
    */
-  async executeJs({ code, ipfsId, authSig, jsParams, debug }) {
+  async executeJs({ code, ipfsId, authSig, jsParams = {}, debug }) {
     if (!this.ready) {
       throwError({
         message:
