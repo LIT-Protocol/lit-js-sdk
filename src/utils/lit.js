@@ -1476,3 +1476,52 @@ export async function getTokenList() {
 export const sendMessageToFrameParent = (data) => {
   window.parent.postMessage(data, "*");
 };
+
+/**
+ * Get the final config object from any overrides
+ * Checks localStorage for override if browser client
+ * Stores config to globalThis.litConfig and return final config object
+ * 
+ * @param {*} config the override config object
+ * 
+ * @returns overridden config
+ */
+export const configure = (config) => {
+  let _config = {
+    alertWhenUnauthorized: true,
+    minNodeCount: 6,
+    debug: true,
+    bootstrapUrls: [
+      "https://node2.litgateway.com:7370",
+      "https://node2.litgateway.com:7371",
+      "https://node2.litgateway.com:7372",
+      "https://node2.litgateway.com:7373",
+      "https://node2.litgateway.com:7374",
+      "https://node2.litgateway.com:7375",
+      "https://node2.litgateway.com:7376",
+      "https://node2.litgateway.com:7377",
+      "https://node2.litgateway.com:7378",
+      "https://node2.litgateway.com:7379",
+    ],
+  };
+
+  if (config) {
+    _config = { ..._config, ...config };
+  }
+
+  try {
+    if (typeof window !== "undefined" && window && window.localStorage) {
+      let configOverride = window.localStorage.getItem("LitNodeClientConfig");
+      if (configOverride) {
+        configOverride = JSON.parse(configOverride);
+        _config = { ..._config, ...configOverride };
+      }
+    }
+  } catch (e) {
+    console.log("Error accessing local storage", e);
+  }
+
+  globalThis.litConfig = _config;
+
+  return _config;
+}
