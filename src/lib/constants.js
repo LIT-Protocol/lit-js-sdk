@@ -417,6 +417,18 @@ export const LIT_NETWORKS = {
     "http://localhost:7478",
     "http://localhost:7479",
   ],
+  mumbai: [
+    "https://polygon-mumbai.litgateway.com:7370",
+    "https://polygon-mumbai.litgateway.com:7371",
+    "https://polygon-mumbai.litgateway.com:7372",
+    "https://polygon-mumbai.litgateway.com:7373",
+    "https://polygon-mumbai.litgateway.com:7374",
+    "https://polygon-mumbai.litgateway.com:7375",
+    "https://polygon-mumbai.litgateway.com:7376",
+    "https://polygon-mumbai.litgateway.com:7377",
+    "https://polygon-mumbai.litgateway.com:7378",
+    "https://polygon-mumbai.litgateway.com:7379",
+  ],
 };
 
 // you can either pass a "chain" param to lit functions, which it uses to tell which network your sig came from.
