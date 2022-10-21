@@ -245,10 +245,15 @@ export default class LitNodeClient {
         });
       }
 
+      const encodedSig = `0x${signature.r}${signature.s}${
+        signature.recid ? "1c" : "1b"
+      }`;
+
       signatures[key] = {
         ...signature,
-        publicKey: mostCommonString(sigShares.map((s) => s.publicKey)),
-        dataSigned: mostCommonString(sigShares.map((s) => s.dataSigned)),
+        signature: encodedSig,
+        publicKey: "0x" + mostCommonString(sigShares.map((s) => s.publicKey)),
+        dataSigned: "0x" + mostCommonString(sigShares.map((s) => s.dataSigned)),
       };
     });
 
