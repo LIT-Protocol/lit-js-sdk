@@ -133,7 +133,7 @@ export default class LitNodeClient {
         }
       }
     } catch (e) {
-      console.log("Error accessing local storage", e);
+      log("Error accessing local storage", e);
     }
 
     // set bootstrapUrls to match the network litNetwork unless it's set to custom
@@ -165,7 +165,14 @@ export default class LitNodeClient {
    * @param {Boolean} params.debug A boolean that defines if debug info will be returned or not.
    * @returns {Object} An object containing the resulting signatures.  Each signature comes with the public key and the data signed.
    */
-  async executeJs({ code, ipfsId, authSig, jsParams = {}, debug }) {
+  async executeJs({
+    code,
+    ipfsId,
+    authSig,
+    authMethods = [],
+    jsParams = {},
+    debug,
+  }) {
     if (!this.ready) {
       throwError({
         message:
@@ -178,7 +185,7 @@ export default class LitNodeClient {
     // some JS types don't serialize well, so we will convert them before sending to the nodes
     jsParams = convertLitActionsParams(jsParams);
 
-    const reqBody = { authSig, jsParams };
+    const reqBody = { authSig, jsParams, authMethods };
     if (code) {
       // base64 encode before sending over the wire
       const encodedJs = uint8arrayToString(
@@ -195,6 +202,8 @@ export default class LitNodeClient {
         errorCode: "missing_parameter",
       });
     }
+
+    // log("sending request to all nodes for executeJs: ", reqBody);
 
     // ask each node to run the js
     const nodePromises = [];
@@ -231,7 +240,7 @@ export default class LitNodeClient {
         publicKey: s.publicKey,
         dataSigned: s.dataSigned,
       }));
-      console.log("sigShares", sigShares);
+      log("sigShares", sigShares);
       const sigType = mostCommonString(sigShares.map((s) => s.sigType));
       let signature;
       if (sigType === "BLS") {
@@ -526,7 +535,7 @@ export default class LitNodeClient {
     )
       return;
 
-    console.log("sessionSigs", sessionSigs);
+    log("sessionSigs", sessionSigs);
 
     if (
       sessionSigs &&
@@ -789,7 +798,7 @@ export default class LitNodeClient {
     )
       return;
 
-    console.log("sessionSigs", sessionSigs);
+    log("sessionSigs", sessionSigs);
 
     if (
       sessionSigs &&
@@ -1403,10 +1412,10 @@ export default class LitNodeClient {
       const shares = JSON.stringify(valid_shares);
       await wasmECDSA.initWasmEcdsaSdk(); // init WASM
       const signature = wasmECDSA.combine_signature(R_x, R_y, shares);
-      console.log("raw ecdsav sig", signature);
+      log("raw ecdsav sig", signature);
       return signature;
     } catch (e) {
-      console.log("Error - signed_ecdsa_messages ");
+      log("Error - signed_ecdsa_messages ");
       const signed_ecdsa_message = nodePromises[0];
       return signed_ecdsa_message;
     }
@@ -1507,10 +1516,10 @@ export default class LitNodeClient {
       const shares = JSON.stringify(valid_shares);
       await wasmECDSA.initWasmEcdsaSdk(); // init WASM
       const signature = wasmECDSA.combine_signature(R_x, R_y, shares);
-      console.log("raw ecdsa sig", signature);
+      log("raw ecdsa sig", signature);
       return signature;
     } catch (e) {
-      console.log("Error - signed_ecdsa_messages - ", e);
+      log("Error - signed_ecdsa_messages - ", e);
       const signed_ecdsa_message = nodePromises[0];
       return signed_ecdsa_message;
     }
@@ -1620,7 +1629,14 @@ export default class LitNodeClient {
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
-  async getJsExecutionShares({ url, code, ipfsId, authSig, jsParams }) {
+  async getJsExecutionShares({
+    url,
+    code,
+    ipfsId,
+    authSig,
+    jsParams,
+    authMethods,
+  }) {
     log("getJsExecutionShares");
     const urlWithPath = `${url}/web/execute`;
     const data = {
@@ -1628,6 +1644,7 @@ export default class LitNodeClient {
       ipfsId,
       authSig,
       jsParams,
+      authMethods,
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
@@ -1708,7 +1725,7 @@ export default class LitNodeClient {
   }
 
   async signECDSA({ url, message, chain, iat, exp }) {
-    console.log("sign_message_ecdsa");
+    log("sign_message_ecdsa");
     const urlWithPath = `${url}/web/signing/sign_message_ecdsa`;
     const data = {
       message,
