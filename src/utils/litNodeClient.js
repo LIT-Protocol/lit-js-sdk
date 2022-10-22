@@ -17,6 +17,7 @@ import {
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import * as wasmECDSA from "../lib/ecdsa-sdk";
 import { LIT_NETWORKS } from "../lib/constants";
+import { joinSignature } from "@ethersproject/bytes";
 
 import {
   hashAccessControlConditions,
@@ -254,9 +255,11 @@ export default class LitNodeClient {
         });
       }
 
-      const encodedSig = `0x${signature.r}${signature.s}${
-        signature.recid ? "1c" : "1b"
-      }`;
+      const encodedSig = joinSignature({
+        r: "0x" + signature.r,
+        s: "0x" + signature.s,
+        v: signature.recid,
+      });
 
       signatures[key] = {
         ...signature,
