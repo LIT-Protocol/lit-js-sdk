@@ -166,6 +166,7 @@ Execute JS on the nodes and combine and return any resulting signatures
     *   `params.authSig` **[AuthSig][140]** the authSig to use to authorize the user with the nodes
     *   `params.jsParams` **[Object][136]** An object that contains params to expose to the Lit Action.  These will be injected to the JS runtime before your code runs, so you can use any of these as normal variables in your Lit Action. (optional, default `{}`)
     *   `params.debug` **[Boolean][137]** A boolean that defines if debug info will be returned or not.
+    *   `params.authMethods`   (optional, default `[]`)
 
 Returns **[Object][136]** An object containing the resulting signatures.  Each signature comes with the public key and the data signed.
 
