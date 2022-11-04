@@ -2220,6 +2220,101 @@
         });
       };
 
+      var TooManyConditions = async () => {
+        const oneCondition = {
+          contractAddress: "",
+          standardContractType: "",
+          chain,
+          method: "eth_getBalance",
+          parameters: [":userAddress", "latest"],
+          returnValueTest: {
+            comparator: ">=",
+            value: "0",
+          },
+        };
+        let accessControlConditions = [];
+        for (let i = 0; i < 31; i++) {
+          accessControlConditions.push(oneCondition);
+          if (i < 30) {
+            accessControlConditions.push({ operator: "or" });
+          }
+        }
+
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "TooManyConditions",
+          chain: "polygon",
+          switchChain: true,
+        });
+      };
+
+      var TooManyConditionsEncryption = async () => {
+        const testName = "TooManyConditionsEncryption";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+        });
+
+        const oneCondition = {
+          contractAddress: "",
+          standardContractType: "",
+          chain,
+          method: "eth_getBalance",
+          parameters: [":userAddress", "latest"],
+          returnValueTest: {
+            comparator: ">=",
+            value: "0",
+          },
+        };
+        let accessControlConditions = [];
+        for (let i = 0; i < 31; i++) {
+          accessControlConditions.push(oneCondition);
+          if (i < 30) {
+            accessControlConditions.push({ operator: "or" });
+          }
+        }
+
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { accessControlConditions }
+        )}`;
+
+        const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(
+          "this is a secret message"
+        );
+
+        const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
+          accessControlConditions,
+          symmetricKey,
+          authSig,
+          chain,
+        });
+
+        console.log("encrypted symmetric key", encryptedSymmetricKey);
+
+        const retrievedSymmKey = await litNodeClient.getEncryptionKey({
+          accessControlConditions,
+          toDecrypt: LitJsSdk.uint8arrayToString(
+            encryptedSymmetricKey,
+            "base16"
+          ),
+          chain,
+          authSig,
+        });
+
+        const decryptedString = await LitJsSdk.decryptString(
+          encryptedString,
+          retrievedSymmKey
+        );
+
+        console.log("decrypted string", decryptedString);
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Success.  Decrypted string is: ${decryptedString}`;
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -2431,6 +2526,16 @@
 
     <button onclick="GetSigWithChainSwitchingDisabled()">
       GetSigWithChainSwitchingDisabled
+    </button>
+    <br />
+    <br />
+
+    <button onclick="TooManyConditions()">TooManyConditions</button>
+    <br />
+    <br />
+
+    <button onclick="TooManyConditionsEncryption()">
+      TooManyConditionsEncryption
     </button>
     <br />
     <br />

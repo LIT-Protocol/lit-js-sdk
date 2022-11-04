@@ -1,9 +1,8 @@
 import JSZip from "jszip";
 import nacl from "tweetnacl";
-import {
-  fromString as uint8arrayFromString,
-  toString as uint8arrayToString,
-} from "uint8arrays";
+import Uint8arrays from "../lib/uint8arrays";
+const uint8arrayFromString = Uint8arrays.fromString;
+const uint8arrayToString = Uint8arrays.toString;
 import { formatEther, formatUnits } from "@ethersproject/units";
 import {
   throwError,
