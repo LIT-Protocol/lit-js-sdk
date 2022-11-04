@@ -1,5 +1,9 @@
 import "regenerator-runtime/runtime";
 
+// always polyfill buffer
+import { Buffer as buf } from "buffer/";
+globalThis.Buffer = buf;
+
 // add window global on nodejs
 import {
   listenForChildFrameMessages,

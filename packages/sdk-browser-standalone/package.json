@@ -1,6 +1,6 @@
 {
   "name": "@lit-protocol/sdk-browser-standalone",
-  "version": "1.1.231",
+  "version": "1.1.232",
   "main": "build/index.web.js",
   "license": "MIT",
   "dependencies": {
@@ -23,7 +23,6 @@
     "tslib": "^2.3.1",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
-    "uint8arrays": "^4.0.2",
     "utf-8-validate": "^5.0.8"
   },
   "devDependencies": {
