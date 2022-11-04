@@ -1,8 +1,10 @@
 import "regenerator-runtime/runtime";
 
-// always polyfill buffer
+// polyfill buffer if needed
 import { Buffer as buf } from "buffer/";
-globalThis.Buffer = buf;
+if (typeof Buffer === "undefined" || !Buffer) {
+  globalThis.Buffer = buf;
+}
 
 // add window global on nodejs
 import {
