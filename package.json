@@ -1,6 +1,6 @@
 {
   "name": "lit-js-sdk",
-  "version": "1.1.229",
+  "version": "1.1.231",
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
   "main": "build/index.js",
@@ -57,7 +57,6 @@
     "tslib": "^2.3.1",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
-    "uint8arrays": "^4.0.2",
     "utf-8-validate": "^5.0.8"
   }
 }

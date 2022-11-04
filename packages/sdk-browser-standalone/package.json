@@ -1,6 +1,6 @@
 {
   "name": "@lit-protocol/sdk-browser-standalone",
-  "version": "1.1.230",
+  "version": "1.1.231",
   "main": "build/index.web.js",
   "license": "MIT",
   "dependencies": {
@@ -11,12 +11,12 @@
     "@ethersproject/strings": "^5.5.0",
     "@ethersproject/units": "^5.4.0",
     "@ethersproject/wallet": "^5.2.0",
-    "@walletconnect/ethereum-provider": "^1.7.8",
+    "@walletconnect/ethereum-provider": "1.7.8",
     "buffer": "^6.0.3",
     "bufferutil": "^4.0.6",
     "cross-blob": "^3.0.1",
     "jszip": "^3.6.0",
-    "lit-connect-modal": "^0.1.8",
+    "lit-connect-modal": "^0.1.10",
     "lit-siwe": "^1.1.8",
     "node-fetch": "^3.2.3",
     "pako": "^2.0.4",

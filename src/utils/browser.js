@@ -1,7 +1,6 @@
-import {
-  fromString as uint8arrayFromStringFromLib,
-  toString as uint8arrayToStringFromLib,
-} from "uint8arrays";
+import Uint8arrays from "../lib/uint8arrays";
+const uint8arrayFromStringFromLib = Uint8arrays.fromString;
+const uint8arrayToStringFromLib = Uint8arrays.toString;
 
 /** Convert a Blob to a base64urlpad string.  Note: This function returns a promise.
  * @param {Blob | File} blob The Blob or File to turn into a base64 string
