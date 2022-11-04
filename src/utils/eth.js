@@ -349,6 +349,11 @@ export async function signAndSaveAuthMessage({
 }) {
   // const { chainId } = await web3.getNetwork();
 
+  if (!expiration) {
+    // set default of 1 week
+    expiration = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
+  }
+
   const preparedMessage = {
     domain: globalThis.location.host,
     address: getAddress(account), // convert to EIP-55 format or else SIWE complains
