@@ -3,6 +3,9 @@ import naclUtil from "tweetnacl-util";
 import { throwError, log } from "../lib/utils";
 import * as wasmECDSA from "../lib/ecdsa-sdk";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
+import Uint8arrays from "../lib/uint8arrays";
+const uint8arrayFromString = Uint8arrays.fromString;
+const uint8arrayToString = Uint8arrays.toString;
 
 const SYMM_KEY_ALGO_PARAMS = {
   name: "AES-CBC",
