@@ -17,6 +17,8 @@ import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import * as wasmECDSA from "../lib/ecdsa-sdk";
 import { LIT_NETWORKS } from "../lib/constants";
 import { joinSignature } from "@ethersproject/bytes";
+import { computeAddress } from "@ethersproject/transactions";
+import { SiweMessage } from "lit-siwe";
 
 import {
   hashAccessControlConditions,
@@ -337,6 +339,131 @@ export default class LitNodeClient {
     }
 
     return returnVal;
+  }
+
+  /**
+   * Sign a session key using a PKP
+   * @param {Object} params
+   * @param {string} params.sessionKey The session key to sign
+   * @param {Array<Object>} params.authMethods The auth methods to try for authenticating with the PKP.  You must pass either at least 1 AuthMethod or an authSig
+   * @param {AuthSig} params.authSig The authSig to use try for authenticating with the PKP.  You must pass either at least 1 AuthMethod or an authSig
+   * @param {Object} params.pkpPublicKey The PKP public key to use for signing
+   * @param {String} params.expirationTime When this session signature will expire.  The user will have to reauthenticate after this time using whatever auth method you set up.  This means you will have to call this signSessionKey function again to get a new session signature.  This is a RFC3339 timestamp.  The default is 24 hours from now.
+   * @returns {Object} An object containing the resulting signature.
+   */
+  async signSessionKey({
+    sessionKey,
+    authMethods,
+    pkpPublicKey,
+    authSig,
+    expirationTime,
+  }) {
+    if (!this.ready) {
+      throwError({
+        message:
+          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
+        name: "LitNodeClientNotReadyError",
+        errorCode: "lit_node_client_not_ready",
+      });
+    }
+
+    const pkpEthAddress = computeAddress(pkpPublicKey);
+
+    let siweMessage = new SiweMessage({
+      domain: globalThis.location.host,
+      address: pkpEthAddress,
+      statement: "Lit Protocol PKP session signature",
+      uri: sessionKey,
+      version: "1",
+      chainId: "1",
+      expirationTime:
+        expirationTime ||
+        new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    });
+    siweMessage = siweMessage.prepareMessage();
+
+    /* body must include:
+    pub session_key: String,
+    pub auth_methods: Vec<AuthMethod>,
+    pub pkp_public_key: String,
+    pub auth_sig: Option<AuthSigItem>,
+    pub siwe_message: String,
+    */
+    const reqBody = {
+      sessionKey,
+      authMethods,
+      pkpPublicKey,
+      authSig,
+      siweMessage,
+    };
+
+    // log("sending request to all nodes for signSessionKey: ", reqBody);
+
+    // ask each node to run the js
+    const nodePromises = [];
+    for (const url of this.connectedNodes) {
+      nodePromises.push(
+        this.getSignSessionKeyShares({
+          url,
+          body: reqBody,
+        })
+      );
+    }
+    const res = await this.handleNodePromises(nodePromises);
+    if (res.success === false) {
+      this.throwNodeError(res);
+      return;
+    }
+    const responseData = res.values;
+
+    log("responseData", JSON.stringify(responseData, null, 2));
+
+    // combine the signatures
+    const signedData = responseData.map((r) => r.signedData);
+
+    const signatures = {};
+    Object.keys(signedData[0]).forEach((key) => {
+      const shares = signedData.map((r) => r[key]);
+      shares.sort((a, b) => a.shareIndex - b.shareIndex);
+      const sigShares = shares.map((s) => ({
+        sigType: s.sigType,
+        shareHex: s.signatureShare,
+        shareIndex: s.shareIndex,
+        localX: s.localX,
+        localY: s.localY,
+        publicKey: s.publicKey,
+        dataSigned: s.dataSigned,
+      }));
+      log("sigShares", sigShares);
+      const sigType = mostCommonString(sigShares.map((s) => s.sigType));
+      let signature;
+      if (sigType === "BLS") {
+        signature = combineBlsShares(sigShares, this.networkPubKeySet);
+      } else if (sigType === "ECDSA") {
+        signature = combineEcdsaShares(sigShares);
+      } else {
+        throwError({
+          message: "Unknown signature type",
+          name: "UnknownSignatureTypeError",
+          errorCode: "unknown_signature_type",
+        });
+      }
+
+      const encodedSig = joinSignature({
+        r: "0x" + signature.r,
+        s: "0x" + signature.s,
+        v: signature.recid,
+      });
+
+      signatures[key] = {
+        ...signature,
+        signature: encodedSig,
+        publicKey: "0x" + mostCommonString(sigShares.map((s) => s.publicKey)),
+        dataSigned: "0x" + mostCommonString(sigShares.map((s) => s.dataSigned)),
+      };
+    });
+
+    return signatures.sessionSig;
   }
 
   /**
@@ -1646,6 +1773,12 @@ export default class LitNodeClient {
       authMethods,
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
+  }
+
+  async getSignSessionKeyShares({ url, body }) {
+    log("getSignSessionKeyShares");
+    const urlWithPath = `${url}/web/sign_session_key`;
+    return await this.sendCommandToNode({ url: urlWithPath, data: body });
   }
 
   async handshakeWithSgx({ url }) {
