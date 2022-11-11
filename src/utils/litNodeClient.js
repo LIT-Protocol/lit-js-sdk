@@ -43,6 +43,7 @@ import {
   combineBlsShares,
   combineBlsDecryptionShares,
 } from "./crypto";
+import { Base64 } from "js-base64";
 
 /**
  * @typedef {Object} AccessControlCondition
@@ -1976,7 +1977,7 @@ export default class LitNodeClient {
     expiration,
     chain,
     resources = [],
-    sessionCapabilities,
+    sessionCapabilityObject,
     switchChain,
     authNeededCallback,
     sessionKey,
@@ -2004,13 +2005,23 @@ export default class LitNodeClient {
 
     let sessionKeyUri = getSessionKeyUri({ publicKey: sessionKey.publicKey });
 
-    // if the user passed no sessionCapabilities, let's create them for them
+    // if the user passed no sessionCapabilityObject, let's create them for them
     // with wildcards so the user doesn't have to sign every time
-    if (!sessionCapabilities || sessionCapabilities.length === 0) {
-      sessionCapabilities = resources.map((resource) => {
+    if (!sessionCapabilityObject || Object.keys(sessionCapabilityObject).length === 0) {
+      let capabilityObject = {
+        def: [],
+      };
+      let defaultActionsToAdd = new Set();
+      
+      resources.forEach((resource) => {
         const { protocol, resourceId } = parseResource({ resource });
-        return `${protocol}Capability://*`;
+
+        if (!defaultActionsToAdd.has(protocol)) {
+          defaultActionsToAdd.add(protocol);
+        }
       });
+      capabilityObject.def = Array.from(defaultActionsToAdd);
+      sessionCapabilityObject = capabilityObject;
     }
 
     if (!expiration) {
@@ -2022,7 +2033,7 @@ export default class LitNodeClient {
     // and then check a few things, including that:
     // 1. the sig isn't expired
     // 2. the sig is for the correct session key
-    // 3. the sig has the sessionCapabilities requires to fulfill the resources requested
+    // 3. the sig has the sessionCapabilityObject requires to fulfill the resources requested
 
     let walletSig;
     try {
@@ -2042,7 +2053,8 @@ export default class LitNodeClient {
       } else {
         walletSig = await checkAndSignAuthMessage({
           chain,
-          resources: sessionCapabilities,
+          // convert into SIWE ReCap compliant session capability.
+          resources: [`urn:recap:lit:session:${Base64.encode(JSON.stringify(sessionCapabilityObject))}`],
           switchChain,
           expiration,
           uri: sessionKeyUri,
@@ -2069,17 +2081,9 @@ export default class LitNodeClient {
     // make sure the sig has the session capabilities required to fulfill the resources requested
     for (let i = 0; i < resources.length; i++) {
       const resource = resources[i];
-      const { protocol, resourceId } = parseResource({ resource });
 
       // check if we have blanket permissions or if we authed the specific resource for the protocol
-      const permissionsFound = sessionCapabilities.some((capability) => {
-        const capabilityParts = parseResource({ resource: capability });
-        return (
-          capabilityParts.protocol === protocol &&
-          (capabilityParts.resourceId === "*" ||
-            capabilityParts.resourceId === resourceId)
-        );
-      });
+      const permissionsFound = findPermissionsForResource(resource, sessionCapabilityObject);
       if (!permissionsFound) {
         needToReSignSessionKey = true;
       }
@@ -2098,7 +2102,8 @@ export default class LitNodeClient {
       } else {
         walletSig = await checkAndSignAuthMessage({
           chain,
-          resources: sessionCapabilities,
+          // convert into SIWE ReCap compliant session capability.
+          resources: [`urn:recap:lit:session:${Base64.encode(JSON.stringify(sessionCapabilityObject))}`],
           switchChain,
           expiration,
           uri: sessionKeyUri,
@@ -2195,4 +2200,29 @@ export default class LitNodeClient {
       }, 500);
     });
   }
+}
+
+// check if we have blanket permissions or if we authed the specific resource for the protocol
+function findPermissionsForResource(resource, capabilityObject) {
+  const { protocol, resourceId } = parseResource({ resource });
+
+  // first check default permitted actions
+  for (const defaultAction of capabilityObject.def) {
+    if (defaultAction === "*" || defaultAction === protocol) {
+      return true;
+    }
+  }
+
+  // then check specific targets
+  if (Object.keys(capabilityObject.tar).indexOf(resourceId) === -1) {
+    return false;
+  }
+
+  for (const permittedAction of capabilityObject.tar[resourceId]) {
+    if (permittedAction === "*" || permittedAction === protocol) {
+      return true;
+    }
+  }
+
+  return false;
 }
