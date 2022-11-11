@@ -7,139 +7,141 @@
     *   [Parameters][3]
     *   [executeJs][4]
         *   [Parameters][5]
-    *   [getSignedChainDataToken][6]
+    *   [signSessionKey][6]
         *   [Parameters][7]
-    *   [getSignedToken][8]
+    *   [getSignedChainDataToken][8]
         *   [Parameters][9]
-    *   [saveSigningCondition][10]
+    *   [getSignedToken][10]
         *   [Parameters][11]
-    *   [getEncryptionKey][12]
+    *   [saveSigningCondition][12]
         *   [Parameters][13]
-    *   [saveEncryptionKey][14]
+    *   [getEncryptionKey][14]
         *   [Parameters][15]
-    *   [signWithEcdsa][16]
+    *   [saveEncryptionKey][16]
         *   [Parameters][17]
-    *   [validate_and_sign_ecdsa][18]
+    *   [signWithEcdsa][18]
         *   [Parameters][19]
-    *   [connect][20]
-*   [Static Content - Encryption and decryption utilities][21]
-*   [encryptString][22]
-    *   [Parameters][23]
-*   [decryptString][24]
+    *   [validate_and_sign_ecdsa][20]
+        *   [Parameters][21]
+    *   [connect][22]
+*   [Static Content - Encryption and decryption utilities][23]
+*   [encryptString][24]
     *   [Parameters][25]
-*   [encryptFile][26]
+*   [decryptString][26]
     *   [Parameters][27]
-*   [decryptFile][28]
+*   [encryptFile][28]
     *   [Parameters][29]
-*   [zipAndEncryptString][30]
+*   [decryptFile][30]
     *   [Parameters][31]
-*   [zipAndEncryptFiles][32]
+*   [zipAndEncryptString][32]
     *   [Parameters][33]
-*   [encryptFileAndZipWithMetadata][34]
+*   [zipAndEncryptFiles][34]
     *   [Parameters][35]
-*   [decryptZipFileWithMetadata][36]
+*   [encryptFileAndZipWithMetadata][36]
     *   [Parameters][37]
-*   [encryptZip][38]
+*   [decryptZipFileWithMetadata][38]
     *   [Parameters][39]
-*   [decryptZip][40]
+*   [encryptZip][40]
     *   [Parameters][41]
-*   [decryptWithSymmetricKey][42]
+*   [decryptZip][42]
     *   [Parameters][43]
-*   [encryptWithSymmetricKey][44]
+*   [decryptWithSymmetricKey][44]
     *   [Parameters][45]
-*   [Dynamic Content - Loading content from a server][46]
-*   [verifyJwt][47]
-    *   [Parameters][48]
-*   [Authentication Signature Utilities][49]
-*   [checkAndSignAuthMessage][50]
-    *   [Parameters][51]
-*   [signAndSaveAuthMessage][52]
+*   [encryptWithSymmetricKey][46]
+    *   [Parameters][47]
+*   [Dynamic Content - Loading content from a server][48]
+*   [verifyJwt][49]
+    *   [Parameters][50]
+*   [Authentication Signature Utilities][51]
+*   [checkAndSignAuthMessage][52]
     *   [Parameters][53]
-*   [disconnectWeb3][54]
-*   [Conversion Utilities][55]
-*   [blobToBase64String][56]
-    *   [Parameters][57]
-*   [base64StringToBlob][58]
+*   [signAndSaveAuthMessage][54]
+    *   [Parameters][55]
+*   [disconnectWeb3][56]
+*   [Conversion Utilities][57]
+*   [blobToBase64String][58]
     *   [Parameters][59]
-*   [uint8arrayToString][60]
+*   [base64StringToBlob][60]
     *   [Parameters][61]
-*   [uint8arrayFromString][62]
+*   [uint8arrayToString][62]
     *   [Parameters][63]
-*   [fileToDataUrl][64]
+*   [uint8arrayFromString][64]
     *   [Parameters][65]
-*   [Other Utilities][66]
-*   [humanizeAccessControlConditions][67]
-    *   [Parameters][68]
-*   [hashUnifiedAccessControlConditions][69]
+*   [fileToDataUrl][66]
+    *   [Parameters][67]
+*   [Other Utilities][68]
+*   [humanizeAccessControlConditions][69]
     *   [Parameters][70]
-*   [HTML NFT Utilities][71]
-*   [findLITs][72]
-    *   [Parameters][73]
-*   [sendLIT][74]
+*   [hashUnifiedAccessControlConditions][71]
+    *   [Parameters][72]
+*   [HTML NFT Utilities][73]
+*   [findLITs][74]
     *   [Parameters][75]
-*   [createHtmlLIT][76]
+*   [sendLIT][76]
     *   [Parameters][77]
-*   [mintLIT][78]
+*   [createHtmlLIT][78]
     *   [Parameters][79]
-*   [unlockLitWithKey][80]
+*   [mintLIT][80]
     *   [Parameters][81]
-*   [toggleLock][82]
-*   [injectViewerIFrame][83]
-    *   [Parameters][84]
-*   [Types][85]
-*   [AccessControlCondition][86]
-    *   [Properties][87]
-*   [EVMContractCondition][88]
+*   [unlockLitWithKey][82]
+    *   [Parameters][83]
+*   [toggleLock][84]
+*   [injectViewerIFrame][85]
+    *   [Parameters][86]
+*   [Types][87]
+*   [AccessControlCondition][88]
     *   [Properties][89]
-*   [SolRpcCondition][90]
+*   [EVMContractCondition][90]
     *   [Properties][91]
-*   [CosmosCondition][92]
+*   [SolRpcCondition][92]
     *   [Properties][93]
-*   [ResourceId][94]
+*   [CosmosCondition][94]
     *   [Properties][95]
-*   [AuthSig][96]
+*   [ResourceId][96]
     *   [Properties][97]
-*   [Chain Info][98]
-*   [LITChain][99]
-    *   [Properties][100]
-*   [LITEVMChain][101]
+*   [AuthSig][98]
+    *   [Properties][99]
+*   [Chain Info][100]
+*   [LITChain][101]
     *   [Properties][102]
-*   [LITSVMChain][103]
+*   [LITEVMChain][103]
     *   [Properties][104]
-*   [Misc][105]
-*   [LITCosmosChain][106]
-    *   [Properties][107]
-*   [LIT_CHAINS][108]
-*   [LIT_SVM_CHAINS][109]
-*   [LIT_COSMOS_CHAINS][110]
-*   [ALL_LIT_CHAINS][111]
-*   [getVarType][112]
-    *   [Parameters][113]
-*   [checkType][114]
+*   [LITSVMChain][105]
+    *   [Properties][106]
+*   [Misc][107]
+*   [LITCosmosChain][108]
+    *   [Properties][109]
+*   [LIT_CHAINS][110]
+*   [LIT_SVM_CHAINS][111]
+*   [LIT_COSMOS_CHAINS][112]
+*   [ALL_LIT_CHAINS][113]
+*   [getVarType][114]
     *   [Parameters][115]
-*   [convertLitActionsParams][116]
+*   [checkType][116]
     *   [Parameters][117]
-*   [downloadFile][118]
+*   [convertLitActionsParams][118]
     *   [Parameters][119]
-*   [importSymmetricKey][120]
+*   [downloadFile][120]
     *   [Parameters][121]
-*   [generateSymmetricKey][122]
-*   [encryptWithPubKey][123]
-    *   [Parameters][124]
-*   [decryptWithPrivKey][125]
+*   [importSymmetricKey][122]
+    *   [Parameters][123]
+*   [generateSymmetricKey][124]
+*   [encryptWithPubKey][125]
     *   [Parameters][126]
-*   [decimalPlaces][127]
+*   [decryptWithPrivKey][127]
     *   [Parameters][128]
-*   [lookupNameServiceAddress][129]
+*   [decimalPlaces][129]
     *   [Parameters][130]
-*   [metadataForFile][131]
+*   [lookupNameServiceAddress][131]
     *   [Parameters][132]
-*   [CallRequest][133]
-    *   [Properties][134]
+*   [metadataForFile][133]
+    *   [Parameters][134]
+*   [CallRequest][135]
+    *   [Properties][136]
 
 ## Welcome
 
-Welcome to the LIT JS SDK API documentation.  To understand how these functions fit together, please view the documentation for this SDK, located at [https://developer.litprotocol.com/docs/SDK/intro][135]
+Welcome to the LIT JS SDK API documentation.  To understand how these functions fit together, please view the documentation for this SDK, located at [https://developer.litprotocol.com/docs/SDK/intro][137]
 
 ## LitNodeClient
 
@@ -147,11 +149,11 @@ A LIT node client.  Connects directly to the LIT nodes to store and retrieve enc
 
 ### Parameters
 
-*   `config` **[Object][136]** 
+*   `config` **[Object][138]** 
 
-    *   `config.alertWhenUnauthorized` **[boolean][137]** Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  An exception will also be thrown regardless of this option. (optional, default `true`)
-    *   `config.minNodeCount` **[number][138]** The minimum number of nodes that must be connected for the LitNodeClient to be ready to use. (optional, default `6`)
-    *   `config.debug` **[boolean][137]** Whether or not to show debug messages. (optional, default `true`)
+    *   `config.alertWhenUnauthorized` **[boolean][139]** Whether or not to show a JS alert() when a user tries to unlock a LIT but is unauthorized.  An exception will also be thrown regardless of this option. (optional, default `true`)
+    *   `config.minNodeCount` **[number][140]** The minimum number of nodes that must be connected for the LitNodeClient to be ready to use. (optional, default `6`)
+    *   `config.debug` **[boolean][139]** Whether or not to show debug messages. (optional, default `true`)
 
 ### executeJs
 
@@ -159,16 +161,35 @@ Execute JS on the nodes and combine and return any resulting signatures
 
 #### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.code` **[string][139]** JS code to run on the nodes
-    *   `params.ipfsId` **[string][139]** The IPFS ID of some JS code to run on the nodes
-    *   `params.authSig` **[AuthSig][140]** the authSig to use to authorize the user with the nodes
-    *   `params.jsParams` **[Object][136]** An object that contains params to expose to the Lit Action.  These will be injected to the JS runtime before your code runs, so you can use any of these as normal variables in your Lit Action. (optional, default `{}`)
-    *   `params.debug` **[Boolean][137]** A boolean that defines if debug info will be returned or not.
+    *   `params.code` **[string][141]** JS code to run on the nodes
+    *   `params.ipfsId` **[string][141]** The IPFS ID of some JS code to run on the nodes
+    *   `params.authSig` **[AuthSig][142]** the authSig to use to authorize the user with the nodes
+    *   `params.jsParams` **[Object][138]** An object that contains params to expose to the Lit Action.  These will be injected to the JS runtime before your code runs, so you can use any of these as normal variables in your Lit Action. (optional, default `{}`)
+    *   `params.debug` **[Boolean][139]** A boolean that defines if debug info will be returned or not.
     *   `params.authMethods`   (optional, default `[]`)
 
-Returns **[Object][136]** An object containing the resulting signatures.  Each signature comes with the public key and the data signed.
+Returns **[Object][138]** An object containing the resulting signatures.  Each signature comes with the public key and the data signed.
+
+### signSessionKey
+
+Sign a session key using a PKP
+
+#### Parameters
+
+*   `params` **[Object][138]** 
+
+    *   `params.sessionKey` **[string][141]** The session key to sign
+    *   `params.authMethods` **[Array][143]<[Object][138]>** The auth methods to try for authenticating with the PKP.  You must pass either at least 1 AuthMethod or an authSig
+    *   `params.pkpPublicKey` **[Object][138]** The PKP public key to use for signing
+    *   `params.authSig` **[AuthSig][142]** The authSig to use try for authenticating with the PKP.  You must pass either at least 1 AuthMethod or an authSig
+    *   `params.expirationTime` **[String][141]** When this session signature will expire.  The user will have to reauthenticate after this time using whatever auth method you set up.  This means you will have to call this signSessionKey function again to get a new session signature.  This is a RFC3339 timestamp.  The default is 24 hours from now.
+    *   `params.expiration`  
+    *   `params.resources`   (optional, default `[]`)
+    *   `params.chain`  
+
+Returns **[Object][138]** An object containing the resulting signature.
 
 ### getSignedChainDataToken
 
@@ -176,12 +197,12 @@ Request a signed JWT of any solidity function call from the LIT network.  There 
 
 #### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.callRequests` **[Array][141]<[CallRequest][142]>** The call requests to make.  The responses will be signed and returned.
-    *   `params.chain` **[string][139]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+    *   `params.callRequests` **[Array][143]<[CallRequest][144]>** The call requests to make.  The responses will be signed and returned.
+    *   `params.chain` **[string][141]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
 
-Returns **[Object][136]** A signed JWT that proves the response to the function call is genuine. You may present this to a smart contract, or a server for authorization, and it can be verified using the verifyJwt function.
+Returns **[Object][138]** A signed JWT that proves the response to the function call is genuine. You may present this to a smart contract, or a server for authorization, and it can be verified using the verifyJwt function.
 
 ### getSignedToken
 
@@ -189,18 +210,18 @@ Request a signed JWT from the LIT network.  Before calling this function, you mu
 
 #### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.accessControlConditions` **[Array][141]<[AccessControlCondition][143]>** The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
-    *   `params.evmContractConditions` **[Array][141]<[EVMContractCondition][144]>** EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions solRpcConditions or unifiedAccessControlConditions.
-    *   `params.solRpcConditions` **[Array][141]<[SolRpcCondition][145]>** Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
-    *   `params.unifiedAccessControlConditions` **[Array][141]<([AccessControlCondition][143] | [EVMContractCondition][144] | [SolRpcCondition][145])>** An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
-    *   `params.chain` **[string][139]** The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
-    *   `params.authSig` **[AuthSig][140]** The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions.
-    *   `params.resourceId` **[ResourceId][146]** The resourceId representing something on the web via a URL
+    *   `params.accessControlConditions` **[Array][143]<[AccessControlCondition][145]>** The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+    *   `params.evmContractConditions` **[Array][143]<[EVMContractCondition][146]>** EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions solRpcConditions or unifiedAccessControlConditions.
+    *   `params.solRpcConditions` **[Array][143]<[SolRpcCondition][147]>** Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+    *   `params.unifiedAccessControlConditions` **[Array][143]<([AccessControlCondition][145] | [EVMContractCondition][146] | [SolRpcCondition][147])>** An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+    *   `params.chain` **[string][141]** The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
+    *   `params.authSig` **[AuthSig][142]** The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions.
+    *   `params.resourceId` **[ResourceId][148]** The resourceId representing something on the web via a URL
     *   `params.sessionSigs`  
 
-Returns **[Object][136]** A signed JWT that proves you meet the access control conditions for the given resource id.  You may present this to a server for authorization, and the server can verify it using the verifyJwt function.
+Returns **[Object][138]** A signed JWT that proves you meet the access control conditions for the given resource id.  You may present this to a server for authorization, and the server can verify it using the verifyJwt function.
 
 ### saveSigningCondition
 
@@ -208,20 +229,20 @@ Associated access control conditions with a resource on the web.  After calling 
 
 #### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.accessControlConditions` **[Array][141]<[AccessControlCondition][143]>** The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
-    *   `params.evmContractConditions` **[Array][141]<[EVMContractCondition][144]>** EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
-    *   `params.solRpcConditions` **[Array][141]<[SolRpcCondition][145]>** Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
-    *   `params.unifiedAccessControlConditions` **[Array][141]<([AccessControlCondition][143] | [EVMContractCondition][144] | [SolRpcCondition][145])>** An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
-    *   `params.chain` **[string][139]** The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
-    *   `params.authSig` **[AuthSig][140]** The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions
-    *   `params.resourceId` **[ResourceId][146]** The resourceId representing something on the web via a URL
-    *   `params.permanent` **[boolean][137]** Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default. (optional, default `true`)
+    *   `params.accessControlConditions` **[Array][143]<[AccessControlCondition][145]>** The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+    *   `params.evmContractConditions` **[Array][143]<[EVMContractCondition][146]>** EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+    *   `params.solRpcConditions` **[Array][143]<[SolRpcCondition][147]>** Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+    *   `params.unifiedAccessControlConditions` **[Array][143]<([AccessControlCondition][145] | [EVMContractCondition][146] | [SolRpcCondition][147])>** An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+    *   `params.chain` **[string][141]** The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
+    *   `params.authSig` **[AuthSig][142]** The authentication signature that proves that the user owns the crypto wallet address that meets the access control conditions
+    *   `params.resourceId` **[ResourceId][148]** The resourceId representing something on the web via a URL
+    *   `params.permanent` **[boolean][139]** Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default. (optional, default `true`)
     *   `params.permanant`  
     *   `params.sessionSigs`  
 
-Returns **[boolean][137]** Success
+Returns **[boolean][139]** Success
 
 ### getEncryptionKey
 
@@ -229,18 +250,18 @@ Retrieve the symmetric encryption key from the LIT nodes.  Note that this will o
 
 #### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.accessControlConditions` **[Array][141]<[AccessControlCondition][143]>** The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
-    *   `params.evmContractConditions` **[Array][141]<[EVMContractCondition][144]>** EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
-    *   `params.solRpcConditions` **[Array][141]<[SolRpcCondition][145]>** Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
-    *   `params.unifiedAccessControlConditions` **[Array][141]<([AccessControlCondition][143] | [EVMContractCondition][144] | [SolRpcCondition][145])>** An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
-    *   `params.toDecrypt` **[string][139]** The ciphertext that you wish to decrypt encoded as a hex string
-    *   `params.chain` **[string][139]** The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
-    *   `params.authSig` **[AuthSig][140]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
+    *   `params.accessControlConditions` **[Array][143]<[AccessControlCondition][145]>** The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+    *   `params.evmContractConditions` **[Array][143]<[EVMContractCondition][146]>** EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+    *   `params.solRpcConditions` **[Array][143]<[SolRpcCondition][147]>** Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+    *   `params.unifiedAccessControlConditions` **[Array][143]<([AccessControlCondition][145] | [EVMContractCondition][146] | [SolRpcCondition][147])>** An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+    *   `params.toDecrypt` **[string][141]** The ciphertext that you wish to decrypt encoded as a hex string
+    *   `params.chain` **[string][141]** The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
+    *   `params.authSig` **[AuthSig][142]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions.
     *   `params.sessionSigs`  
 
-Returns **[Uint8Array][147]** The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
+Returns **[Uint8Array][149]** The symmetric encryption key that can be used to decrypt the locked content inside the LIT.  You should pass this key to the decryptZip function.
 
 ### saveEncryptionKey
 
@@ -248,21 +269,21 @@ Securely save the association between access control conditions and something th
 
 #### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.accessControlConditions` **[Array][141]<[AccessControlCondition][143]>** The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
-    *   `params.evmContractConditions` **[Array][141]<[EVMContractCondition][144]>** EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
-    *   `params.solRpcConditions` **[Array][141]<[SolRpcCondition][145]>** Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
-    *   `params.unifiedAccessControlConditions` **[Array][141]<([AccessControlCondition][143] | [EVMContractCondition][144] | [SolRpcCondition][145])>** An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
-    *   `params.chain` **[string][139]** The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
-    *   `params.authSig` **[AuthSig][140]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
-    *   `params.symmetricKey` **[Uint8Array][147]** The symmetric encryption key that was used to encrypt the locked content inside the LIT as a Uint8Array.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.  You must pass either symmetricKey or encryptedSymmetricKey.
-    *   `params.encryptedSymmetricKey` **[Uint8Array][147]** The encrypted symmetric key of the item you with to update.  You must pass either symmetricKey or encryptedSymmetricKey.
-    *   `params.permanent` **[boolean][137]** Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default. (optional, default `true`)
+    *   `params.accessControlConditions` **[Array][143]<[AccessControlCondition][145]>** The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+    *   `params.evmContractConditions` **[Array][143]<[EVMContractCondition][146]>** EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+    *   `params.solRpcConditions` **[Array][143]<[SolRpcCondition][147]>** Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+    *   `params.unifiedAccessControlConditions` **[Array][143]<([AccessControlCondition][145] | [EVMContractCondition][146] | [SolRpcCondition][147])>** An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+    *   `params.chain` **[string][141]** The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
+    *   `params.authSig` **[AuthSig][142]** The authentication signature that proves that the user owns the crypto wallet address meets the access control conditions
+    *   `params.symmetricKey` **[Uint8Array][149]** The symmetric encryption key that was used to encrypt the locked content inside the LIT as a Uint8Array.  You should use zipAndEncryptString or zipAndEncryptFiles to get this encryption key.  This key will be hashed and the hash will be sent to the LIT nodes.  You must pass either symmetricKey or encryptedSymmetricKey.
+    *   `params.encryptedSymmetricKey` **[Uint8Array][149]** The encrypted symmetric key of the item you with to update.  You must pass either symmetricKey or encryptedSymmetricKey.
+    *   `params.permanent` **[boolean][139]** Whether or not the access control condition should be saved permanently.  If false, the access control conditions will be updateable by the creator.  If you don't pass this param, it's set to true by default. (optional, default `true`)
     *   `params.permanant`  
     *   `params.sessionSigs`  
 
-Returns **[Uint8Array][147]** The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will need it to decrypt the content in the future.
+Returns **[Uint8Array][149]** The symmetricKey parameter that has been encrypted with the network public key.  Save this - you will need it to decrypt the content in the future.
 
 ### signWithEcdsa
 
@@ -270,12 +291,12 @@ Signs a message with Lit threshold ECDSA algorithms.
 
 #### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.message` **[string][139]** The message to be signed - note this message is not currently converted to a digest!!!!!
-    *   `params.chain` **[string][139]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+    *   `params.message` **[string][141]** The message to be signed - note this message is not currently converted to a digest!!!!!
+    *   `params.chain` **[string][141]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
 
-Returns **[Object][136]** JSON structure with signed message, signature & public key.
+Returns **[Object][138]** JSON structure with signed message, signature & public key.
 
 ### validate_and_sign_ecdsa
 
@@ -283,20 +304,20 @@ Validates a condition, and then signs the condition if the validation returns tr
 
 #### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.accessControlConditions` **[Array][141]<[AccessControlCondition][143]>** The on chain control conditions that are to be evaluated and - if valid -  signed.
-    *   `params.chain` **[string][139]** The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
-    *   `params.authSig` **[AuthSig][140]** The authentication signature that proves that the user owns the crypto wallet address that seeks to evaluate conditions.
+    *   `params.accessControlConditions` **[Array][143]<[AccessControlCondition][145]>** The on chain control conditions that are to be evaluated and - if valid -  signed.
+    *   `params.chain` **[string][141]** The chain name of the chain that you are querying.  See ALL_LIT_CHAINS for currently supported chains.
+    *   `params.authSig` **[AuthSig][142]** The authentication signature that proves that the user owns the crypto wallet address that seeks to evaluate conditions.
     *   `params.auth_sig`  
 
-Returns **[Object][136]** JSON structure with signed message, signature & public key..
+Returns **[Object][138]** JSON structure with signed message, signature & public key..
 
 ### connect
 
 Connect to the LIT nodes.
 
-Returns **[Promise][148]** A promise that resolves when the nodes are connected.
+Returns **[Promise][150]** A promise that resolves when the nodes are connected.
 
 ## Static Content - Encryption and decryption utilities
 
@@ -308,9 +329,9 @@ Encrypt a string.  This is used to encrypt any string that is to be locked via t
 
 ### Parameters
 
-*   `str` **[string][139]** The string to encrypt
+*   `str` **[string][141]** The string to encrypt
 
-Returns **[Promise][148]<[Object][136]>** A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
+Returns **[Promise][150]<[Object][138]>** A promise containing the encryptedString as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.
 
 ## decryptString
 
@@ -318,10 +339,10 @@ Decrypt a string that was encrypted with the encryptString function.
 
 ### Parameters
 
-*   `encryptedStringBlob` **([Blob][149] | File)** The encrypted string as a Blob
-*   `symmKey` **[Uint8Array][147]** The symmetric key used that will be used to decrypt this.
+*   `encryptedStringBlob` **([Blob][151] | File)** The encrypted string as a Blob
+*   `symmKey` **[Uint8Array][149]** The symmetric key used that will be used to decrypt this.
 
-Returns **[Promise][148]<[string][139]>** A promise containing the decrypted string
+Returns **[Promise][150]<[string][141]>** A promise containing the decrypted string
 
 ## encryptFile
 
@@ -329,11 +350,11 @@ Encrypt a file without doing any zipping or packing.  This is useful for large f
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.file` **([Blob][149] | File)** The file you wish to encrypt
+    *   `params.file` **([Blob][151] | File)** The file you wish to encrypt
 
-Returns **[Promise][148]<[Object][136]>** A promise containing an object with keys encryptedFile and symmetricKey.  encryptedFile is a Blob, and symmetricKey is a Uint8Array that can be used to decrypt the file.
+Returns **[Promise][150]<[Object][138]>** A promise containing an object with keys encryptedFile and symmetricKey.  encryptedFile is a Blob, and symmetricKey is a Uint8Array that can be used to decrypt the file.
 
 ## decryptFile
 
@@ -341,12 +362,12 @@ Decrypt a file that was encrypted with the encryptFile function, without doing a
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.file` **([Blob][149] | File)** The file you wish to decrypt
-    *   `params.symmetricKey` **[Uint8Array][147]** The symmetric key used that will be used to decrypt this.
+    *   `params.file` **([Blob][151] | File)** The file you wish to decrypt
+    *   `params.symmetricKey` **[Uint8Array][149]** The symmetric key used that will be used to decrypt this.
 
-Returns **[Promise][148]<[ArrayBuffer][150]>** A promise containing the decrypted file.  The file is an ArrayBuffer.
+Returns **[Promise][150]<[ArrayBuffer][152]>** A promise containing the decrypted file.  The file is an ArrayBuffer.
 
 ## zipAndEncryptString
 
@@ -354,9 +375,9 @@ Zip and encrypt a string.  This is used to encrypt any string that is to be lock
 
 ### Parameters
 
-*   `string` **[string][139]** The string to zip and encrypt
+*   `string` **[string][141]** The string to zip and encrypt
 
-Returns **[Promise][148]<[Object][136]>** A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a single file called "string.txt"
+Returns **[Promise][150]<[Object][138]>** A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a single file called "string.txt"
 
 ## zipAndEncryptFiles
 
@@ -364,9 +385,9 @@ Zip and encrypt multiple files.
 
 ### Parameters
 
-*   `files` **[Array][141]\<File>** An array of the files you wish to zip and encrypt
+*   `files` **[Array][143]\<File>** An array of the files you wish to zip and encrypt
 
-Returns **[Promise][148]<[Object][136]>** A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
+Returns **[Promise][150]<[Object][138]>** A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array.  The encrypted zip will contain a folder "encryptedAssets" and all of the files will be inside it.
 
 ## encryptFileAndZipWithMetadata
 
@@ -374,19 +395,19 @@ Encrypt a single file, save the key to the Lit network, and then zip it up with 
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.authSig` **[Object][136]** The authSig of the user.  Returned via the checkAndSignAuthMessage function
-    *   `params.accessControlConditions` **[Array][141]<[AccessControlCondition][143]>** The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
-    *   `params.evmContractConditions` **[Array][141]<[EVMContractCondition][144]>** EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
-    *   `params.solRpcConditions` **[Array][141]<[SolRpcCondition][145]>** Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
-    *   `params.unifiedAccessControlConditions` **[Array][141]<([AccessControlCondition][143] | [EVMContractCondition][144] | [SolRpcCondition][145])>** An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
-    *   `params.chain` **[string][139]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+    *   `params.authSig` **[Object][138]** The authSig of the user.  Returned via the checkAndSignAuthMessage function
+    *   `params.accessControlConditions` **[Array][143]<[AccessControlCondition][145]>** The access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+    *   `params.evmContractConditions` **[Array][143]<[EVMContractCondition][146]>** EVM Smart Contract access control conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.  This is different than accessControlConditions because accessControlConditions only supports a limited number of contract calls.  evmContractConditions supports any contract call.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+    *   `params.solRpcConditions` **[Array][143]<[SolRpcCondition][147]>** Solana RPC call conditions that the user must meet to obtain this signed token.  This could be posession of an NFT, for example.
+    *   `params.unifiedAccessControlConditions` **[Array][143]<([AccessControlCondition][145] | [EVMContractCondition][146] | [SolRpcCondition][147])>** An array of unified access control conditions.  You may use AccessControlCondition, EVMContractCondition, or SolRpcCondition objects in this array, but make sure you add a conditionType for each one.  You must pass either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions.
+    *   `params.chain` **[string][141]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
     *   `params.file` **File** The file you wish to encrypt
-    *   `params.litNodeClient` **[LitNodeClient][151]** An instance of LitNodeClient that is already connected
-    *   `params.readme` **[string][139]** An optional readme text that will be inserted into readme.txt in the final zip file.  This is useful in case someone comes across this zip file and wants to know how to decrypt it.  This file could contain instructions and a URL to use to decrypt the file.
+    *   `params.litNodeClient` **[LitNodeClient][153]** An instance of LitNodeClient that is already connected
+    *   `params.readme` **[string][141]** An optional readme text that will be inserted into readme.txt in the final zip file.  This is useful in case someone comes across this zip file and wants to know how to decrypt it.  This file could contain instructions and a URL to use to decrypt the file.
 
-Returns **[Promise][148]<[Object][136]>** A promise containing an object with 3 keys: zipBlob, encryptedSymmetricKey, and symmetricKey.  zipBlob is a zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network.  encryptedSymmetricKey is the symmetric key needed to decrypt the content, encrypted with the Lit network public key.  You may wish to store encryptedSymmetricKey in your own database to support quicker re-encryption operations when adding additional access control conditions in the future, but this is entirely optional, and this key is already stored inside the zipBlob.  symmetricKey is the raw symmetric key used to encrypt the files.  DO NOT STORE IT.  It is provided in case you wish to create additional "OR" access control conditions for the same file.
+Returns **[Promise][150]<[Object][138]>** A promise containing an object with 3 keys: zipBlob, encryptedSymmetricKey, and symmetricKey.  zipBlob is a zip file that contains an encrypted file and the metadata needed to decrypt it via the Lit network.  encryptedSymmetricKey is the symmetric key needed to decrypt the content, encrypted with the Lit network public key.  You may wish to store encryptedSymmetricKey in your own database to support quicker re-encryption operations when adding additional access control conditions in the future, but this is entirely optional, and this key is already stored inside the zipBlob.  symmetricKey is the raw symmetric key used to encrypt the files.  DO NOT STORE IT.  It is provided in case you wish to create additional "OR" access control conditions for the same file.
 
 ## decryptZipFileWithMetadata
 
@@ -394,14 +415,14 @@ Given a zip file with metadata inside it, unzip, load the metadata, and return t
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.authSig` **[Object][136]** The authSig of the user.  Returned via the checkAndSignAuthMessage function
-    *   `params.file` **([Blob][149] | File)** The zip file blob with metadata inside it and the encrypted asset
-    *   `params.litNodeClient` **[LitNodeClient][151]** An instance of LitNodeClient that is already connected
+    *   `params.authSig` **[Object][138]** The authSig of the user.  Returned via the checkAndSignAuthMessage function
+    *   `params.file` **([Blob][151] | File)** The zip file blob with metadata inside it and the encrypted asset
+    *   `params.litNodeClient` **[LitNodeClient][153]** An instance of LitNodeClient that is already connected
     *   `params.additionalAccessControlConditions`  
 
-Returns **[Promise][148]<[Object][136]>** A promise containing an object that contains decryptedFile and metadata properties.  The decryptedFile is an ArrayBuffer that is ready to use, and metadata is an object that contains all the properties of the file like it's name and size and type.
+Returns **[Promise][150]<[Object][138]>** A promise containing an object that contains decryptedFile and metadata properties.  The decryptedFile is an ArrayBuffer that is ready to use, and metadata is an object that contains all the properties of the file like it's name and size and type.
 
 ## encryptZip
 
@@ -411,7 +432,7 @@ Encrypt a zip file created with JSZip using a new random symmetric key via WebCr
 
 *   `zip` **JSZip** The JSZip instance to encrypt
 
-Returns **[Promise][148]<[Object][136]>** A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array string.
+Returns **[Promise][150]<[Object][138]>** A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array string.
 
 ## decryptZip
 
@@ -419,10 +440,10 @@ Decrypt and unzip a zip that was created using encryptZip, zipAndEncryptString, 
 
 ### Parameters
 
-*   `encryptedZipBlob` **([Blob][149] | File)** The encrypted zip as a Blob
-*   `symmKey` **[Uint8Array][147]** The symmetric key used that will be used to decrypt this zip.
+*   `encryptedZipBlob` **([Blob][151] | File)** The encrypted zip as a Blob
+*   `symmKey` **[Uint8Array][149]** The symmetric key used that will be used to decrypt this zip.
 
-Returns **[Promise][148]<[Object][136]>** A promise containing a JSZip object indexed by the filenames of the zipped files.  For example, if you have a file called "meow.jpg" in the root of your zip, you could get it from the JSZip object by doing this: const imageBlob = await decryptedZip\['meow.jpg'].async('blob')
+Returns **[Promise][150]<[Object][138]>** A promise containing a JSZip object indexed by the filenames of the zipped files.  For example, if you have a file called "meow.jpg" in the root of your zip, you could get it from the JSZip object by doing this: const imageBlob = await decryptedZip\['meow.jpg'].async('blob')
 
 ## decryptWithSymmetricKey
 
@@ -430,10 +451,10 @@ Decrypt an encrypted blob with a symmetric key.  Uses AES-CBC via SubtleCrypto
 
 ### Parameters
 
-*   `encryptedBlob` **[Blob][149]** The encrypted blob that should be decrypted
-*   `symmKey` **[Object][136]** The symmetric key
+*   `encryptedBlob` **[Blob][151]** The encrypted blob that should be decrypted
+*   `symmKey` **[Object][138]** The symmetric key
 
-Returns **[Blob][149]** The decrypted blob
+Returns **[Blob][151]** The decrypted blob
 
 ## encryptWithSymmetricKey
 
@@ -441,10 +462,10 @@ Encrypt a blob with a symmetric key
 
 ### Parameters
 
-*   `symmKey` **[Object][136]** The symmetric key
-*   `data` **[Blob][149]** The blob to encrypt
+*   `symmKey` **[Object][138]** The symmetric key
+*   `data` **[Blob][151]** The blob to encrypt
 
-Returns **[Blob][149]** The encrypted blob
+Returns **[Blob][151]** The encrypted blob
 
 ## Dynamic Content - Loading content from a server
 
@@ -456,11 +477,11 @@ Verify a JWT from the LIT network.  Use this for auth on your server.  For some 
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.jwt` **[string][139]** A JWT signed by the LIT network using the BLS12-381 algorithm
+    *   `params.jwt` **[string][141]** A JWT signed by the LIT network using the BLS12-381 algorithm
 
-Returns **[Object][136]** An object with 4 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.  "signature": A uint8array that represents the raw  signature of the JWT.
+Returns **[Object][138]** An object with 4 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.  "signature": A uint8array that represents the raw  signature of the JWT.
 
 ## Authentication Signature Utilities
 
@@ -472,15 +493,15 @@ Check for an existing cryptographic authentication signature and create one of i
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.chain` **[string][139]** The chain you want to use.  Find the supported list of chains here: [https://developer.litprotocol.com/docs/supportedChains][152]
-    *   `params.resources` **[Array][141]<[string][139]>** Optional and only used with EVM chains.  A list of resources to be passed to Sign In with Ethereum.  These resources will be part of the Sign in with Ethereum signed message presented to the user.
-    *   `params.switchChain` **[Array][141]<[boolean][137]>** Optional and only used with EVM chains right now.  Set to true by default.  Whether or not to ask Metamask or the user's wallet to switch chains before signing.  This may be desired if you're going to have the user send a txn on that chain.  On the other hand, if all you care about is the user's wallet signature, then you probably don't want to make them switch chains for no reason.  Pass false here to disable this chain switching behavior. (optional, default `true`)
+    *   `params.chain` **[string][141]** The chain you want to use.  Find the supported list of chains here: [https://developer.litprotocol.com/docs/supportedChains][154]
+    *   `params.resources` **[Array][143]<[string][141]>** Optional and only used with EVM chains.  A list of resources to be passed to Sign In with Ethereum.  These resources will be part of the Sign in with Ethereum signed message presented to the user.
+    *   `params.switchChain` **[Array][143]<[boolean][139]>** Optional and only used with EVM chains right now.  Set to true by default.  Whether or not to ask Metamask or the user's wallet to switch chains before signing.  This may be desired if you're going to have the user send a txn on that chain.  On the other hand, if all you care about is the user's wallet signature, then you probably don't want to make them switch chains for no reason.  Pass false here to disable this chain switching behavior. (optional, default `true`)
     *   `params.expiration`  
     *   `params.uri`  
 
-Returns **[AuthSig][140]** The AuthSig created or retrieved
+Returns **[AuthSig][142]** The AuthSig created or retrieved
 
 ## signAndSaveAuthMessage
 
@@ -488,16 +509,16 @@ Sign the auth message with the user's wallet, and store it in localStorage.  Cal
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
     *   `params.web3` **Web3Provider** An ethers.js Web3Provider instance
-    *   `params.account` **[string][139]** The account to sign the message with
+    *   `params.account` **[string][141]** The account to sign the message with
     *   `params.chainId`  
     *   `params.resources`  
     *   `params.uri`  
     *   `params.expiration`  
 
-Returns **[AuthSig][140]** The AuthSig created or retrieved
+Returns **[AuthSig][142]** The AuthSig created or retrieved
 
 ## disconnectWeb3
 
@@ -513,9 +534,9 @@ Convert a Blob to a base64urlpad string.  Note: This function returns a promise.
 
 ### Parameters
 
-*   `blob` **([Blob][149] | File)** The Blob or File to turn into a base64 string
+*   `blob` **([Blob][151] | File)** The Blob or File to turn into a base64 string
 
-Returns **[Promise][148]<[String][139]>** A promise that resolves to the base64 string
+Returns **[Promise][150]<[String][141]>** A promise that resolves to the base64 string
 
 ## base64StringToBlob
 
@@ -523,31 +544,31 @@ Convert a base64urlpad string to a Blob.  Note: This function DOES NOT return a 
 
 ### Parameters
 
-*   `base64String` **[String][139]** The base64 string that to turn into a Blob
+*   `base64String` **[String][141]** The base64 string that to turn into a Blob
 
-Returns **[Blob][149]** A blob that contains the decoded base64 data
+Returns **[Blob][151]** A blob that contains the decoded base64 data
 
 ## uint8arrayToString
 
-Convert a Uint8Array to a string.  Supports various encodings.  This is a re-export of [https://www.npmjs.com/package/uint8arrays][153] and you can find the list of supported encodings here [https://github.com/multiformats/multibase/blob/master/multibase.csv][154]
+Convert a Uint8Array to a string.  Supports various encodings.  This is a re-export of [https://www.npmjs.com/package/uint8arrays][155] and you can find the list of supported encodings here [https://github.com/multiformats/multibase/blob/master/multibase.csv][156]
 
 ### Parameters
 
-*   `uint8array` **[Uint8Array][147]** The Uint8Array to convert to a string
-*   `encoding` **[String][139]** The encoding to use when converting the Uint8Array to a string.
+*   `uint8array` **[Uint8Array][149]** The Uint8Array to convert to a string
+*   `encoding` **[String][141]** The encoding to use when converting the Uint8Array to a string.
 
-Returns **[String][139]** The string representation of the Uint8Array
+Returns **[String][141]** The string representation of the Uint8Array
 
 ## uint8arrayFromString
 
-Convert a string to a Uint8Array.  Supports various encodings.  This is a re-export of [https://www.npmjs.com/package/uint8arrays][153] and you can find the list of supported encodings here [https://github.com/multiformats/multibase/blob/master/multibase.csv][154]
+Convert a string to a Uint8Array.  Supports various encodings.  This is a re-export of [https://www.npmjs.com/package/uint8arrays][155] and you can find the list of supported encodings here [https://github.com/multiformats/multibase/blob/master/multibase.csv][156]
 
 ### Parameters
 
-*   `str` **[String][139]** The string to convert to a Uint8Array
-*   `encoding` **[String][139]** The encoding to use when converting the string to a Uint8Array.
+*   `str` **[String][141]** The string to convert to a Uint8Array
+*   `encoding` **[String][141]** The encoding to use when converting the string to a Uint8Array.
 
-Returns **[String][139]** The Uint8Array representation of the data from the string
+Returns **[String][141]** The Uint8Array representation of the data from the string
 
 ## fileToDataUrl
 
@@ -557,7 +578,7 @@ Convert a file to a data URL, which could then be embedded in a LIT.  A data URL
 
 *   `file` **File** The file to turn into a data url
 
-Returns **[string][139]** The data URL.  This is a string representation that can be used anywhere the original file would be used.
+Returns **[string][141]** The data URL.  This is a string representation that can be used anywhere the original file would be used.
 
 ## Other Utilities
 
@@ -569,16 +590,16 @@ The human readable name for an access control condition
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.accessControlConditions` **[Array][141]** The array of access control conditions that you want to humanize
-    *   `params.evmContractConditions` **[Array][141]** The array of evm contract conditions that you want to humanize
-    *   `params.solRpcConditions` **[Array][141]** The array of Solana RPC conditions that you want to humanize
-    *   `params.unifiedAccessControlConditions` **[Array][141]** The array of unified access control conditions that you want to humanize
+    *   `params.accessControlConditions` **[Array][143]** The array of access control conditions that you want to humanize
+    *   `params.evmContractConditions` **[Array][143]** The array of evm contract conditions that you want to humanize
+    *   `params.solRpcConditions` **[Array][143]** The array of Solana RPC conditions that you want to humanize
+    *   `params.unifiedAccessControlConditions` **[Array][143]** The array of unified access control conditions that you want to humanize
     *   `params.tokenList`  
     *   `params.myWalletAddress`  
 
-Returns **[Promise][148]<[string][139]>** A promise containing a human readable description of the access control conditions
+Returns **[Promise][150]<[string][141]>** A promise containing a human readable description of the access control conditions
 
 ## hashUnifiedAccessControlConditions
 
@@ -586,9 +607,9 @@ Hash the unified access control conditions using SHA-256 in a deterministic way.
 
 ### Parameters
 
-*   `unifiedAccessControlConditions` **[Object][136]** The unified access control conditions to hash.
+*   `unifiedAccessControlConditions` **[Object][138]** The unified access control conditions to hash.
 
-Returns **[Promise][148]<[ArrayBuffer][150]>** A promise that resolves to an ArrayBuffer that contains the hash
+Returns **[Promise][150]<[ArrayBuffer][152]>** A promise that resolves to an ArrayBuffer that contains the hash
 
 ## HTML NFT Utilities
 
@@ -600,12 +621,12 @@ Finds the tokens that the current user owns from the predeployed LIT contracts
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.chain` **[string][139]** The chain that was minted on. "ethereum" and "polygon" are currently supported.
-    *   `params.accountAddress` **[number][138]** The account address to check
+    *   `params.chain` **[string][141]** The chain that was minted on. "ethereum" and "polygon" are currently supported.
+    *   `params.accountAddress` **[number][140]** The account address to check
 
-Returns **[array][141]** The token ids owned by the accountAddress
+Returns **[array][143]** The token ids owned by the accountAddress
 
 ## sendLIT
 
@@ -613,12 +634,12 @@ Send a token to another account
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.tokenMetadata` **[string][139]** The token metadata of the token to be transferred.  Should include tokenId, tokenAddress, and chain
-    *   `params.to` **[number][138]** The account address to send the token to
+    *   `params.tokenMetadata` **[string][141]** The token metadata of the token to be transferred.  Should include tokenId, tokenAddress, and chain
+    *   `params.to` **[number][140]** The account address to send the token to
 
-Returns **[Object][136]** Success or error
+Returns **[Object][138]** Success or error
 
 ## createHtmlLIT
 
@@ -626,20 +647,20 @@ Create a ready-to-go LIT using provided HTML/CSS body and an encrypted zip data 
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.title` **[string][139]** The title that will be used for the title tag in the outputted HTML
-    *   `params.htmlBody` **[number][138]** The HTML body for the locked state of the LIT.  All users will be able to see this HTML.  This HTML must have a button with an id of "unlockButton" which will be automatically set up to decrypt and load the encryptedZipDataUrl
-    *   `params.css` **[string][139]** Any CSS you would like to include in the outputted HTML
-    *   `params.encryptedZipDataUrl` **[number][138]** a data URL of the encrypted zip that contains the locked content that only token holders will be able to view.
-    *   `params.chain` **[string][139]** The chain that the corresponding NFT was minted on.  "ethereum" and "polygon" are currently supported.
-    *   `params.npmPackages` **[Array][141]** An array of strings of NPM package names that should be embedded into this LIT.  These packages will be pulled down via unpkg, converted to data URLs, and embedded in the LIT HTML.  You can include any packages from npmjs.com. (optional, default `[]`)
-    *   `params.tokenAddress` **[string][139]** The token address of the corresponding NFT for this LIT.  ERC721 and ERC 1155 tokens are currently supported.
-    *   `params.tokenId` **[number][138]** The ID of the token of the corresponding NFT for this LIT.  Only holders of this token ID will be able to unlock and decrypt this LIT.
+    *   `params.title` **[string][141]** The title that will be used for the title tag in the outputted HTML
+    *   `params.htmlBody` **[number][140]** The HTML body for the locked state of the LIT.  All users will be able to see this HTML.  This HTML must have a button with an id of "unlockButton" which will be automatically set up to decrypt and load the encryptedZipDataUrl
+    *   `params.css` **[string][141]** Any CSS you would like to include in the outputted HTML
+    *   `params.encryptedZipDataUrl` **[number][140]** a data URL of the encrypted zip that contains the locked content that only token holders will be able to view.
+    *   `params.chain` **[string][141]** The chain that the corresponding NFT was minted on.  "ethereum" and "polygon" are currently supported.
+    *   `params.npmPackages` **[Array][143]** An array of strings of NPM package names that should be embedded into this LIT.  These packages will be pulled down via unpkg, converted to data URLs, and embedded in the LIT HTML.  You can include any packages from npmjs.com. (optional, default `[]`)
+    *   `params.tokenAddress` **[string][141]** The token address of the corresponding NFT for this LIT.  ERC721 and ERC 1155 tokens are currently supported.
+    *   `params.tokenId` **[number][140]** The ID of the token of the corresponding NFT for this LIT.  Only holders of this token ID will be able to unlock and decrypt this LIT.
     *   `params.accessControlConditions`  
     *   `params.encryptedSymmetricKey`  
 
-Returns **[Promise][148]<[string][139]>** A promise containing the HTML string that is now a LIT.  You can send this HTML around and only token holders will be able to unlock and decrypt the content inside it.  Included in the HTML is this LIT JS SDK itself, the encrypted locked content, an automatic connection to the LIT nodes network, and a handler for a button with id "unlockButton" which will perform the unlock operation when clicked.
+Returns **[Promise][150]<[string][141]>** A promise containing the HTML string that is now a LIT.  You can send this HTML around and only token holders will be able to unlock and decrypt the content inside it.  Included in the HTML is this LIT JS SDK itself, the encrypted locked content, an automatic connection to the LIT nodes network, and a handler for a button with id "unlockButton" which will perform the unlock operation when clicked.
 
 ## mintLIT
 
@@ -647,12 +668,12 @@ This function mints a LIT using our pre-deployed token contracts.  You may use o
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.chain` **[string][139]** The chain to mint on.  "ethereum" and "polygon" are currently supported.
-    *   `params.quantity` **[number][138]** The number of tokens to mint.  Note that these will be fungible, so they will not have serial numbers.
+    *   `params.chain` **[string][141]** The chain to mint on.  "ethereum" and "polygon" are currently supported.
+    *   `params.quantity` **[number][140]** The number of tokens to mint.  Note that these will be fungible, so they will not have serial numbers.
 
-Returns **[Object][136]** The txHash, tokenId, tokenAddress, mintingAddress, and authSig.
+Returns **[Object][138]** The txHash, tokenId, tokenAddress, mintingAddress, and authSig.
 
 ## unlockLitWithKey
 
@@ -660,17 +681,17 @@ Manually unlock a LIT with a symmetric key.  You can obtain this key by calling 
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.symmetricKey` **[Uint8Array][147]** The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
+    *   `params.symmetricKey` **[Uint8Array][149]** The decryption key obtained by calling "LitNodeClient.getEncryptionKey"
 
-Returns **[promise][148]** A promise that will resolve when the LIT is unlocked
+Returns **[promise][150]** A promise that will resolve when the LIT is unlocked
 
 ## toggleLock
 
 Lock and unlock the encrypted content inside a LIT.  This content is only viewable by holders of the NFT that corresponds to this LIT.  Locked content will be decrypted and placed into the HTML element with id "mediaGridHolder".  The HTML element with the id "lockedHeader" will have it's text automatically changed to LOCKED or UNLOCKED to denote the state of the LIT.  Note that if you're creating a LIT using the createHtmlLIT function, you do not need to use this function, because this function is automatically bound to any button in your HTML with the id "unlockButton".
 
-Returns **[Promise][148]** the promise will resolve when the LIT has been unlocked or an error message has been shown informing the user that they are not authorized to unlock the LIT
+Returns **[Promise][150]** the promise will resolve when the LIT has been unlocked or an error message has been shown informing the user that they are not authorized to unlock the LIT
 
 ## injectViewerIFrame
 
@@ -678,12 +699,12 @@ Inject an iFrame into the current page that will display a LIT.  This function s
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.destinationId` **[Object][136]** The DOM ID of the element to inject the iFrame into
-    *   `params.title` **[string][139]** The title of the content being displayed
-    *   `params.fileUrl` **[string][139]** The URL of the content that will be shown in the iFrame
-    *   `params.className` **[string][139]** An optional DOM class name to add to the iFrame for styling
+    *   `params.destinationId` **[Object][138]** The DOM ID of the element to inject the iFrame into
+    *   `params.title` **[string][141]** The title of the content being displayed
+    *   `params.fileUrl` **[string][141]** The URL of the content that will be shown in the iFrame
+    *   `params.className` **[string][141]** An optional DOM class name to add to the iFrame for styling
 
 ## Types
 
@@ -691,73 +712,73 @@ Inject an iFrame into the current page that will display a LIT.  This function s
 
 ## AccessControlCondition
 
-Type: [Object][136]
+Type: [Object][138]
 
 ### Properties
 
-*   `contractAddress` **[string][139]** The address of the contract that will be queried
-*   `chain` **[string][139]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-*   `standardContractType` **[string][139]** If the contract is an ERC20, ERC721, or ERC1155, please put that here
-*   `method` **[string][139]** The smart contract function to call
-*   `parameters` **[Array][141]** The parameters to use when calling the smart contract.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
-*   `returnValueTest` **[Object][136]** An object containing two keys: "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.
+*   `contractAddress` **[string][141]** The address of the contract that will be queried
+*   `chain` **[string][141]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+*   `standardContractType` **[string][141]** If the contract is an ERC20, ERC721, or ERC1155, please put that here
+*   `method` **[string][141]** The smart contract function to call
+*   `parameters` **[Array][143]** The parameters to use when calling the smart contract.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
+*   `returnValueTest` **[Object][138]** An object containing two keys: "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.
 
 ## EVMContractCondition
 
-Type: [Object][136]
+Type: [Object][138]
 
 ### Properties
 
-*   `contractAddress` **[string][139]** The address of the contract that will be queried
-*   `chain` **[string][139]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-*   `functionName` **[string][139]** The smart contract function to call
-*   `functionParams` **[Array][141]** The parameters to use when calling the smart contract.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
-*   `functionAbi` **[Object][136]** The ABI of the smart contract function to call.  This is used to encode the function parameters and decode the return value of the function.  Do not pass the entire contract ABI here.  Instead, find the function you want to call in the contract ABI and pass that function's ABI here.
-*   `returnValueTest` **[Object][136]** An object containing three keys: "key", "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "key": "", "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.  The "key" is used when the return value is a struct which contains multiple values and should be the name of the returned value from the function abi.  You must always pass "key" when using "returnValueTest", even if you pass an empty string for it, because the function only returns a single value.
+*   `contractAddress` **[string][141]** The address of the contract that will be queried
+*   `chain` **[string][141]** The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
+*   `functionName` **[string][141]** The smart contract function to call
+*   `functionParams` **[Array][143]** The parameters to use when calling the smart contract.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
+*   `functionAbi` **[Object][138]** The ABI of the smart contract function to call.  This is used to encode the function parameters and decode the return value of the function.  Do not pass the entire contract ABI here.  Instead, find the function you want to call in the contract ABI and pass that function's ABI here.
+*   `returnValueTest` **[Object][138]** An object containing three keys: "key", "comparator" and "value".  The return value of the smart contract function will be compared against these.  For example, to check if someone holds an NFT, you could use "key": "", "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.  The "key" is used when the return value is a struct which contains multiple values and should be the name of the returned value from the function abi.  You must always pass "key" when using "returnValueTest", even if you pass an empty string for it, because the function only returns a single value.
 
 ## SolRpcCondition
 
-Type: [Object][136]
+Type: [Object][138]
 
 ### Properties
 
-*   `method` **[string][139]** The Solana RPC method to be called.  You can find a list here: [https://docs.solana.com/developing/clients/jsonrpc-api][155]
-*   `params` **[Array][141]** The parameters to use when making the RPC call.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
-*   `chain` **[string][139]** The chain name of the chain that this contract is deployed on.  See ALL_LIT_CHAINS for currently supported chains.  On Solana, we support "solana" for mainnet, "solanaDevnet" for devnet and "solanaTestnet" for testnet.
-*   `returnValueTest` **[Object][136]** An object containing three keys: "key", "comparator" and "value".  The return value of the rpc call will be compared against these.  The "key" selector supports JSONPath syntax, so you can filter and iterate over the results.  For example, to check if someone holds an NFT with address 29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE, you could use "method": "GetTokenAccountsByOwner", "params": \[":userAddress",{"programId":"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"},{"encoding":"jsonParsed"}], "key": "$\[?(@.account.data.parsed.info.mint == "29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE")].account.data.parsed.info.tokenAmount.amount", "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.  The "key" is used when the return value is an array or object which contains multiple values and should be the name of the returned value or a JSONPath item.  You must always pass "key" when using "returnValueTest", even if you pass an empty string for it, because the rpc call only returns a single value.
+*   `method` **[string][141]** The Solana RPC method to be called.  You can find a list here: [https://docs.solana.com/developing/clients/jsonrpc-api][157]
+*   `params` **[Array][143]** The parameters to use when making the RPC call.  You can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature
+*   `chain` **[string][141]** The chain name of the chain that this contract is deployed on.  See ALL_LIT_CHAINS for currently supported chains.  On Solana, we support "solana" for mainnet, "solanaDevnet" for devnet and "solanaTestnet" for testnet.
+*   `returnValueTest` **[Object][138]** An object containing three keys: "key", "comparator" and "value".  The return value of the rpc call will be compared against these.  The "key" selector supports JSONPath syntax, so you can filter and iterate over the results.  For example, to check if someone holds an NFT with address 29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE, you could use "method": "GetTokenAccountsByOwner", "params": \[":userAddress",{"programId":"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"},{"encoding":"jsonParsed"}], "key": "$\[?(@.account.data.parsed.info.mint == "29G6GSKNGP8K6ATy65QrNZk4rNgsZX1sttvb5iLXWDcE")].account.data.parsed.info.tokenAmount.amount", "comparator: >" and "value: 0" which would check that a user has a token balance greater than zero.  The "key" is used when the return value is an array or object which contains multiple values and should be the name of the returned value or a JSONPath item.  You must always pass "key" when using "returnValueTest", even if you pass an empty string for it, because the rpc call only returns a single value.
 
 ## CosmosCondition
 
-Type: [Object][136]
+Type: [Object][138]
 
 ### Properties
 
-*   `path` **[string][139]** The RPC URL path that will be called.  This will typically contain any parameters you need for the call.  Note that you can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature.  For example, this path would be used to get the requesting user's balance: "/cosmos/bank/v1beta1/balances/:userAddress"
-*   `chain` **[string][139]** The chain name of the chain that this contract is deployed on.  See ALL_LIT_CHAINS for currently supported chains.  On Cosmos we currently support "cosmos" and "kyve"
-*   `returnValueTest` **[Object][136]** An object containing three keys: "key", "comparator" and "value".  The return value of the rpc call will be compared against these.  The "key" selector supports JSONPath syntax, so you can filter and iterate over the results.  For example, to check the balance of someone's account, you can use the key "$.balances\[0].amount" which will pull out balances\[0].amount from the JSON response and compare it against the "value" field according to the "comparator".  The "key" is used when the return value is an array or object which contains multiple values and should be the name of the returned value or a JSONPath item.  You must always pass "key" when using "returnValueTest", even if you pass an empty string for it, because the rpc call only returns a single value.
+*   `path` **[string][141]** The RPC URL path that will be called.  This will typically contain any parameters you need for the call.  Note that you can use the special ":userAddress" parameter which will be replaced with the requesting user's wallet address, verified via message signature.  For example, this path would be used to get the requesting user's balance: "/cosmos/bank/v1beta1/balances/:userAddress"
+*   `chain` **[string][141]** The chain name of the chain that this contract is deployed on.  See ALL_LIT_CHAINS for currently supported chains.  On Cosmos we currently support "cosmos" and "kyve"
+*   `returnValueTest` **[Object][138]** An object containing three keys: "key", "comparator" and "value".  The return value of the rpc call will be compared against these.  The "key" selector supports JSONPath syntax, so you can filter and iterate over the results.  For example, to check the balance of someone's account, you can use the key "$.balances\[0].amount" which will pull out balances\[0].amount from the JSON response and compare it against the "value" field according to the "comparator".  The "key" is used when the return value is an array or object which contains multiple values and should be the name of the returned value or a JSONPath item.  You must always pass "key" when using "returnValueTest", even if you pass an empty string for it, because the rpc call only returns a single value.
 
 ## ResourceId
 
-Type: [Object][136]
+Type: [Object][138]
 
 ### Properties
 
-*   `baseUrl` **[string][139]** The base url of the resource that will be authorized
-*   `path` **[string][139]** The path of the url of the resource that will be authorized
-*   `orgId` **[string][139]** The org id that the user would be authorized to belong to.  The orgId key must be present but it may contain an empty string if you don't need to store anything in it.
-*   `role` **[string][139]** The role that the user would be authorized to have.  The role key must be present but it may contain an empty string if you don't need to store anything in it.
-*   `extraData` **[string][139]** Any extra data you may want to store.  You may store stringified JSON in here, for example.  The extraData key must be present but it may contain an empty string if you don't need to store anything in it.
+*   `baseUrl` **[string][141]** The base url of the resource that will be authorized
+*   `path` **[string][141]** The path of the url of the resource that will be authorized
+*   `orgId` **[string][141]** The org id that the user would be authorized to belong to.  The orgId key must be present but it may contain an empty string if you don't need to store anything in it.
+*   `role` **[string][141]** The role that the user would be authorized to have.  The role key must be present but it may contain an empty string if you don't need to store anything in it.
+*   `extraData` **[string][141]** Any extra data you may want to store.  You may store stringified JSON in here, for example.  The extraData key must be present but it may contain an empty string if you don't need to store anything in it.
 
 ## AuthSig
 
-Type: [Object][136]
+Type: [Object][138]
 
 ### Properties
 
-*   `sig` **[string][139]** The actual hex-encoded signature
-*   `derivedVia` **[string][139]** The method used to derive the signature. Typically "web3.eth.personal.sign"
-*   `signedMessage` **[string][139]** The message that was signed
-*   `address` **[string][139]** The crypto wallet address that signed the message
+*   `sig` **[string][141]** The actual hex-encoded signature
+*   `derivedVia` **[string][141]** The method used to derive the signature. Typically "web3.eth.personal.sign"
+*   `signedMessage` **[string][141]** The message that was signed
+*   `address` **[string][141]** The crypto wallet address that signed the message
 
 ## Chain Info
 
@@ -765,30 +786,30 @@ Type: [Object][136]
 
 ## LITChain
 
-Type: [Object][136]
+Type: [Object][138]
 
 ### Properties
 
-*   `vmType` **[string][139]** Either EVM for an Ethereum compatible chain or SVM for a Solana compatible chain
-*   `name` **[string][139]** The human readable name of the chain
+*   `vmType` **[string][141]** Either EVM for an Ethereum compatible chain or SVM for a Solana compatible chain
+*   `name` **[string][141]** The human readable name of the chain
 
 ## LITEVMChain
 
-Type: [Object][136]
+Type: [Object][138]
 
 ### Properties
 
-*   `contractAddress` **[string][139]** The address of the token contract for the optional predeployed ERC1155 contract.  Only present on EVM chains.
-*   `chainId` **[string][139]** The chain ID of the chain that this token contract is deployed on.  Used for EVM chains.
-*   `name` **[string][139]** The human readable name of the chain
+*   `contractAddress` **[string][141]** The address of the token contract for the optional predeployed ERC1155 contract.  Only present on EVM chains.
+*   `chainId` **[string][141]** The chain ID of the chain that this token contract is deployed on.  Used for EVM chains.
+*   `name` **[string][141]** The human readable name of the chain
 
 ## LITSVMChain
 
-Type: [Object][136]
+Type: [Object][138]
 
 ### Properties
 
-*   `name` **[string][139]** The human readable name of the chain
+*   `name` **[string][141]** The human readable name of the chain
 
 ## Misc
 
@@ -796,35 +817,35 @@ Type: [Object][136]
 
 ## LITCosmosChain
 
-Type: [Object][136]
+Type: [Object][138]
 
 ### Properties
 
-*   `name` **[string][139]** The human readable name of the chain
+*   `name` **[string][141]** The human readable name of the chain
 
 ## LIT_CHAINS
 
 EVM Chains supported by the LIT protocol.  Each chain includes an optional pre-deployed token contract that you may use for minting LITs.  These are ERC1155 contracts that let you mint any quantity of a given token.  Use the chain name as a key in this object.
 
-Type: [LITEVMChain][156]
+Type: [LITEVMChain][158]
 
 ## LIT_SVM_CHAINS
 
 Solana Chains supported by the LIT protocol.  Use the chain name as a key in this object.
 
-Type: [LITSVMChain][157]
+Type: [LITSVMChain][159]
 
 ## LIT_COSMOS_CHAINS
 
 Cosmos Chains supported by the LIT protocol.  Use the chain name as a key in this object.
 
-Type: [LITCosmosChain][158]
+Type: [LITCosmosChain][160]
 
 ## ALL_LIT_CHAINS
 
 All Chains supported by the LIT protocol.  Use the chain name as a key in this object.
 
-Type: [LITChain][159]
+Type: [LITChain][161]
 
 ## getVarType
 
@@ -836,7 +857,7 @@ or simply a`string`or`int\` type
 
 *   `value` **any** 
 
-Returns **[String][139]** type
+Returns **[String][141]** type
 
 ## checkType
 
@@ -845,7 +866,7 @@ If not, throw `invalidParamType` error
 
 ### Parameters
 
-*   `$0` **[Object][136]** 
+*   `$0` **[Object][138]** 
 
     *   `$0.value`  
     *   `$0.allowedTypes`  
@@ -853,12 +874,12 @@ If not, throw `invalidParamType` error
     *   `$0.functionName`  
     *   `$0.throwOnError`   (optional, default `true`)
 *   `value` **any** 
-*   `allowedTypes` **[Array][141]<[String][139]>** 
-*   `paramName` **[string][139]** 
-*   `functionName` **[string][139]** 
-*   `throwOnError` **[boolean][137]** 
+*   `allowedTypes` **[Array][143]<[String][141]>** 
+*   `paramName` **[string][141]** 
+*   `functionName` **[string][141]** 
+*   `throwOnError` **[boolean][139]** 
 
-Returns **[Boolean][137]** true/false
+Returns **[Boolean][139]** true/false
 
 ## convertLitActionsParams
 
@@ -868,7 +889,7 @@ Convert types before sending to Lit Actions as jsParams.
 
 *   `jsParams`  
 
-Returns **[Object][136]** The jsParams object, but with any incompatible types automatically converted
+Returns **[Object][138]** The jsParams object, but with any incompatible types automatically converted
 
 ## downloadFile
 
@@ -876,13 +897,13 @@ Download a file in memory to the user's computer
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.filename` **[string][139]** The name of the file
-    *   `params.data` **[Uint8Array][147]** The actual file itself as a Uint8Array
-    *   `params.mimetype` **[string][139]** The mime type of the file
+    *   `params.filename` **[string][141]** The name of the file
+    *   `params.data` **[Uint8Array][149]** The actual file itself as a Uint8Array
+    *   `params.mimetype` **[string][141]** The mime type of the file
 
-Returns **[string][139]** The data URL.  This is a string representation that can be used anywhere the original file would be used.
+Returns **[string][141]** The data URL.  This is a string representation that can be used anywhere the original file would be used.
 
 ## importSymmetricKey
 
@@ -890,15 +911,15 @@ Import a symmetric key from a Uint8Array to a webcrypto key.  You should only us
 
 ### Parameters
 
-*   `symmKey` **[Uint8Array][147]** The symmetric key to import
+*   `symmKey` **[Uint8Array][149]** The symmetric key to import
 
-Returns **[Promise][148]\<CryptoKey>** A promise that resolves to the imported key
+Returns **[Promise][150]\<CryptoKey>** A promise that resolves to the imported key
 
 ## generateSymmetricKey
 
 Generate a new random symmetric key using WebCrypto subtle API.  You should only use this if you're handling your own key generation and management with Lit.  Typically, Lit handles this internally for you.
 
-Returns **[Promise][148]\<CryptoKey>** A promise that resolves to the generated key
+Returns **[Promise][150]\<CryptoKey>** A promise that resolves to the generated key
 
 ## encryptWithPubKey
 
@@ -906,11 +927,11 @@ Encrypt a blob with the public key of a receiver
 
 ### Parameters
 
-*   `receiverPublicKey` **[string][139]** The base64 encoded 32 byte public key.  The corresponding private key will be able to decrypt this blob
-*   `data` **[Blob][149]** The blob to encrypt
-*   `version` **[string][139]** The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
+*   `receiverPublicKey` **[string][141]** The base64 encoded 32 byte public key.  The corresponding private key will be able to decrypt this blob
+*   `data` **[Blob][151]** The blob to encrypt
+*   `version` **[string][141]** The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
 
-Returns **[Blob][149]** The encrypted blob
+Returns **[Blob][151]** The encrypted blob
 
 ## decryptWithPrivKey
 
@@ -918,11 +939,11 @@ Decrypt a blob with a private key
 
 ### Parameters
 
-*   `encryptedData` **[Blob][149]** The blob to decrypt
-*   `receiverPrivateKey` **[string][139]** The base64 encoded 32 byte private key.  The corresponding public key was used to encrypt this blob
-*   `version` **[string][139]** The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
+*   `encryptedData` **[Blob][151]** The blob to decrypt
+*   `receiverPrivateKey` **[string][141]** The base64 encoded 32 byte private key.  The corresponding public key was used to encrypt this blob
+*   `version` **[string][141]** The encryption algorithm to use.  This should be set to "x25519-xsalsa20-poly1305" as no other algorithms are implemented right now.
 
-Returns **[Blob][149]** The decrypted blob
+Returns **[Blob][151]** The decrypted blob
 
 ## decimalPlaces
 
@@ -930,12 +951,12 @@ Get the number of decimal places in a token
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.contractAddress` **[string][139]** The token contract address
-    *   `params.chain` **[string][139]** The chain on which the token is deployed
+    *   `params.contractAddress` **[string][141]** The token contract address
+    *   `params.chain` **[string][141]** The chain on which the token is deployed
 
-Returns **[number][138]** The number of decimal places in the token
+Returns **[number][140]** The number of decimal places in the token
 
 ## lookupNameServiceAddress
 
@@ -943,12 +964,12 @@ Lookup an eth address from a given ENS name
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.chain` **[string][139]** The chain on which to resolve the name
-    *   `params.name` **[string][139]** The name to resolve
+    *   `params.chain` **[string][141]** The chain on which to resolve the name
+    *   `params.name` **[string][141]** The name to resolve
 
-Returns **[string][139]** The resolved eth address
+Returns **[string][141]** The resolved eth address
 
 ## metadataForFile
 
@@ -956,12 +977,12 @@ Get all the metadata needed to decrypt something in the future.  If you're encry
 
 ### Parameters
 
-*   `params` **[Object][136]** 
+*   `params` **[Object][138]** 
 
-    *   `params.accessControlConditions` **[Array][141]** The array of access control conditions defined for the object
-    *   `params.chain` **[string][139]** The blockchain on which the access control conditions should be checked
-    *   `params.encryptedSymmetricKey` **[Uint8Array][147]** The encrypted symmetric key that was returned by the LitNodeClient.saveEncryptionKey function
-    *   `params.objectUrl` **[string][139]** The url to the object, like an IPFS or Arweave url.
+    *   `params.accessControlConditions` **[Array][143]** The array of access control conditions defined for the object
+    *   `params.chain` **[string][141]** The blockchain on which the access control conditions should be checked
+    *   `params.encryptedSymmetricKey` **[Uint8Array][149]** The encrypted symmetric key that was returned by the LitNodeClient.saveEncryptionKey function
+    *   `params.objectUrl` **[string][141]** The url to the object, like an IPFS or Arweave url.
     *   `params.name`  
     *   `params.type`  
     *   `params.size`  
@@ -969,17 +990,17 @@ Get all the metadata needed to decrypt something in the future.  If you're encry
     *   `params.solRpcConditions`  
     *   `params.unifiedAccessControlConditions`  
 
-Returns **[Object][136]** An object with 3 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.
+Returns **[Object][138]** An object with 3 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.
 
 ## CallRequest
 
-Type: [Object][136]
+Type: [Object][138]
 
 ### Properties
 
-*   `to` **[string][139]** The address of the contract that will be queried
-*   `from` **[string][139]** Optional.  The address calling the function.
-*   `data` **[string][139]** Hex encoded data to send to the contract.
+*   `to` **[string][141]** The address of the contract that will be queried
+*   `from` **[string][141]** Optional.  The address calling the function.
+*   `data` **[string][141]** Hex encoded data to send to the contract.
 
 [1]: #welcome
 
@@ -991,310 +1012,314 @@ Type: [Object][136]
 
 [5]: #parameters-1
 
-[6]: #getsignedchaindatatoken
+[6]: #signsessionkey
 
 [7]: #parameters-2
 
-[8]: #getsignedtoken
+[8]: #getsignedchaindatatoken
 
 [9]: #parameters-3
 
-[10]: #savesigningcondition
+[10]: #getsignedtoken
 
 [11]: #parameters-4
 
-[12]: #getencryptionkey
+[12]: #savesigningcondition
 
 [13]: #parameters-5
 
-[14]: #saveencryptionkey
+[14]: #getencryptionkey
 
 [15]: #parameters-6
 
-[16]: #signwithecdsa
+[16]: #saveencryptionkey
 
 [17]: #parameters-7
 
-[18]: #validate_and_sign_ecdsa
+[18]: #signwithecdsa
 
 [19]: #parameters-8
 
-[20]: #connect
+[20]: #validate_and_sign_ecdsa
 
-[21]: #static-content---encryption-and-decryption-utilities
+[21]: #parameters-9
 
-[22]: #encryptstring
+[22]: #connect
 
-[23]: #parameters-9
+[23]: #static-content---encryption-and-decryption-utilities
 
-[24]: #decryptstring
+[24]: #encryptstring
 
 [25]: #parameters-10
 
-[26]: #encryptfile
+[26]: #decryptstring
 
 [27]: #parameters-11
 
-[28]: #decryptfile
+[28]: #encryptfile
 
 [29]: #parameters-12
 
-[30]: #zipandencryptstring
+[30]: #decryptfile
 
 [31]: #parameters-13
 
-[32]: #zipandencryptfiles
+[32]: #zipandencryptstring
 
 [33]: #parameters-14
 
-[34]: #encryptfileandzipwithmetadata
+[34]: #zipandencryptfiles
 
 [35]: #parameters-15
 
-[36]: #decryptzipfilewithmetadata
+[36]: #encryptfileandzipwithmetadata
 
 [37]: #parameters-16
 
-[38]: #encryptzip
+[38]: #decryptzipfilewithmetadata
 
 [39]: #parameters-17
 
-[40]: #decryptzip
+[40]: #encryptzip
 
 [41]: #parameters-18
 
-[42]: #decryptwithsymmetrickey
+[42]: #decryptzip
 
 [43]: #parameters-19
 
-[44]: #encryptwithsymmetrickey
+[44]: #decryptwithsymmetrickey
 
 [45]: #parameters-20
 
-[46]: #dynamic-content---loading-content-from-a-server
+[46]: #encryptwithsymmetrickey
 
-[47]: #verifyjwt
+[47]: #parameters-21
 
-[48]: #parameters-21
+[48]: #dynamic-content---loading-content-from-a-server
 
-[49]: #authentication-signature-utilities
+[49]: #verifyjwt
 
-[50]: #checkandsignauthmessage
+[50]: #parameters-22
 
-[51]: #parameters-22
+[51]: #authentication-signature-utilities
 
-[52]: #signandsaveauthmessage
+[52]: #checkandsignauthmessage
 
 [53]: #parameters-23
 
-[54]: #disconnectweb3
+[54]: #signandsaveauthmessage
 
-[55]: #conversion-utilities
+[55]: #parameters-24
 
-[56]: #blobtobase64string
+[56]: #disconnectweb3
 
-[57]: #parameters-24
+[57]: #conversion-utilities
 
-[58]: #base64stringtoblob
+[58]: #blobtobase64string
 
 [59]: #parameters-25
 
-[60]: #uint8arraytostring
+[60]: #base64stringtoblob
 
 [61]: #parameters-26
 
-[62]: #uint8arrayfromstring
+[62]: #uint8arraytostring
 
 [63]: #parameters-27
 
-[64]: #filetodataurl
+[64]: #uint8arrayfromstring
 
 [65]: #parameters-28
 
-[66]: #other-utilities
+[66]: #filetodataurl
 
-[67]: #humanizeaccesscontrolconditions
+[67]: #parameters-29
 
-[68]: #parameters-29
+[68]: #other-utilities
 
-[69]: #hashunifiedaccesscontrolconditions
+[69]: #humanizeaccesscontrolconditions
 
 [70]: #parameters-30
 
-[71]: #html-nft-utilities
+[71]: #hashunifiedaccesscontrolconditions
 
-[72]: #findlits
+[72]: #parameters-31
 
-[73]: #parameters-31
+[73]: #html-nft-utilities
 
-[74]: #sendlit
+[74]: #findlits
 
 [75]: #parameters-32
 
-[76]: #createhtmllit
+[76]: #sendlit
 
 [77]: #parameters-33
 
-[78]: #mintlit
+[78]: #createhtmllit
 
 [79]: #parameters-34
 
-[80]: #unlocklitwithkey
+[80]: #mintlit
 
 [81]: #parameters-35
 
-[82]: #togglelock
+[82]: #unlocklitwithkey
 
-[83]: #injectvieweriframe
+[83]: #parameters-36
 
-[84]: #parameters-36
+[84]: #togglelock
 
-[85]: #types
+[85]: #injectvieweriframe
 
-[86]: #accesscontrolcondition
+[86]: #parameters-37
 
-[87]: #properties
+[87]: #types
 
-[88]: #evmcontractcondition
+[88]: #accesscontrolcondition
 
-[89]: #properties-1
+[89]: #properties
 
-[90]: #solrpccondition
+[90]: #evmcontractcondition
 
-[91]: #properties-2
+[91]: #properties-1
 
-[92]: #cosmoscondition
+[92]: #solrpccondition
 
-[93]: #properties-3
+[93]: #properties-2
 
-[94]: #resourceid
+[94]: #cosmoscondition
 
-[95]: #properties-4
+[95]: #properties-3
 
-[96]: #authsig
+[96]: #resourceid
 
-[97]: #properties-5
+[97]: #properties-4
 
-[98]: #chain-info
+[98]: #authsig
 
-[99]: #litchain
+[99]: #properties-5
 
-[100]: #properties-6
+[100]: #chain-info
 
-[101]: #litevmchain
+[101]: #litchain
 
-[102]: #properties-7
+[102]: #properties-6
 
-[103]: #litsvmchain
+[103]: #litevmchain
 
-[104]: #properties-8
+[104]: #properties-7
 
-[105]: #misc
+[105]: #litsvmchain
 
-[106]: #litcosmoschain
+[106]: #properties-8
 
-[107]: #properties-9
+[107]: #misc
 
-[108]: #lit_chains
+[108]: #litcosmoschain
 
-[109]: #lit_svm_chains
+[109]: #properties-9
 
-[110]: #lit_cosmos_chains
+[110]: #lit_chains
 
-[111]: #all_lit_chains
+[111]: #lit_svm_chains
 
-[112]: #getvartype
+[112]: #lit_cosmos_chains
 
-[113]: #parameters-37
+[113]: #all_lit_chains
 
-[114]: #checktype
+[114]: #getvartype
 
 [115]: #parameters-38
 
-[116]: #convertlitactionsparams
+[116]: #checktype
 
 [117]: #parameters-39
 
-[118]: #downloadfile
+[118]: #convertlitactionsparams
 
 [119]: #parameters-40
 
-[120]: #importsymmetrickey
+[120]: #downloadfile
 
 [121]: #parameters-41
 
-[122]: #generatesymmetrickey
+[122]: #importsymmetrickey
 
-[123]: #encryptwithpubkey
+[123]: #parameters-42
 
-[124]: #parameters-42
+[124]: #generatesymmetrickey
 
-[125]: #decryptwithprivkey
+[125]: #encryptwithpubkey
 
 [126]: #parameters-43
 
-[127]: #decimalplaces
+[127]: #decryptwithprivkey
 
 [128]: #parameters-44
 
-[129]: #lookupnameserviceaddress
+[129]: #decimalplaces
 
 [130]: #parameters-45
 
-[131]: #metadataforfile
+[131]: #lookupnameserviceaddress
 
 [132]: #parameters-46
 
-[133]: #callrequest
+[133]: #metadataforfile
 
-[134]: #properties-10
+[134]: #parameters-47
 
-[135]: https://developer.litprotocol.com/docs/SDK/intro
+[135]: #callrequest
 
-[136]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[136]: #properties-10
 
-[137]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[137]: https://developer.litprotocol.com/docs/SDK/intro
 
-[138]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[138]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
-[139]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[139]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[140]: #authsig
+[140]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[141]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[141]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
-[142]: #callrequest
+[142]: #authsig
 
-[143]: #accesscontrolcondition
+[143]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
 
-[144]: #evmcontractcondition
+[144]: #callrequest
 
-[145]: #solrpccondition
+[145]: #accesscontrolcondition
 
-[146]: #resourceid
+[146]: #evmcontractcondition
 
-[147]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array
+[147]: #solrpccondition
 
-[148]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[148]: #resourceid
 
-[149]: https://developer.mozilla.org/docs/Web/API/Blob
+[149]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array
 
-[150]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
+[150]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
 
-[151]: #litnodeclient
+[151]: https://developer.mozilla.org/docs/Web/API/Blob
 
-[152]: https://developer.litprotocol.com/docs/supportedChains
+[152]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
 
-[153]: https://www.npmjs.com/package/uint8arrays
+[153]: #litnodeclient
 
-[154]: https://github.com/multiformats/multibase/blob/master/multibase.csv
+[154]: https://developer.litprotocol.com/docs/supportedChains
 
-[155]: https://docs.solana.com/developing/clients/jsonrpc-api
+[155]: https://www.npmjs.com/package/uint8arrays
 
-[156]: #litevmchain
+[156]: https://github.com/multiformats/multibase/blob/master/multibase.csv
 
-[157]: #litsvmchain
+[157]: https://docs.solana.com/developing/clients/jsonrpc-api
 
-[158]: #litcosmoschain
+[158]: #litevmchain
 
-[159]: #litchain
+[159]: #litsvmchain
+
+[160]: #litcosmoschain
+
+[161]: #litchain
