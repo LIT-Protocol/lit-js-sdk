@@ -2,6 +2,7 @@ import Uint8arrays from "../lib/uint8arrays";
 const uint8arrayFromString = Uint8arrays.fromString;
 const uint8arrayToString = Uint8arrays.toString;
 import naclUtil from "tweetnacl-util";
+import nacl from "tweetnacl";
 
 import { version } from "../version";
 
@@ -19,6 +20,13 @@ import { LIT_NETWORKS } from "../lib/constants";
 import { joinSignature } from "@ethersproject/bytes";
 import { computeAddress } from "@ethersproject/transactions";
 import { SiweMessage } from "lit-siwe";
+import { generateSessionKeyPair } from "./crypto";
+
+import {
+  getSessionKeyUri,
+  parseResource,
+  checkAndSignAuthMessage,
+} from "./lit";
 
 import {
   hashAccessControlConditions,
@@ -356,7 +364,9 @@ export default class LitNodeClient {
     authMethods,
     pkpPublicKey,
     authSig,
-    expirationTime,
+    expiration,
+    resources = [],
+    chain,
   }) {
     if (!this.ready) {
       throwError({
@@ -377,8 +387,8 @@ export default class LitNodeClient {
       version: "1",
       chainId: "1",
       expirationTime:
-        expirationTime ||
-        new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        expiration || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      resources,
     });
     siweMessage = siweMessage.prepareMessage();
 
@@ -433,6 +443,7 @@ export default class LitNodeClient {
         localY: s.localY,
         publicKey: s.publicKey,
         dataSigned: s.dataSigned,
+        siweMessage: s.siweMessage,
       }));
       log("sigShares", sigShares);
       const sigType = mostCommonString(sigShares.map((s) => s.sigType));
@@ -460,10 +471,18 @@ export default class LitNodeClient {
         signature: encodedSig,
         publicKey: "0x" + mostCommonString(sigShares.map((s) => s.publicKey)),
         dataSigned: "0x" + mostCommonString(sigShares.map((s) => s.dataSigned)),
+        siweMessage: mostCommonString(sigShares.map((s) => s.siweMessage)),
       };
     });
 
-    return signatures.sessionSig;
+    const { sessionSig } = signatures;
+
+    return {
+      sig: sessionSig.signature,
+      derivedVia: "web3.eth.personal.sign via Lit PKP",
+      signedMessage: sessionSig.siweMessage,
+      address: computeAddress(sessionSig.publicKey),
+    };
   }
 
   /**
@@ -1890,6 +1909,166 @@ export default class LitNodeClient {
       exp,
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
+  }
+
+  // high level, how this works:
+  // generate or retrieve session key
+  // generate or retrieve the wallet signature of the session key
+  // sign the specific resources with the session key
+  async getSessionSigs({
+    expiration,
+    chain,
+    resources = [],
+    sessionCapabilities,
+    switchChain,
+    authNeededCallback,
+  }) {
+    // check if we already have a session key + signature for this chain
+    let sessionKey = localStorage.getItem(`lit-session-key`);
+    if (!sessionKey || sessionKey === "") {
+      // if not, generate one
+      sessionKey = generateSessionKeyPair();
+      localStorage.setItem(`lit-session-key`, JSON.stringify(sessionKey));
+    } else {
+      sessionKey = JSON.parse(sessionKey);
+    }
+    let sessionKeyUri = getSessionKeyUri({ publicKey: sessionKey.publicKey });
+
+    // if the user passed no sessionCapabilities, let's create them for them
+    // with wildcards so the user doesn't have to sign every time
+    if (!sessionCapabilities || sessionCapabilities.length === 0) {
+      sessionCapabilities = resources.map((resource) => {
+        const { protocol, resourceId } = parseResource({ resource });
+        return `${protocol}Capability://*`;
+      });
+    }
+
+    if (!expiration) {
+      // set default of 1 week
+      expiration = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
+    }
+
+    // check if we already have a wallet sig from the user
+    // and then check a few things, including that:
+    // 1. the sig isn't expired
+    // 2. the sig is for the correct session key
+    // 3. the sig has the sessionCapabilities requires to fulfill the resources requested
+
+    let walletSig = localStorage.getItem(`lit-wallet-sig`);
+    if (!walletSig || walletSig == "") {
+      if (authNeededCallback) {
+        walletSig = await authNeededCallback({
+          chain,
+          resources: sessionCapabilities,
+          expiration,
+          uri: sessionKeyUri,
+          litNodeClient: this,
+        });
+      } else {
+        walletSig = await checkAndSignAuthMessage({
+          chain,
+          resources: sessionCapabilities,
+          switchChain,
+          expiration,
+          uri: sessionKeyUri,
+        });
+      }
+    } else {
+      walletSig = JSON.parse(walletSig);
+    }
+
+    const siweMessage = new SiweMessage(walletSig.signedMessage);
+    let needToReSignSessionKey = false;
+    try {
+      // make sure it's legit
+      await siweMessage.verify({ signature: walletSig.sig });
+    } catch (e) {
+      needToReSignSessionKey = true;
+    }
+
+    // make sure the sig is for the correct session key
+    if (siweMessage.uri !== sessionKeyUri) {
+      needToReSignSessionKey = true;
+    }
+
+    // make sure the sig has the session capabilities required to fulfill the resources requested
+    for (let i = 0; i < resources.length; i++) {
+      const resource = resources[i];
+      const { protocol, resourceId } = parseResource({ resource });
+
+      // check if we have blanket permissions or if we authed the specific resource for the protocol
+      const permissionsFound = sessionCapabilities.some((capability) => {
+        const capabilityParts = parseResource({ resource: capability });
+        return (
+          capabilityParts.protocol === protocol &&
+          (capabilityParts.resourceId === "*" ||
+            capabilityParts.resourceId === resourceId)
+        );
+      });
+      if (!permissionsFound) {
+        needToReSignSessionKey = true;
+      }
+    }
+
+    if (needToReSignSessionKey) {
+      log("need to re-sign session key.  Signing...");
+      if (authNeededCallback) {
+        walletSig = await authNeededCallback({
+          chain,
+          resources: sessionCapabilities,
+          expiration,
+          uri: sessionKeyUri,
+          litNodeClient: this,
+        });
+      } else {
+        walletSig = await checkAndSignAuthMessage({
+          chain,
+          resources: sessionCapabilities,
+          switchChain,
+          expiration,
+          uri: sessionKeyUri,
+        });
+      }
+    }
+
+    // okay great, now we have a valid signed session key
+    // let's sign the resources with the session key
+    // 5 minutes is the default expiration for a session signature
+    // because we can generate a new session sig every time the user wants to access a resource
+    // without prompting them to sign with their wallet
+    let sessionExpiration = new Date(Date.now() + 1000 * 60 * 5);
+    const signingTemplate = {
+      sessionKey: sessionKey.publicKey,
+      resources,
+      capabilities: [walletSig],
+      issuedAt: new Date().toISOString(),
+      expiration: sessionExpiration.toISOString(),
+    };
+    const signatures = {};
+
+    this.connectedNodes.forEach((nodeAddress) => {
+      const toSign = {
+        ...signingTemplate,
+        nodeAddress,
+      };
+      let signedMessage = JSON.stringify(toSign);
+      const uint8arrayKey = uint8arrayFromString(
+        sessionKey.secretKey,
+        "base16"
+      );
+      const uint8arrayMessage = uint8arrayFromString(signedMessage, "utf8");
+      let signature = nacl.sign.detached(uint8arrayMessage, uint8arrayKey);
+      // console.log("signature", signature);
+      signatures[nodeAddress] = {
+        sig: uint8arrayToString(signature, "base16"),
+        derivedVia: "litSessionSignViaNacl",
+        signedMessage,
+        address: sessionKey.publicKey,
+        algo: "ed25519",
+      };
+    });
+
+    return signatures;
   }
 
   /**

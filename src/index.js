@@ -40,7 +40,6 @@ import {
   humanizeAccessControlConditions,
   getTokenList,
   checkAndSignAuthMessage,
-  getSessionSigs,
 } from "./utils/lit";
 
 import {
@@ -164,7 +163,6 @@ const functions = {
   encryptWithBlsPubkey,
   generateSymmetricKey,
   importSymmetricKey,
-  getSessionSigs,
   hashResourceIdForSigning,
   blobToBase64String,
   base64StringToBlob,

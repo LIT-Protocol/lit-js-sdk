@@ -42,9 +42,8 @@
         );
         console.log("hashedResourceId", hashedResourceId);
 
-        var sessionSigs = await LitJsSdk.getSessionSigs({
+        var sessionSigs = await litNodeClient.getSessionSigs({
           chain: "ethereum",
-          litNodeClient,
           resources: [`litSigningCondition://${hashedResourceId}`],
         });
 
@@ -86,9 +85,8 @@
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
 
-        var sessionSigs = await LitJsSdk.getSessionSigs({
+        var sessionSigs = await litNodeClient.getSessionSigs({
           chain: "ethereum",
-          litNodeClient,
           resources: [`litEncryptionCondition://*`],
         });
 
@@ -111,9 +109,8 @@
           encryptedSymmetricKey,
         });
 
-        sessionSigs = await LitJsSdk.getSessionSigs({
+        sessionSigs = await litNodeClient.getSessionSigs({
           chain: "ethereum",
-          litNodeClient,
           resources: [`litEncryptionCondition://${hashOfKey}`],
         });
 
