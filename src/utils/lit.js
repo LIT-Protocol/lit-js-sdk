@@ -33,6 +33,7 @@ import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import { fileToDataUrl } from "./browser";
 import { ALL_LIT_CHAINS, NETWORK_PUB_KEY } from "../lib/constants";
 import { SiweMessage } from "lit-siwe";
+import { Base64 } from "js-base64";
 
 const PACKAGE_CACHE = {};
 
@@ -90,6 +91,31 @@ export async function checkAndSignAuthMessage({
   }
 }
 
+// check if we have blanket permissions or if we authed the specific resource for the protocol
+function findPermissionsForResource(resource, capabilityObject) {
+    const { protocol, resourceId } = parseResource({ resource });
+
+    // first check default permitted actions
+    for (const defaultAction of capabilityObject.def) {
+      if (defaultAction === "*" || defaultAction === protocol) {
+        return true;
+      }
+    }
+
+    // then check specific targets
+    if (Object.keys(capabilityObject.tar).indexOf(resourceId) === -1) {
+      return false;
+    }
+
+    for (const permittedAction of capabilityObject.tar[resourceId]) {
+      if (permittedAction === "*" || permittedAction === protocol) {
+        return true;
+      }
+    }
+
+    return false;
+}
+
 // high level, how this works:
 // generate or retrieve session key
 // generate or retrieve the wallet signature of the session key
@@ -98,7 +124,7 @@ export async function getSessionSigs({
   expiration,
   chain,
   resources = [],
-  sessionCapabilities,
+  sessionCapabilityObject,
   switchChain,
   litNodeClient,
 }) {
@@ -113,26 +139,37 @@ export async function getSessionSigs({
   }
   let sessionKeyUri = getSessionKeyUri({ publicKey: sessionKey.publicKey });
 
-  // if the user passed no sessionCapabilities, let's create them for them
+  // if the user passed no sessionCapabilityObject, let's create them for them
   // with wildcards so the user doesn't have to sign every time
-  if (!sessionCapabilities || sessionCapabilities.length === 0) {
-    sessionCapabilities = resources.map((resource) => {
+  if (!sessionCapabilityObject || Object.keys(sessionCapabilityObject).length === 0) {
+    let capabilityObject = {
+      def: [],
+    };
+    let defaultActionsToAdd = new Set();
+    
+    resources.forEach((resource) => {
       const { protocol, resourceId } = parseResource({ resource });
-      return `${protocol}Capability://*`;
+
+      if (!defaultActionsToAdd.has(protocol)) {
+        defaultActionsToAdd.add(protocol);
+      }
     });
+    capabilityObject.def = Array.from(defaultActionsToAdd);
+    sessionCapabilityObject = capabilityObject;
   }
 
   // check if we already have a wallet sig from the user
   // and then check a few things, including that:
   // 1. the sig isn't expired
   // 2. the sig is for the correct session key
-  // 3. the sig has the sessionCapabilities requires to fulfill the resources requested
+  // 3. the sig has the sessionCapabilityObject requires to fulfill the resources requested
 
   let walletSig = localStorage.getItem(`lit-wallet-sig`);
   if (!walletSig || walletSig == "") {
     walletSig = await checkAndSignAuthMessage({
       chain,
-      resources: sessionCapabilities,
+      // convert into SIWE ReCap compliant session capability.
+      resources: [`urn:recap:lit:session:${Base64.encode(JSON.stringify(sessionCapabilityObject))}`],
       switchChain,
       expiration,
       uri: sessionKeyUri,
@@ -158,26 +195,20 @@ export async function getSessionSigs({
   // make sure the sig has the session capabilities required to fulfill the resources requested
   for (let i = 0; i < resources.length; i++) {
     const resource = resources[i];
-    const { protocol, resourceId } = parseResource({ resource });
 
     // check if we have blanket permissions or if we authed the specific resource for the protocol
-    const permissionsFound = sessionCapabilities.some((capability) => {
-      const capabilityParts = parseResource({ resource: capability });
-      return (
-        capabilityParts.protocol === protocol &&
-        (capabilityParts.resourceId === "*" ||
-          capabilityParts.resourceId === resourceId)
-      );
-    });
+    // only search through the def key of the capabilities object for now.
+    const permissionsFound = findPermissionsForResource(resource, sessionCapabilityObject);
     if (!permissionsFound) {
       needToReSignSessionKey = true;
     }
   }
 
   if (needToReSignSessionKey) {
-    waletSig = await checkAndSignAuthMessage({
+    walletSig = await checkAndSignAuthMessage({
       chain,
-      resources: sessionCapabilities,
+      // convert into SIWE ReCap compliant session capability.
+      resources: [`urn:recap:lit:session:${Base64.encode(JSON.stringify(sessionCapabilityObject))}`],
       switchChain,
       expiration,
       uri: sessionKeyUri,
