@@ -1933,16 +1933,29 @@ export default class LitNodeClient {
     sessionCapabilities,
     switchChain,
     authNeededCallback,
+    sessionKey,
   }) {
-    // check if we already have a session key + signature for this chain
-    let sessionKey = localStorage.getItem(`lit-session-key`);
-    if (!sessionKey || sessionKey === "") {
-      // if not, generate one
-      sessionKey = generateSessionKeyPair();
-      localStorage.setItem(`lit-session-key`, JSON.stringify(sessionKey));
-    } else {
-      sessionKey = JSON.parse(sessionKey);
+    if (!sessionKey) {
+      // check if we already have a session key + signature for this chain
+      let storedSessionKey;
+      try {
+        storedSessionKey = localStorage.getItem(`lit-session-key`);
+      } catch (e) {
+        log("Localstorage not available.  Not a problem.  Continuing...");
+      }
+      if (!storedSessionKey || storedSessionKey === "") {
+        // if not, generate one
+        sessionKey = generateSessionKeyPair();
+        try {
+          localStorage.setItem(`lit-session-key`, JSON.stringify(sessionKey));
+        } catch (e) {
+          log("Localstorage not available.  Not a problem.  Continuing...");
+        }
+      } else {
+        sessionKey = JSON.parse(storedSessionKey);
+      }
     }
+
     let sessionKeyUri = getSessionKeyUri({ publicKey: sessionKey.publicKey });
 
     // if the user passed no sessionCapabilities, let's create them for them
@@ -1965,7 +1978,12 @@ export default class LitNodeClient {
     // 2. the sig is for the correct session key
     // 3. the sig has the sessionCapabilities requires to fulfill the resources requested
 
-    let walletSig = localStorage.getItem(`lit-wallet-sig`);
+    let walletSig;
+    try {
+      walletSig = localStorage.getItem(`lit-wallet-sig`);
+    } catch (e) {
+      log("Localstorage not available.  Not a problem.  Continuing...");
+    }
     if (!walletSig || walletSig == "") {
       if (authNeededCallback) {
         walletSig = await authNeededCallback({
