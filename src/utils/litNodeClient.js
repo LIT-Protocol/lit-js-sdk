@@ -178,6 +178,7 @@ export default class LitNodeClient {
     code,
     ipfsId,
     authSig,
+    sessionSigs,
     authMethods = [],
     jsParams = {},
     debug,
@@ -189,6 +190,38 @@ export default class LitNodeClient {
         name: "LitNodeClientNotReadyError",
         errorCode: "lit_node_client_not_ready",
       });
+    }
+
+    // -- validate
+    if (
+      authSig &&
+      !checkType({
+        value: authSig,
+        allowedTypes: ["Object"],
+        paramName: "authSig",
+        functionName: "executeJs",
+      })
+    )
+      return;
+
+    if (
+      sessionSigs &&
+      !checkType({
+        value: sessionSigs,
+        allowedTypes: ["Object"],
+        paramName: "sessionSigs",
+        functionName: "executeJs",
+      })
+    )
+      return;
+
+    if (!sessionSigs && !authSig) {
+      throwError({
+        message: "You must pass either authSig or sessionSigs",
+        name: "InvalidArgumentException",
+        errorCode: "invalid_argument",
+      });
+      return;
     }
 
     // some JS types don't serialize well, so we will convert them before sending to the nodes
@@ -217,6 +250,19 @@ export default class LitNodeClient {
     // ask each node to run the js
     const nodePromises = [];
     for (const url of this.connectedNodes) {
+      let sigToPassToNode = authSig;
+      if (sessionSigs) {
+        // find the sessionSig for this node
+        sigToPassToNode = sessionSigs[url];
+        if (!sigToPassToNode) {
+          throwError({
+            message: `You passed sessionSigs but we could not find session sig for node ${url}`,
+            name: "InvalidArgumentException",
+            errorCode: "invalid_argument",
+          });
+        }
+      }
+      reqBody.authSig = sigToPassToNode;
       nodePromises.push(
         this.getJsExecutionShares({
           url,
@@ -680,7 +726,7 @@ export default class LitNodeClient {
     )
       return;
 
-    log("sessionSigs", sessionSigs);
+    // log("sessionSigs", sessionSigs);
 
     if (
       sessionSigs &&
@@ -1969,7 +2015,7 @@ export default class LitNodeClient {
 
     if (!expiration) {
       // set default of 24 hours
-      expiration = new Date(Date.now() + 1000 * 60 * 60 * 24);
+      expiration = new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString();
     }
 
     // check if we already have a wallet sig from the user
