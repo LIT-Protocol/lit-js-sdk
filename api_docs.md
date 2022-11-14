@@ -170,6 +170,7 @@ Execute JS on the nodes and combine and return any resulting signatures
     *   `params.authSig` **[AuthSig][144]** the authSig to use to authorize the user with the nodes
     *   `params.jsParams` **[Object][140]** An object that contains params to expose to the Lit Action.  These will be injected to the JS runtime before your code runs, so you can use any of these as normal variables in your Lit Action. (optional, default `{}`)
     *   `params.debug` **[Boolean][141]** A boolean that defines if debug info will be returned or not.
+    *   `params.sessionSigs`  
     *   `params.authMethods`   (optional, default `[]`)
 
 Returns **[Object][140]** An object containing the resulting signatures.  Each signature comes with the public key and the data signed.
@@ -328,6 +329,7 @@ Get session signatures for a set of resources
     *   `params.sessionCapabilities` **[Array][145]<[String][143]>** An optional list of capabilities that you want to request for this session.  If you pass nothing, then this will default to a wildcard for each type of resource you're accessing.  For example, if you passed \["litEncryptionCondition://123456"] then this would default to \["litEncryptionConditionCapability://\*"], which would grant this session signature the ability to decrypt any resource.
     *   `params.switchChain` **bool** If you want to ask Metamask to try and switch the user's chain, you may pass true here.  This will only work if the user is using Metamask.  If the user is not using Metamask, then this will be ignored.
     *   `params.authNeededCallback` **[Function][153]** This is a callback that will be called if the user needs to authenticate using a PKP.  For example, if the user has no wallet, but owns a Lit PKP though something like Google Oauth, then you can use this callback to prompt the user to authenticate with their PKP.  This callback should use the LitNodeClient.signSessionKey function to get a session signature for the user from their PKP.  If you don't pass this callback, then the user will be prompted to authenticate with their wallet, like metamask.
+    *   `params.sessionKey`  
 
 Returns **[Object][140]** An object containing the resulting signature.
 

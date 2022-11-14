@@ -73,6 +73,7 @@ import {
   importSymmetricKey,
   hashResourceIdForSigning,
   hashEncryptionKey,
+  generateSessionKeyPair,
 } from "./utils/crypto";
 
 import {
@@ -167,6 +168,7 @@ const functions = {
   blobToBase64String,
   base64StringToBlob,
   hashEncryptionKey,
+  generateSessionKeyPair,
 };
 
 module.exports = functions;
