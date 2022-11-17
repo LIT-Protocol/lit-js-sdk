@@ -17,7 +17,7 @@ const SYMM_KEY_ALGO_PARAMS = {
  * @param {Object} unifiedAccessControlConditions - The unified access control conditions to hash.
  * @returns {Promise<ArrayBuffer>} A promise that resolves to an ArrayBuffer that contains the hash
  */
-export function hashUnifiedAccessControlConditions(
+export async function hashUnifiedAccessControlConditions(
   unifiedAccessControlConditions
 ) {
   const conds = unifiedAccessControlConditions.map((c) =>
