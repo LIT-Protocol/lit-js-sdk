@@ -421,13 +421,6 @@ export const LIT_NETWORKS = {
     "https://polygon-mumbai.litgateway.com:7370",
     "https://polygon-mumbai.litgateway.com:7371",
     "https://polygon-mumbai.litgateway.com:7372",
-    "https://polygon-mumbai.litgateway.com:7373",
-    "https://polygon-mumbai.litgateway.com:7374",
-    "https://polygon-mumbai.litgateway.com:7375",
-    "https://polygon-mumbai.litgateway.com:7376",
-    "https://polygon-mumbai.litgateway.com:7377",
-    "https://polygon-mumbai.litgateway.com:7378",
-    "https://polygon-mumbai.litgateway.com:7379",
   ],
 };
 
