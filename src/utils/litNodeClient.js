@@ -43,6 +43,7 @@ import {
   combineBlsShares,
   combineBlsDecryptionShares,
 } from "./crypto";
+import { Base64 } from "js-base64";
 
 /**
  * @typedef {Object} AccessControlCondition
@@ -1967,7 +1968,7 @@ export default class LitNodeClient {
    * @param {String} params.expiration When this session signature will expire.  The user will have to reauthenticate after this time using whatever auth method you set up.  This means you will have to call this signSessionKey function again to get a new session signature.  This is a RFC3339 timestamp.  The default is 24 hours from now.
    * @param {String} params.chain The chain to use for the session signature.  This is the chain that will be used to sign the session key.  If you're using EVM then this probably doesn't matter at all.
    * @param {Array<String>} params.resources These are the resources that will be signed with the session key.  You may pass a wildcard that allows these session signatures to work with any resource on Lit.  To see a list of resources, check out the docs: https://developer.litprotocol.com/sdk/explanation/walletsigs/sessionsigs/#resources-you-can-request
-   * @param {Array<String>} params.sessionCapabilities An optional list of capabilities that you want to request for this session.  If you pass nothing, then this will default to a wildcard for each type of resource you're accessing.  For example, if you passed ["litEncryptionCondition://123456"] then this would default to ["litEncryptionConditionCapability://*"], which would grant this session signature the ability to decrypt any resource.
+   * @param {Array<String>} params.sessionCapabilityObject An optional capability object you want to request for this session.  If you pass nothing, then this will default to a wildcard for each type of resource you're accessing.  For example, if you passed ["litEncryptionCondition://123456"] then this would default to ["litEncryptionConditionCapability://*"], which would grant this session signature the ability to decrypt any resource.
    * @param {bool} params.switchChain If you want to ask Metamask to try and switch the user's chain, you may pass true here.  This will only work if the user is using Metamask.  If the user is not using Metamask, then this will be ignored.
    * @param {Function} params.authNeededCallback This is a callback that will be called if the user needs to authenticate using a PKP.  For example, if the user has no wallet, but owns a Lit PKP though something like Google Oauth, then you can use this callback to prompt the user to authenticate with their PKP.  This callback should use the LitNodeClient.signSessionKey function to get a session signature for the user from their PKP.  If you don't pass this callback, then the user will be prompted to authenticate with their wallet, like metamask.
    * @returns {Object} An object containing the resulting signature.
@@ -1976,7 +1977,7 @@ export default class LitNodeClient {
     expiration,
     chain,
     resources = [],
-    sessionCapabilities,
+    sessionCapabilityObject,
     switchChain,
     authNeededCallback,
     sessionKey,
@@ -2004,13 +2005,23 @@ export default class LitNodeClient {
 
     let sessionKeyUri = getSessionKeyUri({ publicKey: sessionKey.publicKey });
 
-    // if the user passed no sessionCapabilities, let's create them for them
+    // if the user passed no sessionCapabilityObject, let's create them for them
     // with wildcards so the user doesn't have to sign every time
-    if (!sessionCapabilities || sessionCapabilities.length === 0) {
-      sessionCapabilities = resources.map((resource) => {
+    if (!sessionCapabilityObject || Object.keys(sessionCapabilityObject).length === 0) {
+      let capabilityObject = {
+        def: [],
+      };
+      let defaultActionsToAdd = new Set();
+      
+      resources.forEach((resource) => {
         const { protocol, resourceId } = parseResource({ resource });
-        return `${protocol}Capability://*`;
+
+        if (!defaultActionsToAdd.has(protocol)) {
+          defaultActionsToAdd.add(protocol);
+        }
       });
+      capabilityObject.def = Array.from(defaultActionsToAdd);
+      sessionCapabilityObject = capabilityObject;
     }
 
     if (!expiration) {
@@ -2022,7 +2033,7 @@ export default class LitNodeClient {
     // and then check a few things, including that:
     // 1. the sig isn't expired
     // 2. the sig is for the correct session key
-    // 3. the sig has the sessionCapabilities requires to fulfill the resources requested
+    // 3. the sig has the sessionCapabilityObject requires to fulfill the resources requested
 
     let walletSig;
     try {
@@ -2034,7 +2045,8 @@ export default class LitNodeClient {
       if (authNeededCallback) {
         walletSig = await authNeededCallback({
           chain,
-          resources: sessionCapabilities,
+          // convert into SIWE ReCap compliant session capability.
+          resources: [`urn:recap:lit:session:${Base64.encode(JSON.stringify(sessionCapabilityObject))}`],
           expiration,
           uri: sessionKeyUri,
           litNodeClient: this,
@@ -2042,7 +2054,8 @@ export default class LitNodeClient {
       } else {
         walletSig = await checkAndSignAuthMessage({
           chain,
-          resources: sessionCapabilities,
+          // convert into SIWE ReCap compliant session capability.
+          resources: [`urn:recap:lit:session:${Base64.encode(JSON.stringify(sessionCapabilityObject))}`],
           switchChain,
           expiration,
           uri: sessionKeyUri,
@@ -2069,17 +2082,9 @@ export default class LitNodeClient {
     // make sure the sig has the session capabilities required to fulfill the resources requested
     for (let i = 0; i < resources.length; i++) {
       const resource = resources[i];
-      const { protocol, resourceId } = parseResource({ resource });
 
       // check if we have blanket permissions or if we authed the specific resource for the protocol
-      const permissionsFound = sessionCapabilities.some((capability) => {
-        const capabilityParts = parseResource({ resource: capability });
-        return (
-          capabilityParts.protocol === protocol &&
-          (capabilityParts.resourceId === "*" ||
-            capabilityParts.resourceId === resourceId)
-        );
-      });
+      const permissionsFound = findPermissionsForResource(resource, sessionCapabilityObject);
       if (!permissionsFound) {
         needToReSignSessionKey = true;
       }
@@ -2090,7 +2095,8 @@ export default class LitNodeClient {
       if (authNeededCallback) {
         walletSig = await authNeededCallback({
           chain,
-          resources: sessionCapabilities,
+          // convert into SIWE ReCap compliant session capability.
+          resources: [`urn:recap:lit:session:${Base64.encode(JSON.stringify(sessionCapabilityObject))}`],
           expiration,
           uri: sessionKeyUri,
           litNodeClient: this,
@@ -2098,7 +2104,8 @@ export default class LitNodeClient {
       } else {
         walletSig = await checkAndSignAuthMessage({
           chain,
-          resources: sessionCapabilities,
+          // convert into SIWE ReCap compliant session capability.
+          resources: [`urn:recap:lit:session:${Base64.encode(JSON.stringify(sessionCapabilityObject))}`],
           switchChain,
           expiration,
           uri: sessionKeyUri,
@@ -2195,4 +2202,29 @@ export default class LitNodeClient {
       }, 500);
     });
   }
+}
+
+// check if we have blanket permissions or if we authed the specific resource for the protocol
+function findPermissionsForResource(resource, capabilityObject) {
+  const { protocol, resourceId } = parseResource({ resource });
+
+  // first check default permitted actions
+  for (const defaultAction of capabilityObject.def) {
+    if (defaultAction === "*" || defaultAction === protocol) {
+      return true;
+    }
+  }
+
+  // then check specific targets
+  if (Object.keys(capabilityObject.tar).indexOf(resourceId) === -1) {
+    return false;
+  }
+
+  for (const permittedAction of capabilityObject.tar[resourceId]) {
+    if (permittedAction === "*" || permittedAction === protocol) {
+      return true;
+    }
+  }
+
+  return false;
 }
