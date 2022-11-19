@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset='utf-8'>
-  <title>lit-js-sdk 1.2.36 | Documentation</title>
+  <title>lit-js-sdk 1.2.37 | Documentation</title>
   <meta name='description' content='LIT Javascript SDK'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' rel='stylesheet'>
@@ -15,7 +15,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>lit-js-sdk</h3>
-          <div class='mb1'><code>1.2.36</code></div>
+          <div class='mb1'><code>1.2.37</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -2288,9 +2288,9 @@
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>params.sessionCapabilities</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>></code>
+  <td class='break-word'><span class='code bold'>params.sessionCapabilityObject</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>></code>
   </td>
-  <td class='break-word'><span>An optional list of capabilities that you want to request for this session.  If you pass nothing, then this will default to a wildcard for each type of resource you're accessing.  For example, if you passed ["litEncryptionCondition://123456"] then this would default to ["litEncryptionConditionCapability://*"], which would grant this session signature the ability to decrypt any resource.
+  <td class='break-word'><span>An optional capability object you want to request for this session.  If you pass nothing, then this will default to a wildcard for each type of resource you're accessing.  For example, if you passed ["litEncryptionCondition://123456"] then this would default to ["litEncryptionConditionCapability://*"], which would grant this session signature the ability to decrypt any resource.
 </span></td>
 </tr>
 

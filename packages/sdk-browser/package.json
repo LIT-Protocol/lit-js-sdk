@@ -1,6 +1,6 @@
 {
   "name": "@lit-protocol/sdk-browser",
-  "version": "1.2.36",
+  "version": "1.2.37",
   "main": "build/index.js",
   "license": "MIT",
   "dependencies": {
@@ -15,6 +15,7 @@
     "buffer": "^6.0.3",
     "bufferutil": "^4.0.6",
     "cross-blob": "^3.0.1",
+    "js-base64": "^3.7.2",
     "jszip": "^3.6.0",
     "lit-connect-modal": "^0.1.10",
     "lit-siwe": "^1.1.8",
