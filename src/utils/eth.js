@@ -350,7 +350,7 @@ export async function signAndSaveAuthMessage({
 
   if (!expiration) {
     // set default of 1 week
-    expiration = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
+    expiration = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString();
   }
 
   const preparedMessage = {
@@ -358,7 +358,7 @@ export async function signAndSaveAuthMessage({
     address: getAddress(account), // convert to EIP-55 format or else SIWE complains
     version: "1",
     chainId,
-    expirationTime: expiration.toISOString(),
+    expirationTime: expiration,
   };
 
   if (resources && resources.length > 0) {
