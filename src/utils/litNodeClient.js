@@ -165,6 +165,18 @@ export default class LitNodeClient {
     log("LitNodeClient config", this.config);
   }
 
+  /**
+   * Crafts & signs the transaction using LitActions.signEcdsa() on the given chain
+   * @param {Object} params
+   * @param {string} params.toAddress The "to" parameter in the transaction
+   * @param {string} params.value The "value" parameter in the transaction
+   * @param {string} params.data The "data" parameter in the transaction
+   * @param {string} params.gasPrice [Optional] The "gasPrice" parameter in the transaction
+   * @param {string} params.gasLimit [Optional] The "gasLimit" parameter in the transaction
+   * @param {string} params.chain Used to get the "chainId" parameter in the transaction
+   * @param {string} params.publicKey The publicKey used in the LitActions.signEcdsa() function
+   * @returns {Object} An object containing the resulting signature.
+   */
   async signTransactionWithLitActions({
     toAddress,
     value,
