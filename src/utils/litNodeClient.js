@@ -3,7 +3,7 @@ const uint8arrayFromString = Uint8arrays.fromString;
 const uint8arrayToString = Uint8arrays.toString;
 import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
-
+import { LIT_CHAINS } from "../lib/constants";
 import { version } from "../version";
 
 import {
@@ -163,6 +163,86 @@ export default class LitNodeClient {
 
     globalThis.litConfig = this.config;
     log("LitNodeClient config", this.config);
+  }
+
+  async signTransactionWithLitActions({
+    toAddress,
+    value,
+    data,
+    gasPrice,
+    gasLimit,
+    chain,
+    publicKey,
+  }) {
+    if (!this.ready) {
+      throwError({
+        message:
+          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
+        name: "LitNodeClientNotReadyError",
+        errorCode: "lit_node_client_not_ready",
+      });
+    }
+
+    const chainId = LIT_CHAINS[chain].chainId;
+    console.log("chainId- ", chainId);
+    if (!chainId) {
+      throwError({
+        message:
+          "Invalid chain.  Please pass a valid chain.",
+        name: "InvalidChain",
+        errorCode: "invalid_input_chain",
+      });
+    }
+
+    if (!publicKey) {
+      throwError({
+        message:
+          "Pubic Key not provided.  Please pass a valid Public Key.",
+        name: "MissingPublicKey",
+        errorCode: "missing_public_key",
+      });
+    }
+
+    const authSig = await checkAndSignAuthMessage({ chain });
+    console.log("authSign- ", authSig);
+
+    const signLitTransaction = `
+      (async () => {
+        const latestNonce = await LitActions.getLatestNonce({ address: to, chain });
+        const txParams = {
+          nonce: latestNonce,
+          gasPrice,
+          gasLimit,
+          to,
+          value,
+          data,
+          chainId,
+        };
+
+        const serializedTx = ethers.utils.serializeTransaction(txParams);
+        const rlpEncodedTxn = ethers.utils.arrayify(serializedTx);
+        const unsignedTxn = ethers.utils.keccak256(rlpEncodedTxn);
+        const sigShare = await LitActions.signEcdsa({ toSign: unsignedTxn, publicKey, sigName });
+      })();
+    `;
+
+    const results = await this.executeJs({
+      code: signLitTransaction,
+      authSig,
+      jsParams: {
+        publicKey,
+        chain,
+        chainId,
+        sigName: "sig1",
+        to: toAddress,
+        value,
+        data,
+        gasPrice: gasPrice || "0x2e90edd000",
+        gasLimit: gasLimit || "0x" + (30000).toString(16),
+      }
+    });
+
+    return results.signatures["sig1"];
   }
 
   /**
