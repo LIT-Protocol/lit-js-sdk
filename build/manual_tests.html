@@ -13,7 +13,7 @@
       type="application/javascript"
     ></script>
     <script>
-      var chain = "polygon";
+      var chain = "mumbai";
 
       //var authSig = JSON.parse("{\"sig\":\"0x18a173d68d2f78cc5c13da0dfe36eec2a293285bee6d42547b9577bf26cdc985660ed3dddc4e75d422366cac07e8a9fc77669b10373bef9c7b8e4280252dfddf1b\",\"derivedVia\":\"web3.eth.personal.sign\",\"signedMessage\":\"I am creating an account to use LITs at 2021-08-04T20:14:04.918Z\",\"address\":\"0xdbd360f30097fb6d938dcc8b7b62854b36160b45\"}")
 
@@ -72,7 +72,7 @@
         accessControlConditions,
         testName,
         authSig,
-        chain = "polygon",
+        chain = "mumbai",
         switchChain = true,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -2032,7 +2032,7 @@
           accessControlConditions,
           testName,
           authSig,
-          chain: "polygon",
+          chain: "mumbai",
         });
         testResults.accessControlConditions = res;
 
@@ -2078,7 +2078,7 @@
           evmContractConditions,
           testName,
           authSig,
-          chain: "polygon",
+          chain: "mumbai",
         });
 
         testResults.evmContractConditions = res;
@@ -2163,7 +2163,7 @@
                 },
               ],
             },
-            chain: "polygon",
+            chain: "mumbai",
             returnValueTest: {
               key: "",
               comparator: ">",
@@ -2243,7 +2243,7 @@
         await testProvisoningAndSigning({
           accessControlConditions,
           testName: "TooManyConditions",
-          chain: "polygon",
+          chain: "mumbai",
           switchChain: true,
         });
       };
@@ -2315,6 +2315,38 @@
         ).innerText = `${testName}: Success.  Decrypted string is: ${decryptedString}`;
       };
 
+
+      /// PKP TESTING
+      var SendTransactionViaLitAction = async () => {
+          
+        const provider = new ethers.providers.JsonRpcProvider('https://polygon-mumbai.g.alchemy.com/v2/yourcodehere');
+
+        const testName = "SendTransactionViaLitAction";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+
+        const transactionParams =  {
+          toAddress : '0x38b08eF8de2b9D9d83bD0e00B1c269366d93Df38',
+          value : '0x0',
+          data : '0x',
+          gasPrice : '0x2e90edd000',
+          gasLimit : '0x' + (30000).toString(16),
+          chain : 'mumbai',
+          publicKey : '0x04d623d0f95043666675f5e743885784389e04be33521148b6466017cd2d1e7e3b9ce8a2887192cbe675f659b973cc854ed7e029d2fd67b156b90692c192e782d7',
+        };
+
+        // the publicKey is Brendon's PKP -> replace wiht your own. 
+       const transactionRequest = await litNodeClient.signTransactionWithLitActions(transactionParams);
+                
+        
+        const res = await provider.sendTransaction(transactionRequest.signature);
+
+        console.log('send transaction result');
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Success.  Decrypted string is: ${decryptedString}`;
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -2325,6 +2357,8 @@
           "status"
         ).innerText = `${testName}: Success - Logged out`;
       };
+
+
 
       document.addEventListener(
         "lit-ready",
@@ -2536,6 +2570,13 @@
 
     <button onclick="TooManyConditionsEncryption()">
       TooManyConditionsEncryption
+    </button>
+    <br />
+    <br />
+
+
+    <button onclick="SendTransactionViaLitAction()">
+      SendTransactionViaLitAction  (will need to be checked for pubkeys!)
     </button>
     <br />
     <br />
