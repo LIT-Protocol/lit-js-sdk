@@ -44,6 +44,7 @@ import {
   combineBlsDecryptionShares,
 } from "./crypto";
 import { Base64 } from "js-base64";
+import { EtherscanProvider } from "@ethersproject/providers";
 
 /**
  * @typedef {Object} AccessControlCondition
@@ -178,11 +179,11 @@ export default class LitNodeClient {
    * @returns {Object} An object containing the resulting signature.
    */
   async signTransactionWithLitActions({
-    toAddress,
-    value,
-    data,
-    gasPrice,
-    gasLimit,
+    toAddressParam,    
+    valueParam,
+    dataParam,
+    gasPriceParam,
+    gasLimitParam,
     chain,
     publicKey,
   }) {
@@ -195,9 +196,9 @@ export default class LitNodeClient {
       });
     }
 
-    const chainId = LIT_CHAINS[chain].chainId;
-    console.log("chainId- ", chainId);
-    if (!chainId) {
+    const chainIdParam = LIT_CHAINS[chain].chainId;
+    console.log("chainId- ", chainIdParam);
+    if (!chainIdParam) {
       throwError({
         message:
           "Invalid chain.  Please pass a valid chain.",
@@ -218,22 +219,29 @@ export default class LitNodeClient {
     const authSig = await checkAndSignAuthMessage({ chain });
     console.log("authSign- ", authSig);
 
+
+
     const signLitTransaction = `
       (async () => {
-        const latestNonce = await LitActions.getLatestNonce({ address: to, chain });
+        const fromAddressParam = ethers.utils.computeAddress(publicKey);
+        const latestNonce = await LitActions.getLatestNonce({ address: fromAddressParam, chain });
         const txParams = {
           nonce: latestNonce,
-          gasPrice,
-          gasLimit,
-          to,
-          value,
-          data,
-          chainId,
+          gasPrice: gasPriceParam,
+          gasLimit: gasLimitParam,          
+          to: toAddressParam,          
+          value: valueParam,          
+          chainId: chainIdParam,
         };
 
+        console.log("txParams", txParams);
+        
         const serializedTx = ethers.utils.serializeTransaction(txParams);
         const rlpEncodedTxn = ethers.utils.arrayify(serializedTx);
-        const unsignedTxn = ethers.utils.keccak256(rlpEncodedTxn);
+        const unsignedTxn =  ethers.utils.arrayify( ethers.utils.keccak256(rlpEncodedTxn));
+
+
+
         const sigShare = await LitActions.signEcdsa({ toSign: unsignedTxn, publicKey, sigName });
       })();
     `;
@@ -244,13 +252,13 @@ export default class LitNodeClient {
       jsParams: {
         publicKey,
         chain,
-        chainId,
         sigName: "sig1",
-        to: toAddress,
-        value,
-        data,
-        gasPrice: gasPrice || "0x2e90edd000",
-        gasLimit: gasLimit || "0x" + (30000).toString(16),
+        chainIdParam,
+        toAddressParam,
+        valueParam,
+        dataParam,
+        gasPriceParam: gasPriceParam || "0x2e90edd000",
+        gasLimitParam: gasLimitParam || "0x" + (30000).toString(16),
       }
     });
 
