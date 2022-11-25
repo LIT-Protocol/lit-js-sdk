@@ -82,7 +82,7 @@ export async function signAndSaveAuthMessage({ provider, account }) {
   return authSig;
 }
 
-export async function signSolAuthMessageAsNode(wallet, messageToSign) {
+export async function signSolAuthMessageAsNode(publicKey, messageToSign) {
   
   if (window) {
     throwError({
@@ -105,7 +105,7 @@ export async function signSolAuthMessageAsNode(wallet, messageToSign) {
     sig: hexSignature,
     derivedVia: "solana.signMessage",
     signedMessage: messageToSign,
-    address: wallet.publicKey.toBase58()
+    address: publicKey.toBase58()
   };
 
   return authSig;
