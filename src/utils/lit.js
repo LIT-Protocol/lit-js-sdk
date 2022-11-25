@@ -22,7 +22,7 @@ import {
 } from "./crypto";
 
 import { checkAndSignEVMAuthMessage, decimalPlaces } from "./eth";
-import { checkAndSignSolAuthMessage } from "./sol";
+import { checkAndSignSolAuthMessage, checkAndSignSolAuthMessageAsNode} from "./sol";
 import { checkAndSignCosmosAuthMessage } from "./cosmos";
 
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
@@ -71,6 +71,15 @@ export async function checkAndSignAuthMessage({
       errorCode: "unsupported_chain",
     });
   }
+}
+
+/**
+ * Create an authentication signature for node environment. This is used to prove ownership of a given crypto wallet address to the Lit nodes.
+ * @param {wallet}
+ * @param {messageToSign}
+ */
+export async function signAuthMessageForNodeEnvironment(wallet, messageToSign) {
+  checkAndSignSolAuthMessageAsNode(wallet, messageToSign);
 }
 
 /**
