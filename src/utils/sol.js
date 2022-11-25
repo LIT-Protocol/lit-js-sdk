@@ -82,7 +82,7 @@ export async function signAndSaveAuthMessage({ provider, account }) {
   return authSig;
 }
 
-export async function checkAndSignSolAuthMessageAsNode(wallet, messageToSign) {
+export async function signSolAuthMessageAsNode(wallet, messageToSign) {
   
   if (window) {
     throwError({

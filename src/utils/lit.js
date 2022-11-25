@@ -22,7 +22,7 @@ import {
 } from "./crypto";
 
 import { checkAndSignEVMAuthMessage, decimalPlaces } from "./eth";
-import { checkAndSignSolAuthMessage, checkAndSignSolAuthMessageAsNode} from "./sol";
+import { checkAndSignSolAuthMessage, signSolAuthMessageAsNode} from "./sol";
 import { checkAndSignCosmosAuthMessage } from "./cosmos";
 
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
@@ -79,7 +79,7 @@ export async function checkAndSignAuthMessage({
  * @param {messageToSign}
  */
 export async function signAuthMessageForNodeEnvironment(wallet, messageToSign) {
-  checkAndSignSolAuthMessageAsNode(wallet, messageToSign);
+  signSolAuthMessageAsNode(wallet, messageToSign);
 }
 
 /**
