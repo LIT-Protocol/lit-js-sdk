@@ -74,7 +74,7 @@ export async function checkAndSignAuthMessage({
 }
 
 /**
- * Create an authentication signature for node environment. This is used to prove ownership of a given crypto wallet address to the Lit nodes.  This currently only works for Solana.  To do this on any other chain, simply create a SIWE compatible signature using whatever method you would like.
+ * Create an Solana wallet authentication signature for node environment. This is used to prove ownership of a given crypto wallet address to the Lit nodes.  This currently only works for Solana.  To do this on any other chain, simply create a SIWE compatible signature using whatever method you would like.
  * @param {wallet}
  * @param {messageToSign}
  */
