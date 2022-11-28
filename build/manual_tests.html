@@ -2338,7 +2338,7 @@
         };
 
         // the publicKey is Brendon's PKP -> replace wiht your own. 
-       const transactionRequest = await litNodeClient.signTransactionWithLitActions(transactionParams);
+       const transactionRequest = await litNodeClient.signPKPTransaction(transactionParams);
                     
       console.log("Lit Action Transaction result:", transactionRequest);
        
