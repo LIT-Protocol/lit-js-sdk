@@ -78,11 +78,8 @@ export async function checkAndSignAuthMessage({
  * @param {wallet}
  * @param {messageToSign}
  */
-export async function signAuthMessageForNodeEnvironment(
-  publicKey,
-  messageToSign
-) {
-  signSolAuthMessageAsNode(publicKey, messageToSign);
+export async function signAuthMessageForNodeEnvironment(wallet, messageToSign) {
+  signSolAuthMessageAsNode(wallet, messageToSign);
 }
 
 /**
