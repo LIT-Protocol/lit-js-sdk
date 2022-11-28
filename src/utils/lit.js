@@ -22,7 +22,7 @@ import {
 } from "./crypto";
 
 import { checkAndSignEVMAuthMessage, decimalPlaces } from "./eth";
-import { checkAndSignSolAuthMessage, signSolAuthMessageAsNode} from "./sol";
+import { checkAndSignSolAuthMessage, signSolAuthMessageAsNode } from "./sol";
 import { checkAndSignCosmosAuthMessage } from "./cosmos";
 
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
@@ -74,11 +74,14 @@ export async function checkAndSignAuthMessage({
 }
 
 /**
- * Create an authentication signature for node environment. This is used to prove ownership of a given crypto wallet address to the Lit nodes.
+ * Create an authentication signature for node environment. This is used to prove ownership of a given crypto wallet address to the Lit nodes.  This currently only works for Solana.  To do this on any other chain, simply create a SIWE compatible signature using whatever method you would like.
  * @param {wallet}
  * @param {messageToSign}
  */
-export async function signAuthMessageForNodeEnvironment(publicKey, messageToSign) {
+export async function signAuthMessageForNodeEnvironment(
+  publicKey,
+  messageToSign
+) {
   signSolAuthMessageAsNode(publicKey, messageToSign);
 }
 
@@ -1489,9 +1492,9 @@ export const sendMessageToFrameParent = (data) => {
  * Get the final config object from any overrides
  * Checks localStorage for override if browser client
  * Stores config to globalThis.litConfig and return final config object
- * 
+ *
  * @param {*} config the override config object
- * 
+ *
  * @returns overridden config
  */
 export const configure = (config) => {
@@ -1532,4 +1535,4 @@ export const configure = (config) => {
   globalThis.litConfig = _config;
 
   return _config;
-}
+};
