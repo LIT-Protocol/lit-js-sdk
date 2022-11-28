@@ -22,7 +22,7 @@ import {
 } from "./crypto";
 
 import { checkAndSignEVMAuthMessage, decimalPlaces } from "./eth";
-import { checkAndSignSolAuthMessage, signSolAuthMessageAsNode } from "./sol";
+import { checkAndSignSolAuthMessage } from "./sol";
 import { checkAndSignCosmosAuthMessage } from "./cosmos";
 
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
@@ -71,15 +71,6 @@ export async function checkAndSignAuthMessage({
       errorCode: "unsupported_chain",
     });
   }
-}
-
-/**
- * Create an Solana wallet authentication signature for node environment. This is used to prove ownership of a given crypto wallet address to the Lit nodes.  This currently only works for Solana.  To do this on any other chain, simply create a SIWE compatible signature using whatever signing method you would like.
- * @param {wallet}
- * @param {messageToSign}
- */
-export async function signAuthMessageForNodeEnvironment(wallet, messageToSign) {
-  signSolAuthMessageAsNode(wallet, messageToSign);
 }
 
 /**

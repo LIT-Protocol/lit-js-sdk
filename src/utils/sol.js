@@ -2,7 +2,6 @@ import Uint8arrays from "../lib/uint8arrays";
 const uint8arrayFromString = Uint8arrays.fromString;
 const uint8arrayToString = Uint8arrays.toString;
 import { throwError, log } from "../lib/utils";
-import * as nacl from 'tweetnacl';
 
 export const AUTH_SIGNATURE_BODY =
   "I am creating an account to use Lit Protocol at {{timestamp}}";
@@ -79,34 +78,5 @@ export async function signAndSaveAuthMessage({ provider, account }) {
   };
 
   localStorage.setItem("lit-auth-sol-signature", JSON.stringify(authSig));
-  return authSig;
-}
-
-export async function signSolAuthMessageAsNode(publicKey, messageToSign) {
-  
-  if (window) {
-    throwError({
-      message:
-        "It looks like you are having access to window variable.",
-      name: "UsingWrongMethodException",
-      errorCode: "no_node_environment",
-    });
-  }
-
-  log("signing auth message because sig based on your wallet");
-  
-  // Signing message
-  const signature = nacl.sign.detached(Buffer.from(messageToSign, 'utf-8'), wallet.payer.secretKey);
-
-  const hexSignature = uint8arrayToString(signature, 'base16');
-
-  // AuthSig that is compatible with Lit nodes
-  const authSig = {
-    sig: hexSignature,
-    derivedVia: "solana.signMessage",
-    signedMessage: messageToSign,
-    address: publicKey.toBase58()
-  };
-
   return authSig;
 }
