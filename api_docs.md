@@ -885,12 +885,13 @@ Returns **[string][137]** The resolved eth address
 
 ## signAuthMessageForNodeEnvironment
 
-Create an authentication signature for node environment. This is used to prove ownership of a given crypto wallet address to the Lit nodes.
+Create an Solana wallet authentication signature for node environment. This is used to prove ownership of a given crypto wallet address to the Lit nodes.  This currently only works for Solana.  To do this on any other chain, simply create a SIWE compatible signature using whatever signing method you would like.
 
 ### Parameters
 
-*   `wallet`  
+*   `publicKey`  
 *   `messageToSign`  
+*   `wallet`  
 
 ## metadataForFile
 
