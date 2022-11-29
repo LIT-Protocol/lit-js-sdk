@@ -8,8 +8,8 @@ assignees: ''
 ---
 
 **Before reporting, I have already *** 
-- checked LIT Protocol [developer docs](https://developer.litprotocol.com/) and/or the [lit-js-sdk](https://lit-protocol.github.io/lit-js-sdk/api_docs_html/)
-- searched for other open issues
+- checked LIT Protocol [developer docs](https://developer.litprotocol.com/) and/or the [lit-js-sdk](https://lit-protocol.github.io/lit-js-sdk/api_docs_html/).
+- searched for other [open issues](https://github.com/LIT-Protocol/lit-js-sdk/issues).
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -28,6 +28,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Environment:**
+ - Lit SDK version (including the network (ie, "serrano") if different, and type - browser or backend) 
  - Node version
  - Framework (React, Vue, Angular, Svelte - just Plain HTML!, etc)
  - Specific tooling (Webpack, Vite, browserify, etc) 
