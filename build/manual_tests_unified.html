@@ -30,9 +30,16 @@
           { unifiedAccessControlConditions }
         )}`;
 
-        var solAuthSig = await LitJsSdk.checkAndSignAuthMessage({
-          chain: "solana",
-        });
+        var solAuthSig = null;
+
+        try {
+          solAuthSig = await LitJsSdk.checkAndSignAuthMessage({
+            chain: "solana",
+          });
+        } catch (e) {
+          console.log("Could not obtain solana auth sig", e);
+        }
+
         var ethAuthSig = await LitJsSdk.checkAndSignAuthMessage({
           chain: "ethereum",
         });
@@ -85,9 +92,17 @@
         testName,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
-        var solAuthSig = await LitJsSdk.checkAndSignAuthMessage({
-          chain: "solana",
-        });
+
+        var solAuthSig = null;
+
+        try {
+          solAuthSig = await LitJsSdk.checkAndSignAuthMessage({
+            chain: "solana",
+          });
+        } catch (e) {
+          console.log("Could not obtain solana auth sig", e);
+        }
+
         var ethAuthSig = await LitJsSdk.checkAndSignAuthMessage({
           chain: "ethereum",
         });
@@ -347,8 +362,8 @@
 
       var IsPermittedAction = async () => {
         /*
-        { contract_address: "0x9e1DDB2499C6834204347F047Ace1ae18E830449", chain: "mumbai", standard_contract_type: "PubkeyRouterAndPermissions", method: "isPermittedAction", parameters: ["0xab9704fbd33d96c0475f6d2f1e6e7ff3497d4eceb10df78d0fcf012ab3b09300", "0x12203577a857f9d58507be2f4a87d969cc582dd00a1d0486281113e68208163cb5e8"], return_value_test: JsonReturnValueTest { comparator: "=", value: "true" } }
-        */
+           { contract_address: "0x9e1DDB2499C6834204347F047Ace1ae18E830449", chain: "mumbai", standard_contract_type: "PubkeyRouterAndPermissions", method: "isPermittedAction", parameters: ["0xab9704fbd33d96c0475f6d2f1e6e7ff3497d4eceb10df78d0fcf012ab3b09300", "0x12203577a857f9d58507be2f4a87d969cc582dd00a1d0486281113e68208163cb5e8"], return_value_test: JsonReturnValueTest { comparator: "=", value: "true" } }
+           */
         var unifiedAccessControlConditions = [
           {
             conditionType: "evmBasic",
@@ -366,6 +381,30 @@
         await testProvisoningEncryptingAndDecrypting({
           unifiedAccessControlConditions,
           testName: "IsPermittedAction",
+        });
+      };
+
+      var UserTest = async () => {
+        /*
+           { contract_address: "0x9e1DDB2499C6834204347F047Ace1ae18E830449", chain: "mumbai", standard_contract_type: "PubkeyRouterAndPermissions", method: "isPermittedAction", parameters: ["0xab9704fbd33d96c0475f6d2f1e6e7ff3497d4eceb10df78d0fcf012ab3b09300", "0x12203577a857f9d58507be2f4a87d969cc582dd00a1d0486281113e68208163cb5e8"], return_value_test: JsonReturnValueTest { comparator: "=", value: "true" } }
+           */
+        var unifiedAccessControlConditions = [
+          {
+            conditionType: "evmBasic",
+            contractAddress: "",
+            standardContractType: "",
+            chain: "mumbai",
+            method: "getLatestNonce",
+            parameters: ["0x630A5FA5eA0B94daAe707fE105404749D52909B9"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          unifiedAccessControlConditions,
+          testName: "UserTest",
         });
       };
 
@@ -411,6 +450,10 @@
     <br />
 
     <button onclick="IsPermittedAction()">IsPermittedAction</button>
+    <br />
+    <br />
+
+    <button onclick="UserTest()">UserTest</button>
     <br />
     <br />
 
