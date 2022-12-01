@@ -2351,15 +2351,15 @@
         // Change the litNetwork to "serrano" in the Client initiation in utils/init.js
         const transactionParams = {
           provider, 
-          toAddressParam: "0x38b08eF8de2b9D9d83bD0e00B1c269366d93Df38",
-          valueParam: "0x000001",
-          dataParam: "0x",
-          gasPriceParam: "0x2e90edd000",
-          gasLimitParam: "0x" + (30000).toString(16),
+          to: "0x0b1C5E9E82393AD5d1d1e9a498BF7bAAC13b31Ee",
+          value: "0x000001",
+          data: "0x",
+          gasPrice: "0x2e90edd000",
+          gasLimit: "0x" + (30000).toString(16),
           chain: "mumbai",
           publicKey:  
             // the publicKey is a LIT Staff members's PKP -> replace with your own.
-            "0x04d623d0f95043666675f5e743885784389e04be33521148b6466017cd2d1e7e3b9ce8a2887192cbe675f659b973cc854ed7e029d2fd67b156b90692c192e782d7",
+            "0x04c7dca80715fcc3825123e27be2bcbc7e3347573310288e315c65d72db9fc69460ffb5c1c28b75d7910263c2e76caef15d821568dc98ab73fae0699c33519f174",
         };
 
         const transactionRequest = await litNodeClient.sendPKPTransaction(
