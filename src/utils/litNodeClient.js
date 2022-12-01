@@ -3,8 +3,9 @@ const uint8arrayFromString = Uint8arrays.fromString;
 const uint8arrayToString = Uint8arrays.toString;
 import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
-
+import { LIT_CHAINS } from "../lib/constants";
 import { version } from "../version";
+import { serialize } from "@ethersproject/transactions";
 
 import {
   mostCommonString,
@@ -163,6 +164,139 @@ export default class LitNodeClient {
 
     globalThis.litConfig = this.config;
     log("LitNodeClient config", this.config);
+  }
+
+  /**
+   * Crafts & signs the transaction using LitActions.signEcdsa() on the given chain
+   * @param {Object} params
+   * @param {string} params.toAddress The "to" parameter in the transaction
+   * @param {string} params.value The "value" parameter in the transaction
+   * @param {string} params.data The "data" parameter in the transaction
+   * @param {string} params.chain Used to get the "chainId" parameter in the transaction
+   * @param {string} params.publicKey The publicKey used in the LitActions.signEcdsa() function
+   * @param {string} params.gasPrice [Optional] The "gasPrice" parameter in the transaction
+   * @param {string} params.gasLimit [Optional] The "gasLimit" parameter in the transaction
+   * @returns {Object} An object containing the resulting signature.
+   */
+  async signPKPTransaction({
+    toAddressParam,
+    valueParam,
+    dataParam,
+    chain,
+    publicKey,
+    gasPriceParam,
+    gasLimitParam,
+  }) {
+    if (!this.ready) {
+      throwError({
+        message:
+          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
+        name: "LitNodeClientNotReadyError",
+        errorCode: "lit_node_client_not_ready",
+      });
+    }
+
+    const chainIdParam = LIT_CHAINS[chain].chainId;
+    if (!chainIdParam) {
+      throwError({
+        message:
+          "Invalid chain.  Please pass a valid chain.",
+        name: "InvalidChain",
+        errorCode: "invalid_input_chain",
+      });
+    }
+
+    if (!publicKey) {
+      throwError({
+        message:
+          "Pubic Key not provided.  Please pass a valid Public Key.",
+        name: "MissingPublicKey",
+        errorCode: "missing_public_key",
+      });
+    }
+
+    const authSig = await checkAndSignAuthMessage({ chain });
+
+    const signLitTransaction = `
+      (async () => {
+        const fromAddressParam = ethers.utils.computeAddress(publicKey);
+        const latestNonce = await LitActions.getLatestNonce({ address: fromAddressParam, chain });
+        const txParams = {
+          nonce: latestNonce,
+          gasPrice: gasPriceParam,
+          gasLimit: gasLimitParam,
+          to: toAddressParam,
+          value: valueParam,
+          chainId: chainIdParam,
+          data: dataParam,
+        };
+
+        LitActions.setResponse({ response: JSON.stringify(txParams) });
+        
+        const serializedTx = ethers.utils.serializeTransaction(txParams);
+        const rlpEncodedTxn = ethers.utils.arrayify(serializedTx);
+        const unsignedTxn =  ethers.utils.arrayify(ethers.utils.keccak256(rlpEncodedTxn));
+
+        const sigShare = await LitActions.signEcdsa({ toSign: unsignedTxn, publicKey, sigName });
+      })();
+    `;
+
+    return await this.executeJs({
+      code: signLitTransaction,
+      authSig,
+      jsParams: {
+        publicKey,
+        chain,
+        sigName: "sig1",
+        chainIdParam,
+        toAddressParam,
+        valueParam,
+        dataParam,
+        gasPriceParam: gasPriceParam || "0x2e90edd000",
+        gasLimitParam: gasLimitParam || "0x" + (30000).toString(16),
+      }
+    });
+  }
+
+  /**
+   * Signs & sends the transaction using the Provider on the given chain
+   * @param {Object} params
+   * @param {Object} params.provider The provider used to send the signed transaction to the appropriate network
+   * @param {string} params.toAddress The "to" parameter in the transaction
+   * @param {string} params.value The "value" parameter in the transaction
+   * @param {string} params.data The "data" parameter in the transaction
+   * @param {string} params.chain Used to get the "chainId" parameter in the transaction
+   * @param {string} params.publicKey The publicKey used in the LitActions.signEcdsa() function
+   * @param {string} params.gasPrice [Optional] The "gasPrice" parameter in the transaction
+   * @param {string} params.gasLimit [Optional] The "gasLimit" parameter in the transaction
+   * @returns {Object} An object containing the resulting signature.
+   */
+  async sendPKPTransaction({
+    provider,
+    toAddressParam,
+    valueParam,
+    dataParam,
+    chain,
+    publicKey,
+    gasPriceParam,
+    gasLimitParam,
+  }) {
+    const signResult = await this.signPKPTransaction({
+      toAddressParam,
+      valueParam,
+      dataParam,
+      gasPriceParam,
+      gasLimitParam,
+      chain,
+      publicKey,
+    });
+
+    const tx = signResult.response;
+    const signature = signResult.signatures["sig1"].signature;
+    const serializedTx = serialize(tx, signature);
+    const sentTx = await provider.sendTransaction(serializedTx);
+
+    await sentTx.wait(1);
   }
 
   /**

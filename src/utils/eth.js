@@ -23,6 +23,7 @@ import ERC20 from "../abis/ERC20.json";
 import { LIT_CHAINS } from "../lib/constants";
 import { throwError, log } from "../lib/utils";
 
+
 function chainHexIdToChainName(chainHexId) {
   for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
     const chainName = Object.keys(LIT_CHAINS)[i];

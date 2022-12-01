@@ -23,7 +23,7 @@ export const litJsSdkLoadedInALIT = () => {
       //   "inside lit - no parent frame lit node connection.  connecting ourselves."
       // );
       // we're on our own with no parent frame.  initiate our own connection to lit nodes
-      const litNodeClient = new LitNodeClient();
+      const litNodeClient = new LitNodeClient();     
       litNodeClient.connect();
       window.litNodeClient = litNodeClient;
     } else {
