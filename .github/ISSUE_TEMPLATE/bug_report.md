@@ -10,6 +10,8 @@ assignees: ''
 **Before reporting, I have already *** 
 - checked LIT Protocol [developer docs](https://developer.litprotocol.com/) and/or the [lit-js-sdk](https://lit-protocol.github.io/lit-js-sdk/api_docs_html/).
 - searched for other [open issues](https://github.com/LIT-Protocol/lit-js-sdk/issues).
+- verified the correctness of my access control condition in the [Debugger](https://lit-accs-debugger.vercel.app/), if the issue is regarding access control conditions
+- checked out Lit's [Discord](https://discord.com/invite/GnTtFukpHq) with a keyword search
 
 **Describe the bug**
 A clear and concise description of what the bug is.
