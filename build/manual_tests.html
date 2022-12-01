@@ -2317,58 +2317,36 @@
 
       /// PKP TESTING
 
-      // Todo->
-
       var SendTransactionViaLitAction = async () => {
         const provider = new ethers.providers.JsonRpcProvider(
           "https://polygon-mumbai.g.alchemy.com/v2/onvoLvV97DDoLkAmdi0Cj7sxvfglKqDh"
         );
 
-        const testName = "SendTransactionViaLitAction";
+        const testName = "sendPKPTransaction";
         document.getElementById("status").innerText = `Testing ${testName}...`;
 
         const transactionParams = {
+          provider, 
           toAddressParam: "0x38b08eF8de2b9D9d83bD0e00B1c269366d93Df38",
           valueParam: "0x000001",
           dataParam: "0x",
           gasPriceParam: "0x2e90edd000",
           gasLimitParam: "0x" + (30000).toString(16),
           chain: "mumbai",
-          publicKey:
+          publicKey:  
+            // the publicKey is a LIT Staff members's PKP -> replace with your own.
             "0x04d623d0f95043666675f5e743885784389e04be33521148b6466017cd2d1e7e3b9ce8a2887192cbe675f659b973cc854ed7e029d2fd67b156b90692c192e782d7",
         };
 
-        // the publicKey is Brendon's PKP -> replace wiht your own.
-        const transactionRequest = await litNodeClient.signPKPTransaction(
+        const transactionRequest = await litNodeClient.sendPKPTransaction(
           transactionParams
         );
 
         console.log("Lit Action Transaction result:", transactionRequest);
 
-        // this is a mirror of the transaction in the LitSdk - we need to serialize the actual transaction /w the signature returned from the JS function
-
-        const tx = {
-          nonce: "0x1",
-          gasPrice: transactionParams.gasPriceParam,
-          gasLimit: transactionParams.gasLimitParam,
-          to: transactionParams.toAddressParam,
-          value: transactionParams.valueParam,
-          chainId: 80001,
-        };
-
-        console.log("transaction to send:", tx);
-
-        const serializedTx = ethers.utils.serializeTransaction(
-          tx,
-          transactionRequest.signature
-        );
-        const sentTx = await provider.sendTransaction(serializedTx);
-
-        await sentTx.wait(1); // wait a block to ensure the transaction goes through.
-
         document.getElementById(
           "status"
-        ).innerText = `${testName}: Success.  result is: ${sentTx}`;
+        ).innerText = `${testName}: Success.  result is: ${transactionRequest}`;
       };
 
       var logout = async () => {
