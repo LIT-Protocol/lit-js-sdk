@@ -169,18 +169,13 @@ Crafts & signs the transaction using LitActions.signEcdsa() on the given chain
 
 *   `params` **[Object][144]** 
 
-    *   `params.chain` **[string][147]** Used to get the "chainId" parameter in the transaction
-    *   `params.publicKey` **[string][147]** The publicKey used in the LitActions.signEcdsa() function
-    *   `params.toAddress` **[string][147]** The "to" parameter in the transaction
+    *   `params.to` **[string][147]** The "to" parameter in the transaction
     *   `params.value` **[string][147]** The "value" parameter in the transaction
     *   `params.data` **[string][147]** The "data" parameter in the transaction
+    *   `params.chain` **[string][147]** Used to get the "chainId" parameter in the transaction
+    *   `params.publicKey` **[string][147]** The publicKey used in the LitActions.signEcdsa() function
     *   `params.gasPrice` **[string][147]** \[Optional] The "gasPrice" parameter in the transaction
     *   `params.gasLimit` **[string][147]** \[Optional] The "gasLimit" parameter in the transaction
-    *   `params.toAddressParam`  
-    *   `params.valueParam`  
-    *   `params.dataParam`  
-    *   `params.gasPriceParam`  
-    *   `params.gasLimitParam`  
 
 Returns **[Object][144]** An object containing the resulting signature.
 
@@ -193,18 +188,13 @@ Signs & sends the transaction using the Provider on the given chain
 *   `params` **[Object][144]** 
 
     *   `params.provider` **[Object][144]** The provider used to send the signed transaction to the appropriate network
-    *   `params.chain` **[string][147]** Used to get the "chainId" parameter in the transaction
-    *   `params.publicKey` **[string][147]** The publicKey used in the LitActions.signEcdsa() function
-    *   `params.toAddress` **[string][147]** The "to" parameter in the transaction
+    *   `params.to` **[string][147]** The "to" parameter in the transaction
     *   `params.value` **[string][147]** The "value" parameter in the transaction
     *   `params.data` **[string][147]** The "data" parameter in the transaction
+    *   `params.chain` **[string][147]** Used to get the "chainId" parameter in the transaction
+    *   `params.publicKey` **[string][147]** The publicKey used in the LitActions.signEcdsa() function
     *   `params.gasPrice` **[string][147]** \[Optional] The "gasPrice" parameter in the transaction
     *   `params.gasLimit` **[string][147]** \[Optional] The "gasLimit" parameter in the transaction
-    *   `params.toAddressParam`  
-    *   `params.valueParam`  
-    *   `params.dataParam`  
-    *   `params.gasPriceParam`  
-    *   `params.gasLimitParam`  
 
 Returns **[Object][144]** An object containing the resulting signature.
 
