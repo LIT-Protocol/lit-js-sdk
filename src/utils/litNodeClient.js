@@ -169,7 +169,7 @@ export default class LitNodeClient {
   /**
    * Crafts & signs the transaction using LitActions.signEcdsa() on the given chain
    * @param {Object} params
-   * @param {string} params.toAddress The "to" parameter in the transaction
+   * @param {string} params.to The "to" parameter in the transaction
    * @param {string} params.value The "value" parameter in the transaction
    * @param {string} params.data The "data" parameter in the transaction
    * @param {string} params.chain Used to get the "chainId" parameter in the transaction
@@ -179,13 +179,13 @@ export default class LitNodeClient {
    * @returns {Object} An object containing the resulting signature.
    */
   async signPKPTransaction({
-    toAddressParam,
-    valueParam,
-    dataParam,
+    to,
+    value,
+    data,
     chain,
     publicKey,
-    gasPriceParam,
-    gasLimitParam,
+    gasPrice,
+    gasLimit,
   }) {
     if (!this.ready) {
       throwError({
@@ -196,8 +196,8 @@ export default class LitNodeClient {
       });
     }
 
-    const chainIdParam = LIT_CHAINS[chain].chainId;
-    if (!chainIdParam) {
+    const chainId = LIT_CHAINS[chain].chainId;
+    if (!chainId) {
       throwError({
         message:
           "Invalid chain.  Please pass a valid chain.",
@@ -219,16 +219,16 @@ export default class LitNodeClient {
 
     const signLitTransaction = `
       (async () => {
-        const fromAddressParam = ethers.utils.computeAddress(publicKey);
-        const latestNonce = await LitActions.getLatestNonce({ address: fromAddressParam, chain });
+        const fromAddress = ethers.utils.computeAddress(publicKey);
+        const latestNonce = await LitActions.getLatestNonce({ address: fromAddress, chain });
         const txParams = {
           nonce: latestNonce,
-          gasPrice: gasPriceParam,
-          gasLimit: gasLimitParam,
-          to: toAddressParam,
-          value: valueParam,
-          chainId: chainIdParam,
-          data: dataParam,
+          gasPrice,
+          gasLimit,
+          to,
+          value,
+          chainId,
+          data,
         };
 
         LitActions.setResponse({ response: JSON.stringify(txParams) });
@@ -248,12 +248,12 @@ export default class LitNodeClient {
         publicKey,
         chain,
         sigName: "sig1",
-        chainIdParam,
-        toAddressParam,
-        valueParam,
-        dataParam,
-        gasPriceParam: gasPriceParam || "0x2e90edd000",
-        gasLimitParam: gasLimitParam || "0x" + (30000).toString(16),
+        chainId,
+        to,
+        value,
+        data,
+        gasPrice: gasPrice || "0x2e90edd000",
+        gasLimit: gasLimit || "0x" + (30000).toString(16),
       }
     });
   }
@@ -262,7 +262,7 @@ export default class LitNodeClient {
    * Signs & sends the transaction using the Provider on the given chain
    * @param {Object} params
    * @param {Object} params.provider The provider used to send the signed transaction to the appropriate network
-   * @param {string} params.toAddress The "to" parameter in the transaction
+   * @param {string} params.to The "to" parameter in the transaction
    * @param {string} params.value The "value" parameter in the transaction
    * @param {string} params.data The "data" parameter in the transaction
    * @param {string} params.chain Used to get the "chainId" parameter in the transaction
@@ -273,20 +273,20 @@ export default class LitNodeClient {
    */
   async sendPKPTransaction({
     provider,
-    toAddressParam,
-    valueParam,
-    dataParam,
+    to,
+    value,
+    data,
     chain,
     publicKey,
-    gasPriceParam,
-    gasLimitParam,
+    gasPrice,
+    gasLimit,
   }) {
     const signResult = await this.signPKPTransaction({
-      toAddressParam,
-      valueParam,
-      dataParam,
-      gasPriceParam,
-      gasLimitParam,
+      to,
+      value,
+      data,
+      gasPrice,
+      gasLimit,
       chain,
       publicKey,
     });
