@@ -15,8 +15,6 @@
     <script>
       var chain = "polygon";
 
-      //var authSig = JSON.parse("{\"sig\":\"0x18a173d68d2f78cc5c13da0dfe36eec2a293285bee6d42547b9577bf26cdc985660ed3dddc4e75d422366cac07e8a9fc77669b10373bef9c7b8e4280252dfddf1b\",\"derivedVia\":\"web3.eth.personal.sign\",\"signedMessage\":\"I am creating an account to use LITs at 2021-08-04T20:14:04.918Z\",\"address\":\"0xdbd360f30097fb6d938dcc8b7b62854b36160b45\"}")
-
       var testEncryptingFileAndZipWithMetadata = async ({
         accessControlConditions,
         evmContractConditions,
@@ -2245,6 +2243,108 @@
         ).innerText = `${testName}: Success.  Decrypted string is: ${decryptedString}`;
       };
 
+      var OldWalletSigFormat = async () => {
+        const authSig = JSON.parse(
+          '{"sig":"0x18a173d68d2f78cc5c13da0dfe36eec2a293285bee6d42547b9577bf26cdc985660ed3dddc4e75d422366cac07e8a9fc77669b10373bef9c7b8e4280252dfddf1b","derivedVia":"web3.eth.personal.sign","signedMessage":"I am creating an account to use LITs at 2021-08-04T20:14:04.918Z","address":"0xdbd360f30097fb6d938dcc8b7b62854b36160b45"}'
+        );
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "ethereum",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "OldWalletSigFormat",
+          authSig,
+        });
+      };
+
+      var ExpiredSIWE = async () => {
+        const toSign = `login.xyz wants you to sign in with your Ethereum account:
+0xB962537314B11C6bCD6D9FF63feb048A9e91E7AE
+
+Sign-In With Ethereum Example Statement
+
+URI: https://login.xyz
+Version: 1
+Chain ID: 1
+Nonce: s67qkhzo
+Issued At: 2022-12-01T02:14:51.690Z
+Expiration Time: 2022-12-02T02:14:51.688Z`; // prettier-ignore
+        const { web3, account } = await LitJsSdk.connectWeb3();
+        const signedResult = await LitJsSdk.signMessageAsync(
+          web3.getSigner(),
+          account,
+          toSign
+        );
+        const authSig = {
+          sig: signedResult.signature,
+          derivedVia: "web3.eth.personal.sign",
+          signedMessage: toSign,
+          address: signedResult.address,
+        };
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "ethereum",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "ExpiredSIWE",
+          authSig,
+        });
+      };
+
+      var InvalidSigFormat = async () => {
+        const toSign = "Meow meow i'm a cat meow";
+        const { web3, account } = await LitJsSdk.connectWeb3();
+        const signedResult = await LitJsSdk.signMessageAsync(
+          web3.getSigner(),
+          account,
+          toSign
+        );
+        const authSig = {
+          sig: signedResult.signature,
+          derivedVia: "web3.eth.personal.sign",
+          signedMessage: toSign,
+          address: signedResult.address,
+        };
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "ethereum",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "InvalidSigFormat",
+          authSig,
+        });
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -2451,6 +2551,18 @@
     <button onclick="TooManyConditionsEncryption()">
       TooManyConditionsEncryption
     </button>
+    <br />
+    <br />
+
+    <button onclick="OldWalletSigFormat()">OldWalletSigFormat</button>
+    <br />
+    <br />
+
+    <button onclick="ExpiredSIWE()">ExpiredSIWE</button>
+    <br />
+    <br />
+
+    <button onclick="InvalidSigFormat()">InvalidSigFormat</button>
     <br />
     <br />
 
