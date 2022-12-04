@@ -2280,16 +2280,16 @@ Nonce: s67qkhzo
 Issued At: 2022-12-01T02:14:51.690Z
 Expiration Time: 2022-12-02T02:14:51.688Z`; // prettier-ignore
         const { web3, account } = await LitJsSdk.connectWeb3();
-        const signedResult = await LitJsSdk.signMessageAsync(
+        const sig = await LitJsSdk.signMessageAsync(
           web3.getSigner(),
           account,
           toSign
         );
         const authSig = {
-          sig: signedResult.signature,
+          sig,
           derivedVia: "web3.eth.personal.sign",
           signedMessage: toSign,
-          address: signedResult.address,
+          address: account,
         };
         const accessControlConditions = [
           {
@@ -2314,16 +2314,16 @@ Expiration Time: 2022-12-02T02:14:51.688Z`; // prettier-ignore
       var InvalidSigFormat = async () => {
         const toSign = "Meow meow i'm a cat meow";
         const { web3, account } = await LitJsSdk.connectWeb3();
-        const signedResult = await LitJsSdk.signMessageAsync(
+        const sig = await LitJsSdk.signMessageAsync(
           web3.getSigner(),
           account,
           toSign
         );
         const authSig = {
-          sig: signedResult.signature,
+          sig,
           derivedVia: "web3.eth.personal.sign",
           signedMessage: toSign,
-          address: signedResult.address,
+          address: account,
         };
         const accessControlConditions = [
           {
@@ -2341,6 +2341,41 @@ Expiration Time: 2022-12-02T02:14:51.688Z`; // prettier-ignore
         await testProvisoningAndSigning({
           accessControlConditions,
           testName: "InvalidSigFormat",
+          authSig,
+        });
+      };
+
+      var OrbisSig = async () => {
+        const toSign =
+          "I am creating an account to use the private features of Orbis at 2022-11-07T13:00:14.814Z";
+        const { web3, account } = await LitJsSdk.connectWeb3();
+        const sig = await LitJsSdk.signMessageAsync(
+          web3.getSigner(),
+          account,
+          toSign
+        );
+        const authSig = {
+          sig,
+          derivedVia: "web3.eth.personal.sign",
+          signedMessage: toSign,
+          address: account,
+        };
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "ethereum",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "OrbisSig",
           authSig,
         });
       };
@@ -2563,6 +2598,10 @@ Expiration Time: 2022-12-02T02:14:51.688Z`; // prettier-ignore
     <br />
 
     <button onclick="InvalidSigFormat()">InvalidSigFormat</button>
+    <br />
+    <br />
+
+    <button onclick="OrbisSig()">OrbisSig</button>
     <br />
     <br />
 
