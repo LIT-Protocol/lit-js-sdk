@@ -384,6 +384,28 @@
         });
       };
 
+
+      var BalanceEncryptSingleCondition = async () => {
+        var unifiedAccessControlConditions = [
+          {
+            conditionType: "evmBasic",
+            contractAddress: "",
+            standardContractType: "",
+            chain: "ethereum",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          unifiedAccessControlConditions,
+          testName: "BalanceEncryptSingleCondition",
+        });
+      };
+
       var UserTest = async () => {
         /*
            { contract_address: "0x9e1DDB2499C6834204347F047Ace1ae18E830449", chain: "mumbai", standard_contract_type: "PubkeyRouterAndPermissions", method: "isPermittedAction", parameters: ["0xab9704fbd33d96c0475f6d2f1e6e7ff3497d4eceb10df78d0fcf012ab3b09300", "0x12203577a857f9d58507be2f4a87d969cc582dd00a1d0486281113e68208163cb5e8"], return_value_test: JsonReturnValueTest { comparator: "=", value: "true" } }
@@ -446,6 +468,12 @@
     <br />
 
     <button onclick="TimeLockEncryptDecrypt()">TimeLockEncryptDecrypt</button>
+    <br />
+    <br />
+
+    <button onclick="BalanceEncryptSingleCondition()">
+      BalanceEncryptSingleCondition
+    </button>
     <br />
     <br />
 

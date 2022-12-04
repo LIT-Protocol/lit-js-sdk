@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset='utf-8'>
-  <title>lit-js-sdk 1.2.40 | Documentation</title>
+
   <meta name='description' content='LIT Javascript SDK'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' rel='stylesheet'>
@@ -772,6 +772,16 @@
                   href='#metadataforfile'
                   class="">
                   metadataForFile
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#configure'
+                  class="">
+                  configure
                   
                 </a>
                 
@@ -7886,6 +7896,80 @@ If not, throw <code>invalidParamType</code> error</p>
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
         An object with 3 keys: "verified": A boolean that represents whether or not the token verifies successfully.  A true result indicates that the token was successfully verified.  "header": the JWT header.  "payload": the JWT payload which includes the resource being authorized, etc.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='configure'>
+      configure
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Get the final config object from any overrides
+Checks localStorage for override if browser client
+Stores config to globalThis.litConfig and return final config object</p>
+
+    <div class='pre p1 fill-light mt0'>configure</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>config</span> <code class='quiet'>(any)</code>
+	    the override config object
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>any</code>:
+        overridden config
 
       
     

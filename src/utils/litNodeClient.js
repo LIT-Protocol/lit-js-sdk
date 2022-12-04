@@ -46,6 +46,8 @@ import {
 } from "./crypto";
 import { Base64 } from "js-base64";
 
+import { configure } from "./lit";
+
 /**
  * @typedef {Object} AccessControlCondition
  * @property {string} contractAddress - The address of the contract that will be queried
@@ -106,27 +108,8 @@ import { Base64 } from "js-base64";
  */
 export default class LitNodeClient {
   constructor(config) {
-    this.config = {
-      alertWhenUnauthorized: true,
-      minNodeCount: 6,
-      debug: true,
-      bootstrapUrls: [
-        "https://node2.litgateway.com:7370",
-        "https://node2.litgateway.com:7371",
-        "https://node2.litgateway.com:7372",
-        "https://node2.litgateway.com:7373",
-        "https://node2.litgateway.com:7374",
-        "https://node2.litgateway.com:7375",
-        "https://node2.litgateway.com:7376",
-        "https://node2.litgateway.com:7377",
-        "https://node2.litgateway.com:7378",
-        "https://node2.litgateway.com:7379",
-      ],
-      litNetwork: "jalapeno",
-    };
-    if (config) {
-      this.config = { ...this.config, ...config };
-    }
+    // configure() also stores config to `globalThis.litConfig`, see function def
+    this.config = configure(config);
 
     this.connectedNodes = new Set();
     this.serverKeys = {};
@@ -135,35 +118,6 @@ export default class LitNodeClient {
     this.networkPubKey = null;
     this.networkPubKeySet = null;
 
-    try {
-      if (typeof window !== "undefined" && window && window.localStorage) {
-        let configOverride = window.localStorage.getItem("LitNodeClientConfig");
-        if (configOverride) {
-          configOverride = JSON.parse(configOverride);
-          this.config = { ...this.config, ...configOverride };
-        }
-      }
-    } catch (e) {
-      log("Error accessing local storage", e);
-    }
-
-    // set bootstrapUrls to match the network litNetwork unless it's set to custom
-    if (this.config.litNetwork !== "custom") {
-      // set bootstrapUrls to match the network litNetwork
-      if (!(this.config.litNetwork in LIT_NETWORKS)) {
-        // network not found, report error
-        throwError({
-          message:
-            "the litNetwork specified in the LitNodeClient config not found in LIT_NETWORKS",
-          name: "LitNodeClientConfigBad",
-          errorCode: "lit_node_client_config_bad",
-        });
-      }
-      this.config.bootstrapUrls = LIT_NETWORKS[this.config.litNetwork];
-    }
-
-    globalThis.litConfig = this.config;
-    log("LitNodeClient config", this.config);
   }
 
   /**
