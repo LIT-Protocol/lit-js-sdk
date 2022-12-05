@@ -3,7 +3,7 @@ const uint8arrayFromString = Uint8arrays.fromString;
 const uint8arrayToString = Uint8arrays.toString;
 import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
-import { LIT_CHAINS } from "../lib/constants";
+import { LIT_CHAINS, LIT_NETWORKS } from "../lib/constants";
 import { version } from "../version";
 import { serialize } from "@ethersproject/transactions";
 
@@ -117,7 +117,6 @@ export default class LitNodeClient {
     this.subnetPubKey = null;
     this.networkPubKey = null;
     this.networkPubKeySet = null;
-
   }
 
   /**
@@ -153,8 +152,7 @@ export default class LitNodeClient {
     const chainId = LIT_CHAINS[chain].chainId;
     if (!chainId) {
       throwError({
-        message:
-          "Invalid chain.  Please pass a valid chain.",
+        message: "Invalid chain.  Please pass a valid chain.",
         name: "InvalidChain",
         errorCode: "invalid_input_chain",
       });
@@ -162,8 +160,7 @@ export default class LitNodeClient {
 
     if (!publicKey) {
       throwError({
-        message:
-          "Pubic Key not provided.  Please pass a valid Public Key.",
+        message: "Pubic Key not provided.  Please pass a valid Public Key.",
         name: "MissingPublicKey",
         errorCode: "missing_public_key",
       });
@@ -208,7 +205,7 @@ export default class LitNodeClient {
         data,
         gasPrice: gasPrice || "0x2e90edd000",
         gasLimit: gasLimit || "0x" + (30000).toString(16),
-      }
+      },
     });
   }
 
@@ -2095,12 +2092,15 @@ export default class LitNodeClient {
 
     // if the user passed no sessionCapabilityObject, let's create them for them
     // with wildcards so the user doesn't have to sign every time
-    if (!sessionCapabilityObject || Object.keys(sessionCapabilityObject).length === 0) {
+    if (
+      !sessionCapabilityObject ||
+      Object.keys(sessionCapabilityObject).length === 0
+    ) {
       let capabilityObject = {
         def: [],
       };
       let defaultActionsToAdd = new Set();
-      
+
       resources.forEach((resource) => {
         const { protocol, resourceId } = parseResource({ resource });
 
@@ -2134,7 +2134,11 @@ export default class LitNodeClient {
         walletSig = await authNeededCallback({
           chain,
           // convert into SIWE ReCap compliant session capability.
-          resources: [`urn:recap:lit:session:${Base64.encode(JSON.stringify(sessionCapabilityObject))}`],
+          resources: [
+            `urn:recap:lit:session:${Base64.encode(
+              JSON.stringify(sessionCapabilityObject)
+            )}`,
+          ],
           expiration,
           uri: sessionKeyUri,
           litNodeClient: this,
@@ -2143,7 +2147,11 @@ export default class LitNodeClient {
         walletSig = await checkAndSignAuthMessage({
           chain,
           // convert into SIWE ReCap compliant session capability.
-          resources: [`urn:recap:lit:session:${Base64.encode(JSON.stringify(sessionCapabilityObject))}`],
+          resources: [
+            `urn:recap:lit:session:${Base64.encode(
+              JSON.stringify(sessionCapabilityObject)
+            )}`,
+          ],
           switchChain,
           expiration,
           uri: sessionKeyUri,
@@ -2172,7 +2180,10 @@ export default class LitNodeClient {
       const resource = resources[i];
 
       // check if we have blanket permissions or if we authed the specific resource for the protocol
-      const permissionsFound = findPermissionsForResource(resource, sessionCapabilityObject);
+      const permissionsFound = findPermissionsForResource(
+        resource,
+        sessionCapabilityObject
+      );
       if (!permissionsFound) {
         needToReSignSessionKey = true;
       }
@@ -2184,7 +2195,11 @@ export default class LitNodeClient {
         walletSig = await authNeededCallback({
           chain,
           // convert into SIWE ReCap compliant session capability.
-          resources: [`urn:recap:lit:session:${Base64.encode(JSON.stringify(sessionCapabilityObject))}`],
+          resources: [
+            `urn:recap:lit:session:${Base64.encode(
+              JSON.stringify(sessionCapabilityObject)
+            )}`,
+          ],
           expiration,
           uri: sessionKeyUri,
           litNodeClient: this,
@@ -2193,7 +2208,11 @@ export default class LitNodeClient {
         walletSig = await checkAndSignAuthMessage({
           chain,
           // convert into SIWE ReCap compliant session capability.
-          resources: [`urn:recap:lit:session:${Base64.encode(JSON.stringify(sessionCapabilityObject))}`],
+          resources: [
+            `urn:recap:lit:session:${Base64.encode(
+              JSON.stringify(sessionCapabilityObject)
+            )}`,
+          ],
           switchChain,
           expiration,
           uri: sessionKeyUri,
