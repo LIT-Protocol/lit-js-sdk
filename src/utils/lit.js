@@ -28,7 +28,11 @@ import { checkAndSignCosmosAuthMessage } from "./cosmos";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 
 import { fileToDataUrl } from "./browser";
-import { ALL_LIT_CHAINS, NETWORK_PUB_KEY } from "../lib/constants";
+import {
+  ALL_LIT_CHAINS,
+  NETWORK_PUB_KEY,
+  LIT_NETWORKS,
+} from "../lib/constants";
 
 const PACKAGE_CACHE = {};
 

@@ -3,7 +3,7 @@ const uint8arrayFromString = Uint8arrays.fromString;
 const uint8arrayToString = Uint8arrays.toString;
 import naclUtil from "tweetnacl-util";
 import nacl from "tweetnacl";
-import { LIT_CHAINS, LIT_NETWORKS } from "../lib/constants";
+import { LIT_CHAINS } from "../lib/constants";
 import { version } from "../version";
 import { serialize } from "@ethersproject/transactions";
 
@@ -17,7 +17,6 @@ import {
 } from "../lib/utils";
 import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 import * as wasmECDSA from "../lib/ecdsa-sdk";
-import { LIT_NETWORKS } from "../lib/constants";
 import { joinSignature } from "@ethersproject/bytes";
 import { computeAddress } from "@ethersproject/transactions";
 import { SiweMessage } from "lit-siwe";
@@ -27,6 +26,7 @@ import {
   getSessionKeyUri,
   parseResource,
   checkAndSignAuthMessage,
+  configure,
 } from "./lit";
 
 import {
@@ -45,8 +45,6 @@ import {
   combineBlsDecryptionShares,
 } from "./crypto";
 import { Base64 } from "js-base64";
-
-import { configure } from "./lit";
 
 /**
  * @typedef {Object} AccessControlCondition
