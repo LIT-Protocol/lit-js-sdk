@@ -1543,6 +1543,21 @@ export const configure = (config) => {
     console.log("Error accessing local storage", e);
   }
 
+  // set bootstrapUrls to match the network litNetwork unless it's set to custom
+  if (_config.litNetwork !== "custom") {
+    // set bootstrapUrls to match the network litNetwork
+    if (!(_config.litNetwork in LIT_NETWORKS)) {
+      // network not found, report error
+      throwError({
+        message:
+          "the litNetwork specified in the LitNodeClient config not found in LIT_NETWORKS",
+        name: "LitNodeClientConfigBad",
+        errorCode: "lit_node_client_config_bad",
+      });
+    }
+    _config.bootstrapUrls = LIT_NETWORKS[_config.litNetwork];
+  }
+
   globalThis.litConfig = _config;
 
   return _config;
