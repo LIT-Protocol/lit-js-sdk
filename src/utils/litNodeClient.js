@@ -218,7 +218,7 @@ export default class LitNodeClient {
    * @param {string} params.publicKey The publicKey used in the LitActions.signEcdsa() function
    * @param {string} params.gasPrice [Optional] The "gasPrice" parameter in the transaction
    * @param {string} params.gasLimit [Optional] The "gasLimit" parameter in the transaction
-   * @returns {Object} An object containing the resulting signature.
+   * @returns {Object} A promise of the corresponding TransactionResponse.
    */
   async sendPKPTransaction({
     provider,
@@ -243,9 +243,7 @@ export default class LitNodeClient {
     const tx = signResult.response;
     const signature = signResult.signatures["sig1"].signature;
     const serializedTx = serialize(tx, signature);
-    const sentTx = await provider.sendTransaction(serializedTx);
-
-    await sentTx.wait(1);
+    return provider.sendTransaction(serializedTx);
   }
 
   /**
