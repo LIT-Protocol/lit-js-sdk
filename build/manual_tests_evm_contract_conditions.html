@@ -75,11 +75,14 @@
       var testProvisoningEncryptingAndDecrypting = async ({
         evmContractConditions,
         testName,
+        authSig,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
-        const authSig = await LitJsSdk.checkAndSignAuthMessage({
-          chain,
-        });
+        if (!authSig) {
+          authSig = await LitJsSdk.checkAndSignAuthMessage({
+            chain,
+          });
+        }
         // const authSig = {
         //   sig: "0x49ae73506caef12d0bf8e5f7864b265c94352926fdddcf62d8b818a04a75529a1aa73b67f9cd938c756a61a6959c55ea8a2845209b28a1d2a6903555314e3a291b",
         //   derivedVia: "web3.eth.personal.sign",
@@ -491,6 +494,55 @@
         });
       };
 
+      var SIWEResourceAsParam = async () => {
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+          resources: ["litParam:tokenId:8"],
+        });
+        var evmContractConditions = [
+          {
+            contractAddress: "0x7C7757a9675f06F3BE4618bB68732c4aB25D2e88",
+            functionName: "balanceOf",
+            functionParams: [":userAddress", ":tokenId"],
+            functionAbi: {
+              type: "function",
+              stateMutability: "view",
+              outputs: [
+                {
+                  type: "uint256",
+                  name: "",
+                  internalType: "uint256",
+                },
+              ],
+              name: "balanceOf",
+              inputs: [
+                {
+                  type: "address",
+                  name: "account",
+                  internalType: "address",
+                },
+                {
+                  type: "uint256",
+                  name: "id",
+                  internalType: "uint256",
+                },
+              ],
+            },
+            chain,
+            returnValueTest: {
+              key: "",
+              comparator: ">",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          evmContractConditions,
+          testName: "SIWEResourceAsParam",
+          authSig,
+        });
+      };
+
       var RandomTestFromUser = async () => {
         var evmContractConditions = [
           {
@@ -568,6 +620,10 @@
     <br />
 
     <button onclick="SignAGroup()">SignAGroup</button>
+    <br />
+    <br />
+
+    <button onclick="SIWEResourceAsParam()">SIWEResourceAsParam</button>
     <br />
     <br />
 
