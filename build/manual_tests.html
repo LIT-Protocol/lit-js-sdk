@@ -2508,6 +2508,40 @@ Expiration Time: 2022-12-02T02:14:51.688Z`; // prettier-ignore
         });
       };
 
+      var MonaSig = async () => {
+        const toSign = "[Mona]: Sign this message to Verify Membership";
+        const { web3, account } = await LitJsSdk.connectWeb3();
+        const sig = await LitJsSdk.signMessageAsync(
+          web3.getSigner(),
+          account,
+          toSign
+        );
+        const authSig = {
+          sig,
+          derivedVia: "web3.eth.personal.sign",
+          signedMessage: toSign,
+          address: account,
+        };
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "ethereum",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "MonaSig",
+          authSig,
+        });
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -2757,6 +2791,10 @@ Expiration Time: 2022-12-02T02:14:51.688Z`; // prettier-ignore
     <br />
 
     <button onclick="OrbisSig()">OrbisSig</button>
+    <br />
+    <br />
+
+    <button onclick="MonaSig()">MonaSig</button>
     <br />
     <br />
 
