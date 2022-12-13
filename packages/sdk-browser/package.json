@@ -1,6 +1,6 @@
 {
   "name": "@lit-protocol/sdk-browser",
-  "version": "1.2.51",
+  "version": "1.2.52",
   "main": "build/index.js",
   "license": "MIT",
   "dependencies": {

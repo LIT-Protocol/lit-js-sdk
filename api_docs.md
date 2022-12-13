@@ -198,7 +198,7 @@ Signs & sends the transaction using the Provider on the given chain
     *   `params.gasPrice` **[string][149]** \[Optional] The "gasPrice" parameter in the transaction
     *   `params.gasLimit` **[string][149]** \[Optional] The "gasLimit" parameter in the transaction
 
-Returns **[Object][146]** An object containing the resulting signature.
+Returns **[Object][146]** A promise of the corresponding TransactionResponse.
 
 ### executeJs
 
