@@ -1,9 +1,7 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
-
-- [Lit Protocol JS SDK](#lit-protocol-js-sdk)
+- [DEPRECATED: Lit Protocol JS SDK V1](#deprecated-lit-protocol-js-sdk-v1)
   - [Support](#support)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
