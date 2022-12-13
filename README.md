@@ -1,15 +1,16 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
 - [Lit Protocol JS SDK](#lit-protocol-js-sdk)
   - [Support](#support)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# Lit Protocol JS SDK
+# DEPRECATED: Lit Protocol JS SDK V1
 
-Docs for the JS SDK live here: https://developer.litprotocol.com/docs/SDK/intro
+This SDK is now deprecated and will only receive security updates. Find the latest SDK V2 here https://github.com/LIT-Protocol/js-sdk
 
 ## Support
 
