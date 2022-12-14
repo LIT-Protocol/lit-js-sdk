@@ -6,9 +6,13 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# DEPRECATED: Lit Protocol JS SDK V1
+# Lit Protocol JS SDK V1
 
-This SDK is now deprecated and will only receive security updates. Find the latest SDK V2 here https://github.com/LIT-Protocol/js-sdk
+Docs for the JS SDK live here: https://developer.litprotocol.com/docs/SDK/intro
+
+## Future plans
+
+Very soon, this SDK will be deprecated and will only receive security updates. Find the latest SDK V2 here https://github.com/LIT-Protocol/js-sdk
 
 ## Support
 
