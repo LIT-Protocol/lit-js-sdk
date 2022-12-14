@@ -1,7 +1,8 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [DEPRECATED: Lit Protocol JS SDK V1](#deprecated-lit-protocol-js-sdk-v1)
+- [Lit Protocol JS SDK V1](#lit-protocol-js-sdk-v1)
+  - [Future plans](#future-plans)
   - [Support](#support)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
