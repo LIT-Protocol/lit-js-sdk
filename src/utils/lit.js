@@ -1529,6 +1529,7 @@ export const configure = (config) => {
       "https://node2.litgateway.com:7378",
       "https://node2.litgateway.com:7379",
     ],
+    litNetwork: "jalapeno",
   };
 
   if (config) {
