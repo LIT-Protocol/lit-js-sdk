@@ -23,7 +23,6 @@ import ERC20 from "../abis/ERC20.json";
 import { LIT_CHAINS } from "../lib/constants";
 import { throwError, log } from "../lib/utils";
 
-
 function chainHexIdToChainName(chainHexId) {
   for (let i = 0; i < Object.keys(LIT_CHAINS).length; i++) {
     const chainName = Object.keys(LIT_CHAINS)[i];
@@ -429,7 +428,7 @@ export async function signMessage({ body, web3, account }) {
   log("Signature: ", signature);
   log("recovered address: ", address);
 
-  if (address !== account.toLowerCase()) {
+  if (address !== account) {
     const msg = `ruh roh, the user signed with a different address (${address}) then they\'re using with web3 (${account}).  this will lead to confusion.`;
     console.error(msg);
     alert(
