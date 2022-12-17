@@ -4,6 +4,7 @@
   "description": "LIT Javascript SDK",
   "source": "src/index.js",
   "main": "build/index.js",
+  "typings": "./ActionsSDK/types.d.ts",
   "scripts": {
     "start": "concurrently \"microbundle watch -o build/index.js -f cjs\" \"nodemon -i build esbuild-nodejs.js\" \"nodemon -i build esbuild-web.js\" \"nodemon -w build yalcPublish.js\" \"serve -p 3050 build\" \"sleep 3; open http://localhost:3050/manual_tests.html\" \"sleep 3; open http://localhost:3050/manual_tests_evm_contract_conditions.html\"",
     "startNoCompressUseThisIfYouGetATerserErrorMaximumCallStackSizeExceeded": "microbundle watch --no-compress ",
