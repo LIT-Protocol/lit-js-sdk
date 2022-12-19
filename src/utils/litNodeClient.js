@@ -309,7 +309,10 @@ export default class LitNodeClient {
     // some JS types don't serialize well, so we will convert them before sending to the nodes
     jsParams = convertLitActionsParams(jsParams);
 
-    const reqBody = { authSig, jsParams, authMethods };
+    // generate a unique id for this request
+    const requestId = Math.random().toString(16).slice(2);
+
+    const reqBody = { authSig, jsParams, authMethods, requestId };
     if (code) {
       // base64 encode before sending over the wire
       const encodedJs = uint8arrayToString(
@@ -520,6 +523,9 @@ export default class LitNodeClient {
     });
     siweMessage = siweMessage.prepareMessage();
 
+    // generate a unique id for this request
+    const requestId = Math.random().toString(16).slice(2);
+
     /* body must include:
     pub session_key: String,
     pub auth_methods: Vec<AuthMethod>,
@@ -533,6 +539,7 @@ export default class LitNodeClient {
       pkpPublicKey,
       authSig,
       siweMessage,
+      requestId,
     };
 
     // log("sending request to all nodes for signSessionKey: ", reqBody);
@@ -1909,6 +1916,7 @@ export default class LitNodeClient {
     authSig,
     jsParams,
     authMethods,
+    requestId,
   }) {
     log("getJsExecutionShares");
     const urlWithPath = `${url}/web/execute`;
@@ -1918,6 +1926,7 @@ export default class LitNodeClient {
       authSig,
       jsParams,
       authMethods,
+      requestId,
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
