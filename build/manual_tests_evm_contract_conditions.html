@@ -544,27 +544,54 @@
       };
 
       var RandomTestFromUser = async () => {
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+          resources: [
+            "litParam:flags:115792089237316195423570985008687907853269984665640564039457584007913129639935",
+            "litParam:proof:[0x384f4752adbc4eceb7d86a1e68cf8117e82329564b7a87f5df16ef3f821eac99]",
+          ],
+        });
         var evmContractConditions = [
           {
-            contractAddress: "0xCA120e8aEaA69Ea37077E492b27E1a6F197DDA63",
-            functionName: "hasAccess",
+            contractAddress: "0x5CA39978c74B6BbB6041450875fE81Dc4a92DC21",
+            functionName: "canReadMerkle",
             functionParams: [
+              "0x2000000000000000000000000000000000000000000000000000000000000001",
+              "0x138484a44a1140ae0d1b018b4d54d52885d615b7c44317d6e6eead4c9699bb32",
+              "0x4670445dfc823ef7d65e51172f512bef7983a3707b50eaf9a2c78244da671a4d",
               ":userAddress",
-              "c230000000000000000000000000000000000000000000000000000000000000",
+              ":litParam:flags",
+              ":litParam:proof",
             ],
             functionAbi: {
               constant: true,
               inputs: [
                 {
-                  name: "user",
+                  name: "grantorDeploymentId",
+                  type: "bytes32",
+                },
+                {
+                  name: "uid",
+                  type: "bytes32",
+                },
+                {
+                  name: "dataId",
+                  type: "bytes32",
+                },
+                {
+                  name: "grantee",
                   type: "address",
                 },
                 {
-                  name: "id",
-                  type: "bytes32",
+                  name: "flags",
+                  type: "uint256",
+                },
+                {
+                  name: "proof",
+                  type: "bytes32[]",
                 },
               ],
-              name: "hasAccess",
+              name: "canReadMerkle",
               outputs: [
                 {
                   name: "access",
@@ -577,7 +604,7 @@
             },
             chain: "xdai",
             returnValueTest: {
-              key: "",
+              key: "access",
               comparator: "=",
               value: "true",
             },
@@ -587,6 +614,7 @@
         await testProvisoningEncryptingAndDecrypting({
           evmContractConditions,
           testName: "RandomTestFromUser",
+          authSig,
         });
       };
 
