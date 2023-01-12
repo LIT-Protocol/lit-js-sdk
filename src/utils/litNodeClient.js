@@ -1057,7 +1057,10 @@ export default class LitNodeClient {
           networkPubKey: resp.networkPublicKey,
           networkPubKeySet: resp.networkPublicKeySet,
         };
-      });
+      })
+        .catch((err) => {
+
+        });
     }
 
     return new Promise((resolve) => {
