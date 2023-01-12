@@ -1059,7 +1059,7 @@ export default class LitNodeClient {
         };
       })
         .catch((err) => {
-
+          // catch error so it does not propagate
         });
     }
 
