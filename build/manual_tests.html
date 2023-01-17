@@ -667,6 +667,26 @@
         });
       };
 
+      var ETHOnMumbai = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "mumbai",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "ETHOnMumbai",
+        });
+      };
+
       var ETHOnAurora = async () => {
         const accessControlConditions = [
           {
@@ -2637,6 +2657,9 @@ Expiration Time: 2022-12-02T02:14:51.688Z`; // prettier-ignore
     <br />
     <br />
     <button onclick="ETHOnXdai()">ETHOnXdai</button>
+    <br />
+    <br />
+    <button onclick="ETHOnMumbai()">ETHOnMumbai</button>
     <br />
     <br />
     <button onclick="ETHOnAurora()">ETHOnAurora</button>

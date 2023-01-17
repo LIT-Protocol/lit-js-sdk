@@ -2272,15 +2272,19 @@ export default class LitNodeClient {
   connect() {
     // handshake with each node
     for (const url of this.config.bootstrapUrls) {
-      this.handshakeWithSgx({ url }).then((resp) => {
-        this.connectedNodes.add(url);
-        this.serverKeys[url] = {
-          serverPubKey: resp.serverPublicKey,
-          subnetPubKey: resp.subnetPublicKey,
-          networkPubKey: resp.networkPublicKey,
-          networkPubKeySet: resp.networkPublicKeySet,
-        };
-      });
+      this.handshakeWithSgx({ url })
+        .then((resp) => {
+          this.connectedNodes.add(url);
+          this.serverKeys[url] = {
+            serverPubKey: resp.serverPublicKey,
+            subnetPubKey: resp.subnetPublicKey,
+            networkPubKey: resp.networkPublicKey,
+            networkPubKeySet: resp.networkPublicKeySet,
+          };
+        })
+        .catch((e) => {
+          throw e;
+        });
     }
 
     return new Promise((resolve) => {

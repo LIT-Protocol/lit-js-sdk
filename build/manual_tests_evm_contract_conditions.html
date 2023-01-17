@@ -495,9 +495,15 @@
       };
 
       var SIWEResourceAsParam = async () => {
+        let tokenId = "8";
+        // base64url encode the param
+        let encodedSiweResource = LitJsSdk.uint8arrayToString(
+          LitJsSdk.uint8arrayFromString(tokenId, "utf8"),
+          "base64url"
+        );
         const authSig = await LitJsSdk.checkAndSignAuthMessage({
           chain,
-          resources: ["litParam:tokenId:8"],
+          resources: [`litParam:tokenId:${encodedSiweResource}`],
         });
         var evmContractConditions = [
           {
