@@ -1,11 +1,11 @@
-import Uint8arrays from "../lib/uint8arrays";
+import Uint8arrays from '../lib/uint8arrays';
 const uint8arrayFromString = Uint8arrays.fromString;
 const uint8arrayToString = Uint8arrays.toString;
-import naclUtil from "tweetnacl-util";
-import nacl from "tweetnacl";
-import { LIT_CHAINS } from "../lib/constants";
-import { version } from "../version";
-import { serialize } from "@ethersproject/transactions";
+import naclUtil from 'tweetnacl-util';
+import nacl from 'tweetnacl';
+import { LIT_CHAINS } from '../lib/constants';
+import { version } from '../version';
+import { serialize } from '@ethersproject/transactions';
 
 import {
   mostCommonString,
@@ -14,20 +14,20 @@ import {
   checkType,
   checkIfAuthSigRequiresChainParam,
   convertLitActionsParams,
-} from "../lib/utils";
-import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
-import * as wasmECDSA from "../lib/ecdsa-sdk";
-import { joinSignature } from "@ethersproject/bytes";
-import { computeAddress } from "@ethersproject/transactions";
-import { SiweMessage } from "lit-siwe";
-import { generateSessionKeyPair } from "./crypto";
+} from '../lib/utils';
+import { wasmBlsSdkHelpers } from '../lib/bls-sdk';
+import * as wasmECDSA from '../lib/ecdsa-sdk';
+import { joinSignature } from '@ethersproject/bytes';
+import { computeAddress } from '@ethersproject/transactions';
+import { SiweMessage } from 'lit-siwe';
+import { generateSessionKeyPair } from './crypto';
 
 import {
   getSessionKeyUri,
   parseResource,
   checkAndSignAuthMessage,
   configure,
-} from "./lit";
+} from './lit';
 
 import {
   hashAccessControlConditions,
@@ -43,8 +43,8 @@ import {
   combineEcdsaShares,
   combineBlsShares,
   combineBlsDecryptionShares,
-} from "./crypto";
-import { Base64 } from "js-base64";
+} from './crypto';
+import { Base64 } from 'js-base64';
 
 /**
  * @typedef {Object} AccessControlCondition
@@ -141,26 +141,26 @@ export default class LitNodeClient {
     if (!this.ready) {
       throwError({
         message:
-          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+          'LitNodeClient is not ready.  Please call await litNodeClient.connect() first.',
+        name: 'LitNodeClientNotReadyError',
+        errorCode: 'lit_node_client_not_ready',
       });
     }
 
     const chainId = LIT_CHAINS[chain].chainId;
     if (!chainId) {
       throwError({
-        message: "Invalid chain.  Please pass a valid chain.",
-        name: "InvalidChain",
-        errorCode: "invalid_input_chain",
+        message: 'Invalid chain.  Please pass a valid chain.',
+        name: 'InvalidChain',
+        errorCode: 'invalid_input_chain',
       });
     }
 
     if (!publicKey) {
       throwError({
-        message: "Pubic Key not provided.  Please pass a valid Public Key.",
-        name: "MissingPublicKey",
-        errorCode: "missing_public_key",
+        message: 'Pubic Key not provided.  Please pass a valid Public Key.',
+        name: 'MissingPublicKey',
+        errorCode: 'missing_public_key',
       });
     }
 
@@ -196,13 +196,13 @@ export default class LitNodeClient {
       jsParams: {
         publicKey,
         chain,
-        sigName: "sig1",
+        sigName: 'sig1',
         chainId,
         to,
         value,
         data,
-        gasPrice: gasPrice || "0x2e90edd000",
-        gasLimit: gasLimit || "0x" + (30000).toString(16),
+        gasPrice: gasPrice || '0x2e90edd000',
+        gasLimit: gasLimit || '0x' + (30000).toString(16),
       },
     });
   }
@@ -241,7 +241,7 @@ export default class LitNodeClient {
     });
 
     const tx = signResult.response;
-    const signature = signResult.signatures["sig1"].signature;
+    const signature = signResult.signatures['sig1'].signature;
     const serializedTx = serialize(tx, signature);
     return provider.sendTransaction(serializedTx);
   }
@@ -268,9 +268,9 @@ export default class LitNodeClient {
     if (!this.ready) {
       throwError({
         message:
-          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+          'LitNodeClient is not ready.  Please call await litNodeClient.connect() first.',
+        name: 'LitNodeClientNotReadyError',
+        errorCode: 'lit_node_client_not_ready',
       });
     }
 
@@ -279,9 +279,9 @@ export default class LitNodeClient {
       authSig &&
       !checkType({
         value: authSig,
-        allowedTypes: ["Object"],
-        paramName: "authSig",
-        functionName: "executeJs",
+        allowedTypes: ['Object'],
+        paramName: 'authSig',
+        functionName: 'executeJs',
       })
     )
       return;
@@ -290,18 +290,18 @@ export default class LitNodeClient {
       sessionSigs &&
       !checkType({
         value: sessionSigs,
-        allowedTypes: ["Object"],
-        paramName: "sessionSigs",
-        functionName: "executeJs",
+        allowedTypes: ['Object'],
+        paramName: 'sessionSigs',
+        functionName: 'executeJs',
       })
     )
       return;
 
     if (!sessionSigs && !authSig) {
       throwError({
-        message: "You must pass either authSig or sessionSigs",
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        message: 'You must pass either authSig or sessionSigs',
+        name: 'InvalidArgumentException',
+        errorCode: 'invalid_argument',
       });
       return;
     }
@@ -316,17 +316,17 @@ export default class LitNodeClient {
     if (code) {
       // base64 encode before sending over the wire
       const encodedJs = uint8arrayToString(
-        uint8arrayFromString(code, "utf8"),
-        "base64"
+        uint8arrayFromString(code, 'utf8'),
+        'base64'
       );
       reqBody.code = encodedJs;
     } else if (ipfsId) {
       reqBody.ipfsId = ipfsId;
     } else {
       throwError({
-        message: "You must pass either code or ipfsId",
-        name: "MissingParameterError",
-        errorCode: "missing_parameter",
+        message: 'You must pass either code or ipfsId',
+        name: 'MissingParameterError',
+        errorCode: 'missing_parameter',
       });
     }
 
@@ -342,8 +342,8 @@ export default class LitNodeClient {
         if (!sigToPassToNode) {
           throwError({
             message: `You passed sessionSigs but we could not find session sig for node ${url}`,
-            name: "InvalidArgumentException",
-            errorCode: "invalid_argument",
+            name: 'InvalidArgumentException',
+            errorCode: 'invalid_argument',
           });
         }
       }
@@ -362,7 +362,7 @@ export default class LitNodeClient {
     }
     const responseData = res.values;
 
-    log("responseData", JSON.stringify(responseData, null, 2));
+    log('responseData', JSON.stringify(responseData, null, 2));
 
     // combine the signatures
     const signedData = responseData.map((r) => r.signedData);
@@ -380,32 +380,32 @@ export default class LitNodeClient {
         publicKey: s.publicKey,
         dataSigned: s.dataSigned,
       }));
-      log("sigShares", sigShares);
+      log('sigShares', sigShares);
       const sigType = mostCommonString(sigShares.map((s) => s.sigType));
       let signature;
-      if (sigType === "BLS") {
+      if (sigType === 'BLS') {
         signature = combineBlsShares(sigShares, this.networkPubKeySet);
-      } else if (sigType === "ECDSA") {
+      } else if (sigType === 'ECDSA') {
         signature = combineEcdsaShares(sigShares);
       } else {
         throwError({
-          message: "Unknown signature type",
-          name: "UnknownSignatureTypeError",
-          errorCode: "unknown_signature_type",
+          message: 'Unknown signature type',
+          name: 'UnknownSignatureTypeError',
+          errorCode: 'unknown_signature_type',
         });
       }
 
       const encodedSig = joinSignature({
-        r: "0x" + signature.r,
-        s: "0x" + signature.s,
+        r: '0x' + signature.r,
+        s: '0x' + signature.s,
         v: signature.recid,
       });
 
       signatures[key] = {
         ...signature,
         signature: encodedSig,
-        publicKey: "0x" + mostCommonString(sigShares.map((s) => s.publicKey)),
-        dataSigned: "0x" + mostCommonString(sigShares.map((s) => s.dataSigned)),
+        publicKey: '0x' + mostCommonString(sigShares.map((s) => s.publicKey)),
+        dataSigned: '0x' + mostCommonString(sigShares.map((s) => s.dataSigned)),
       };
     });
 
@@ -427,7 +427,7 @@ export default class LitNodeClient {
       );
       const ciphertext = mostCommonString(decShares.map((s) => s.ciphertext));
       let decrypted;
-      if (algorithmType === "BLS") {
+      if (algorithmType === 'BLS') {
         decrypted = combineBlsDecryptionShares(
           decShares,
           this.networkPubKeySet,
@@ -435,14 +435,14 @@ export default class LitNodeClient {
         );
       } else {
         throwError({
-          message: "Unknown decryption algorithm type",
-          name: "UnknownDecryptionAlgorithmTypeError",
-          errorCode: "unknown_decryption_algorithm_type",
+          message: 'Unknown decryption algorithm type',
+          name: 'UnknownDecryptionAlgorithmTypeError',
+          errorCode: 'unknown_decryption_algorithm_type',
         });
       }
 
       decryptions[key] = {
-        decrypted: uint8arrayToString(decrypted, "base16"),
+        decrypted: uint8arrayToString(decrypted, 'base16'),
         publicKey: mostCommonString(decShares.map((s) => s.publicKey)),
         ciphertext: mostCommonString(decShares.map((s) => s.ciphertext)),
       };
@@ -453,7 +453,7 @@ export default class LitNodeClient {
       response = JSON.parse(response);
     } catch (e) {
       log(
-        "Error parsing response as json.  Swallowing and returning as string.",
+        'Error parsing response as json.  Swallowing and returning as string.',
         response
       );
     }
@@ -502,9 +502,9 @@ export default class LitNodeClient {
     if (!this.ready) {
       throwError({
         message:
-          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+          'LitNodeClient is not ready.  Please call await litNodeClient.connect() first.',
+        name: 'LitNodeClientNotReadyError',
+        errorCode: 'lit_node_client_not_ready',
       });
     }
 
@@ -513,10 +513,10 @@ export default class LitNodeClient {
     let siweMessage = new SiweMessage({
       domain: globalThis.location.host,
       address: pkpEthAddress,
-      statement: "Lit Protocol PKP session signature",
+      statement: 'Lit Protocol PKP session signature',
       uri: sessionKey,
-      version: "1",
-      chainId: "1",
+      version: '1',
+      chainId: '1',
       expirationTime:
         expiration || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       resources,
@@ -561,7 +561,7 @@ export default class LitNodeClient {
     }
     const responseData = res.values;
 
-    log("responseData", JSON.stringify(responseData, null, 2));
+    log('responseData', JSON.stringify(responseData, null, 2));
 
     // combine the signatures
     const signedData = responseData.map((r) => r.signedData);
@@ -580,32 +580,32 @@ export default class LitNodeClient {
         dataSigned: s.dataSigned,
         siweMessage: s.siweMessage,
       }));
-      log("sigShares", sigShares);
+      log('sigShares', sigShares);
       const sigType = mostCommonString(sigShares.map((s) => s.sigType));
       let signature;
-      if (sigType === "BLS") {
+      if (sigType === 'BLS') {
         signature = combineBlsShares(sigShares, this.networkPubKeySet);
-      } else if (sigType === "ECDSA") {
+      } else if (sigType === 'ECDSA') {
         signature = combineEcdsaShares(sigShares);
       } else {
         throwError({
-          message: "Unknown signature type",
-          name: "UnknownSignatureTypeError",
-          errorCode: "unknown_signature_type",
+          message: 'Unknown signature type',
+          name: 'UnknownSignatureTypeError',
+          errorCode: 'unknown_signature_type',
         });
       }
 
       const encodedSig = joinSignature({
-        r: "0x" + signature.r,
-        s: "0x" + signature.s,
+        r: '0x' + signature.r,
+        s: '0x' + signature.s,
         v: signature.recid,
       });
 
       signatures[key] = {
         ...signature,
         signature: encodedSig,
-        publicKey: "0x" + mostCommonString(sigShares.map((s) => s.publicKey)),
-        dataSigned: "0x" + mostCommonString(sigShares.map((s) => s.dataSigned)),
+        publicKey: '0x' + mostCommonString(sigShares.map((s) => s.publicKey)),
+        dataSigned: '0x' + mostCommonString(sigShares.map((s) => s.dataSigned)),
         siweMessage: mostCommonString(sigShares.map((s) => s.siweMessage)),
       };
     });
@@ -614,7 +614,7 @@ export default class LitNodeClient {
 
     return {
       sig: sessionSig.signature,
-      derivedVia: "web3.eth.personal.sign via Lit PKP",
+      derivedVia: 'web3.eth.personal.sign via Lit PKP',
       signedMessage: sessionSig.siweMessage,
       address: computeAddress(sessionSig.publicKey),
     };
@@ -631,9 +631,9 @@ export default class LitNodeClient {
     if (!this.ready) {
       throwError({
         message:
-          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+          'LitNodeClient is not ready.  Please call await litNodeClient.connect() first.',
+        name: 'LitNodeClientNotReadyError',
+        errorCode: 'lit_node_client_not_ready',
       });
     }
 
@@ -658,8 +658,8 @@ export default class LitNodeClient {
       );
     }
     const signatureShares = await Promise.all(nodePromises);
-    log("signatureShares", signatureShares);
-    const goodShares = signatureShares.filter((d) => d.signatureShare !== "");
+    log('signatureShares', signatureShares);
+    const goodShares = signatureShares.filter((d) => d.signatureShare !== '');
     if (goodShares.length < this.config.minNodeCount) {
       log(
         `majority of shares are bad. goodShares is ${JSON.stringify(
@@ -668,14 +668,14 @@ export default class LitNodeClient {
       );
       if (this.config.alertWhenUnauthorized) {
         alert(
-          "You are not authorized to receive a signature to grant access to this content"
+          'You are not authorized to receive a signature to grant access to this content'
         );
       }
 
       throwError({
         message: `You are not authorized to recieve a signature on this item`,
-        name: "UnauthorizedException",
-        errorCode: "not_authorized",
+        name: 'UnauthorizedException',
+        errorCode: 'not_authorized',
       });
     }
 
@@ -686,7 +686,7 @@ export default class LitNodeClient {
       )
     ) {
       const msg =
-        "Unsigned JWT is not the same from all the nodes.  This means the combined signature will be bad because the nodes signed the wrong things";
+        'Unsigned JWT is not the same from all the nodes.  This means the combined signature will be bad because the nodes signed the wrong things';
       log(msg);
       alert(msg);
     }
@@ -696,8 +696,8 @@ export default class LitNodeClient {
 
     // combine the signature shares
 
-    const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, "base16");
-    log("pkSetAsBytes", pkSetAsBytes);
+    const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, 'base16');
+    log('pkSetAsBytes', pkSetAsBytes);
 
     const sigShares = signatureShares.map((s) => ({
       shareHex: s.signatureShare,
@@ -707,8 +707,8 @@ export default class LitNodeClient {
       pkSetAsBytes,
       sigShares
     );
-    log("raw sig", signature);
-    log("signature is ", uint8arrayToString(signature, "base16"));
+    log('raw sig', signature);
+    log('signature is ', uint8arrayToString(signature, 'base16'));
 
     const unsignedJwt = mostCommonString(
       signatureShares.map((s) => s.unsignedJwt)
@@ -717,7 +717,7 @@ export default class LitNodeClient {
     // convert the sig to base64 and append to the jwt
     const finalJwt = `${unsignedJwt}.${uint8arrayToString(
       signature,
-      "base64url"
+      'base64url'
     )}`;
 
     return finalJwt;
@@ -748,9 +748,9 @@ export default class LitNodeClient {
     if (!this.ready) {
       throwError({
         message:
-          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+          'LitNodeClient is not ready.  Please call await litNodeClient.connect() first.',
+        name: 'LitNodeClientNotReadyError',
+        errorCode: 'lit_node_client_not_ready',
       });
     }
 
@@ -759,9 +759,9 @@ export default class LitNodeClient {
       accessControlConditions &&
       !checkType({
         value: accessControlConditions,
-        allowedTypes: ["Array"],
-        paramName: "accessControlConditions",
-        functionName: "getSignedToken",
+        allowedTypes: ['Array'],
+        paramName: 'accessControlConditions',
+        functionName: 'getSignedToken',
       })
     )
       return;
@@ -769,9 +769,9 @@ export default class LitNodeClient {
       evmContractConditions &&
       !checkType({
         value: evmContractConditions,
-        allowedTypes: ["Array"],
-        paramName: "evmContractConditions",
-        functionName: "getSignedToken",
+        allowedTypes: ['Array'],
+        paramName: 'evmContractConditions',
+        functionName: 'getSignedToken',
       })
     )
       return;
@@ -779,9 +779,9 @@ export default class LitNodeClient {
       solRpcConditions &&
       !checkType({
         value: solRpcConditions,
-        allowedTypes: ["Array"],
-        paramName: "solRpcConditions",
-        functionName: "getSignedToken",
+        allowedTypes: ['Array'],
+        paramName: 'solRpcConditions',
+        functionName: 'getSignedToken',
       })
     )
       return;
@@ -789,18 +789,18 @@ export default class LitNodeClient {
       unifiedAccessControlConditions &&
       !checkType({
         value: unifiedAccessControlConditions,
-        allowedTypes: ["Array"],
-        paramName: "unifiedAccessControlConditions",
-        functionName: "getSignedToken",
+        allowedTypes: ['Array'],
+        paramName: 'unifiedAccessControlConditions',
+        functionName: 'getSignedToken',
       })
     )
       return;
     if (
       !checkType({
         value: resourceId,
-        allowedTypes: ["Object"],
-        paramName: "resourceId",
-        functionName: "getSignedToken",
+        allowedTypes: ['Object'],
+        paramName: 'resourceId',
+        functionName: 'getSignedToken',
       })
     )
       return;
@@ -808,9 +808,9 @@ export default class LitNodeClient {
       authSig &&
       !checkType({
         value: authSig,
-        allowedTypes: ["Object"],
-        paramName: "authSig",
-        functionName: "getSignedToken",
+        allowedTypes: ['Object'],
+        paramName: 'authSig',
+        functionName: 'getSignedToken',
       })
     )
       return;
@@ -821,25 +821,25 @@ export default class LitNodeClient {
       sessionSigs &&
       !checkType({
         value: sessionSigs,
-        allowedTypes: ["Object"],
-        paramName: "sessionSigs",
-        functionName: "getSignedToken",
+        allowedTypes: ['Object'],
+        paramName: 'sessionSigs',
+        functionName: 'getSignedToken',
       })
     )
       return;
 
     if (!sessionSigs && !authSig) {
       throwError({
-        message: "You must pass either authSig or sessionSigs",
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        message: 'You must pass either authSig or sessionSigs',
+        name: 'InvalidArgumentException',
+        errorCode: 'invalid_argument',
       });
       return;
     }
 
     if (
       authSig &&
-      !checkIfAuthSigRequiresChainParam(authSig, chain, "getSignedToken")
+      !checkIfAuthSigRequiresChainParam(authSig, chain, 'getSignedToken')
     )
       return;
 
@@ -859,7 +859,7 @@ export default class LitNodeClient {
         canonicalAccessControlConditionFormatter(c)
       );
       log(
-        "formattedAccessControlConditions",
+        'formattedAccessControlConditions',
         JSON.stringify(formattedAccessControlConditions)
       );
     } else if (evmContractConditions) {
@@ -867,7 +867,7 @@ export default class LitNodeClient {
         canonicalEVMContractConditionFormatter(c)
       );
       log(
-        "formattedEVMContractConditions",
+        'formattedEVMContractConditions',
         JSON.stringify(formattedEVMContractConditions)
       );
     } else if (solRpcConditions) {
@@ -875,7 +875,7 @@ export default class LitNodeClient {
         canonicalSolRpcConditionFormatter(c)
       );
       log(
-        "formattedSolRpcConditions",
+        'formattedSolRpcConditions',
         JSON.stringify(formattedSolRpcConditions)
       );
     } else if (unifiedAccessControlConditions) {
@@ -884,14 +884,14 @@ export default class LitNodeClient {
           canonicalUnifiedAccessControlConditionFormatter(c)
         );
       log(
-        "formattedUnifiedAccessControlConditions",
+        'formattedUnifiedAccessControlConditions',
         JSON.stringify(formattedUnifiedAccessControlConditions)
       );
     } else {
       throwError({
         message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        name: 'InvalidArgumentException',
+        errorCode: 'invalid_argument',
       });
     }
 
@@ -907,8 +907,8 @@ export default class LitNodeClient {
         if (!sigToPassToNode) {
           throwError({
             message: `You passed sessionSigs but we could not find session sig for node ${url}`,
-            name: "InvalidArgumentException",
-            errorCode: "invalid_argument",
+            name: 'InvalidArgumentException',
+            errorCode: 'invalid_argument',
           });
         }
       }
@@ -935,7 +935,7 @@ export default class LitNodeClient {
       return;
     }
     const signatureShares = res.values;
-    log("signatureShares", signatureShares);
+    log('signatureShares', signatureShares);
 
     // sanity check
     if (
@@ -944,7 +944,7 @@ export default class LitNodeClient {
       )
     ) {
       const msg =
-        "Unsigned JWT is not the same from all the nodes.  This means the combined signature will be bad because the nodes signed the wrong things";
+        'Unsigned JWT is not the same from all the nodes.  This means the combined signature will be bad because the nodes signed the wrong things';
       log(msg);
       alert(msg);
     }
@@ -954,8 +954,8 @@ export default class LitNodeClient {
 
     // combine the signature shares
 
-    const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, "base16");
-    log("pkSetAsBytes", pkSetAsBytes);
+    const pkSetAsBytes = uint8arrayFromString(this.networkPubKeySet, 'base16');
+    log('pkSetAsBytes', pkSetAsBytes);
 
     const sigShares = signatureShares.map((s) => ({
       shareHex: s.signatureShare,
@@ -965,8 +965,8 @@ export default class LitNodeClient {
       pkSetAsBytes,
       sigShares
     );
-    log("raw sig", signature);
-    log("signature is ", uint8arrayToString(signature, "base16"));
+    log('raw sig', signature);
+    log('signature is ', uint8arrayToString(signature, 'base16'));
 
     const unsignedJwt = mostCommonString(
       signatureShares.map((s) => s.unsignedJwt)
@@ -975,7 +975,7 @@ export default class LitNodeClient {
     // convert the sig to base64 and append to the jwt
     const finalJwt = `${unsignedJwt}.${uint8arrayToString(
       signature,
-      "base64url"
+      'base64url'
     )}`;
 
     return finalJwt;
@@ -1006,14 +1006,14 @@ export default class LitNodeClient {
     permanent = true,
     sessionSigs,
   }) {
-    log("saveSigningCondition");
+    log('saveSigningCondition');
 
     if (!this.ready) {
       throwError({
         message:
-          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+          'LitNodeClient is not ready.  Please call await litNodeClient.connect() first.',
+        name: 'LitNodeClientNotReadyError',
+        errorCode: 'lit_node_client_not_ready',
       });
     }
 
@@ -1022,9 +1022,9 @@ export default class LitNodeClient {
       accessControlConditions &&
       !checkType({
         value: accessControlConditions,
-        allowedTypes: ["Array"],
-        paramName: "accessControlConditions",
-        functionName: "getSignedToken",
+        allowedTypes: ['Array'],
+        paramName: 'accessControlConditions',
+        functionName: 'getSignedToken',
       })
     )
       return;
@@ -1032,9 +1032,9 @@ export default class LitNodeClient {
       evmContractConditions &&
       !checkType({
         value: evmContractConditions,
-        allowedTypes: ["Array"],
-        paramName: "evmContractConditions",
-        functionName: "getSignedToken",
+        allowedTypes: ['Array'],
+        paramName: 'evmContractConditions',
+        functionName: 'getSignedToken',
       })
     )
       return;
@@ -1042,9 +1042,9 @@ export default class LitNodeClient {
       solRpcConditions &&
       !checkType({
         value: solRpcConditions,
-        allowedTypes: ["Array"],
-        paramName: "solRpcConditions",
-        functionName: "getSignedToken",
+        allowedTypes: ['Array'],
+        paramName: 'solRpcConditions',
+        functionName: 'getSignedToken',
       })
     )
       return;
@@ -1052,18 +1052,18 @@ export default class LitNodeClient {
       unifiedAccessControlConditions &&
       !checkType({
         value: unifiedAccessControlConditions,
-        allowedTypes: ["Array"],
-        paramName: "unifiedAccessControlConditions",
-        functionName: "getSignedToken",
+        allowedTypes: ['Array'],
+        paramName: 'unifiedAccessControlConditions',
+        functionName: 'getSignedToken',
       })
     )
       return;
     if (
       !checkType({
         value: resourceId,
-        allowedTypes: ["Object"],
-        paramName: "resourceId",
-        functionName: "getSignedToken",
+        allowedTypes: ['Object'],
+        paramName: 'resourceId',
+        functionName: 'getSignedToken',
       })
     )
       return;
@@ -1071,43 +1071,43 @@ export default class LitNodeClient {
       authSig &&
       !checkType({
         value: authSig,
-        allowedTypes: ["Object"],
-        paramName: "authSig",
-        functionName: "getSignedToken",
+        allowedTypes: ['Object'],
+        paramName: 'authSig',
+        functionName: 'getSignedToken',
       })
     )
       return;
 
-    log("sessionSigs", sessionSigs);
+    log('sessionSigs', sessionSigs);
 
     if (
       sessionSigs &&
       !checkType({
         value: sessionSigs,
-        allowedTypes: ["Object"],
-        paramName: "sessionSigs",
-        functionName: "getSignedToken",
+        allowedTypes: ['Object'],
+        paramName: 'sessionSigs',
+        functionName: 'getSignedToken',
       })
     )
       return;
 
     if (!sessionSigs && !authSig) {
       throwError({
-        message: "You must pass either authSig or sessionSigs",
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        message: 'You must pass either authSig or sessionSigs',
+        name: 'InvalidArgumentException',
+        errorCode: 'invalid_argument',
       });
       return;
     }
 
     if (
       authSig &&
-      !checkIfAuthSigRequiresChainParam(authSig, chain, "getSignedToken")
+      !checkIfAuthSigRequiresChainParam(authSig, chain, 'getSignedToken')
     )
       return;
 
     // this is to fix my spelling mistake that we must now maintain forever lol
-    if (typeof permanant !== "undefined") {
+    if (typeof permanant !== 'undefined') {
       permanent = permanant;
     }
 
@@ -1115,7 +1115,7 @@ export default class LitNodeClient {
     const hashOfResourceId = await hashResourceId(resourceId);
     const hashOfResourceIdStr = uint8arrayToString(
       new Uint8Array(hashOfResourceId),
-      "base16"
+      'base16'
     );
 
     let hashOfConditions;
@@ -1135,14 +1135,14 @@ export default class LitNodeClient {
     } else {
       throwError({
         message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        name: 'InvalidArgumentException',
+        errorCode: 'invalid_argument',
       });
     }
 
     const hashOfConditionsStr = uint8arrayToString(
       new Uint8Array(hashOfConditions),
-      "base16"
+      'base16'
     );
     // create access control conditions on lit nodes
     const nodePromises = [];
@@ -1198,9 +1198,9 @@ export default class LitNodeClient {
     if (!this.ready) {
       throwError({
         message:
-          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+          'LitNodeClient is not ready.  Please call await litNodeClient.connect() first.',
+        name: 'LitNodeClientNotReadyError',
+        errorCode: 'lit_node_client_not_ready',
       });
     }
 
@@ -1209,9 +1209,9 @@ export default class LitNodeClient {
       accessControlConditions &&
       !checkType({
         value: accessControlConditions,
-        allowedTypes: ["Array"],
-        paramName: "accessControlConditions",
-        functionName: "getEncryptionKey",
+        allowedTypes: ['Array'],
+        paramName: 'accessControlConditions',
+        functionName: 'getEncryptionKey',
       })
     )
       return;
@@ -1219,9 +1219,9 @@ export default class LitNodeClient {
       evmContractConditions &&
       !checkType({
         value: evmContractConditions,
-        allowedTypes: ["Array"],
-        paramName: "evmContractConditions",
-        functionName: "getEncryptionKey",
+        allowedTypes: ['Array'],
+        paramName: 'evmContractConditions',
+        functionName: 'getEncryptionKey',
       })
     )
       return;
@@ -1229,9 +1229,9 @@ export default class LitNodeClient {
       solRpcConditions &&
       !checkType({
         value: solRpcConditions,
-        allowedTypes: ["Array"],
-        paramName: "solRpcConditions",
-        functionName: "getEncryptionKey",
+        allowedTypes: ['Array'],
+        paramName: 'solRpcConditions',
+        functionName: 'getEncryptionKey',
       })
     )
       return;
@@ -1239,18 +1239,18 @@ export default class LitNodeClient {
       unifiedAccessControlConditions &&
       !checkType({
         value: unifiedAccessControlConditions,
-        allowedTypes: ["Array"],
-        paramName: "unifiedAccessControlConditions",
-        functionName: "getEncryptionKey",
+        allowedTypes: ['Array'],
+        paramName: 'unifiedAccessControlConditions',
+        functionName: 'getEncryptionKey',
       })
     )
       return;
     if (
       !checkType({
         value: toDecrypt,
-        allowedTypes: ["String"],
-        paramName: "toDecrypt",
-        functionName: "getEncryptionKey",
+        allowedTypes: ['String'],
+        paramName: 'toDecrypt',
+        functionName: 'getEncryptionKey',
       })
     )
       return;
@@ -1258,9 +1258,9 @@ export default class LitNodeClient {
       authSig &&
       !checkType({
         value: authSig,
-        allowedTypes: ["Object"],
-        paramName: "authSig",
-        functionName: "getEncryptionKey",
+        allowedTypes: ['Object'],
+        paramName: 'authSig',
+        functionName: 'getEncryptionKey',
       })
     )
       return;
@@ -1268,25 +1268,25 @@ export default class LitNodeClient {
       sessionSigs &&
       !checkType({
         value: sessionSigs,
-        allowedTypes: ["Object"],
-        paramName: "sessionSigs",
-        functionName: "getEncryptionKey",
+        allowedTypes: ['Object'],
+        paramName: 'sessionSigs',
+        functionName: 'getEncryptionKey',
       })
     )
       return;
 
     if (!sessionSigs && !authSig) {
       throwError({
-        message: "You must pass either authSig or sessionSigs",
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        message: 'You must pass either authSig or sessionSigs',
+        name: 'InvalidArgumentException',
+        errorCode: 'invalid_argument',
       });
       return;
     }
 
     if (
       authSig &&
-      !checkIfAuthSigRequiresChainParam(authSig, chain, "getEncryptionKey")
+      !checkIfAuthSigRequiresChainParam(authSig, chain, 'getEncryptionKey')
     )
       return;
 
@@ -1299,7 +1299,7 @@ export default class LitNodeClient {
         canonicalAccessControlConditionFormatter(c)
       );
       log(
-        "formattedAccessControlConditions: ",
+        'formattedAccessControlConditions: ',
         JSON.stringify(formattedAccessControlConditions)
       );
     } else if (evmContractConditions) {
@@ -1307,7 +1307,7 @@ export default class LitNodeClient {
         canonicalEVMContractConditionFormatter(c)
       );
       log(
-        "formattedEVMContractConditions",
+        'formattedEVMContractConditions',
         JSON.stringify(formattedEVMContractConditions)
       );
     } else if (solRpcConditions) {
@@ -1315,7 +1315,7 @@ export default class LitNodeClient {
         canonicalSolRpcConditionFormatter(c)
       );
       log(
-        "formattedSolRpcConditions",
+        'formattedSolRpcConditions',
         JSON.stringify(formattedSolRpcConditions)
       );
     } else if (unifiedAccessControlConditions) {
@@ -1324,14 +1324,14 @@ export default class LitNodeClient {
           canonicalUnifiedAccessControlConditionFormatter(c)
         );
       log(
-        "formattedUnifiedAccessControlConditions",
+        'formattedUnifiedAccessControlConditions',
         JSON.stringify(formattedUnifiedAccessControlConditions)
       );
     } else {
       throwError({
         message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        name: 'InvalidArgumentException',
+        errorCode: 'invalid_argument',
       });
     }
 
@@ -1345,8 +1345,8 @@ export default class LitNodeClient {
         if (!sigToPassToNode) {
           throwError({
             message: `You passed sessionSigs but we could not find session sig for node ${url}`,
-            name: "InvalidArgumentException",
-            errorCode: "invalid_argument",
+            name: 'InvalidArgumentException',
+            errorCode: 'invalid_argument',
           });
         }
       }
@@ -1370,7 +1370,7 @@ export default class LitNodeClient {
       return;
     }
     const decryptionShares = res.values;
-    log("decryptionShares", decryptionShares);
+    log('decryptionShares', decryptionShares);
 
     // // sort the decryption shares by share index.  this is important when combining the shares.
     // decryptionShares.sort((a, b) => a.shareIndex - b.shareIndex);
@@ -1440,14 +1440,14 @@ export default class LitNodeClient {
     permanent = true,
     sessionSigs,
   }) {
-    log("LitNodeClient.saveEncryptionKey");
+    log('LitNodeClient.saveEncryptionKey');
 
     if (!this.ready) {
       throwError({
         message:
-          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+          'LitNodeClient is not ready.  Please call await litNodeClient.connect() first.',
+        name: 'LitNodeClientNotReadyError',
+        errorCode: 'lit_node_client_not_ready',
       });
     }
 
@@ -1456,9 +1456,9 @@ export default class LitNodeClient {
       accessControlConditions &&
       !checkType({
         value: accessControlConditions,
-        allowedTypes: ["Array"],
-        paramName: "accessControlConditions",
-        functionName: "saveEncryptionKey",
+        allowedTypes: ['Array'],
+        paramName: 'accessControlConditions',
+        functionName: 'saveEncryptionKey',
       })
     )
       return;
@@ -1466,9 +1466,9 @@ export default class LitNodeClient {
       evmContractConditions &&
       !checkType({
         value: evmContractConditions,
-        allowedTypes: ["Array"],
-        paramName: "evmContractConditions",
-        functionName: "saveEncryptionKey",
+        allowedTypes: ['Array'],
+        paramName: 'evmContractConditions',
+        functionName: 'saveEncryptionKey',
       })
     )
       return;
@@ -1476,9 +1476,9 @@ export default class LitNodeClient {
       solRpcConditions &&
       !checkType({
         value: solRpcConditions,
-        allowedTypes: ["Array"],
-        paramName: "solRpcConditions",
-        functionName: "saveEncryptionKey",
+        allowedTypes: ['Array'],
+        paramName: 'solRpcConditions',
+        functionName: 'saveEncryptionKey',
       })
     )
       return;
@@ -1486,9 +1486,9 @@ export default class LitNodeClient {
       unifiedAccessControlConditions &&
       !checkType({
         value: unifiedAccessControlConditions,
-        allowedTypes: ["Array"],
-        paramName: "unifiedAccessControlConditions",
-        functionName: "saveEncryptionKey",
+        allowedTypes: ['Array'],
+        paramName: 'unifiedAccessControlConditions',
+        functionName: 'saveEncryptionKey',
       })
     )
       return;
@@ -1497,9 +1497,9 @@ export default class LitNodeClient {
       authSig &&
       !checkType({
         value: authSig,
-        allowedTypes: ["Object"],
-        paramName: "authSig",
-        functionName: "saveEncryptionKey",
+        allowedTypes: ['Object'],
+        paramName: 'authSig',
+        functionName: 'saveEncryptionKey',
       })
     )
       return;
@@ -1508,32 +1508,32 @@ export default class LitNodeClient {
       sessionSigs &&
       !checkType({
         value: sessionSigs,
-        allowedTypes: ["Object"],
-        paramName: "sessionSigs",
-        functionName: "saveEncryptionKey",
+        allowedTypes: ['Object'],
+        paramName: 'sessionSigs',
+        functionName: 'saveEncryptionKey',
       })
     )
       return;
     if (!sessionSigs && !authSig) {
       throwError({
-        message: "You must pass either authSig or sessionSigs",
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        message: 'You must pass either authSig or sessionSigs',
+        name: 'InvalidArgumentException',
+        errorCode: 'invalid_argument',
       });
       return;
     }
     if (
       authSig &&
-      !checkIfAuthSigRequiresChainParam(authSig, chain, "saveEncryptionKey")
+      !checkIfAuthSigRequiresChainParam(authSig, chain, 'saveEncryptionKey')
     )
       return;
     if (
       symmetricKey &&
       !checkType({
         value: symmetricKey,
-        allowedTypes: ["Uint8Array"],
-        paramName: "symmetricKey",
-        functionName: "saveEncryptionKey",
+        allowedTypes: ['Uint8Array'],
+        paramName: 'symmetricKey',
+        functionName: 'saveEncryptionKey',
       })
     )
       return;
@@ -1541,24 +1541,24 @@ export default class LitNodeClient {
       encryptedSymmetricKey &&
       !checkType({
         value: encryptedSymmetricKey,
-        allowedTypes: ["Uint8Array"],
-        paramName: "encryptedSymmetricKey",
-        functionName: "saveEncryptionKey",
+        allowedTypes: ['Uint8Array'],
+        paramName: 'encryptedSymmetricKey',
+        functionName: 'saveEncryptionKey',
       })
     )
       return;
 
     // to fix spelling mistake
-    if (typeof permanant !== "undefined") {
+    if (typeof permanant !== 'undefined') {
       permanent = permanant;
     }
 
     if (
-      (!symmetricKey || symmetricKey == "") &&
-      (!encryptedSymmetricKey || encryptedSymmetricKey == "")
+      (!symmetricKey || symmetricKey == '') &&
+      (!encryptedSymmetricKey || encryptedSymmetricKey == '')
     ) {
       throw new Error(
-        "symmetricKey and encryptedSymmetricKey are blank.  You must pass one or the other"
+        'symmetricKey and encryptedSymmetricKey are blank.  You must pass one or the other'
       );
     }
 
@@ -1570,7 +1570,7 @@ export default class LitNodeClient {
         unifiedAccessControlConditions.length == 0)
     ) {
       throw new Error(
-        "accessControlConditions and evmContractConditions and solRpcConditions and unifiedAccessControlConditions are blank"
+        'accessControlConditions and evmContractConditions and solRpcConditions and unifiedAccessControlConditions are blank'
       );
     }
 
@@ -1580,19 +1580,19 @@ export default class LitNodeClient {
       encryptedKey = encryptedSymmetricKey;
     } else {
       encryptedKey = wasmBlsSdkHelpers.encrypt(
-        uint8arrayFromString(this.subnetPubKey, "base16"),
+        uint8arrayFromString(this.subnetPubKey, 'base16'),
         symmetricKey
       );
       log(
-        "symmetric key encrypted with LIT network key: ",
-        uint8arrayToString(encryptedKey, "base16")
+        'symmetric key encrypted with LIT network key: ',
+        uint8arrayToString(encryptedKey, 'base16')
       );
     }
     // hash the encrypted pubkey
-    const hashOfKey = await crypto.subtle.digest("SHA-256", encryptedKey);
+    const hashOfKey = await crypto.subtle.digest('SHA-256', encryptedKey);
     const hashOfKeyStr = uint8arrayToString(
       new Uint8Array(hashOfKey),
-      "base16"
+      'base16'
     );
 
     // hash the access control conditions
@@ -1613,14 +1613,14 @@ export default class LitNodeClient {
     } else {
       throwError({
         message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        name: 'InvalidArgumentException',
+        errorCode: 'invalid_argument',
       });
     }
 
     const hashOfConditionsStr = uint8arrayToString(
       new Uint8Array(hashOfConditions),
-      "base16"
+      'base16'
     );
 
     // create access control conditions on lit nodes
@@ -1633,8 +1633,8 @@ export default class LitNodeClient {
         if (!sigToPassToNode) {
           throwError({
             message: `You passed sessionSigs but we could not find session sig for node ${url}`,
-            name: "InvalidArgumentException",
-            errorCode: "invalid_argument",
+            name: 'InvalidArgumentException',
+            errorCode: 'invalid_argument',
           });
         }
       }
@@ -1692,14 +1692,14 @@ export default class LitNodeClient {
       const shares = JSON.stringify(valid_shares);
       await wasmECDSA.initWasmEcdsaSdk(); // init WASM
       const signature = wasmECDSA.combine_signature(R_x, R_y, shares);
-      log("raw ecdsav sig", signature);
+      log('raw ecdsav sig', signature);
       return signature;
     } catch (e) {
-      log("Error - signed_ecdsa_messages ");
+      log('Error - signed_ecdsa_messages ');
       const signed_ecdsa_message = nodePromises[0];
       return signed_ecdsa_message;
     }
-    return throwError("some other error?");
+    return throwError('some other error?');
   }
 
   /**
@@ -1714,9 +1714,9 @@ export default class LitNodeClient {
     if (!this.ready) {
       throwError({
         message:
-          "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+          'LitNodeClient is not ready.  Please call await litNodeClient.connect() first.',
+        name: 'LitNodeClientNotReadyError',
+        errorCode: 'lit_node_client_not_ready',
       });
     }
 
@@ -1735,7 +1735,7 @@ export default class LitNodeClient {
         canonicalAccessControlConditionFormatter(c)
       );
       log(
-        "formattedAccessControlConditions",
+        'formattedAccessControlConditions',
         JSON.stringify(formattedAccessControlConditions)
       );
     }
@@ -1759,8 +1759,8 @@ export default class LitNodeClient {
     else {
       throwError({
         message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        name: 'InvalidArgumentException',
+        errorCode: 'invalid_argument',
       });
     }
 
@@ -1784,7 +1784,7 @@ export default class LitNodeClient {
     try {
       const share_data = await Promise.all(nodePromises);
 
-      if (share_data[0].result == "failure") return "Condition Failed";
+      if (share_data[0].result == 'failure') return 'Condition Failed';
 
       // R_x & R_y values can come from any node (they will be different per node), and will generate a valid signature
       const R_x = share_data[0].local_x;
@@ -1796,10 +1796,10 @@ export default class LitNodeClient {
       const shares = JSON.stringify(valid_shares);
       await wasmECDSA.initWasmEcdsaSdk(); // init WASM
       const signature = wasmECDSA.combine_signature(R_x, R_y, shares);
-      log("raw ecdsa sig", signature);
+      log('raw ecdsa sig', signature);
       return signature;
     } catch (e) {
-      log("Error - signed_ecdsa_messages - ", e);
+      log('Error - signed_ecdsa_messages - ', e);
       const signed_ecdsa_message = nodePromises[0];
       return signed_ecdsa_message;
     }
@@ -1813,7 +1813,7 @@ export default class LitNodeClient {
     chain,
     permanent,
   }) {
-    log("storeSigningConditionWithNode");
+    log('storeSigningConditionWithNode');
     const urlWithPath = `${url}/web/signing/store`;
     const data = {
       key,
@@ -1833,7 +1833,7 @@ export default class LitNodeClient {
     chain,
     permanent,
   }) {
-    log("storeEncryptionConditionWithNode");
+    log('storeEncryptionConditionWithNode');
     const urlWithPath = `${url}/web/encryption/store`;
     const data = {
       key,
@@ -1846,7 +1846,7 @@ export default class LitNodeClient {
   }
 
   async getChainDataSigningShare({ url, callRequests, chain, iat, exp }) {
-    log("getChainDataSigningShare");
+    log('getChainDataSigningShare');
     const urlWithPath = `${url}/web/signing/sign_chain_data`;
     const data = {
       callRequests,
@@ -1869,7 +1869,7 @@ export default class LitNodeClient {
     iat,
     exp,
   }) {
-    log("getSigningShare");
+    log('getSigningShare');
     const urlWithPath = `${url}/web/signing/retrieve`;
     const data = {
       accessControlConditions,
@@ -1895,7 +1895,7 @@ export default class LitNodeClient {
     authSig,
     chain,
   }) {
-    log("getDecryptionShare");
+    log('getDecryptionShare');
     const urlWithPath = `${url}/web/encryption/retrieve`;
     const data = {
       accessControlConditions,
@@ -1918,7 +1918,7 @@ export default class LitNodeClient {
     authMethods,
     requestId,
   }) {
-    log("getJsExecutionShares");
+    log('getJsExecutionShares');
     const urlWithPath = `${url}/web/execute`;
     const data = {
       code,
@@ -1932,7 +1932,7 @@ export default class LitNodeClient {
   }
 
   async getSignSessionKeyShares({ url, body }) {
-    log("getSignSessionKeyShares");
+    log('getSignSessionKeyShares');
     const urlWithPath = `${url}/web/sign_session_key`;
     return await this.sendCommandToNode({ url: urlWithPath, data: body });
   }
@@ -1941,24 +1941,28 @@ export default class LitNodeClient {
     const urlWithPath = `${url}/web/handshake`;
     log(`handshakeWithSgx ${urlWithPath}`);
     const data = {
-      clientPublicKey: "test",
+      clientPublicKey: 'test',
     };
     return await this.sendCommandToNode({ url: urlWithPath, data });
   }
 
   sendCommandToNode({ url, data }) {
     log(`sendCommandToNode with url ${url} and data`, data);
+    // generate a unique id for this request
+    const requestId = Math.random().toString(16).slice(2);
     return fetch(url, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "lit-js-sdk-version": version,
+        'Content-Type': 'application/json',
+        'lit-js-sdk-version': version, // do we still need this?
+        'X-SDK-Version': version,
+        'X-Request-Id': requestId,
       },
       body: JSON.stringify(data),
     }).then(async (response) => {
       const isJson = response.headers
-        .get("content-type")
-        ?.includes("application/json");
+        .get('content-type')
+        ?.includes('application/json');
       const data = isJson ? await response.json() : null;
 
       if (!response.ok) {
@@ -1973,8 +1977,8 @@ export default class LitNodeClient {
 
   async handleNodePromises(promises) {
     const responses = await Promise.allSettled(promises);
-    log("responses", responses);
-    const successes = responses.filter((r) => r.status === "fulfilled");
+    log('responses', responses);
+    const successes = responses.filter((r) => r.status === 'fulfilled');
     if (successes.length >= this.config.minNodeCount) {
       return {
         success: true,
@@ -1983,7 +1987,7 @@ export default class LitNodeClient {
     }
 
     // if we're here, then we did not succeed.  time to handle and report errors.
-    const rejected = responses.filter((r) => r.status === "rejected");
+    const rejected = responses.filter((r) => r.status === 'rejected');
     const mostCommonError = JSON.parse(
       mostCommonString(rejected.map((r) => JSON.stringify(r.reason)))
     );
@@ -1997,23 +2001,23 @@ export default class LitNodeClient {
   throwNodeError(res) {
     if (res.error && res.error.errorCode) {
       if (
-        res.error.errorCode === "not_authorized" &&
+        res.error.errorCode === 'not_authorized' &&
         this.config.alertWhenUnauthorized
       ) {
-        alert("You are not authorized to access to this content");
+        alert('You are not authorized to access to this content');
       }
-      throwError({ ...res.error, name: "NodeError" });
+      throwError({ ...res.error, name: 'NodeError' });
     } else {
       throwError({
         message: `There was an error getting the signing shares from the nodes`,
-        name: "UnknownError",
-        errorCode: "unknown_error",
+        name: 'UnknownError',
+        errorCode: 'unknown_error',
       });
     }
   }
 
   async signECDSA({ url, message, chain, iat, exp }) {
-    log("sign_message_ecdsa");
+    log('sign_message_ecdsa');
     const urlWithPath = `${url}/web/signing/sign_message_ecdsa`;
     const data = {
       message,
@@ -2034,7 +2038,7 @@ export default class LitNodeClient {
     iat,
     exp,
   }) {
-    log("sign_condition_ecdsa");
+    log('sign_condition_ecdsa');
     const urlWithPath = `${url}/web/signing/sign_condition_ecdsa`;
     const data = {
       access_control_conditions: accessControlConditions,
@@ -2078,15 +2082,15 @@ export default class LitNodeClient {
       try {
         storedSessionKey = localStorage.getItem(`lit-session-key`);
       } catch (e) {
-        log("Localstorage not available.  Not a problem.  Continuing...");
+        log('Localstorage not available.  Not a problem.  Continuing...');
       }
-      if (!storedSessionKey || storedSessionKey === "") {
+      if (!storedSessionKey || storedSessionKey === '') {
         // if not, generate one
         sessionKey = generateSessionKeyPair();
         try {
           localStorage.setItem(`lit-session-key`, JSON.stringify(sessionKey));
         } catch (e) {
-          log("Localstorage not available.  Not a problem.  Continuing...");
+          log('Localstorage not available.  Not a problem.  Continuing...');
         }
       } else {
         sessionKey = JSON.parse(storedSessionKey);
@@ -2132,9 +2136,9 @@ export default class LitNodeClient {
     try {
       walletSig = localStorage.getItem(`lit-wallet-sig`);
     } catch (e) {
-      log("Localstorage not available.  Not a problem.  Continuing...");
+      log('Localstorage not available.  Not a problem.  Continuing...');
     }
-    if (!walletSig || walletSig == "") {
+    if (!walletSig || walletSig == '') {
       if (authNeededCallback) {
         walletSig = await authNeededCallback({
           chain,
@@ -2195,7 +2199,7 @@ export default class LitNodeClient {
     }
 
     if (needToReSignSessionKey) {
-      log("need to re-sign session key.  Signing...");
+      log('need to re-sign session key.  Signing...');
       if (authNeededCallback) {
         walletSig = await authNeededCallback({
           chain,
@@ -2248,17 +2252,17 @@ export default class LitNodeClient {
       let signedMessage = JSON.stringify(toSign);
       const uint8arrayKey = uint8arrayFromString(
         sessionKey.secretKey,
-        "base16"
+        'base16'
       );
-      const uint8arrayMessage = uint8arrayFromString(signedMessage, "utf8");
+      const uint8arrayMessage = uint8arrayFromString(signedMessage, 'utf8');
       let signature = nacl.sign.detached(uint8arrayMessage, uint8arrayKey);
       // console.log("signature", signature);
       signatures[nodeAddress] = {
-        sig: uint8arrayToString(signature, "base16"),
-        derivedVia: "litSessionSignViaNacl",
+        sig: uint8arrayToString(signature, 'base16'),
+        derivedVia: 'litSessionSignViaNacl',
         signedMessage,
         address: sessionKey.publicKey,
-        algo: "ed25519",
+        algo: 'ed25519',
       };
     });
 
@@ -2308,9 +2312,9 @@ export default class LitNodeClient {
             )
           );
           this.ready = true;
-          log("lit is ready");
-          if (typeof document !== "undefined") {
-            document.dispatchEvent(new Event("lit-ready"));
+          log('lit is ready');
+          if (typeof document !== 'undefined') {
+            document.dispatchEvent(new Event('lit-ready'));
           }
 
           resolve();
@@ -2326,7 +2330,7 @@ function findPermissionsForResource(resource, capabilityObject) {
 
   // first check default permitted actions
   for (const defaultAction of capabilityObject.def) {
-    if (defaultAction === "*" || defaultAction === protocol) {
+    if (defaultAction === '*' || defaultAction === protocol) {
       return true;
     }
   }
@@ -2337,7 +2341,7 @@ function findPermissionsForResource(resource, capabilityObject) {
   }
 
   for (const permittedAction of capabilityObject.tar[resourceId]) {
-    if (permittedAction === "*" || permittedAction === protocol) {
+    if (permittedAction === '*' || permittedAction === protocol) {
       return true;
     }
   }
