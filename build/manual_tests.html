@@ -2562,6 +2562,49 @@ Expiration Time: 2022-12-02T02:14:51.688Z`; // prettier-ignore
         });
       };
 
+      var smartContractAuthSig = async (address) => {
+        const toSign = "Any string message works!";
+        const { web3, account } = await LitJsSdk.connectWeb3();
+        const sig = await LitJsSdk.signMessageAsync(
+          web3.getSigner(),
+          account,
+          toSign
+        );
+        const authSig = {
+          sig,
+          derivedVia: "EIP1271",
+          signedMessage: toSign,
+          address,
+        };
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "mumbai",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "0",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "smartContractAuthSig",
+          authSig,
+          chain: "mumbai"
+        });
+      };
+
+      var smartContractAuthSigValid = async () => {
+        await smartContractAuthSig("0x6FdF5aD7f256D9677eC1d6B7e633Ff1E7FA5Ac14") // Always return true
+      };
+
+      var smartContractAuthSigInvalid = async () => {
+        await smartContractAuthSig("0x056054954b075e9053B5646dc1E2234D51c0E79c") // Always return false
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -2818,6 +2861,18 @@ Expiration Time: 2022-12-02T02:14:51.688Z`; // prettier-ignore
     <br />
 
     <button onclick="MonaSig()">MonaSig</button>
+    <br />
+    <br />
+
+    <button onclick="smartContractAuthSigValid()">
+      Smart Contract AuthSig Valid
+    </button>
+    <br />
+    <br />
+
+    <button onclick="smartContractAuthSigInvalid()">
+      Smart Contract AuthSig Invalid
+    </button>
     <br />
     <br />
 
