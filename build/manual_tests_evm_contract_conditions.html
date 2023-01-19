@@ -549,6 +549,43 @@
         });
       };
 
+      var ByteArrayAsSIWEParam = async () => {
+        let bytes32Array =
+          "[0000000000000000000000000000000000000000000000000000000000000002,0000000000000000000000000000000000000000000000000000000000000003]";
+        // base64url encode the param
+        let encodedSiweResource = LitJsSdk.uint8arrayToString(
+          LitJsSdk.uint8arrayFromString(bytes32Array, "utf8"),
+          "base64url"
+        );
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain: "xdai",
+          resources: [`litParam:bytes32Array:${encodedSiweResource}`],
+        });
+        var evmContractConditions = [
+          {
+            contractAddress: "0xc7BA08FB2546cA2198F6C69e5c4B15252D90A347",
+            functionName: "sumBytes32",
+            functionParams: [":litParam:bytes32Array"],
+            functionAbi: {
+              name: "sumBytes32",
+              inputs: [
+                { internalType: "bytes32[]", name: "vals", type: "bytes32[]" },
+              ],
+              outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+              constant: true,
+              stateMutability: "view",
+            },
+            chain: "xdai",
+            returnValueTest: { key: "", comparator: "=", value: "5" },
+          },
+        ];
+        await testProvisoningEncryptingAndDecrypting({
+          evmContractConditions,
+          testName: "ByteArrayAsSIWEParam",
+          authSig,
+        });
+      };
+
       var RandomTestFromUser = async () => {
         var evmContractConditions = [
           {
@@ -630,6 +667,10 @@
     <br />
 
     <button onclick="SIWEResourceAsParam()">SIWEResourceAsParam</button>
+    <br />
+    <br />
+
+    <button onclick="ByteArrayAsSIWEParam()">ByteArrayAsSIWEParam</button>
     <br />
     <br />
 
