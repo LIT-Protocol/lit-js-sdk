@@ -12,10 +12,10 @@ function getProvider() {
     return keplr;
   } else {
     throwError({
-      message:
+      description:
         "No web3 wallet was found that works with Cosmos.  Install a Cosmos wallet or choose another chain",
-      name: "NoWalletException",
-      errorCode: "no_wallet",
+      error_kind: "NoWalletException",
+      error_code: "no_wallet",
     });
   }
 }

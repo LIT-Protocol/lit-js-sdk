@@ -140,27 +140,28 @@ export default class LitNodeClient {
   }) {
     if (!this.ready) {
       throwError({
-        message:
+        description:
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+        error_kind: "LitNodeClientNotReadyError",
+        error_code: "lit_node_client_not_ready",
+        status: 403,
       });
     }
 
     const chainId = LIT_CHAINS[chain].chainId;
     if (!chainId) {
       throwError({
-        message: "Invalid chain.  Please pass a valid chain.",
-        name: "InvalidChain",
-        errorCode: "invalid_input_chain",
+        description: "Invalid chain.  Please pass a valid chain.",
+        error_kind: "InvalidChain",
+        error_code: "invalid_input_chain",
       });
     }
 
     if (!publicKey) {
       throwError({
-        message: "Pubic Key not provided.  Please pass a valid Public Key.",
-        name: "MissingPublicKey",
-        errorCode: "missing_public_key",
+        description: "Pubic Key not provided.  Please pass a valid Public Key.",
+        error_kind: "MissingPublicKey",
+        error_code: "missing_public_key",
       });
     }
 
@@ -267,10 +268,11 @@ export default class LitNodeClient {
   }) {
     if (!this.ready) {
       throwError({
-        message:
+        description:
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+        error_kind: "LitNodeClientNotReadyError",
+        error_code: "lit_node_client_not_ready",
+        status: 403,
       });
     }
 
@@ -299,9 +301,9 @@ export default class LitNodeClient {
 
     if (!sessionSigs && !authSig) {
       throwError({
-        message: "You must pass either authSig or sessionSigs",
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        description: "You must pass either authSig or sessionSigs",
+        error_kind: "InvalidArgumentException",
+        error_code: "invalid_argument",
       });
       return;
     }
@@ -324,9 +326,9 @@ export default class LitNodeClient {
       reqBody.ipfsId = ipfsId;
     } else {
       throwError({
-        message: "You must pass either code or ipfsId",
-        name: "MissingParameterError",
-        errorCode: "missing_parameter",
+        description: "You must pass either code or ipfsId",
+        error_kind: "MissingParameterError",
+        error_code: "missing_parameter",
       });
     }
 
@@ -341,9 +343,10 @@ export default class LitNodeClient {
         sigToPassToNode = sessionSigs[url];
         if (!sigToPassToNode) {
           throwError({
-            message: `You passed sessionSigs but we could not find session sig for node ${url}`,
-            name: "InvalidArgumentException",
-            errorCode: "invalid_argument",
+            description: `You passed sessionSigs but we could not find session sig for node ${url}`,
+            error_kind: "InvalidArgumentException",
+            error_code: "invalid_argument",
+            status: 401,
           });
         }
       }
@@ -389,9 +392,9 @@ export default class LitNodeClient {
         signature = combineEcdsaShares(sigShares);
       } else {
         throwError({
-          message: "Unknown signature type",
-          name: "UnknownSignatureTypeError",
-          errorCode: "unknown_signature_type",
+          description: "Unknown signature type",
+          error_kind: "UnknownSignatureTypeError",
+          error_code: "unknown_signature_type",
         });
       }
 
@@ -435,9 +438,9 @@ export default class LitNodeClient {
         );
       } else {
         throwError({
-          message: "Unknown decryption algorithm type",
-          name: "UnknownDecryptionAlgorithmTypeError",
-          errorCode: "unknown_decryption_algorithm_type",
+          description: "Unknown decryption algorithm type",
+          error_kind: "UnknownDecryptionAlgorithmTypeError",
+          error_code: "unknown_decryption_algorithm_type",
         });
       }
 
@@ -501,10 +504,11 @@ export default class LitNodeClient {
   }) {
     if (!this.ready) {
       throwError({
-        message:
+        description:
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+        error_kind: "LitNodeClientNotReadyError",
+        error_code: "lit_node_client_not_ready",
+        status: 403,
       });
     }
 
@@ -589,9 +593,9 @@ export default class LitNodeClient {
         signature = combineEcdsaShares(sigShares);
       } else {
         throwError({
-          message: "Unknown signature type",
-          name: "UnknownSignatureTypeError",
-          errorCode: "unknown_signature_type",
+          description: "Unknown signature type",
+          error_kind: "UnknownSignatureTypeError",
+          error_code: "unknown_signature_type",
         });
       }
 
@@ -630,10 +634,11 @@ export default class LitNodeClient {
   async getSignedChainDataToken({ callRequests, chain }) {
     if (!this.ready) {
       throwError({
-        message:
+        description:
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+        error_kind: "LitNodeClientNotReadyError",
+        error_code: "lit_node_client_not_ready",
+        status: 403,
       });
     }
 
@@ -673,9 +678,10 @@ export default class LitNodeClient {
       }
 
       throwError({
-        message: `You are not authorized to recieve a signature on this item`,
-        name: "UnauthorizedException",
-        errorCode: "not_authorized",
+        description: `You are not authorized to recieve a signature on this item`,
+        error_kind: "UnauthorizedException",
+        error_code: "not_authorized",
+        status: 401,
       });
     }
 
@@ -747,10 +753,11 @@ export default class LitNodeClient {
   }) {
     if (!this.ready) {
       throwError({
-        message:
+        description:
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+        error_kind: "LitNodeClientNotReadyError",
+        error_code: "lit_node_client_not_ready",
+        status: 403,
       });
     }
 
@@ -830,9 +837,9 @@ export default class LitNodeClient {
 
     if (!sessionSigs && !authSig) {
       throwError({
-        message: "You must pass either authSig or sessionSigs",
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        description: "You must pass either authSig or sessionSigs",
+        error_kind: "InvalidArgumentException",
+        error_code: "invalid_argument",
       });
       return;
     }
@@ -889,9 +896,9 @@ export default class LitNodeClient {
       );
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        description: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
+        error_kind: "InvalidArgumentException",
+        error_code: "invalid_argument",
       });
     }
 
@@ -906,9 +913,9 @@ export default class LitNodeClient {
         sigToPassToNode = sessionSigs[url];
         if (!sigToPassToNode) {
           throwError({
-            message: `You passed sessionSigs but we could not find session sig for node ${url}`,
-            name: "InvalidArgumentException",
-            errorCode: "invalid_argument",
+            description: `You passed sessionSigs but we could not find session sig for node ${url}`,
+            error_kind: "InvalidArgumentException",
+            error_code: "invalid_argument",
           });
         }
       }
@@ -1010,10 +1017,11 @@ export default class LitNodeClient {
 
     if (!this.ready) {
       throwError({
-        message:
+        description:
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+        error_kind: "LitNodeClientNotReadyError",
+        error_code: "lit_node_client_not_ready",
+        status: 403,
       });
     }
 
@@ -1093,9 +1101,9 @@ export default class LitNodeClient {
 
     if (!sessionSigs && !authSig) {
       throwError({
-        message: "You must pass either authSig or sessionSigs",
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        description: "You must pass either authSig or sessionSigs",
+        error_kind: "InvalidArgumentException",
+        error_code: "invalid_argument",
       });
       return;
     }
@@ -1134,9 +1142,9 @@ export default class LitNodeClient {
       );
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        description: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
+        error_kind: "InvalidArgumentException",
+        error_code: "invalid_argument",
       });
     }
 
@@ -1197,10 +1205,11 @@ export default class LitNodeClient {
   }) {
     if (!this.ready) {
       throwError({
-        message:
+        description:
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+        error_kind: "LitNodeClientNotReadyError",
+        error_code: "lit_node_client_not_ready",
+        status: 403,
       });
     }
 
@@ -1277,9 +1286,9 @@ export default class LitNodeClient {
 
     if (!sessionSigs && !authSig) {
       throwError({
-        message: "You must pass either authSig or sessionSigs",
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        description: "You must pass either authSig or sessionSigs",
+        error_kind: "InvalidArgumentException",
+        error_code: "invalid_argument",
       });
       return;
     }
@@ -1329,9 +1338,9 @@ export default class LitNodeClient {
       );
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        description: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
+        error_kind: "InvalidArgumentException",
+        error_code: "invalid_argument",
       });
     }
 
@@ -1344,9 +1353,10 @@ export default class LitNodeClient {
         sigToPassToNode = sessionSigs[url];
         if (!sigToPassToNode) {
           throwError({
-            message: `You passed sessionSigs but we could not find session sig for node ${url}`,
-            name: "InvalidArgumentException",
-            errorCode: "invalid_argument",
+            description: `You passed sessionSigs but we could not find session sig for node ${url}`,
+            error_kind: "InvalidArgumentException",
+            error_code: "invalid_argument",
+            status: 401,
           });
         }
       }
@@ -1444,10 +1454,11 @@ export default class LitNodeClient {
 
     if (!this.ready) {
       throwError({
-        message:
+        description:
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+        error_kind: "LitNodeClientNotReadyError",
+        error_code: "lit_node_client_not_ready",
+        status: 403,
       });
     }
 
@@ -1516,9 +1527,9 @@ export default class LitNodeClient {
       return;
     if (!sessionSigs && !authSig) {
       throwError({
-        message: "You must pass either authSig or sessionSigs",
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        description: "You must pass either authSig or sessionSigs",
+        error_kind: "InvalidArgumentException",
+        error_code: "invalid_argument",
       });
       return;
     }
@@ -1612,9 +1623,9 @@ export default class LitNodeClient {
       );
     } else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        description: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
+        error_kind: "InvalidArgumentException",
+        error_code: "invalid_argument",
       });
     }
 
@@ -1632,9 +1643,10 @@ export default class LitNodeClient {
         sigToPassToNode = sessionSigs[url];
         if (!sigToPassToNode) {
           throwError({
-            message: `You passed sessionSigs but we could not find session sig for node ${url}`,
-            name: "InvalidArgumentException",
-            errorCode: "invalid_argument",
+            description: `You passed sessionSigs but we could not find session sig for node ${url}`,
+            error_kind: "InvalidArgumentException",
+            error_code: "invalid_argument",
+            status: 401,
           });
         }
       }
@@ -1713,10 +1725,11 @@ export default class LitNodeClient {
   async validate_and_sign_ecdsa({ accessControlConditions, chain, auth_sig }) {
     if (!this.ready) {
       throwError({
-        message:
+        description:
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
-        name: "LitNodeClientNotReadyError",
-        errorCode: "lit_node_client_not_ready",
+        error_kind: "LitNodeClientNotReadyError",
+        error_code: "lit_node_client_not_ready",
+        status: 403,
       });
     }
 
@@ -1758,9 +1771,9 @@ export default class LitNodeClient {
     // }
     else {
       throwError({
-        message: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
-        name: "InvalidArgumentException",
-        errorCode: "invalid_argument",
+        description: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
+        error_kind: "InvalidArgumentException",
+        error_code: "invalid_argument",
       });
     }
 
@@ -2005,9 +2018,10 @@ export default class LitNodeClient {
       throwError({ ...res.error, name: "NodeError" });
     } else {
       throwError({
-        message: `There was an error getting the signing shares from the nodes`,
-        name: "UnknownError",
+        description: `There was an error getting the signing shares from the nodes`,
+        error_kind: "UnknownError",
         error_code: "unknown_error",
+        status: 500,
       });
     }
   }

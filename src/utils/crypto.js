@@ -52,19 +52,19 @@ export function canonicalUnifiedAccessControlConditionFormatter(cond) {
       return canonicalCosmosConditionFormatter(cond);
     } else {
       throwError({
-        message: `You passed an invalid access control condition that is missing or has a wrong "conditionType": ${JSON.stringify(
+        description: `You passed an invalid access control condition that is missing or has a wrong "conditionType": ${JSON.stringify(
           cond
         )}`,
-        name: "InvalidAccessControlCondition",
-        errorCode: "invalid_access_control_condition",
+        error_kind: "InvalidAccessControlCondition",
+        error_code: "invalid_access_control_condition",
       });
     }
   }
 
   throwError({
-    message: `You passed an invalid access control condition: ${cond}`,
-    name: "InvalidAccessControlCondition",
-    errorCode: "invalid_access_control_condition",
+    description: `You passed an invalid access control condition: ${cond}`,
+    error_kind: "InvalidAccessControlCondition",
+    error_code: "invalid_access_control_condition",
   });
 }
 
@@ -116,9 +116,9 @@ export function canonicalCosmosConditionFormatter(cond) {
   }
 
   throwError({
-    message: `You passed an invalid access control condition: ${cond}`,
-    name: "InvalidAccessControlCondition",
-    errorCode: "invalid_access_control_condition",
+    description: `You passed an invalid access control condition: ${cond}`,
+    error_kind: "InvalidAccessControlCondition",
+    error_code: "invalid_access_control_condition",
   });
 }
 
@@ -190,9 +190,9 @@ pub struct SolPdaInterface {
         !("pdaKey" in cond)
       ) {
         throwError({
-          message: `Solana RPC Conditions have changed and there are some new fields you must include in your condition.  Check the docs here: https://developer.litprotocol.com/AccessControlConditions/solRpcConditions`,
-          name: "InvalidAccessControlCondition",
-          errorCode: "invalid_access_control_condition",
+          description: `Solana RPC Conditions have changed and there are some new fields you must include in your condition.  Check the docs here: https://developer.litprotocol.com/AccessControlConditions/solRpcConditions`,
+          error_kind: "InvalidAccessControlCondition",
+          error_code: "invalid_access_control_condition",
         });
       }
 
@@ -221,9 +221,9 @@ pub struct SolPdaInterface {
   }
 
   throwError({
-    message: `You passed an invalid access control condition: ${cond}`,
-    name: "InvalidAccessControlCondition",
-    errorCode: "invalid_access_control_condition",
+    description: `You passed an invalid access control condition: ${cond}`,
+    error_kind: "InvalidAccessControlCondition",
+    error_code: "invalid_access_control_condition",
   });
 }
 
@@ -330,9 +330,9 @@ export function canonicalEVMContractConditionFormatter(cond) {
   }
 
   throwError({
-    message: `You passed an invalid access control condition: ${cond}`,
-    name: "InvalidAccessControlCondition",
-    errorCode: "invalid_access_control_condition",
+    description: `You passed an invalid access control condition: ${cond}`,
+    error_kind: "InvalidAccessControlCondition",
+    error_code: "invalid_access_control_condition",
   });
 }
 
@@ -385,9 +385,9 @@ export function canonicalAccessControlConditionFormatter(cond) {
   }
 
   throwError({
-    message: `You passed an invalid access control condition: ${cond}`,
-    name: "InvalidAccessControlCondition",
-    errorCode: "invalid_access_control_condition",
+    description: `You passed an invalid access control condition: ${cond}`,
+    error_kind: "InvalidAccessControlCondition",
+    error_code: "invalid_access_control_condition",
   });
 }
 

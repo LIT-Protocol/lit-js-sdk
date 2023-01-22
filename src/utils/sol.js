@@ -15,10 +15,10 @@ function getProvider() {
     // }
   } else {
     throwError({
-      message:
+      description:
         "No web3 wallet was found that works with Solana.  Install a Solana wallet or choose another chain",
-      name: "NoWalletException",
-      errorCode: "no_wallet",
+      error_kind: "NoWalletException",
+      error_code: "no_wallet",
     });
   }
 }

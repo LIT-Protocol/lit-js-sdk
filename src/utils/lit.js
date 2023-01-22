@@ -55,11 +55,11 @@ export async function checkAndSignAuthMessage({
   const chainInfo = ALL_LIT_CHAINS[chain];
   if (!chainInfo) {
     throwError({
-      message: `Unsupported chain selected.  Please select one of: ${Object.keys(
+      description: `Unsupported chain selected.  Please select one of: ${Object.keys(
         ALL_LIT_CHAINS
       )}`,
-      name: "UnsupportedChainException",
-      errorCode: "unsupported_chain",
+      error_kind: "UnsupportedChainException",
+      error_code: "unsupported_chain",
     });
   }
 
@@ -82,11 +82,11 @@ export async function checkAndSignAuthMessage({
     return checkAndSignCosmosAuthMessage({ chain, resources, expiration, uri });
   } else {
     throwError({
-      message: `vmType not found for this chain: ${chain}.  This should not happen.  Unsupported chain selected.  Please select one of: ${Object.keys(
+      description: `vmType not found for this chain: ${chain}.  This should not happen.  Unsupported chain selected.  Please select one of: ${Object.keys(
         ALL_LIT_CHAINS
       )}`,
-      name: "UnsupportedChainException",
-      errorCode: "unsupported_chain",
+      error_kind: "UnsupportedChainException",
+      error_code: "unsupported_chain",
     });
   }
 }
@@ -1112,9 +1112,9 @@ async function humanizeUnifiedAccessControlConditions({
         });
       } else {
         throwError({
-          message: `Unrecognized condition type: ${acc.conditionType}`,
-          name: "InvalidUnifiedConditionType",
-          errorCode: "invalid_unified_condition_type",
+          description: `Unrecognized condition type: ${acc.conditionType}`,
+          error_kind: "InvalidUnifiedConditionType",
+          error_code: "invalid_unified_condition_type",
         });
       }
     })
@@ -1554,10 +1554,10 @@ export const configure = (config) => {
     if (!(_config.litNetwork in LIT_NETWORKS)) {
       // network not found, report error
       throwError({
-        message:
+        description:
           "the litNetwork specified in the LitNodeClient config not found in LIT_NETWORKS",
-        name: "LitNodeClientConfigBad",
-        errorCode: "lit_node_client_config_bad",
+        error_kind: "LitNodeClientConfigBad",
+        error_code: "lit_node_client_config_bad",
       });
     }
     _config.bootstrapUrls = LIT_NETWORKS[_config.litNetwork];

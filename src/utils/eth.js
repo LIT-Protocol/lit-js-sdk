@@ -188,9 +188,9 @@ export async function checkAndSignEVMAuthMessage({
     // couldn't get chainId.  throw the incorrect network error
     log("getNetwork threw an exception", e);
     throwError({
-      message: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
-      name: "WrongNetworkException",
-      errorCode: "wrong_network",
+      description: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
+      error_kind: "WrongNetworkException",
+      error_code: "wrong_network",
     });
   }
   let selectedChainId = "0x" + selectedChain.chainId.toString("16");
@@ -203,9 +203,9 @@ export async function checkAndSignEVMAuthMessage({
     if (web3.provider instanceof WalletConnectProvider) {
       // this chain switching won't work.  alert the user that they need to switch chains manually
       throwError({
-        message: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
-        name: "WrongNetworkException",
-        errorCode: "wrong_network",
+        description: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
+        error_kind: "WrongNetworkException",
+        error_code: "wrong_network",
       });
       return;
     }
@@ -242,9 +242,9 @@ export async function checkAndSignEVMAuthMessage({
           if (addError.code === -32601) {
             // metamask code indicating "no such method"
             throwError({
-              message: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
-              name: "WrongNetworkException",
-              errorCode: "wrong_network",
+              description: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
+              error_kind: "WrongNetworkException",
+              error_code: "wrong_network",
             });
           } else {
             throw addError;
@@ -254,9 +254,9 @@ export async function checkAndSignEVMAuthMessage({
         if (switchError.code === -32601) {
           // metamask code indicating "no such method"
           throwError({
-            message: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
-            name: "WrongNetworkException",
-            errorCode: "wrong_network",
+            description: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
+            error_kind: "WrongNetworkException",
+            error_code: "wrong_network",
           });
         } else {
           throw switchError;
@@ -586,9 +586,9 @@ export async function mintLIT({ chain, quantity }) {
     if (!tokenAddress) {
       log("No token address for this chain.  It's not supported via MintLIT.");
       throwError({
-        message: `This chain is not supported for minting with the Lit token contract because it hasn't been deployed to this chain.  You can use Lit with your own token contract on this chain, though.`,
-        name: "MintingNotSupported",
-        errorCode: "minting_not_supported",
+        description: `This chain is not supported for minting with the Lit token contract because it hasn't been deployed to this chain.  You can use Lit with your own token contract on this chain, though.`,
+        error_kind: "MintingNotSupported",
+        error_code: "minting_not_supported",
       });
       return;
     }

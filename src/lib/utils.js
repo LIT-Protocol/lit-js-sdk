@@ -15,15 +15,13 @@ export const mostCommonString = (arr) => {
     .pop();
 };
 
-export const throwError = ({ error_kind, error_code, status, description, details, message, name, }) => {
+export const throwError = ({ error_kind, error_code, status, description, details }) => {
   throw new (function () {
-    this.message = message || ""; // !TODO: Remove
-    this.name = name || ""; // !TODO: Remove
     this.error_kind = error_kind;
     this.error_code = error_code;
-    this.status = status;
+    this.status = status || 400;
     this.description = description;
-    this.details = details;
+    this.details = details || [];
   })();
 };
 
@@ -92,9 +90,9 @@ export const checkType = ({
 
     if (throwOnError) {
       throwError({
-        message,
-        name: "invalidParamType",
-        errorCode: "invalid_param_type",
+        description: message,
+        error_kind: "invalidParamType",
+        error_code: "invalid_param_type",
       });
     }
     return false;
