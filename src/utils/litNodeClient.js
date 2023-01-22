@@ -1995,9 +1995,9 @@ export default class LitNodeClient {
   }
 
   throwNodeError(res) {
-    if (res.error && res.error.errorCode) {
+    if (res.error && res.error.error_code) {
       if (
-        res.error.errorCode === "not_authorized" &&
+        res.error.error_code === "not_authorized" &&
         this.config.alertWhenUnauthorized
       ) {
         alert("You are not authorized to access to this content");
@@ -2007,7 +2007,7 @@ export default class LitNodeClient {
       throwError({
         message: `There was an error getting the signing shares from the nodes`,
         name: "UnknownError",
-        errorCode: "unknown_error",
+        error_code: "unknown_error",
       });
     }
   }

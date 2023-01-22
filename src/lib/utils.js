@@ -15,11 +15,15 @@ export const mostCommonString = (arr) => {
     .pop();
 };
 
-export const throwError = ({ message, name, errorCode }) => {
+export const throwError = ({ error_kind, error_code, status, description, details, message, name, }) => {
   throw new (function () {
-    this.message = message;
-    this.name = name;
-    this.errorCode = errorCode;
+    this.message = message || ""; // !TODO: Remove
+    this.name = name || ""; // !TODO: Remove
+    this.error_kind = error_kind;
+    this.error_code = error_code;
+    this.status = status;
+    this.description = description;
+    this.details = details;
   })();
 };
 
