@@ -549,7 +549,7 @@ export async function decryptZipFileWithMetadata({
       authSig,
     });
   } catch (e) {
-    if (e.errorCode === "not_authorized") {
+    if (e.error_code === "NodeNotAuthorized") {
       // try more additionalAccessControlConditions
       if (!additionalAccessControlConditions) {
         throw e;
@@ -575,8 +575,8 @@ export async function decryptZipFileWithMetadata({
 
           break; // it worked, we can leave the loop and stop checking additional access control conditions
         } catch (e) {
-          // swallow not_authorized because we are gonna try some more accessControlConditions
-          if (e.errorCode !== "not_authorized") {
+          // swallow NodeNotAuthorized because we are gonna try some more accessControlConditions
+          if (e.error_code !== "NodeNotAuthorized") {
             throw e;
           }
         }
@@ -1113,8 +1113,8 @@ async function humanizeUnifiedAccessControlConditions({
       } else {
         throwError({
           description: `Unrecognized condition type: ${acc.conditionType}`,
-          error_kind: "InvalidUnifiedConditionType",
-          error_code: "invalid_unified_condition_type",
+          error_kind: "Validation",
+          error_code: "NodeInvalidUnifiedConditionType",
         });
       }
     })

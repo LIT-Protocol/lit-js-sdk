@@ -189,8 +189,8 @@ export async function checkAndSignEVMAuthMessage({
     log("getNetwork threw an exception", e);
     throwError({
       description: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
-      error_kind: "WrongNetworkException",
-      error_code: "wrong_network",
+      error_kind: "Validation",
+      error_code: "NodeWrongNetwork",
     });
   }
   let selectedChainId = "0x" + selectedChain.chainId.toString("16");
@@ -204,8 +204,8 @@ export async function checkAndSignEVMAuthMessage({
       // this chain switching won't work.  alert the user that they need to switch chains manually
       throwError({
         description: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
-        error_kind: "WrongNetworkException",
-        error_code: "wrong_network",
+        error_kind: "Validation",
+        error_code: "NodeWrongNetwork",
       });
       return;
     }
@@ -243,8 +243,8 @@ export async function checkAndSignEVMAuthMessage({
             // metamask code indicating "no such method"
             throwError({
               description: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
-              error_kind: "WrongNetworkException",
-              error_code: "wrong_network",
+              error_kind: "Validation",
+              error_code: "NodeWrongNetwork",
             });
           } else {
             throw addError;
@@ -255,8 +255,8 @@ export async function checkAndSignEVMAuthMessage({
           // metamask code indicating "no such method"
           throwError({
             description: `Incorrect network selected.  Please switch to the ${chain} network in your wallet and try again.`,
-            error_kind: "WrongNetworkException",
-            error_code: "wrong_network",
+            error_kind: "Validation",
+            error_code: "NodeWrongNetwork",
           });
         } else {
           throw switchError;

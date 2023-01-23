@@ -391,7 +391,7 @@
           console.log("updated the condition");
         } catch (e) {
           console.log("error updating the condition - this is expected", e);
-          if (e.errorCode === "storage_error") {
+          if (e.error_code === "NodeStorageError") {
             document.getElementById(
               "status"
             ).innerText = `${testName}: Success.  We were unable to update.`;
@@ -661,7 +661,7 @@
           console.log("updated the condition");
         } catch (e) {
           console.log("error getting symmetric key - this is expected", e);
-          if (e.errorCode === "storage_error") {
+          if (e.error_code === "NodeStorageError") {
             document.getElementById(
               "status"
             ).innerText = `${testName}: Success.  We were unable to update.`;
