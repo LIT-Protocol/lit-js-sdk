@@ -17,8 +17,8 @@ function getProvider() {
     throwError({
       description:
         "No web3 wallet was found that works with Solana.  Install a Solana wallet or choose another chain",
-      error_kind: "NoWalletException",
-      error_code: "no_wallet",
+      error_kind: "Generic",
+      error_code: "NodeNoWallet",
     });
   }
 }

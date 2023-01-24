@@ -152,16 +152,16 @@ export default class LitNodeClient {
     if (!chainId) {
       throwError({
         description: "Invalid chain.  Please pass a valid chain.",
-        error_kind: "InvalidChain",
-        error_code: "invalid_input_chain",
+        error_kind: "Generic",
+        error_code: "NodeChainNotSupported",
       });
     }
 
     if (!publicKey) {
       throwError({
         description: "Pubic Key not provided.  Please pass a valid Public Key.",
-        error_kind: "MissingPublicKey",
-        error_code: "missing_public_key",
+        error_kind: "Generic",
+        error_code: "NodeMissingPublicKey",
       });
     }
 
@@ -327,8 +327,8 @@ export default class LitNodeClient {
     } else {
       throwError({
         description: "You must pass either code or ipfsId",
-        error_kind: "MissingParameterError",
-        error_code: "missing_parameter",
+        error_kind: "Generic",
+        error_code: "NodeMissingParameter",
       });
     }
 
@@ -393,8 +393,8 @@ export default class LitNodeClient {
       } else {
         throwError({
           description: "Unknown signature type",
-          error_kind: "UnknownSignatureTypeError",
-          error_code: "unknown_signature_type",
+          error_kind: "Generic",
+          error_code: "UnknownSignatureType",
         });
       }
 
@@ -439,8 +439,8 @@ export default class LitNodeClient {
       } else {
         throwError({
           description: "Unknown decryption algorithm type",
-          error_kind: "UnknownDecryptionAlgorithmTypeError",
-          error_code: "unknown_decryption_algorithm_type",
+          error_kind: "Generic",
+          error_code: "UnknownDecryptionAlgorithmTypeError",
         });
       }
 
@@ -594,8 +594,8 @@ export default class LitNodeClient {
       } else {
         throwError({
           description: "Unknown signature type",
-          error_kind: "UnknownSignatureTypeError",
-          error_code: "unknown_signature_type",
+          error_kind: "Generic",
+          error_code: "UnknownSignatureType",
         });
       }
 
@@ -2015,7 +2015,7 @@ export default class LitNodeClient {
       ) {
         alert("You are not authorized to access to this content");
       }
-      throwError({ ...res.error, name: "NodeError" });
+      throwError({ ...res.error });
     } else {
       throwError({
         description: `There was an error getting the signing shares from the nodes`,

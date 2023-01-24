@@ -58,8 +58,8 @@ export async function checkAndSignAuthMessage({
       description: `Unsupported chain selected.  Please select one of: ${Object.keys(
         ALL_LIT_CHAINS
       )}`,
-      error_kind: "UnsupportedChainException",
-      error_code: "unsupported_chain",
+      error_kind: "Generic",
+      error_code: "NodeChainNotSupported",
     });
   }
 
@@ -85,8 +85,8 @@ export async function checkAndSignAuthMessage({
       description: `vmType not found for this chain: ${chain}.  This should not happen.  Unsupported chain selected.  Please select one of: ${Object.keys(
         ALL_LIT_CHAINS
       )}`,
-      error_kind: "UnsupportedChainException",
-      error_code: "unsupported_chain",
+      error_kind: "Generic",
+      error_code: "NodeChainNotSupported",
     });
   }
 }
@@ -826,7 +826,7 @@ export async function toggleLock() {
     }
 
     const authSig = await checkAndSignAuthMessage({ chain: window.chain });
-    if (authSig.errorCode && authSig.errorCode === "wrong_chain") {
+    if (authSig.error_code && authSig.error_code === "NodeChainNotSupported") {
       alert(
         "You are connected to the wrong blockchain.  Please switch your metamask to " +
           window.chain
@@ -1556,8 +1556,8 @@ export const configure = (config) => {
       throwError({
         description:
           "the litNetwork specified in the LitNodeClient config not found in LIT_NETWORKS",
-        error_kind: "LitNodeClientConfigBad",
-        error_code: "lit_node_client_config_bad",
+        error_kind: "Config",
+        error_code: "NodeLitNodeClientConfigBad",
       });
     }
     _config.bootstrapUrls = LIT_NETWORKS[_config.litNetwork];

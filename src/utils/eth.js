@@ -578,7 +578,7 @@ export async function mintLIT({ chain, quantity }) {
       chain,
       switchChain: true,
     });
-    if (authSig.errorCode) {
+    if (authSig.error_code) {
       return authSig;
     }
     const { web3, account } = await connectWeb3();
@@ -587,8 +587,8 @@ export async function mintLIT({ chain, quantity }) {
       log("No token address for this chain.  It's not supported via MintLIT.");
       throwError({
         description: `This chain is not supported for minting with the Lit token contract because it hasn't been deployed to this chain.  You can use Lit with your own token contract on this chain, though.`,
-        error_kind: "MintingNotSupported",
-        error_code: "minting_not_supported",
+        error_kind: "Generic",
+        error_code: "NodeMintingNotSupported",
       });
       return;
     }
@@ -611,11 +611,11 @@ export async function mintLIT({ chain, quantity }) {
     if (error.code === 4001) {
       // EIP-1193 userRejectedRequest error
       log("User rejected request");
-      return { errorCode: "user_rejected_request" };
+      return { error_code: "NodeUserRejectedRequest" };
     } else {
       console.error(error);
     }
-    return { errorCode: "unknown_error" };
+    return { error_code: "NodeUnknownError" };
   }
 }
 
@@ -657,11 +657,11 @@ export async function findLITs() {
     if (error.code === 4001) {
       // EIP-1193 userRejectedRequest error
       log("User rejected request");
-      return { errorCode: "user_rejected_request" };
+      return { error_code: "NodeUserRejectedRequest" };
     } else {
       console.error(error);
     }
-    return { errorCode: "unknown_error" };
+    return { error_code: "NodeUnknownError" };
   }
 }
 
@@ -694,11 +694,11 @@ export async function sendLIT({ tokenMetadata, to }) {
     if (error.code === 4001) {
       // EIP-1193 userRejectedRequest error
       log("User rejected request");
-      return { errorCode: "user_rejected_request" };
+      return { error_code: "NodeUserRejectedRequest" };
     } else {
       console.error(error);
     }
-    return { errorCode: "unknown_error" };
+    return { error_code: "NodeUnknownError" };
   }
 }
 

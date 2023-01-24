@@ -14,8 +14,8 @@ function getProvider() {
     throwError({
       description:
         "No web3 wallet was found that works with Cosmos.  Install a Cosmos wallet or choose another chain",
-      error_kind: "NoWalletException",
-      error_code: "no_wallet",
+      error_kind: "Validation",
+      error_code: "NodeNoWallet",
     });
   }
 }

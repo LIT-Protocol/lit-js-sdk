@@ -91,8 +91,8 @@ export const checkType = ({
     if (throwOnError) {
       throwError({
         description: message,
-        error_kind: "invalidParamType",
-        error_code: "invalid_param_type",
+        error_kind: "Generic",
+        error_code: "InvalidParamType",
       });
     }
     return false;

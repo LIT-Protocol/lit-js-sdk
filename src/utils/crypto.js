@@ -55,16 +55,16 @@ export function canonicalUnifiedAccessControlConditionFormatter(cond) {
         description: `You passed an invalid access control condition that is missing or has a wrong "conditionType": ${JSON.stringify(
           cond
         )}`,
-        error_kind: "InvalidAccessControlCondition",
-        error_code: "invalid_access_control_condition",
+        error_kind: "Validation",
+        error_code: "NodeIncorrectAccessControlConditions",
       });
     }
   }
 
   throwError({
     description: `You passed an invalid access control condition: ${cond}`,
-    error_kind: "InvalidAccessControlCondition",
-    error_code: "invalid_access_control_condition",
+    error_kind: "Validation",
+    error_code: "NodeIncorrectAccessControlConditions",
   });
 }
 
@@ -117,8 +117,8 @@ export function canonicalCosmosConditionFormatter(cond) {
 
   throwError({
     description: `You passed an invalid access control condition: ${cond}`,
-    error_kind: "InvalidAccessControlCondition",
-    error_code: "invalid_access_control_condition",
+    error_kind: "Validation",
+    error_code: "NodeIncorrectAccessControlConditions",
   });
 }
 
@@ -191,8 +191,8 @@ pub struct SolPdaInterface {
       ) {
         throwError({
           description: `Solana RPC Conditions have changed and there are some new fields you must include in your condition.  Check the docs here: https://developer.litprotocol.com/AccessControlConditions/solRpcConditions`,
-          error_kind: "InvalidAccessControlCondition",
-          error_code: "invalid_access_control_condition",
+          error_kind: "Validation",
+          error_code: "NodeIncorrectAccessControlConditions",
         });
       }
 
@@ -222,8 +222,8 @@ pub struct SolPdaInterface {
 
   throwError({
     description: `You passed an invalid access control condition: ${cond}`,
-    error_kind: "InvalidAccessControlCondition",
-    error_code: "invalid_access_control_condition",
+    error_kind: "Validation",
+    error_code: "NodeIncorrectAccessControlConditions",
   });
 }
 
@@ -331,8 +331,8 @@ export function canonicalEVMContractConditionFormatter(cond) {
 
   throwError({
     description: `You passed an invalid access control condition: ${cond}`,
-    error_kind: "InvalidAccessControlCondition",
-    error_code: "invalid_access_control_condition",
+    error_kind: "Validation",
+    error_code: "NodeIncorrectAccessControlConditions",
   });
 }
 
@@ -386,8 +386,8 @@ export function canonicalAccessControlConditionFormatter(cond) {
 
   throwError({
     description: `You passed an invalid access control condition: ${cond}`,
-    error_kind: "InvalidAccessControlCondition",
-    error_code: "invalid_access_control_condition",
+    error_kind: "Validation",
+    error_code: "NodeIncorrectAccessControlConditions",
   });
 }
 
