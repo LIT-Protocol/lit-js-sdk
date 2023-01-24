@@ -144,7 +144,7 @@ export default class LitNodeClient {
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
         error_kind: "Config",
         error_code: "NodeLitNodeClientNotReady",
-        status: 403,
+        status: 401,
       });
     }
 
@@ -272,7 +272,7 @@ export default class LitNodeClient {
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
         error_kind: "Config",
         error_code: "NodeLitNodeClientNotReady",
-        status: 403,
+        status: 401,
       });
     }
 
@@ -302,7 +302,7 @@ export default class LitNodeClient {
     if (!sessionSigs && !authSig) {
       throwError({
         description: "You must pass either authSig or sessionSigs",
-        error_kind: "InvalidArgumentException",
+        error_kind: "Generic",
         error_code: "NodeInvalidArgument",
       });
       return;
@@ -328,7 +328,7 @@ export default class LitNodeClient {
       throwError({
         description: "You must pass either code or ipfsId",
         error_kind: "Generic",
-        error_code: "NodeMissingParameter",
+        error_code: "NodeInvalidArgument",
       });
     }
 
@@ -344,7 +344,7 @@ export default class LitNodeClient {
         if (!sigToPassToNode) {
           throwError({
             description: `You passed sessionSigs but we could not find session sig for node ${url}`,
-            error_kind: "InvalidArgumentException",
+            error_kind: "Generic",
             error_code: "NodeInvalidArgument",
             status: 401,
           });
@@ -508,7 +508,7 @@ export default class LitNodeClient {
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
         error_kind: "Config",
         error_code: "NodeLitNodeClientNotReady",
-        status: 403,
+        status: 401,
       });
     }
 
@@ -638,7 +638,7 @@ export default class LitNodeClient {
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
         error_kind: "Config",
         error_code: "NodeLitNodeClientNotReady",
-        status: 403,
+        status: 401,
       });
     }
 
@@ -757,7 +757,7 @@ export default class LitNodeClient {
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
         error_kind: "Config",
         error_code: "NodeLitNodeClientNotReady",
-        status: 403,
+        status: 401,
       });
     }
 
@@ -838,7 +838,7 @@ export default class LitNodeClient {
     if (!sessionSigs && !authSig) {
       throwError({
         description: "You must pass either authSig or sessionSigs",
-        error_kind: "InvalidArgumentException",
+        error_kind: "Generic",
         error_code: "NodeInvalidArgument",
       });
       return;
@@ -897,7 +897,7 @@ export default class LitNodeClient {
     } else {
       throwError({
         description: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
-        error_kind: "InvalidArgumentException",
+        error_kind: "Generic",
         error_code: "NodeInvalidArgument",
       });
     }
@@ -914,7 +914,7 @@ export default class LitNodeClient {
         if (!sigToPassToNode) {
           throwError({
             description: `You passed sessionSigs but we could not find session sig for node ${url}`,
-            error_kind: "InvalidArgumentException",
+            error_kind: "Generic",
             error_code: "NodeInvalidArgument",
           });
         }
@@ -1021,7 +1021,7 @@ export default class LitNodeClient {
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
         error_kind: "Config",
         error_code: "NodeLitNodeClientNotReady",
-        status: 403,
+        status: 401,
       });
     }
 
@@ -1102,7 +1102,7 @@ export default class LitNodeClient {
     if (!sessionSigs && !authSig) {
       throwError({
         description: "You must pass either authSig or sessionSigs",
-        error_kind: "InvalidArgumentException",
+        error_kind: "Generic",
         error_code: "NodeInvalidArgument",
       });
       return;
@@ -1143,7 +1143,7 @@ export default class LitNodeClient {
     } else {
       throwError({
         description: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
-        error_kind: "InvalidArgumentException",
+        error_kind: "Generic",
         error_code: "NodeInvalidArgument",
       });
     }
@@ -1209,7 +1209,7 @@ export default class LitNodeClient {
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
         error_kind: "Config",
         error_code: "NodeLitNodeClientNotReady",
-        status: 403,
+        status: 401,
       });
     }
 
@@ -1287,7 +1287,7 @@ export default class LitNodeClient {
     if (!sessionSigs && !authSig) {
       throwError({
         description: "You must pass either authSig or sessionSigs",
-        error_kind: "InvalidArgumentException",
+        error_kind: "Generic",
         error_code: "NodeInvalidArgument",
       });
       return;
@@ -1339,7 +1339,7 @@ export default class LitNodeClient {
     } else {
       throwError({
         description: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
-        error_kind: "InvalidArgumentException",
+        error_kind: "Generic",
         error_code: "NodeInvalidArgument",
       });
     }
@@ -1354,9 +1354,8 @@ export default class LitNodeClient {
         if (!sigToPassToNode) {
           throwError({
             description: `You passed sessionSigs but we could not find session sig for node ${url}`,
-            error_kind: "InvalidArgumentException",
+            error_kind: "Generic",
             error_code: "NodeInvalidArgument",
-            status: 401,
           });
         }
       }
@@ -1458,7 +1457,7 @@ export default class LitNodeClient {
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
         error_kind: "Config",
         error_code: "NodeLitNodeClientNotReady",
-        status: 403,
+        status: 401,
       });
     }
 
@@ -1528,7 +1527,7 @@ export default class LitNodeClient {
     if (!sessionSigs && !authSig) {
       throwError({
         description: "You must pass either authSig or sessionSigs",
-        error_kind: "InvalidArgumentException",
+        error_kind: "Generic",
         error_code: "NodeInvalidArgument",
       });
       return;
@@ -1624,7 +1623,7 @@ export default class LitNodeClient {
     } else {
       throwError({
         description: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions or unifiedAccessControlConditions`,
-        error_kind: "InvalidArgumentException",
+        error_kind: "Generic",
         error_code: "NodeInvalidArgument",
       });
     }
@@ -1644,9 +1643,8 @@ export default class LitNodeClient {
         if (!sigToPassToNode) {
           throwError({
             description: `You passed sessionSigs but we could not find session sig for node ${url}`,
-            error_kind: "InvalidArgumentException",
+            error_kind: "Generic",
             error_code: "NodeInvalidArgument",
-            status: 401,
           });
         }
       }
@@ -1729,7 +1727,7 @@ export default class LitNodeClient {
           "LitNodeClient is not ready.  Please call await litNodeClient.connect() first.",
         error_kind: "Config",
         error_code: "NodeLitNodeClientNotReady",
-        status: 403,
+        status: 401,
       });
     }
 
@@ -1772,7 +1770,7 @@ export default class LitNodeClient {
     else {
       throwError({
         description: `You must provide either accessControlConditions or evmContractConditions or solRpcConditions`,
-        error_kind: "InvalidArgumentException",
+        error_kind: "Generic",
         error_code: "NodeInvalidArgument",
       });
     }
@@ -2021,7 +2019,6 @@ export default class LitNodeClient {
         description: `There was an error getting the signing shares from the nodes`,
         error_kind: "UnknownError",
         error_code: "NodeUnknownError",
-        status: 400,
       });
     }
   }
