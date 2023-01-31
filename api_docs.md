@@ -839,9 +839,9 @@ Type: [Object][146]
 ### Properties
 
 *   `sig` **[string][149]** The actual hex-encoded signature
-*   `derivedVia` **[string][149]** The method used to derive the signature. Typically "web3.eth.personal.sign" or "EIP1271" for smart contract authsig
+*   `derivedVia` **[string][149]** The method used to derive the signature. Typically "web3.eth.personal.sign"
 *   `signedMessage` **[string][149]** The message that was signed
-*   `address` **[string][149]** The crypto wallet address that signed the message or the smart contract address in case of smart contract authsig
+*   `address` **[string][149]** The crypto wallet address that signed the message
 
 ## Chain Info
 
