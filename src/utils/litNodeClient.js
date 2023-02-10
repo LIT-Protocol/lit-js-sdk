@@ -1947,9 +1947,16 @@ export default class LitNodeClient {
   }
 
   sendCommandToNode({ url, data }) {
-    log(`sendCommandToNode with url ${url} and data`, data);
-    // generate a unique id for this request
     const requestId = Math.random().toString(16).slice(2);
+    return this.sendCommandToNodeWithHeader({ url, data, requestId });
+  }
+
+  sendCommandToNodeWithHeader({ url, data, requestId }) {
+    log(
+      `sendCommandToNode with url ${url}, requestId ${requestId}  and data`,
+      data
+    );
+    // generate a unique id for this request
     return fetch(url, {
       method: 'POST',
       headers: {
