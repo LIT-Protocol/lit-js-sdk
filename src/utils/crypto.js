@@ -1,14 +1,14 @@
-import nacl from "tweetnacl";
-import naclUtil from "tweetnacl-util";
-import { throwError, log } from "../lib/utils";
-import * as wasmECDSA from "../lib/ecdsa-sdk";
-import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
-import Uint8arrays from "../lib/uint8arrays";
+import nacl from 'tweetnacl';
+import naclUtil from 'tweetnacl-util';
+import { throwError, log } from '../lib/utils';
+import * as wasmECDSA from '../lib/ecdsa-sdk';
+import { wasmBlsSdkHelpers } from '../lib/bls-sdk';
+import Uint8arrays from '../lib/uint8arrays';
 const uint8arrayFromString = Uint8arrays.fromString;
 const uint8arrayToString = Uint8arrays.toString;
 
 const SYMM_KEY_ALGO_PARAMS = {
-  name: "AES-CBC",
+  name: 'AES-CBC',
   length: 256,
 };
 
@@ -24,10 +24,10 @@ export async function hashUnifiedAccessControlConditions(
     canonicalUnifiedAccessControlConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
-  log("Hashing unified access control conditions: ", toHash);
+  log('Hashing unified access control conditions: ', toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
-  return crypto.subtle.digest("SHA-256", data);
+  return crypto.subtle.digest('SHA-256', data);
 }
 
 export function canonicalUnifiedAccessControlConditionFormatter(cond) {
@@ -35,36 +35,36 @@ export function canonicalUnifiedAccessControlConditionFormatter(cond) {
     return cond.map((c) => canonicalUnifiedAccessControlConditionFormatter(c));
   }
 
-  if ("operator" in cond) {
+  if ('operator' in cond) {
     return {
       operator: cond.operator,
     };
   }
 
-  if ("returnValueTest" in cond) {
-    if (cond.conditionType === "solRpc") {
+  if ('returnValueTest' in cond) {
+    if (cond.conditionType === 'solRpc') {
       return canonicalSolRpcConditionFormatter(cond, true);
-    } else if (cond.conditionType === "evmBasic") {
+    } else if (cond.conditionType === 'evmBasic') {
       return canonicalAccessControlConditionFormatter(cond);
-    } else if (cond.conditionType === "evmContract") {
+    } else if (cond.conditionType === 'evmContract') {
       return canonicalEVMContractConditionFormatter(cond);
-    } else if (cond.conditionType === "cosmos") {
+    } else if (cond.conditionType === 'cosmos') {
       return canonicalCosmosConditionFormatter(cond);
     } else {
       throwError({
         message: `You passed an invalid access control condition that is missing or has a wrong "conditionType": ${JSON.stringify(
           cond
         )}`,
-        name: "InvalidAccessControlCondition",
-        errorCode: "invalid_access_control_condition",
+        name: 'InvalidAccessControlCondition',
+        errorCode: 'invalid_access_control_condition',
       });
     }
   }
 
   throwError({
     message: `You passed an invalid access control condition: ${cond}`,
-    name: "InvalidAccessControlCondition",
-    errorCode: "invalid_access_control_condition",
+    name: 'InvalidAccessControlCondition',
+    errorCode: 'invalid_access_control_condition',
   });
 }
 
@@ -73,10 +73,10 @@ export function hashCosmosConditions(cosmosConditions) {
     canonicalCosmosConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
-  log("Hashing cosmos conditions: ", toHash);
+  log('Hashing cosmos conditions: ', toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
-  return crypto.subtle.digest("SHA-256", data);
+  return crypto.subtle.digest('SHA-256', data);
 }
 
 export function canonicalCosmosConditionFormatter(cond) {
@@ -93,13 +93,13 @@ export function canonicalCosmosConditionFormatter(cond) {
     return cond.map((c) => canonicalCosmosConditionFormatter(c));
   }
 
-  if ("operator" in cond) {
+  if ('operator' in cond) {
     return {
       operator: cond.operator,
     };
   }
 
-  if ("returnValueTest" in cond) {
+  if ('returnValueTest' in cond) {
     const { returnValueTest } = cond;
 
     const canonicalReturnValueTest = {
@@ -117,8 +117,8 @@ export function canonicalCosmosConditionFormatter(cond) {
 
   throwError({
     message: `You passed an invalid access control condition: ${cond}`,
-    name: "InvalidAccessControlCondition",
-    errorCode: "invalid_access_control_condition",
+    name: 'InvalidAccessControlCondition',
+    errorCode: 'invalid_access_control_condition',
   });
 }
 
@@ -127,10 +127,10 @@ export function hashSolRpcConditions(solRpcConditions) {
     canonicalSolRpcConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
-  log("Hashing sol rpc conditions: ", toHash);
+  log('Hashing sol rpc conditions: ', toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
-  return crypto.subtle.digest("SHA-256", data);
+  return crypto.subtle.digest('SHA-256', data);
 }
 
 export function canonicalSolRpcConditionFormatter(
@@ -165,13 +165,13 @@ pub struct SolPdaInterface {
     );
   }
 
-  if ("operator" in cond) {
+  if ('operator' in cond) {
     return {
       operator: cond.operator,
     };
   }
 
-  if ("returnValueTest" in cond) {
+  if ('returnValueTest' in cond) {
     const { returnValueTest } = cond;
 
     const canonicalReturnValueTest = {
@@ -182,17 +182,17 @@ pub struct SolPdaInterface {
 
     // check if this is a sol v1 or v2 condition
     // v1 conditions didn't have any pda params or pda interface or pda key
-    if ("pdaParams" in cond || requireV2Conditions) {
+    if ('pdaParams' in cond || requireV2Conditions) {
       if (
-        !("pdaInterface" in cond) ||
-        !("offset" in cond.pdaInterface) ||
-        !("fields" in cond.pdaInterface) ||
-        !("pdaKey" in cond)
+        !('pdaInterface' in cond) ||
+        !('offset' in cond.pdaInterface) ||
+        !('fields' in cond.pdaInterface) ||
+        !('pdaKey' in cond)
       ) {
         throwError({
           message: `Solana RPC Conditions have changed and there are some new fields you must include in your condition.  Check the docs here: https://developer.litprotocol.com/AccessControlConditions/solRpcConditions`,
-          name: "InvalidAccessControlCondition",
-          errorCode: "invalid_access_control_condition",
+          name: 'InvalidAccessControlCondition',
+          errorCode: 'invalid_access_control_condition',
         });
       }
 
@@ -222,8 +222,8 @@ pub struct SolPdaInterface {
 
   throwError({
     message: `You passed an invalid access control condition: ${cond}`,
-    name: "InvalidAccessControlCondition",
-    errorCode: "invalid_access_control_condition",
+    name: 'InvalidAccessControlCondition',
+    errorCode: 'invalid_access_control_condition',
   });
 }
 
@@ -244,12 +244,12 @@ export function hashResourceId(resourceId) {
   const toHash = JSON.stringify(resId);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
-  return crypto.subtle.digest("SHA-256", data);
+  return crypto.subtle.digest('SHA-256', data);
 }
 
 export async function hashResourceIdForSigning(resourceId) {
   const hashed = await hashResourceId(resourceId);
-  return uint8arrayToString(new Uint8Array(hashed), "base16");
+  return uint8arrayToString(new Uint8Array(hashed), 'base16');
 }
 
 function canonicalAbiParams(params) {
@@ -276,13 +276,13 @@ export function canonicalEVMContractConditionFormatter(cond) {
     return cond.map((c) => canonicalEVMContractConditionFormatter(c));
   }
 
-  if ("operator" in cond) {
+  if ('operator' in cond) {
     return {
       operator: cond.operator,
     };
   }
 
-  if ("returnValueTest" in cond) {
+  if ('returnValueTest' in cond) {
     /* abi needs to match:
       pub name: String,
     /// Function input.
@@ -307,7 +307,7 @@ export function canonicalEVMContractConditionFormatter(cond) {
       inputs: canonicalAbiParams(functionAbi.inputs),
       outputs: canonicalAbiParams(functionAbi.outputs),
       constant:
-        typeof functionAbi.constant === "undefined"
+        typeof functionAbi.constant === 'undefined'
           ? false
           : functionAbi.constant,
       stateMutability: functionAbi.stateMutability,
@@ -331,8 +331,8 @@ export function canonicalEVMContractConditionFormatter(cond) {
 
   throwError({
     message: `You passed an invalid access control condition: ${cond}`,
-    name: "InvalidAccessControlCondition",
-    errorCode: "invalid_access_control_condition",
+    name: 'InvalidAccessControlCondition',
+    errorCode: 'invalid_access_control_condition',
   });
 }
 
@@ -341,10 +341,10 @@ export function hashEVMContractConditions(accessControlConditions) {
     canonicalEVMContractConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
-  log("Hashing evm contract conditions: ", toHash);
+  log('Hashing evm contract conditions: ', toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
-  return crypto.subtle.digest("SHA-256", data);
+  return crypto.subtle.digest('SHA-256', data);
 }
 
 export function canonicalAccessControlConditionFormatter(cond) {
@@ -364,13 +364,13 @@ export function canonicalAccessControlConditionFormatter(cond) {
     return cond.map((c) => canonicalAccessControlConditionFormatter(c));
   }
 
-  if ("operator" in cond) {
+  if ('operator' in cond) {
     return {
       operator: cond.operator,
     };
   }
 
-  if ("returnValueTest" in cond) {
+  if ('returnValueTest' in cond) {
     return {
       contractAddress: cond.contractAddress,
       chain: cond.chain,
@@ -386,8 +386,8 @@ export function canonicalAccessControlConditionFormatter(cond) {
 
   throwError({
     message: `You passed an invalid access control condition: ${cond}`,
-    name: "InvalidAccessControlCondition",
-    errorCode: "invalid_access_control_condition",
+    name: 'InvalidAccessControlCondition',
+    errorCode: 'invalid_access_control_condition',
   });
 }
 
@@ -396,10 +396,10 @@ export function hashAccessControlConditions(accessControlConditions) {
     canonicalAccessControlConditionFormatter(c)
   );
   const toHash = JSON.stringify(conds);
-  log("Hashing access control conditions: ", toHash);
+  log('Hashing access control conditions: ', toHash);
   const encoder = new TextEncoder();
   const data = encoder.encode(toHash);
-  return crypto.subtle.digest("SHA-256", data);
+  return crypto.subtle.digest('SHA-256', data);
 }
 
 export function compareArrayBuffers(buf1, buf2) {
@@ -414,7 +414,7 @@ export function compareArrayBuffers(buf1, buf2) {
 
 export function encryptWithBlsPubkey({ pubkey, data }) {
   return wasmBlsSdkHelpers.encrypt(
-    uint8arrayFromString(pubkey, "base16"),
+    uint8arrayFromString(pubkey, 'base16'),
     data
   );
 }
@@ -426,11 +426,11 @@ export function encryptWithBlsPubkey({ pubkey, data }) {
  */
 export async function importSymmetricKey(symmKey) {
   const importedSymmKey = await crypto.subtle.importKey(
-    "raw",
+    'raw',
     symmKey,
     SYMM_KEY_ALGO_PARAMS,
     true,
-    ["encrypt", "decrypt"]
+    ['encrypt', 'decrypt']
   );
   return importedSymmKey;
 }
@@ -441,8 +441,8 @@ export async function importSymmetricKey(symmKey) {
  */
 export async function generateSymmetricKey() {
   const symmKey = await crypto.subtle.generateKey(SYMM_KEY_ALGO_PARAMS, true, [
-    "encrypt",
-    "decrypt",
+    'encrypt',
+    'decrypt',
   ]);
   return symmKey;
 }
@@ -458,7 +458,7 @@ export async function decryptWithSymmetricKey(encryptedBlob, symmKey) {
   const encryptedZipArrayBuffer = await encryptedBlob.slice(16).arrayBuffer();
   const decryptedZip = await crypto.subtle.decrypt(
     {
-      name: "AES-CBC",
+      name: 'AES-CBC',
       iv: recoveredIv,
     },
     symmKey,
@@ -481,14 +481,14 @@ export async function encryptWithSymmetricKey(symmKey, data) {
 
   const encryptedZipData = await crypto.subtle.encrypt(
     {
-      name: "AES-CBC",
+      name: 'AES-CBC',
       iv,
     },
     symmKey,
     data
   );
   const encryptedZipBlob = new Blob([iv, new Uint8Array(encryptedZipData)], {
-    type: "application/octet-stream",
+    type: 'application/octet-stream',
   });
   return encryptedZipBlob;
 }
@@ -503,7 +503,7 @@ export async function encryptWithSymmetricKey(symmKey, data) {
  */
 export function encryptWithPubKey(receiverPublicKey, data, version) {
   switch (version) {
-    case "x25519-xsalsa20-poly1305": {
+    case 'x25519-xsalsa20-poly1305': {
       // generate ephemeral keypair
       const ephemeralKeyPair = nacl.box.keyPair();
 
@@ -512,7 +512,7 @@ export function encryptWithPubKey(receiverPublicKey, data, version) {
       try {
         pubKeyUInt8Array = naclUtil.decodeBase64(receiverPublicKey);
       } catch (err) {
-        throw new Error("Bad public key");
+        throw new Error('Bad public key');
       }
 
       // padding?  not needed for c decryption?
@@ -532,7 +532,7 @@ export function encryptWithPubKey(receiverPublicKey, data, version) {
 
       // handle encrypted data
       const output = {
-        version: "x25519-xsalsa20-poly1305",
+        version: 'x25519-xsalsa20-poly1305',
         nonce: naclUtil.encodeBase64(nonce),
         ephemPublicKey: naclUtil.encodeBase64(ephemeralKeyPair.publicKey),
         ciphertext: naclUtil.encodeBase64(encryptedMessage),
@@ -542,7 +542,7 @@ export function encryptWithPubKey(receiverPublicKey, data, version) {
     }
 
     default:
-      throw new Error("Encryption type/version not supported");
+      throw new Error('Encryption type/version not supported');
   }
 }
 
@@ -556,7 +556,7 @@ export function encryptWithPubKey(receiverPublicKey, data, version) {
  */
 export function decryptWithPrivKey(encryptedData, receiverPrivateKey) {
   switch (encryptedData.version) {
-    case "x25519-xsalsa20-poly1305": {
+    case 'x25519-xsalsa20-poly1305': {
       const recieverEncryptionPrivateKey =
         naclUtil.decodeBase64(receiverPrivateKey);
 
@@ -580,40 +580,46 @@ export function decryptWithPrivKey(encryptedData, receiverPrivateKey) {
       try {
         output = naclUtil.encodeUTF8(decryptedMessage);
       } catch (err) {
-        throw new Error("Decryption failed.  Could not encode result as utf8");
+        throw new Error('Decryption failed.  Could not encode result as utf8');
       }
 
       if (output) {
         return output;
       }
-      throw new Error("Decryption failed.  Output is falsy");
+      throw new Error('Decryption failed.  Output is falsy');
     }
 
     default:
-      throw new Error("Encryption type/version not supported.");
+      throw new Error('Encryption type/version not supported.');
   }
 }
 
-export function combineEcdsaShares(sigShares) {
+export function combineEcdsaShares(allSigShares) {
+  const sigShares = allSigShares.reduce(function (acc, val) {
+    if (val.shareHex.length > 0) {
+      acc.push(val);
+    }
+    return acc;
+  }, []);
   // R_x & R_y values can come from any node (they will be different per node), and will generate a valid signature
   const R_x = sigShares[0].localX;
   const R_y = sigShares[0].localY;
   // the public key can come from any node - it obviously will be identical from each node
   const publicKey = sigShares[0].publicKey;
-  const dataSigned = "0x" + sigShares[0].dataSigned;
+  const dataSigned = '0x' + sigShares[0].dataSigned;
   const validShares = sigShares.map((s) => s.shareHex);
   const shares = JSON.stringify(validShares);
-  log("shares is", shares);
+  log('shares is', shares);
   const sig = JSON.parse(wasmECDSA.combine_signature(R_x, R_y, shares));
 
-  log("signature", sig);
+  log('signature', sig);
 
   return sig;
 }
 
 export function combineBlsShares(sigSharesWithEverything, networkPubKeySet) {
-  const pkSetAsBytes = uint8arrayFromString(networkPubKeySet, "base16");
-  log("pkSetAsBytes", pkSetAsBytes);
+  const pkSetAsBytes = uint8arrayFromString(networkPubKeySet, 'base16');
+  log('pkSetAsBytes', pkSetAsBytes);
 
   const sigShares = sigSharesWithEverything.map((s) => ({
     shareHex: s.shareHex,
@@ -624,9 +630,9 @@ export function combineBlsShares(sigSharesWithEverything, networkPubKeySet) {
     sigShares
   );
   // log("raw sig", signature);
-  log("signature is ", uint8arrayToString(signature, "base16"));
+  log('signature is ', uint8arrayToString(signature, 'base16'));
 
-  return { signature: uint8arrayToString(signature, "base16") };
+  return { signature: uint8arrayToString(signature, 'base16') };
 }
 
 export function combineBlsDecryptionShares(
@@ -646,18 +652,18 @@ export function combineBlsDecryptionShares(
   // set decryption shares bytes in wasm
   decryptionShares.forEach((s, idx) => {
     wasmExports.set_share_indexes(idx, s.shareIndex);
-    const shareAsBytes = uint8arrayFromString(s.decryptionShare, "base16");
+    const shareAsBytes = uint8arrayFromString(s.decryptionShare, 'base16');
     for (let i = 0; i < shareAsBytes.length; i++) {
       wasmExports.set_decryption_shares_byte(i, idx, shareAsBytes[i]);
     }
   });
 
   // set the public key set bytes in wasm
-  const pkSetAsBytes = uint8arrayFromString(networkPubKeySet, "base16");
+  const pkSetAsBytes = uint8arrayFromString(networkPubKeySet, 'base16');
   wasmBlsSdkHelpers.set_mc_bytes(pkSetAsBytes);
 
   // set the ciphertext bytes
-  const ciphertextAsBytes = uint8arrayFromString(toDecrypt, "base16");
+  const ciphertextAsBytes = uint8arrayFromString(toDecrypt, 'base16');
   for (let i = 0; i < ciphertextAsBytes.length; i++) {
     wasmExports.set_ct_byte(i, ciphertextAsBytes[i]);
   }
@@ -674,16 +680,16 @@ export function combineBlsDecryptionShares(
 export function generateSessionKeyPair() {
   const keyPair = nacl.sign.keyPair();
   return {
-    publicKey: uint8arrayToString(keyPair.publicKey, "base16"),
-    secretKey: uint8arrayToString(keyPair.secretKey, "base16"),
+    publicKey: uint8arrayToString(keyPair.publicKey, 'base16'),
+    secretKey: uint8arrayToString(keyPair.secretKey, 'base16'),
   };
 }
 
 export async function hashEncryptionKey({ encryptedSymmetricKey }) {
   const hashOfKey = await crypto.subtle.digest(
-    "SHA-256",
+    'SHA-256',
     encryptedSymmetricKey
   );
-  const hashOfKeyStr = uint8arrayToString(new Uint8Array(hashOfKey), "base16");
+  const hashOfKeyStr = uint8arrayToString(new Uint8Array(hashOfKey), 'base16');
   return hashOfKeyStr;
 }
