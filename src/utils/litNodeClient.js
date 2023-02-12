@@ -387,16 +387,16 @@ export default class LitNodeClient {
         signature = combineBlsShares(sigShares, this.networkPubKeySet);
       } else if (sigType === "ECDSA") {
         // only include responses that have a signature share
-        const validShares = allSigShares.reduce(function (acc, val) {
+        const goodShares = allSigShares.reduce(function (acc, val) {
           if (val.shareHex.length > 0) {
             acc.push(val);
           }
           return acc;
         }, []);
-        if (validShares.length < this.config.minNodeCount) {
+        if (goodShares.length < this.config.minNodeCount) {
           log(
-            `majority of shares are bad. validShares is ${JSON.stringify(
-              validShares
+            `majority of shares are bad. goodShares is ${JSON.stringify(
+              goodShares
             )}`
           );
           if (this.config.alertWhenUnauthorized) {
@@ -412,7 +412,7 @@ export default class LitNodeClient {
           });
         }
 
-        signature = combineEcdsaShares(validShares);
+        signature = combineEcdsaShares(goodShares);
       } else {
         throwError({
           message: "Unknown signature type",
