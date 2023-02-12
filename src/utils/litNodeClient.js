@@ -385,8 +385,27 @@ export default class LitNodeClient {
       let signature;
       if (sigType === 'BLS') {
         signature = combineBlsShares(sigShares, this.networkPubKeySet);
-      } else if (sigType === 'ECDSA') {
-        signature = combineEcdsaShares(sigShares);
+      } else if (sigType === "ECDSA") {
+        const goodShares = sigShares.filter((d) => d.shareHex !== "");
+        if (goodShares.length < this.config.minNodeCount) {
+          log(
+            `majority of shares are bad. goodShares is ${JSON.stringify(
+              goodShares
+            )}`
+          );
+          if (this.config.alertWhenUnauthorized) {
+            alert(
+              "You are not authorized to receive a signature to grant access to this content"
+            );
+          }
+
+          throwError({
+            message: `You are not authorized to recieve a signature on this item`,
+            name: "UnauthorizedException",
+            errorCode: "not_authorized",
+          });
+        }
+        signature = combineEcdsaShares(goodShares);
       } else {
         throwError({
           message: 'Unknown signature type',

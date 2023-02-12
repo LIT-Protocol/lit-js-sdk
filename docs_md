@@ -207,9 +207,9 @@ Type: [Object][35]
 ### Properties
 
 *   `sig` **[string][36]** The actual hex-encoded signature
-*   `derivedVia` **[string][36]** The method used to derive the signature
+*   `derivedVia` **[string][36]** The method used to derive the signature or "EIP1271" for smart contract authsig
 *   `signedMessage` **[string][36]** The message that was signed
-*   `address` **[string][36]** The crypto wallet address that signed the message
+*   `address` **[string][36]** The crypto wallet address that signed the message or the smart contract address in case of smart contract authsig
 
 ## LITChain
 
