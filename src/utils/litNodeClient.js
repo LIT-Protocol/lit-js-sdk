@@ -387,7 +387,7 @@ export default class LitNodeClient {
         signature = combineBlsShares(sigShares, this.networkPubKeySet);
       } else if (sigType === "ECDSA") {
         // only include responses that have a signature share
-        const goodShares = allSigShares.reduce(function (acc, val) {
+        const goodShares = sigShares.reduce(function (acc, val) {
           if (val.shareHex.length > 0) {
             acc.push(val);
           }
