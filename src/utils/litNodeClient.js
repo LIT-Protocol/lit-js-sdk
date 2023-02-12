@@ -309,10 +309,7 @@ export default class LitNodeClient {
     // some JS types don't serialize well, so we will convert them before sending to the nodes
     jsParams = convertLitActionsParams(jsParams);
 
-    // generate a unique id for this request
-    const requestId = Math.random().toString(16).slice(2);
-
-    const reqBody = { authSig, jsParams, authMethods, requestId };
+    const reqBody = { authSig, jsParams, authMethods };
     if (code) {
       // base64 encode before sending over the wire
       const encodedJs = uint8arrayToString(
@@ -333,6 +330,7 @@ export default class LitNodeClient {
     // log("sending request to all nodes for executeJs: ", reqBody);
 
     // ask each node to run the js
+    const requestId = this.getRequestId();
     const nodePromises = [];
     for (const url of this.connectedNodes) {
       let sigToPassToNode = authSig;
@@ -351,6 +349,7 @@ export default class LitNodeClient {
       nodePromises.push(
         this.getJsExecutionShares({
           url,
+          requestId,
           ...reqBody,
         })
       );
@@ -549,9 +548,6 @@ export default class LitNodeClient {
     });
     siweMessage = siweMessage.prepareMessage();
 
-    // generate a unique id for this request
-    const requestId = Math.random().toString(16).slice(2);
-
     /* body must include:
     pub session_key: String,
     pub auth_methods: Vec<AuthMethod>,
@@ -565,18 +561,19 @@ export default class LitNodeClient {
       pkpPublicKey,
       authSig,
       siweMessage,
-      requestId,
     };
 
     // log("sending request to all nodes for signSessionKey: ", reqBody);
 
     // ask each node to run the js
+    const requestId = this.getRequestId();
     const nodePromises = [];
     for (const url of this.connectedNodes) {
       nodePromises.push(
         this.getSignSessionKeyShares({
           url,
           body: reqBody,
+          requestId,
         })
       );
     }
@@ -671,6 +668,7 @@ export default class LitNodeClient {
     const exp = iat + 12 * 60 * 60; // 12 hours in seconds
 
     // ask each node to sign the content
+    const requestId = this.getRequestId();
     const nodePromises = [];
     for (const url of this.connectedNodes) {
       nodePromises.push(
@@ -680,6 +678,7 @@ export default class LitNodeClient {
           chain,
           iat,
           exp,
+          requestId,
         })
       );
     }
@@ -924,6 +923,7 @@ export default class LitNodeClient {
     const formattedResourceId = canonicalResourceIdFormatter(resourceId);
 
     // ask each node to sign the content
+    const requestId = this.getRequestId();
     const nodePromises = [];
     for (const url of this.connectedNodes) {
       let sigToPassToNode = authSig;
@@ -951,6 +951,7 @@ export default class LitNodeClient {
           chain,
           iat,
           exp,
+          requestId,
         })
       );
     }
@@ -1171,6 +1172,7 @@ export default class LitNodeClient {
       "base16"
     );
     // create access control conditions on lit nodes
+    const requestId = this.getRequestId();
     const nodePromises = [];
     for (const url of this.connectedNodes) {
       let authSigToSend = authSig;
@@ -1186,6 +1188,7 @@ export default class LitNodeClient {
           authSig: authSigToSend,
           chain,
           permanent: permanent ? 1 : 0,
+          requestId,
         })
       );
     }
@@ -1362,6 +1365,7 @@ export default class LitNodeClient {
     }
 
     // ask each node to decrypt the content
+    const requestId = this.getRequestId();
     const nodePromises = [];
     for (const url of this.connectedNodes) {
       let sigToPassToNode = authSig;
@@ -1387,6 +1391,7 @@ export default class LitNodeClient {
           toDecrypt,
           authSig: sigToPassToNode,
           chain,
+          requestId,
         })
       );
     }
@@ -1650,6 +1655,7 @@ export default class LitNodeClient {
     );
 
     // create access control conditions on lit nodes
+    const requestId = this.getRequestId();
     const nodePromises = [];
     for (const url of this.connectedNodes) {
       let sigToPassToNode = authSig;
@@ -1672,6 +1678,7 @@ export default class LitNodeClient {
           authSig: sigToPassToNode,
           chain,
           permanent: permanent ? 1 : 0,
+          requestId,
         })
       );
     }
@@ -1686,49 +1693,6 @@ export default class LitNodeClient {
   }
 
   /**
-   * Signs a message with Lit threshold ECDSA algorithms.
-   * @param {Object} params
-   * @param {string} params.message The message to be signed - note this message is not currently converted to a digest!!!!!
-   * @param {string} params.chain The chain name of the chain that this contract is deployed on.  See LIT_CHAINS for currently supported chains.
-   * @returns {Object} JSON structure with signed message, signature & public key.
-   */
-  async signWithEcdsa({ message, chain }) {
-    // ask each node to decrypt the content
-    const nodePromises = [];
-    for (const url of this.connectedNodes) {
-      nodePromises.push(
-        this.signECDSA({
-          url,
-          message,
-          chain,
-          iat: 0,
-          exp: 0,
-        })
-      );
-    }
-
-    try {
-      const share_data = await Promise.all(nodePromises);
-      // R_x & R_y values can come from any node (they will be different per node), and will generate a valid signature
-      const R_x = share_data[0].local_x;
-      const R_y = share_data[0].local_y;
-      // the public key can come from any node - it obviously will be identical from each node
-      const public_key = share_data[0].public_key;
-      const valid_shares = share_data.map((s) => s.signature_share);
-      const shares = JSON.stringify(valid_shares);
-      await wasmECDSA.initWasmEcdsaSdk(); // init WASM
-      const signature = wasmECDSA.combine_signature(R_x, R_y, shares);
-      log("raw ecdsav sig", signature);
-      return signature;
-    } catch (e) {
-      log("Error - signed_ecdsa_messages ");
-      const signed_ecdsa_message = nodePromises[0];
-      return signed_ecdsa_message;
-    }
-    return throwError("some other error?");
-  }
-
-  /**
    * Validates a condition, and then signs the condition if the validation returns true.   Before calling this function, you must know the on chain conditions that you wish to validate.
    * @param {Object} params
    * @param {Array.<AccessControlCondition>} params.accessControlConditions The on chain control conditions that are to be evaluated and - if valid -  signed.
@@ -1736,7 +1700,7 @@ export default class LitNodeClient {
    * @param {AuthSig} params.authSig The authentication signature that proves that the user owns the crypto wallet address that seeks to evaluate conditions.
    * @returns {Object} JSON structure with signed message, signature & public key..
    */
-  async validate_and_sign_ecdsa({ accessControlConditions, chain, auth_sig }) {
+  async validateAndSignEcdsa({ accessControlConditions, chain, auth_sig }) {
     if (!this.ready) {
       throwError({
         message:
@@ -1791,10 +1755,11 @@ export default class LitNodeClient {
     }
 
     // ask each node to sign the content
+    const requestId = this.getRequestId();
     const nodePromises = [];
     for (const url of this.connectedNodes) {
       nodePromises.push(
-        this.sign_condition_ecdsa({
+        this.signConditionEcdsa({
           url,
           accessControlConditions: formattedAccessControlConditions,
           evmContractConditions: formattedEVMContractConditions,
@@ -1803,6 +1768,7 @@ export default class LitNodeClient {
           chain,
           iat,
           exp,
+          requestId,
         })
       );
     }
@@ -1838,6 +1804,7 @@ export default class LitNodeClient {
     authSig,
     chain,
     permanent,
+    requestId,
   }) {
     log("storeSigningConditionWithNode");
     const urlWithPath = `${url}/web/signing/store`;
@@ -1848,7 +1815,7 @@ export default class LitNodeClient {
       chain,
       permanant: permanent,
     };
-    return await this.sendCommandToNode({ url: urlWithPath, data });
+    return await this.sendCommandToNode({ url: urlWithPath, data, requestId });
   }
 
   async storeEncryptionConditionWithNode({
@@ -1858,6 +1825,7 @@ export default class LitNodeClient {
     authSig,
     chain,
     permanent,
+    requestId,
   }) {
     log("storeEncryptionConditionWithNode");
     const urlWithPath = `${url}/web/encryption/store`;
@@ -1868,10 +1836,17 @@ export default class LitNodeClient {
       chain,
       permanant: permanent,
     };
-    return await this.sendCommandToNode({ url: urlWithPath, data });
+    return await this.sendCommandToNode({ url: urlWithPath, data, requestId });
   }
 
-  async getChainDataSigningShare({ url, callRequests, chain, iat, exp }) {
+  async getChainDataSigningShare({
+    url,
+    callRequests,
+    chain,
+    iat,
+    exp,
+    requestId,
+  }) {
     log("getChainDataSigningShare");
     const urlWithPath = `${url}/web/signing/sign_chain_data`;
     const data = {
@@ -1880,7 +1855,7 @@ export default class LitNodeClient {
       iat,
       exp,
     };
-    return await this.sendCommandToNode({ url: urlWithPath, data });
+    return await this.sendCommandToNode({ url: urlWithPath, data, requestId });
   }
 
   async getSigningShare({
@@ -1894,6 +1869,7 @@ export default class LitNodeClient {
     chain,
     iat,
     exp,
+    requestId,
   }) {
     log("getSigningShare");
     const urlWithPath = `${url}/web/signing/retrieve`;
@@ -1908,7 +1884,7 @@ export default class LitNodeClient {
       iat,
       exp,
     };
-    return await this.sendCommandToNode({ url: urlWithPath, data });
+    return await this.sendCommandToNode({ url: urlWithPath, data, requestId });
   }
 
   async getDecryptionShare({
@@ -1920,6 +1896,7 @@ export default class LitNodeClient {
     toDecrypt,
     authSig,
     chain,
+    requestId,
   }) {
     log("getDecryptionShare");
     const urlWithPath = `${url}/web/encryption/retrieve`;
@@ -1932,7 +1909,7 @@ export default class LitNodeClient {
       authSig,
       chain,
     };
-    return await this.sendCommandToNode({ url: urlWithPath, data });
+    return await this.sendCommandToNode({ url: urlWithPath, data, requestId });
   }
 
   async getJsExecutionShares({
@@ -1952,32 +1929,30 @@ export default class LitNodeClient {
       authSig,
       jsParams,
       authMethods,
-      requestId,
     };
-    return await this.sendCommandToNode({ url: urlWithPath, data });
+    return await this.sendCommandToNode({ url: urlWithPath, data, requestId });
   }
 
-  async getSignSessionKeyShares({ url, body }) {
+  async getSignSessionKeyShares({ url, body, requestId }) {
     log("getSignSessionKeyShares");
     const urlWithPath = `${url}/web/sign_session_key`;
-    return await this.sendCommandToNode({ url: urlWithPath, data: body });
+    return await this.sendCommandToNode({
+      url: urlWithPath,
+      data: body,
+      requestId,
+    });
   }
 
-  async handshakeWithSgx({ url }) {
+  async handshakeWithSgx({ url, requestId }) {
     const urlWithPath = `${url}/web/handshake`;
     log(`handshakeWithSgx ${urlWithPath}`);
     const data = {
       clientPublicKey: "test",
     };
-    return await this.sendCommandToNode({ url: urlWithPath, data });
+    return await this.sendCommandToNode({ url: urlWithPath, data, requestId });
   }
 
-  sendCommandToNode({ url, data }) {
-    const requestId = Math.random().toString(16).slice(2);
-    return this.sendCommandToNodeWithHeader({ url, data, requestId });
-  }
-
-  sendCommandToNodeWithHeader({ url, data, requestId }) {
+  sendCommandToNode({ url, data, requestId }) {
     log(
       `sendCommandToNode with url ${url}, requestId ${requestId}  and data`,
       data
@@ -1987,9 +1962,8 @@ export default class LitNodeClient {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "lit-js-sdk-version": version, // do we still need this?
-        "X-SDK-Version": version,
-        "X-Request-Id": requestId,
+        "X-Lit-SDK-Version": version,
+        "X-Lit-Request-Id": requestId,
       },
       body: JSON.stringify(data),
     }).then(async (response) => {
@@ -2049,19 +2023,7 @@ export default class LitNodeClient {
     }
   }
 
-  async signECDSA({ url, message, chain, iat, exp }) {
-    log("sign_message_ecdsa");
-    const urlWithPath = `${url}/web/signing/sign_message_ecdsa`;
-    const data = {
-      message,
-      chain,
-      iat,
-      exp,
-    };
-    return await this.sendCommandToNode({ url: urlWithPath, data });
-  }
-
-  async sign_condition_ecdsa({
+  async signConditionEcdsa({
     url,
     accessControlConditions,
     evmContractConditions,
@@ -2070,8 +2032,9 @@ export default class LitNodeClient {
     chain,
     iat,
     exp,
+    requestId,
   }) {
-    log("sign_condition_ecdsa");
+    log("signConditionEcdsa");
     const urlWithPath = `${url}/web/signing/sign_condition_ecdsa`;
     const data = {
       access_control_conditions: accessControlConditions,
@@ -2082,7 +2045,7 @@ export default class LitNodeClient {
       iat,
       exp,
     };
-    return await this.sendCommandToNode({ url: urlWithPath, data });
+    return await this.sendCommandToNode({ url: urlWithPath, data, requestId });
   }
 
   // high level, how this works:
@@ -2222,7 +2185,7 @@ export default class LitNodeClient {
       const resource = resources[i];
 
       // check if we have blanket permissions or if we authed the specific resource for the protocol
-      const permissionsFound = findPermissionsForResource(
+      const permissionsFound = this.findPermissionsForResource(
         resource,
         sessionCapabilityObject
       );
@@ -2308,8 +2271,9 @@ export default class LitNodeClient {
    */
   connect() {
     // handshake with each node
+    const requestId = this.getRequestId();
     for (const url of this.config.bootstrapUrls) {
-      this.handshakeWithSgx({ url })
+      this.handshakeWithSgx({ url, requestId })
         .then((resp) => {
           this.connectedNodes.add(url);
           this.serverKeys[url] = {
@@ -2355,29 +2319,33 @@ export default class LitNodeClient {
       }, 500);
     });
   }
-}
 
-// check if we have blanket permissions or if we authed the specific resource for the protocol
-function findPermissionsForResource(resource, capabilityObject) {
-  const { protocol, resourceId } = parseResource({ resource });
-
-  // first check default permitted actions
-  for (const defaultAction of capabilityObject.def) {
-    if (defaultAction === "*" || defaultAction === protocol) {
-      return true;
-    }
+  getRequestId() {
+    return Math.random().toString(16).slice(2);
   }
 
-  // then check specific targets
-  if (Object.keys(capabilityObject.tar).indexOf(resourceId) === -1) {
+  // check if we have blanket permissions or if we authed the specific resource for the protocol
+  findPermissionsForResource(resource, capabilityObject) {
+    const { protocol, resourceId } = parseResource({ resource });
+
+    // first check default permitted actions
+    for (const defaultAction of capabilityObject.def) {
+      if (defaultAction === "*" || defaultAction === protocol) {
+        return true;
+      }
+    }
+
+    // then check specific targets
+    if (Object.keys(capabilityObject.tar).indexOf(resourceId) === -1) {
+      return false;
+    }
+
+    for (const permittedAction of capabilityObject.tar[resourceId]) {
+      if (permittedAction === "*" || permittedAction === protocol) {
+        return true;
+      }
+    }
+
     return false;
   }
-
-  for (const permittedAction of capabilityObject.tar[resourceId]) {
-    if (permittedAction === "*" || permittedAction === protocol) {
-      return true;
-    }
-  }
-
-  return false;
 }

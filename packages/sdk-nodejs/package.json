@@ -1,6 +1,6 @@
 {
   "name": "@lit-protocol/sdk-nodejs",
-  "version": "1.2.59",
+  "version": "1.2.60",
   "main": "build/index.node.js",
   "license": "MIT",
   "dependencies": {
@@ -32,7 +32,6 @@
     "esbuild-node-builtins": "^0.1.0",
     "genversion": "^3.0.1",
     "microbundle": "^0.13.0",
-    "semver-bump": "^1.0.0",
-    "standard": "^16.0.3"
+    "semver-bump": "^1.0.0"
   }
 }
