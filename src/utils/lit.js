@@ -1,14 +1,14 @@
-import JSZip from 'jszip';
-import Uint8arrays from '../lib/uint8arrays';
+import JSZip from "jszip";
+import Uint8arrays from "../lib/uint8arrays";
 const uint8arrayFromString = Uint8arrays.fromString;
 const uint8arrayToString = Uint8arrays.toString;
-import { formatEther, formatUnits } from '@ethersproject/units';
+import { formatEther, formatUnits } from "@ethersproject/units";
 import {
   throwError,
   log,
   checkType,
   checkIfAuthSigRequiresChainParam,
-} from '../lib/utils';
+} from "../lib/utils";
 
 import {
   importSymmetricKey,
@@ -19,20 +19,20 @@ import {
   canonicalEVMContractConditionFormatter,
   canonicalSolRpcConditionFormatter,
   canonicalUnifiedAccessControlConditionFormatter,
-} from './crypto';
+} from "./crypto";
 
-import { checkAndSignEVMAuthMessage, decimalPlaces } from './eth';
-import { checkAndSignSolAuthMessage } from './sol';
-import { checkAndSignCosmosAuthMessage } from './cosmos';
+import { checkAndSignEVMAuthMessage, decimalPlaces } from "./eth";
+import { checkAndSignSolAuthMessage } from "./sol";
+import { checkAndSignCosmosAuthMessage } from "./cosmos";
 
-import { wasmBlsSdkHelpers } from '../lib/bls-sdk';
+import { wasmBlsSdkHelpers } from "../lib/bls-sdk";
 
-import { fileToDataUrl } from './browser';
+import { fileToDataUrl } from "./browser";
 import {
   ALL_LIT_CHAINS,
   NETWORK_PUB_KEY,
   LIT_NETWORKS,
-} from '../lib/constants';
+} from "../lib/constants";
 
 const PACKAGE_CACHE = {};
 
@@ -58,8 +58,8 @@ export async function checkAndSignAuthMessage({
       message: `Unsupported chain selected.  Please select one of: ${Object.keys(
         ALL_LIT_CHAINS
       )}`,
-      name: 'UnsupportedChainException',
-      errorCode: 'unsupported_chain',
+      name: "UnsupportedChainException",
+      errorCode: "unsupported_chain",
     });
   }
 
@@ -68,7 +68,7 @@ export async function checkAndSignAuthMessage({
     expiration = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString();
   }
 
-  if (chainInfo.vmType === 'EVM') {
+  if (chainInfo.vmType === "EVM") {
     return checkAndSignEVMAuthMessage({
       chain,
       resources,
@@ -76,17 +76,17 @@ export async function checkAndSignAuthMessage({
       expiration,
       uri,
     });
-  } else if (chainInfo.vmType === 'SVM') {
+  } else if (chainInfo.vmType === "SVM") {
     return checkAndSignSolAuthMessage({ chain, resources, expiration, uri });
-  } else if (chainInfo.vmType === 'CVM') {
+  } else if (chainInfo.vmType === "CVM") {
     return checkAndSignCosmosAuthMessage({ chain, resources, expiration, uri });
   } else {
     throwError({
       message: `vmType not found for this chain: ${chain}.  This should not happen.  Unsupported chain selected.  Please select one of: ${Object.keys(
         ALL_LIT_CHAINS
       )}`,
-      name: 'UnsupportedChainException',
-      errorCode: 'unsupported_chain',
+      name: "UnsupportedChainException",
+      errorCode: "unsupported_chain",
     });
   }
 }
@@ -101,14 +101,14 @@ export async function encryptString(str) {
   if (
     !checkType({
       value: str,
-      allowedTypes: ['String'],
-      paramName: 'str',
-      functionName: 'encryptString',
+      allowedTypes: ["String"],
+      paramName: "str",
+      functionName: "encryptString",
     })
   )
     return;
 
-  const encodedString = uint8arrayFromString(str, 'utf8');
+  const encodedString = uint8arrayFromString(str, "utf8");
 
   const symmKey = await generateSymmetricKey();
   const encryptedString = await encryptWithSymmetricKey(
@@ -117,7 +117,7 @@ export async function encryptString(str) {
   );
 
   const exportedSymmKey = new Uint8Array(
-    await crypto.subtle.exportKey('raw', symmKey)
+    await crypto.subtle.exportKey("raw", symmKey)
   );
 
   return {
@@ -138,18 +138,18 @@ export async function decryptString(encryptedStringBlob, symmKey) {
   if (
     !checkType({
       value: encryptedStringBlob,
-      allowedTypes: ['Blob', 'File'],
-      paramName: 'encryptedStringBlob',
-      functionName: 'decryptString',
+      allowedTypes: ["Blob", "File"],
+      paramName: "encryptedStringBlob",
+      functionName: "decryptString",
     })
   )
     return;
   if (
     !checkType({
       value: symmKey,
-      allowedTypes: ['Uint8Array'],
-      paramName: ['symmKey'],
-      functionName: ['decryptString'],
+      allowedTypes: ["Uint8Array"],
+      paramName: ["symmKey"],
+      functionName: ["decryptString"],
     })
   )
     return;
@@ -162,7 +162,7 @@ export async function decryptString(encryptedStringBlob, symmKey) {
     importedSymmKey
   );
 
-  return uint8arrayToString(new Uint8Array(decryptedStringArrayBuffer), 'utf8');
+  return uint8arrayToString(new Uint8Array(decryptedStringArrayBuffer), "utf8");
 }
 
 /**
@@ -174,15 +174,15 @@ export async function zipAndEncryptString(string) {
   if (
     !checkType({
       value: string,
-      allowedTypes: ['String'],
-      paramName: 'string',
-      functionName: 'zipAndEncryptString',
+      allowedTypes: ["String"],
+      paramName: "string",
+      functionName: "zipAndEncryptString",
     })
   )
     return;
 
   const zip = new JSZip();
-  zip.file('string.txt', string);
+  zip.file("string.txt", string);
   return encryptZip(zip);
 }
 
@@ -198,13 +198,13 @@ export async function zipAndEncryptFiles(files) {
     if (
       !checkType({
         value: files[i],
-        allowedTypes: ['File'],
+        allowedTypes: ["File"],
         paramName: `files[${i}]`,
-        functionName: 'zipAndEncryptFiles',
+        functionName: "zipAndEncryptFiles",
       })
     )
       return;
-    zip.folder('encryptedAssets').file(files[i].name, files[i]);
+    zip.folder("encryptedAssets").file(files[i].name, files[i]);
   }
   return encryptZip(zip);
 }
@@ -219,18 +219,18 @@ export async function decryptZip(encryptedZipBlob, symmKey) {
   if (
     !checkType({
       value: encryptedZipBlob,
-      allowedTypes: ['Blob', 'File'],
-      paramName: 'encryptedZipBlob',
-      functionName: 'decryptZip',
+      allowedTypes: ["Blob", "File"],
+      paramName: "encryptedZipBlob",
+      functionName: "decryptZip",
     })
   )
     return;
   if (
     !checkType({
       value: symmKey,
-      allowedTypes: ['Uint8Array'],
-      paramName: 'symmKey',
-      functionName: 'decryptZip',
+      allowedTypes: ["Uint8Array"],
+      paramName: "symmKey",
+      functionName: "decryptZip",
     })
   )
     return;
@@ -278,7 +278,7 @@ export async function decryptZip(encryptedZipBlob, symmKey) {
  * @returns {Promise<Object>} A promise containing the encryptedZip as a Blob and the symmetricKey used to encrypt it, as a Uint8Array string.
  */
 export async function encryptZip(zip) {
-  const zipBlob = await zip.generateAsync({ type: 'blob' });
+  const zipBlob = await zip.generateAsync({ type: "blob" });
   const zipBlobArrayBuffer = await zipBlob.arrayBuffer();
   // log('blob', zipBlob)
 
@@ -292,7 +292,7 @@ export async function encryptZip(zip) {
   // saveAs(encryptedZipBlob, 'encrypted.bin')
 
   const exportedSymmKey = new Uint8Array(
-    await crypto.subtle.exportKey('raw', symmKey)
+    await crypto.subtle.exportKey("raw", symmKey)
   );
   // log('exportedSymmKey in hex', uint8arrayToString(exportedSymmKey, 'base16'))
 
@@ -375,9 +375,9 @@ export async function encryptFileAndZipWithMetadata({
   if (
     !checkType({
       value: authSig,
-      allowedTypes: ['Object'],
-      paramName: 'authSig',
-      functionName: 'encryptFileAndZipWithMetadata',
+      allowedTypes: ["Object"],
+      paramName: "authSig",
+      functionName: "encryptFileAndZipWithMetadata",
     })
   )
     return;
@@ -385,9 +385,9 @@ export async function encryptFileAndZipWithMetadata({
     accessControlConditions &&
     !checkType({
       value: accessControlConditions,
-      allowedTypes: ['Array'],
-      paramName: 'accessControlConditions',
-      functionName: 'encryptFileAndZipWithMetadata',
+      allowedTypes: ["Array"],
+      paramName: "accessControlConditions",
+      functionName: "encryptFileAndZipWithMetadata",
     })
   )
     return;
@@ -395,9 +395,9 @@ export async function encryptFileAndZipWithMetadata({
     evmContractConditions &&
     !checkType({
       value: evmContractConditions,
-      allowedTypes: ['Array'],
-      paramName: 'evmContractConditions',
-      functionName: 'encryptFileAndZipWithMetadata',
+      allowedTypes: ["Array"],
+      paramName: "evmContractConditions",
+      functionName: "encryptFileAndZipWithMetadata",
     })
   )
     return;
@@ -405,9 +405,9 @@ export async function encryptFileAndZipWithMetadata({
     solRpcConditions &&
     !checkType({
       value: solRpcConditions,
-      allowedTypes: ['Array'],
-      paramName: 'solRpcConditions',
-      functionName: 'encryptFileAndZipWithMetadata',
+      allowedTypes: ["Array"],
+      paramName: "solRpcConditions",
+      functionName: "encryptFileAndZipWithMetadata",
     })
   )
     return;
@@ -415,9 +415,9 @@ export async function encryptFileAndZipWithMetadata({
     unifiedAccessControlConditions &&
     !checkType({
       value: unifiedAccessControlConditions,
-      allowedTypes: ['Array'],
-      paramName: 'unifiedAccessControlConditions',
-      functionName: 'encryptFileAndZipWithMetadata',
+      allowedTypes: ["Array"],
+      paramName: "unifiedAccessControlConditions",
+      functionName: "encryptFileAndZipWithMetadata",
     })
   )
     return;
@@ -425,16 +425,16 @@ export async function encryptFileAndZipWithMetadata({
     !checkIfAuthSigRequiresChainParam(
       authSig,
       chain,
-      'encryptFileAndZipWithMetadata'
+      "encryptFileAndZipWithMetadata"
     )
   )
     return;
   if (
     !checkType({
       value: file,
-      allowedTypes: ['File'],
-      paramName: 'file',
-      functionName: 'encryptFileAndZipWithMetadata',
+      allowedTypes: ["File"],
+      paramName: "file",
+      functionName: "encryptFileAndZipWithMetadata",
     })
   )
     return;
@@ -442,16 +442,16 @@ export async function encryptFileAndZipWithMetadata({
     readme &&
     !checkType({
       value: readme,
-      allowedTypes: ['String'],
-      paramName: 'readme',
-      functionName: 'encryptFileAndZipWithMetadata',
+      allowedTypes: ["String"],
+      paramName: "readme",
+      functionName: "encryptFileAndZipWithMetadata",
     })
   )
     return;
 
   const symmetricKey = await generateSymmetricKey();
   const exportedSymmKey = new Uint8Array(
-    await crypto.subtle.exportKey('raw', symmetricKey)
+    await crypto.subtle.exportKey("raw", symmetricKey)
   );
   // log('exportedSymmKey in hex', uint8arrayToString(exportedSymmKey, 'base16'))
 
@@ -464,7 +464,7 @@ export async function encryptFileAndZipWithMetadata({
     authSig,
     chain,
   });
-  log('encrypted key saved to Lit', encryptedSymmetricKey);
+  log("encrypted key saved to Lit", encryptedSymmetricKey);
 
   // encrypt the file
   var fileAsArrayBuffer = await file.arrayBuffer();
@@ -486,13 +486,13 @@ export async function encryptFileAndZipWithMetadata({
     chain,
   });
 
-  zip.file('lit_protocol_metadata.json', JSON.stringify(metadata));
+  zip.file("lit_protocol_metadata.json", JSON.stringify(metadata));
   if (readme) {
-    zip.file('readme.txt', readme);
+    zip.file("readme.txt", readme);
   }
-  zip.folder('encryptedAssets').file(file.name, encryptedZipBlob);
+  zip.folder("encryptedAssets").file(file.name, encryptedZipBlob);
 
-  const zipBlob = await zip.generateAsync({ type: 'blob' });
+  const zipBlob = await zip.generateAsync({ type: "blob" });
 
   return { zipBlob, encryptedSymmetricKey, symmetricKey: exportedSymmKey };
 }
@@ -515,27 +515,27 @@ export async function decryptZipFileWithMetadata({
   if (
     !checkType({
       value: authSig,
-      allowedTypes: ['Object'],
-      paramName: 'authSig',
-      functionName: 'decryptZipFileWithMetadata',
+      allowedTypes: ["Object"],
+      paramName: "authSig",
+      functionName: "decryptZipFileWithMetadata",
     })
   )
     return;
   if (
     !checkType({
       value: file,
-      allowedTypes: ['Blob', 'File'],
-      paramName: 'file',
-      functionName: 'decryptZipFileWithMetadata',
+      allowedTypes: ["Blob", "File"],
+      paramName: "file",
+      functionName: "decryptZipFileWithMetadata",
     })
   )
     return;
 
   const zip = await JSZip.loadAsync(file);
   const metadata = JSON.parse(
-    await zip.file('lit_protocol_metadata.json').async('string')
+    await zip.file("lit_protocol_metadata.json").async("string")
   );
-  log('zip metadata', metadata);
+  log("zip metadata", metadata);
 
   let symmKey;
   try {
@@ -549,17 +549,17 @@ export async function decryptZipFileWithMetadata({
       authSig,
     });
   } catch (e) {
-    if (e.errorCode === 'not_authorized') {
+    if (e.errorCode === "not_authorized") {
       // try more additionalAccessControlConditions
       if (!additionalAccessControlConditions) {
         throw e;
       }
-      log('trying additionalAccessControlConditions');
+      log("trying additionalAccessControlConditions");
 
       for (let i = 0; i < additionalAccessControlConditions.length; i++) {
         const accessControlConditions =
           additionalAccessControlConditions[i].accessControlConditions;
-        log('trying additional condition', accessControlConditions);
+        log("trying additional condition", accessControlConditions);
         try {
           symmKey = await litNodeClient.getEncryptionKey({
             accessControlConditions: accessControlConditions,
@@ -576,7 +576,7 @@ export async function decryptZipFileWithMetadata({
           break; // it worked, we can leave the loop and stop checking additional access control conditions
         } catch (e) {
           // swallow not_authorized because we are gonna try some more accessControlConditions
-          if (e.errorCode !== 'not_authorized') {
+          if (e.errorCode !== "not_authorized") {
             throw e;
           }
         }
@@ -594,9 +594,9 @@ export async function decryptZipFileWithMetadata({
   // log('symmetricKey', importedSymmKey)
 
   const encryptedFile = await zip
-    .folder('encryptedAssets')
+    .folder("encryptedAssets")
     .file(metadata.name)
-    .async('blob');
+    .async("blob");
   // log('encryptedFile', encryptedFile)
 
   const decryptedFile = await decryptWithSymmetricKey(
@@ -619,9 +619,9 @@ export async function encryptFile({ file }) {
   if (
     !checkType({
       value: file,
-      allowedTypes: ['Blob', 'File'],
-      paramName: 'file',
-      functionName: 'encryptFile',
+      allowedTypes: ["Blob", "File"],
+      paramName: "file",
+      functionName: "encryptFile",
     })
   )
     return;
@@ -629,7 +629,7 @@ export async function encryptFile({ file }) {
   // generate a random symmetric key
   const symmetricKey = await generateSymmetricKey();
   const exportedSymmKey = new Uint8Array(
-    await crypto.subtle.exportKey('raw', symmetricKey)
+    await crypto.subtle.exportKey("raw", symmetricKey)
   );
 
   // encrypt the file
@@ -654,9 +654,9 @@ export async function decryptFile({ file, symmetricKey }) {
   if (
     !checkType({
       value: file,
-      allowedTypes: ['Blob', 'File'],
-      paramName: 'file',
-      functionName: 'decryptFile',
+      allowedTypes: ["Blob", "File"],
+      paramName: "file",
+      functionName: "decryptFile",
     })
   )
     return;
@@ -664,9 +664,9 @@ export async function decryptFile({ file, symmetricKey }) {
   if (
     !checkType({
       value: symmetricKey,
-      allowedTypes: ['Uint8Array'],
-      paramName: 'symmetricKey',
-      functionName: 'decryptFile',
+      allowedTypes: ["Uint8Array"],
+      paramName: "symmetricKey",
+      functionName: "decryptFile",
     })
   )
     return;
@@ -686,9 +686,9 @@ async function getNpmPackage(packageName) {
     return PACKAGE_CACHE[packageName];
   }
 
-  const resp = await fetch('https://unpkg.com/' + packageName);
+  const resp = await fetch("https://unpkg.com/" + packageName);
   if (!resp.ok) {
-    log('error with response: ', resp);
+    log("error with response: ", resp);
     throw Error(resp.statusText);
   }
   const blob = await resp.blob();
@@ -725,7 +725,7 @@ export async function createHtmlLIT({
   // uncomment this to embed the LIT JS SDK directly instead of retrieving it from unpkg when a user views the LIT
   // npmPackages.push('lit-js-sdk')
   // log('createHtmlLIT with npmPackages', npmPackages)
-  let scriptTags = '';
+  let scriptTags = "";
   for (let i = 0; i < npmPackages.length; i++) {
     const scriptDataUrl = await getNpmPackage(npmPackages[i]);
     const tag = `<script src="${scriptDataUrl}"></script>\n`;
@@ -758,7 +758,7 @@ export async function createHtmlLIT({
       var chain = "${chain}"
       var encryptedSymmetricKey = "${uint8arrayToString(
         encryptedSymmetricKey,
-        'base16'
+        "base16"
       )}"
       var locked = true
       var useLitPostMessageProxy = false
@@ -810,8 +810,8 @@ export async function createHtmlLIT({
  * @returns {Promise} the promise will resolve when the LIT has been unlocked or an error message has been shown informing the user that they are not authorized to unlock the LIT
  */
 export async function toggleLock() {
-  const mediaGridHolder = document.getElementById('mediaGridHolder');
-  const lockedHeader = document.getElementById('lockedHeader');
+  const mediaGridHolder = document.getElementById("mediaGridHolder");
+  const lockedHeader = document.getElementById("lockedHeader");
 
   if (window.locked) {
     // save public content before decryption, so we can toggle back to the
@@ -820,15 +820,15 @@ export async function toggleLock() {
 
     if (!window.useLitPostMessageProxy && !window.litNodeClient.ready) {
       alert(
-        'The LIT network is still connecting.  Please try again in about 10 seconds.'
+        "The LIT network is still connecting.  Please try again in about 10 seconds."
       );
       return;
     }
 
     const authSig = await checkAndSignAuthMessage({ chain: window.chain });
-    if (authSig.errorCode && authSig.errorCode === 'wrong_chain') {
+    if (authSig.errorCode && authSig.errorCode === "wrong_chain") {
       alert(
-        'You are connected to the wrong blockchain.  Please switch your metamask to ' +
+        "You are connected to the wrong blockchain.  Please switch your metamask to " +
           window.chain
       );
       return;
@@ -849,8 +849,8 @@ export async function toggleLock() {
       // instead of asking the network for the key part, ask the parent frame
       // the parentframe will then call unlockLit() with the encryption key
       sendMessageToFrameParent({
-        command: 'getEncryptionKey',
-        target: 'LitNodeClient',
+        command: "getEncryptionKey",
+        target: "LitNodeClient",
         params: {
           accessControlConditions: window.accessControlConditions,
           toDecrypt: window.encryptedSymmetricKey,
@@ -876,7 +876,7 @@ export async function toggleLock() {
     await unlockLitWithKey({ symmetricKey });
   } else {
     mediaGridHolder.innerHTML = window.publicContent;
-    lockedHeader.innerText = 'LOCKED';
+    lockedHeader.innerText = "LOCKED";
     window.locked = true;
   }
 }
@@ -891,23 +891,23 @@ export async function unlockLitWithKey({ symmetricKey }) {
   if (
     !checkType({
       value: symmetricKey,
-      allowedTypes: ['Uint8Array'],
-      paramName: 'symmetricKey',
-      functionName: 'unlockLitWithKey',
+      allowedTypes: ["Uint8Array"],
+      paramName: "symmetricKey",
+      functionName: "unlockLitWithKey",
     })
   )
     return;
-  const mediaGridHolder = document.getElementById('mediaGridHolder');
-  const lockedHeader = document.getElementById('lockedHeader');
+  const mediaGridHolder = document.getElementById("mediaGridHolder");
+  const lockedHeader = document.getElementById("lockedHeader");
 
   // convert data url to blob
   const encryptedZipBlob = await (
     await fetch(window.encryptedZipDataUrl)
   ).blob();
   const decryptedFiles = await decryptZip(encryptedZipBlob, symmetricKey);
-  const mediaGridHtmlBody = await decryptedFiles['string.txt'].async('text');
+  const mediaGridHtmlBody = await decryptedFiles["string.txt"].async("text");
   mediaGridHolder.innerHTML = mediaGridHtmlBody;
-  lockedHeader.innerText = 'UNLOCKED';
+  lockedHeader.innerText = "UNLOCKED";
   window.locked = false;
 }
 
@@ -921,26 +921,26 @@ export function verifyJwt({ jwt }) {
   if (
     !checkType({
       value: jwt,
-      allowedTypes: ['String'],
-      paraamName: 'jwt',
-      functionName: 'verifyJwt',
+      allowedTypes: ["String"],
+      paraamName: "jwt",
+      functionName: "verifyJwt",
     })
   )
     return;
-  log('verifyJwt', jwt);
+  log("verifyJwt", jwt);
   // verify that the wasm was loaded
   if (!globalThis.wasmExports) {
-    log('wasmExports is not loaded.');
+    log("wasmExports is not loaded.");
     // initWasmBlsSdk().then((exports) => {
     //   // log('wtf, window? ', typeof window !== 'undefined')
     //   window.wasmExports = exports;
     // });
   }
 
-  const pubKey = uint8arrayFromString(NETWORK_PUB_KEY, 'base16');
+  const pubKey = uint8arrayFromString(NETWORK_PUB_KEY, "base16");
   // log("pubkey is ", pubKey);
-  const jwtParts = jwt.split('.');
-  const sig = uint8arrayFromString(jwtParts[2], 'base64url');
+  const jwtParts = jwt.split(".");
+  const sig = uint8arrayFromString(jwtParts[2], "base64url");
   // log("sig is ", uint8arrayToString(sig, "base16"));
   const unsignedJwt = `${jwtParts[0]}.${jwtParts[1]}`;
   // log("unsignedJwt is ", unsignedJwt);
@@ -959,10 +959,10 @@ export function verifyJwt({ jwt }) {
   return {
     verified,
     header: JSON.parse(
-      uint8arrayToString(uint8arrayFromString(jwtParts[0], 'base64url'))
+      uint8arrayToString(uint8arrayFromString(jwtParts[0], "base64url"))
     ),
     payload: JSON.parse(
-      uint8arrayToString(uint8arrayFromString(jwtParts[1], 'base64url'))
+      uint8arrayToString(uint8arrayFromString(jwtParts[1], "base64url"))
     ),
     signature: sig,
   };
@@ -997,23 +997,23 @@ function metadataForFile({
     solRpcConditions,
     unifiedAccessControlConditions,
     chain,
-    encryptedSymmetricKey: uint8arrayToString(encryptedSymmetricKey, 'base16'),
+    encryptedSymmetricKey: uint8arrayToString(encryptedSymmetricKey, "base16"),
   };
 }
 
 function humanizeComparator(comparator) {
-  if (comparator === '>') {
-    return 'more than';
-  } else if (comparator === '>=') {
-    return 'at least';
-  } else if (comparator === '=') {
-    return 'exactly';
-  } else if (comparator === '<') {
-    return 'less than';
-  } else if (comparator === '<=') {
-    return 'at most';
-  } else if (comparator === 'contains') {
-    return 'contains';
+  if (comparator === ">") {
+    return "more than";
+  } else if (comparator === ">=") {
+    return "at least";
+  } else if (comparator === "=") {
+    return "exactly";
+  } else if (comparator === "<") {
+    return "less than";
+  } else if (comparator === "<=") {
+    return "at most";
+  } else if (comparator === "contains") {
+    return "contains";
   }
 }
 
@@ -1079,32 +1079,32 @@ async function humanizeUnifiedAccessControlConditions({
       }
 
       if (acc.operator) {
-        if (acc.operator.toLowerCase() === 'and') {
-          return ' and ';
-        } else if (acc.operator.toLowerCase() === 'or') {
-          return ' or ';
+        if (acc.operator.toLowerCase() === "and") {
+          return " and ";
+        } else if (acc.operator.toLowerCase() === "or") {
+          return " or ";
         }
       }
 
-      if (acc.conditionType === 'evmBasic') {
+      if (acc.conditionType === "evmBasic") {
         return humanizeEvmBasicAccessControlConditions({
           accessControlConditions: [acc],
           tokenList,
           myWalletAddress,
         });
-      } else if (acc.conditionType === 'evmContract') {
+      } else if (acc.conditionType === "evmContract") {
         return humanizeEvmContractConditions({
           evmContractConditions: [acc],
           tokenList,
           myWalletAddress,
         });
-      } else if (acc.conditionType === 'solRpc') {
+      } else if (acc.conditionType === "solRpc") {
         return humanizeSolRpcConditions({
           solRpcConditions: [acc],
           tokenList,
           myWalletAddress,
         });
-      } else if (acc.conditionType === 'cosmos') {
+      } else if (acc.conditionType === "cosmos") {
         return humanizeCosmosConditions({
           cosmosConditions: [acc],
           tokenList,
@@ -1113,13 +1113,13 @@ async function humanizeUnifiedAccessControlConditions({
       } else {
         throwError({
           message: `Unrecognized condition type: ${acc.conditionType}`,
-          name: 'InvalidUnifiedConditionType',
-          errorCode: 'invalid_unified_condition_type',
+          name: "InvalidUnifiedConditionType",
+          errorCode: "invalid_unified_condition_type",
         });
       }
     })
   );
-  return promises.join('');
+  return promises.join("");
 }
 
 async function humanizeEvmBasicAccessControlConditions({
@@ -1127,9 +1127,9 @@ async function humanizeEvmBasicAccessControlConditions({
   tokenList,
   myWalletAddress,
 }) {
-  log('humanizing evm basic access control conditions');
-  log('myWalletAddress', myWalletAddress);
-  log('accessControlConditions', accessControlConditions);
+  log("humanizing evm basic access control conditions");
+  log("myWalletAddress", myWalletAddress);
+  log("accessControlConditions", accessControlConditions);
   let fixedConditions = accessControlConditions;
 
   // inject and operator if needed
@@ -1151,7 +1151,7 @@ async function humanizeEvmBasicAccessControlConditions({
         fixedConditions.push(accessControlConditions[i]);
         if (i < accessControlConditions.length - 1) {
           fixedConditions.push({
-            operator: 'and',
+            operator: "and",
           });
         }
       }
@@ -1171,86 +1171,86 @@ async function humanizeEvmBasicAccessControlConditions({
       }
 
       if (acc.operator) {
-        if (acc.operator.toLowerCase() === 'and') {
-          return ' and ';
-        } else if (acc.operator.toLowerCase() === 'or') {
-          return ' or ';
+        if (acc.operator.toLowerCase() === "and") {
+          return " and ";
+        } else if (acc.operator.toLowerCase() === "or") {
+          return " or ";
         }
       }
 
       if (
-        acc.standardContractType === 'timestamp' &&
-        acc.method === 'eth_getBlockByNumber'
+        acc.standardContractType === "timestamp" &&
+        acc.method === "eth_getBlockByNumber"
       ) {
         return `Latest mined block must be past the unix timestamp ${acc.returnValueTest.value}`;
       } else if (
-        acc.standardContractType === 'MolochDAOv2.1' &&
-        acc.method === 'members'
+        acc.standardContractType === "MolochDAOv2.1" &&
+        acc.method === "members"
       ) {
         // molochDAOv2.1 membership
         return `Is a member of the DAO at ${acc.contractAddress}`;
       } else if (
-        acc.standardContractType === 'ERC1155' &&
-        acc.method === 'balanceOf'
+        acc.standardContractType === "ERC1155" &&
+        acc.method === "balanceOf"
       ) {
         // erc1155 owns an amount of specific tokens
         return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${
           acc.returnValueTest.value
         } of ${acc.contractAddress} tokens with token id ${acc.parameters[1]}`;
       } else if (
-        acc.standardContractType === 'ERC1155' &&
-        acc.method === 'balanceOfBatch'
+        acc.standardContractType === "ERC1155" &&
+        acc.method === "balanceOfBatch"
       ) {
         // erc1155 owns an amount of specific tokens from a batch of token ids
         return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${
           acc.returnValueTest.value
         } of ${acc.contractAddress} tokens with token id ${acc.parameters[1]
-          .split(',')
-          .join(' or ')}`;
+          .split(",")
+          .join(" or ")}`;
       } else if (
-        acc.standardContractType === 'ERC721' &&
-        acc.method === 'ownerOf'
+        acc.standardContractType === "ERC721" &&
+        acc.method === "ownerOf"
       ) {
         // specific erc721
         return `Owner of tokenId ${acc.parameters[0]} from ${acc.contractAddress}`;
       } else if (
-        acc.standardContractType === 'ERC721' &&
-        acc.method === 'balanceOf' &&
-        acc.contractAddress === '0x22C1f6050E56d2876009903609a2cC3fEf83B415' &&
-        acc.returnValueTest.comparator === '>' &&
-        acc.returnValueTest.value === '0'
+        acc.standardContractType === "ERC721" &&
+        acc.method === "balanceOf" &&
+        acc.contractAddress === "0x22C1f6050E56d2876009903609a2cC3fEf83B415" &&
+        acc.returnValueTest.comparator === ">" &&
+        acc.returnValueTest.value === "0"
       ) {
         // for POAP main contract where the user owns at least 1 poap
         return `Owns any POAP`;
       } else if (
-        acc.standardContractType === 'POAP' &&
-        acc.method === 'tokenURI'
+        acc.standardContractType === "POAP" &&
+        acc.method === "tokenURI"
       ) {
         // owns a POAP
         return `Owner of a ${acc.returnValueTest.value} POAP on ${acc.chain}`;
       } else if (
-        acc.standardContractType === 'POAP' &&
-        acc.method === 'eventId'
+        acc.standardContractType === "POAP" &&
+        acc.method === "eventId"
       ) {
         // owns a POAP
         return `Owner of a POAP from event ID ${acc.returnValueTest.value} on ${acc.chain}`;
       } else if (
-        acc.standardContractType === 'CASK' &&
-        acc.method === 'getActiveSubscriptionCount'
+        acc.standardContractType === "CASK" &&
+        acc.method === "getActiveSubscriptionCount"
       ) {
         // Cask powered subscription
         return `Cask subscriber to provider ${acc.parameters[1]} for plan ${acc.parameters[2]} on ${acc.chain}`;
       } else if (
-        acc.standardContractType === 'ERC721' &&
-        acc.method === 'balanceOf'
+        acc.standardContractType === "ERC721" &&
+        acc.method === "balanceOf"
       ) {
         // any erc721 in collection
         return `Owns ${humanizeComparator(acc.returnValueTest.comparator)} ${
           acc.returnValueTest.value
         } of ${acc.contractAddress} tokens`;
       } else if (
-        acc.standardContractType === 'ERC20' &&
-        acc.method === 'balanceOf'
+        acc.standardContractType === "ERC20" &&
+        acc.method === "balanceOf"
       ) {
         let tokenFromList;
         if (tokenList) {
@@ -1268,20 +1268,20 @@ async function humanizeEvmBasicAccessControlConditions({
             chain: acc.chain,
           });
         }
-        log('decimals', decimals);
+        log("decimals", decimals);
         return `Owns ${humanizeComparator(
           acc.returnValueTest.comparator
         )} ${formatUnits(acc.returnValueTest.value, decimals)} of ${
           name || acc.contractAddress
         } tokens`;
       } else if (
-        acc.standardContractType === '' &&
-        acc.method === 'eth_getBalance'
+        acc.standardContractType === "" &&
+        acc.method === "eth_getBalance"
       ) {
         return `Owns ${humanizeComparator(
           acc.returnValueTest.comparator
         )} ${formatEther(acc.returnValueTest.value)} ETH`;
-      } else if (acc.standardContractType === '' && acc.method === '') {
+      } else if (acc.standardContractType === "" && acc.method === "") {
         if (
           myWalletAddress &&
           acc.returnValueTest.value.toLowerCase() ===
@@ -1294,7 +1294,7 @@ async function humanizeEvmBasicAccessControlConditions({
       }
     })
   );
-  return promises.join('');
+  return promises.join("");
 }
 
 async function humanizeSolRpcConditions({
@@ -1302,9 +1302,9 @@ async function humanizeSolRpcConditions({
   tokenList,
   myWalletAddress,
 }) {
-  log('humanizing sol rpc conditions');
-  log('myWalletAddress', myWalletAddress);
-  log('solRpcConditions', solRpcConditions);
+  log("humanizing sol rpc conditions");
+  log("myWalletAddress", myWalletAddress);
+  log("solRpcConditions", solRpcConditions);
 
   const promises = await Promise.all(
     solRpcConditions.map(async (acc) => {
@@ -1319,18 +1319,18 @@ async function humanizeSolRpcConditions({
       }
 
       if (acc.operator) {
-        if (acc.operator.toLowerCase() === 'and') {
-          return ' and ';
-        } else if (acc.operator.toLowerCase() === 'or') {
-          return ' or ';
+        if (acc.operator.toLowerCase() === "and") {
+          return " and ";
+        } else if (acc.operator.toLowerCase() === "or") {
+          return " or ";
         }
       }
 
-      if (acc.method === 'getBalance') {
+      if (acc.method === "getBalance") {
         return `Owns ${humanizeComparator(
           acc.returnValueTest.comparator
         )} ${formatSol(acc.returnValueTest.value)} SOL`;
-      } else if (acc.method === '') {
+      } else if (acc.method === "") {
         if (
           myWalletAddress &&
           acc.returnValueTest.value.toLowerCase() ===
@@ -1342,18 +1342,18 @@ async function humanizeSolRpcConditions({
         }
       } else {
         let msg = `Solana RPC method ${acc.method}(${acc.params.join(
-          ', '
+          ", "
         )}) should have a result of ${humanizeComparator(
           acc.returnValueTest.comparator
         )} ${acc.returnValueTest.value}`;
-        if (acc.returnValueTest.key !== '') {
+        if (acc.returnValueTest.key !== "") {
           msg += ` for key ${acc.returnValueTest.key}`;
         }
         return msg;
       }
     })
   );
-  return promises.join('');
+  return promises.join("");
 }
 
 async function humanizeEvmContractConditions({
@@ -1361,9 +1361,9 @@ async function humanizeEvmContractConditions({
   tokenList,
   myWalletAddress,
 }) {
-  log('humanizing evm contract conditions');
-  log('myWalletAddress', myWalletAddress);
-  log('evmContractConditions', evmContractConditions);
+  log("humanizing evm contract conditions");
+  log("myWalletAddress", myWalletAddress);
+  log("evmContractConditions", evmContractConditions);
 
   const promises = await Promise.all(
     evmContractConditions.map(async (acc) => {
@@ -1378,27 +1378,27 @@ async function humanizeEvmContractConditions({
       }
 
       if (acc.operator) {
-        if (acc.operator.toLowerCase() === 'and') {
-          return ' and ';
-        } else if (acc.operator.toLowerCase() === 'or') {
-          return ' or ';
+        if (acc.operator.toLowerCase() === "and") {
+          return " and ";
+        } else if (acc.operator.toLowerCase() === "or") {
+          return " or ";
         }
       }
 
       let msg = `${acc.functionName}(${acc.functionParams.join(
-        ', '
+        ", "
       )}) on contract address ${
         acc.contractAddress
       } should have a result of ${humanizeComparator(
         acc.returnValueTest.comparator
       )} ${acc.returnValueTest.value}`;
-      if (acc.returnValueTest.key !== '') {
+      if (acc.returnValueTest.key !== "") {
         msg += ` for key ${acc.returnValueTest.key}`;
       }
       return msg;
     })
   );
-  return promises.join('');
+  return promises.join("");
 }
 
 async function humanizeCosmosConditions({
@@ -1406,9 +1406,9 @@ async function humanizeCosmosConditions({
   tokenList,
   myWalletAddress,
 }) {
-  log('humanizing cosmos conditions');
-  log('myWalletAddress', myWalletAddress);
-  log('cosmosConditions', cosmosConditions);
+  log("humanizing cosmos conditions");
+  log("myWalletAddress", myWalletAddress);
+  log("cosmosConditions", cosmosConditions);
 
   const promises = await Promise.all(
     cosmosConditions.map(async (acc) => {
@@ -1423,18 +1423,18 @@ async function humanizeCosmosConditions({
       }
 
       if (acc.operator) {
-        if (acc.operator.toLowerCase() === 'and') {
-          return ' and ';
-        } else if (acc.operator.toLowerCase() === 'or') {
-          return ' or ';
+        if (acc.operator.toLowerCase() === "and") {
+          return " and ";
+        } else if (acc.operator.toLowerCase() === "or") {
+          return " or ";
         }
       }
 
-      if (acc.path === '/cosmos/bank/v1beta1/balances/:userAddress') {
+      if (acc.path === "/cosmos/bank/v1beta1/balances/:userAddress") {
         return `Owns ${humanizeComparator(
           acc.returnValueTest.comparator
         )} ${formatAtom(acc.returnValueTest.value)} ATOM`;
-      } else if (acc.path === ':userAddress') {
+      } else if (acc.path === ":userAddress") {
         if (
           myWalletAddress &&
           acc.returnValueTest.value.toLowerCase() ===
@@ -1445,8 +1445,8 @@ async function humanizeCosmosConditions({
           return `Controls wallet with address ${acc.returnValueTest.value}`;
         }
       } else if (
-        acc.chain === 'kyve' &&
-        acc.path === '/kyve/registry/v1beta1/funders_list/0'
+        acc.chain === "kyve" &&
+        acc.path === "/kyve/registry/v1beta1/funders_list/0"
       ) {
         return `Is a current KYVE funder`;
       } else {
@@ -1455,14 +1455,14 @@ async function humanizeCosmosConditions({
         } should have a result of ${humanizeComparator(
           acc.returnValueTest.comparator
         )} ${acc.returnValueTest.value}`;
-        if (acc.returnValueTest.key !== '') {
+        if (acc.returnValueTest.key !== "") {
           msg += ` for key ${acc.returnValueTest.key}`;
         }
         return msg;
       }
     })
   );
-  return promises.join('');
+  return promises.join("");
 }
 
 function formatSol(amount) {
@@ -1475,12 +1475,12 @@ function formatAtom(amount) {
 
 export async function getTokenList() {
   // erc20
-  const erc20Url = 'https://tokens.coingecko.com/uniswap/all.json';
+  const erc20Url = "https://tokens.coingecko.com/uniswap/all.json";
   const erc20Promise = fetch(erc20Url).then((r) => r.json());
 
   // erc721
   const erc721Url =
-    'https://raw.githubusercontent.com/0xsequence/token-directory/main/index/mainnet/erc721.json';
+    "https://raw.githubusercontent.com/0xsequence/token-directory/main/index/mainnet/erc721.json";
   const erc721Promise = fetch(erc721Url).then((r) => r.json());
 
   const [erc20s, erc721s] = await Promise.all([erc20Promise, erc721Promise]);
@@ -1491,15 +1491,15 @@ export async function getTokenList() {
 }
 
 export const sendMessageToFrameParent = (data) => {
-  window.parent.postMessage(data, '*');
+  window.parent.postMessage(data, "*");
 };
 
 export function getSessionKeyUri({ publicKey }) {
-  return 'lit:session:' + publicKey;
+  return "lit:session:" + publicKey;
 }
 
 export function parseResource({ resource }) {
-  const [protocol, resourceId] = resource.split('://');
+  const [protocol, resourceId] = resource.split("://");
   return { protocol, resourceId };
 }
 
@@ -1518,18 +1518,18 @@ export const configure = (config) => {
     minNodeCount: 6,
     debug: true,
     bootstrapUrls: [
-      'https://node2.litgateway.com:7370',
-      'https://node2.litgateway.com:7371',
-      'https://node2.litgateway.com:7372',
-      'https://node2.litgateway.com:7373',
-      'https://node2.litgateway.com:7374',
-      'https://node2.litgateway.com:7375',
-      'https://node2.litgateway.com:7376',
-      'https://node2.litgateway.com:7377',
-      'https://node2.litgateway.com:7378',
-      'https://node2.litgateway.com:7379',
+      "https://node2.litgateway.com:7370",
+      "https://node2.litgateway.com:7371",
+      "https://node2.litgateway.com:7372",
+      "https://node2.litgateway.com:7373",
+      "https://node2.litgateway.com:7374",
+      "https://node2.litgateway.com:7375",
+      "https://node2.litgateway.com:7376",
+      "https://node2.litgateway.com:7377",
+      "https://node2.litgateway.com:7378",
+      "https://node2.litgateway.com:7379",
     ],
-    litNetwork: 'jalapeno',
+    litNetwork: "jalapeno",
   };
 
   if (config) {
@@ -1537,27 +1537,27 @@ export const configure = (config) => {
   }
 
   try {
-    if (typeof window !== 'undefined' && window && window.localStorage) {
-      let configOverride = window.localStorage.getItem('LitNodeClientConfig');
+    if (typeof window !== "undefined" && window && window.localStorage) {
+      let configOverride = window.localStorage.getItem("LitNodeClientConfig");
       if (configOverride) {
         configOverride = JSON.parse(configOverride);
         _config = { ..._config, ...configOverride };
       }
     }
   } catch (e) {
-    console.log('Error accessing local storage', e);
+    console.log("Error accessing local storage", e);
   }
 
   // set bootstrapUrls to match the network litNetwork unless it's set to custom
-  if (_config.litNetwork !== 'custom') {
+  if (_config.litNetwork !== "custom") {
     // set bootstrapUrls to match the network litNetwork
     if (!(_config.litNetwork in LIT_NETWORKS)) {
       // network not found, report error
       throwError({
         message:
-          'the litNetwork specified in the LitNodeClient config not found in LIT_NETWORKS',
-        name: 'LitNodeClientConfigBad',
-        errorCode: 'lit_node_client_config_bad',
+          "the litNetwork specified in the LitNodeClient config not found in LIT_NETWORKS",
+        name: "LitNodeClientConfigBad",
+        errorCode: "lit_node_client_config_bad",
       });
     }
     _config.bootstrapUrls = LIT_NETWORKS[_config.litNetwork];
