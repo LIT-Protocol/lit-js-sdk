@@ -594,13 +594,7 @@ export function decryptWithPrivKey(encryptedData, receiverPrivateKey) {
   }
 }
 
-export function combineEcdsaShares(allSigShares) {
-  const sigShares = allSigShares.reduce(function (acc, val) {
-    if (val.shareHex.length > 0) {
-      acc.push(val);
-    }
-    return acc;
-  }, []);
+export function combineEcdsaShares(validShares) {
   // R_x & R_y values can come from any node (they will be different per node), and will generate a valid signature
   const R_x = sigShares[0].localX;
   const R_y = sigShares[0].localY;
