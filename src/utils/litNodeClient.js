@@ -386,7 +386,13 @@ export default class LitNodeClient {
       if (sigType === "BLS") {
         signature = combineBlsShares(sigShares, this.networkPubKeySet);
       } else if (sigType === "ECDSA") {
-        const goodShares = sigShares.filter((d) => d.shareHex !== "");
+        // only include responses that have a signature share
+        const goodShares = sigShares.reduce(function (acc, val) {
+          if (val.shareHex.length > 0) {
+            acc.push(val);
+          }
+          return acc;
+        }, []);
         if (goodShares.length < this.config.minNodeCount) {
           log(
             `majority of shares are bad. goodShares is ${JSON.stringify(
@@ -405,6 +411,7 @@ export default class LitNodeClient {
             errorCode: "not_authorized",
           });
         }
+
         signature = combineEcdsaShares(goodShares);
       } else {
         throwError({
@@ -1966,12 +1973,23 @@ export default class LitNodeClient {
   }
 
   sendCommandToNode({ url, data }) {
-    log(`sendCommandToNode with url ${url} and data`, data);
+    const requestId = Math.random().toString(16).slice(2);
+    return this.sendCommandToNodeWithHeader({ url, data, requestId });
+  }
+
+  sendCommandToNodeWithHeader({ url, data, requestId }) {
+    log(
+      `sendCommandToNode with url ${url}, requestId ${requestId}  and data`,
+      data
+    );
+    // generate a unique id for this request
     return fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "lit-js-sdk-version": version,
+        "lit-js-sdk-version": version, // do we still need this?
+        "X-SDK-Version": version,
+        "X-Request-Id": requestId,
       },
       body: JSON.stringify(data),
     }).then(async (response) => {

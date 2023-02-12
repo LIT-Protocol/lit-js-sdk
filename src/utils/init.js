@@ -16,6 +16,7 @@ export const litJsSdkLoadedInALIT = () => {
     }, 1000);
     return;
   }
+
   sendMessageToFrameParent({ command: "LIT_SYN" }, "*");
   setTimeout(function () {
     if (!window.useLitPostMessageProxy) {
@@ -23,7 +24,7 @@ export const litJsSdkLoadedInALIT = () => {
       //   "inside lit - no parent frame lit node connection.  connecting ourselves."
       // );
       // we're on our own with no parent frame.  initiate our own connection to lit nodes
-      const litNodeClient = new LitNodeClient();     
+      const litNodeClient = new LitNodeClient();
       litNodeClient.connect();
       window.litNodeClient = litNodeClient;
     } else {

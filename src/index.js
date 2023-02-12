@@ -93,7 +93,6 @@ import * as wasmECDSA from "./lib/ecdsa-sdk";
 
 import LitNodeClient from "./utils/litNodeClient";
 
-
 import { litJsSdkLoadedInALIT } from "./utils/init";
 
 import { version } from "./version";
@@ -170,7 +169,6 @@ const functions = {
   base64StringToBlob,
   hashEncryptionKey,
   generateSessionKeyPair,
-  
 };
 
 module.exports = functions;
