@@ -1963,6 +1963,7 @@ export default class LitNodeClient {
       headers: {
         "Content-Type": "application/json",
         "X-Lit-SDK-Version": version,
+        "X-Lit-SDK-Type": "Javascript",
         "X-Request-Id": "lit_" + requestId,
       },
       body: JSON.stringify(data),
