@@ -50,7 +50,7 @@
     "bufferutil": "^4.0.6",
     "cross-blob": "^3.0.1",
     "jszip": "^3.6.0",
-    "lit-connect-modal": "^0.1.10",
+    "lit-connect-modal": "^0.1.11",
     "lit-siwe": "^1.1.8",
     "node-fetch": "^3.2.3",
     "pako": "^2.0.4",
