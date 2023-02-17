@@ -18,3 +18,7 @@ Very soon, this SDK will be deprecated and will only receive security updates. F
 ## Support
 
 If you need help, join our discord: https://litgateway.com/discord
+
+## Publishing
+
+To publish, use ./publish.sh and select "patch" for your version bump. You must have the "documentation" package installed globally on NPM which you can do with `npm install -g documentation`. You must also have the "jq" program installed, which you can install on mac with `brew install jq`. Only members of the Lit Protocol team can publish to NPM.
