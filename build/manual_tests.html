@@ -2605,6 +2605,71 @@ Expiration Time: 2022-12-02T02:14:51.688Z`; // prettier-ignore
         await smartContractAuthSig("0x056054954b075e9053B5646dc1E2234D51c0E79c") // Always return false
       };
 
+      // checks https://api.weather.gov/gridpoints/LWX/97,71/forecast
+      // look at period[0] and make sure the param you have in the condition
+      // is above that number, if you want this to pass.
+      var LitActionConditionWeatherDecrypt = async () => {
+        const testName = "LitActionConditionWeatherDecrypt";
+        document.getElementById("status").innerText = `Testing ${testName}...`;
+        const authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain,
+        });
+        const accessControlConditions = [
+          {
+            contractAddress:
+              "ipfs://QmcgbVu2sJSPpTeFhBd174FnmYmoVYvUFJeDkS7eYtwoFY",
+            standardContractType: "LitAction",
+            chain: "ethereum",
+            method: "go",
+            parameters: ["30"],
+            returnValueTest: {
+              comparator: "=",
+              value: "true",
+            },
+          },
+        ];
+
+        document.getElementById(
+          "humanized"
+        ).innerText = `Humanized: ${await LitJsSdk.humanizeAccessControlConditions(
+          { accessControlConditions }
+        )}`;
+
+        const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(
+          "this is a secret message"
+        );
+
+        const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
+          accessControlConditions,
+          symmetricKey,
+          authSig,
+          chain,
+        });
+
+        console.log("encrypted symmetric key", encryptedSymmetricKey);
+
+        const retrievedSymmKey = await litNodeClient.getEncryptionKey({
+          accessControlConditions,
+          toDecrypt: LitJsSdk.uint8arrayToString(
+            encryptedSymmetricKey,
+            "base16"
+          ),
+          chain,
+          authSig,
+        });
+
+        const decryptedString = await LitJsSdk.decryptString(
+          encryptedString,
+          retrievedSymmKey
+        );
+
+        console.log("decrypted string", decryptedString);
+
+        document.getElementById(
+          "status"
+        ).innerText = `${testName}: Success.  Decrypted string is: ${decryptedString}`;
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -2872,6 +2937,12 @@ Expiration Time: 2022-12-02T02:14:51.688Z`; // prettier-ignore
 
     <button onclick="smartContractAuthSigInvalid()">
       Smart Contract AuthSig Invalid
+    </button>
+    <br />
+    <br />
+    
+    <button onclick="LitActionConditionWeatherDecrypt()">
+      LitActionConditionWeatherDecrypt
     </button>
     <br />
     <br />
