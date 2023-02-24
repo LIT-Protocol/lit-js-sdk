@@ -285,6 +285,28 @@ export const LIT_CHAINS = {
     type: null,
     vmType: "EVM",
   },
+  bscTestnet: {
+    contractAddress: null,
+    chainId: 97,
+    name: "BSC Testnet",
+    symbol: "BNB",
+    decimals: 18,
+    rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545"],
+    blockExplorerUrls: ["https://testnet.bscscan.com/"],
+    type: null,
+    vmType: "EVM",
+  },
+  baseGoerli: {
+    contractAddress: null,
+    chainId: 84531,
+    name: "Base Goerli",
+    symbol: "ETH",
+    decimals: 18,
+    rpcUrls: ["https://goerli.base.org"],
+    blockExplorerUrls: ["https://goerli.basescan.org"],
+    type: null,
+    vmType: "EVM",
+  },
 };
 
 /**
