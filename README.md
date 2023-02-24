@@ -4,6 +4,7 @@
 - [Lit Protocol JS SDK V1](#lit-protocol-js-sdk-v1)
   - [Future plans](#future-plans)
   - [Support](#support)
+  - [Publishing](#publishing)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
