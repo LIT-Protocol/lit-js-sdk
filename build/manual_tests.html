@@ -707,6 +707,26 @@
         });
       };
 
+      var EthOnBscTestnet = async () => {
+        const accessControlConditions = [
+          {
+            contractAddress: "",
+            standardContractType: "",
+            chain: "bscTestnet",
+            method: "eth_getBalance",
+            parameters: [":userAddress", "latest"],
+            returnValueTest: {
+              comparator: ">=",
+              value: "10000000000000",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          accessControlConditions,
+          testName: "EthOnAurora",
+        });
+      };
+
       var ETHOnEluvioEmptyWallet = async () => {
         const accessControlConditions = [
           {
@@ -2771,6 +2791,9 @@ Expiration Time: 2022-12-02T02:14:51.688Z`; // prettier-ignore
     <br />
     <br />
     <button onclick="ETHOnAurora()">ETHOnAurora</button>
+    <br />
+    <br />
+    <button onclick="EthOnBscTestnet()">EthOnBscTestnet</button>
     <br />
     <br />
     <button onclick="ETHOnEluvioEmptyWallet()">ETHOnEluvioEmptyWallet</button>
