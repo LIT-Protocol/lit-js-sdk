@@ -1,6 +1,6 @@
 {
   "name": "@lit-protocol/sdk-browser-standalone",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "main": "build/index.web.js",
   "license": "MIT",
   "dependencies": {
