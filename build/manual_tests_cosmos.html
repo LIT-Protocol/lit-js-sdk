@@ -25,6 +25,7 @@
         unifiedAccessControlConditions,
         testName,
         authSig,
+        chain = chain,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
         document.getElementById(
@@ -75,6 +76,7 @@
         unifiedAccessControlConditions,
         testName,
         authSig,
+        chain = chain,
       }) => {
         document.getElementById("status").innerText = `Testing ${testName}...`;
 
@@ -315,6 +317,7 @@
           unifiedAccessControlConditions,
           testName: "JuneSpecificWalletAddressSigning",
           authSig,
+          chain: "juno",
         });
       };
 
