@@ -295,6 +295,29 @@
         });
       };
 
+      var JuneSpecificWalletAddressSigning = async () => {
+        var authSig = await LitJsSdk.checkAndSignAuthMessage({
+          chain: "juno",
+        });
+        var unifiedAccessControlConditions = [
+          {
+            conditionType: "cosmos",
+            path: ":userAddress",
+            chain: "juno",
+            returnValueTest: {
+              key: "",
+              comparator: "=",
+              value: "juno1vn6zl0924yj86jrp330wcwjclzdharljkajxqt",
+            },
+          },
+        ];
+        await testProvisoningAndSigning({
+          unifiedAccessControlConditions,
+          testName: "JuneSpecificWalletAddressSigning",
+          authSig,
+        });
+      };
+
       var logout = async () => {
         const testName = "Logout";
         document.getElementById("status").innerText = `Testing ${testName}...`;
@@ -354,6 +377,12 @@
 
     <button onclick="CosmosBalancePlusKyveFundersEncryptDecrypt()">
       CosmosBalancePlusKyveFundersEncryptDecrypt
+    </button>
+    <br />
+    <br />
+
+    <button onclick="JuneSpecificWalletAddressSigning()">
+      JuneSpecificWalletAddressSigning
     </button>
     <br />
     <br />
