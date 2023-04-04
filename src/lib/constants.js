@@ -418,6 +418,15 @@ export const LIT_COSMOS_CHAINS = {
     blockExplorerUrls: ["https://testnet.bigdipper.live"],
     vmType: "CVM",
   },
+  juno: {
+    name: "Juno",
+    symbol: "JUNO",
+    decimals: 6,
+    chainId: "juno-1",
+    rpcUrls: ["https://rest.cosmos.directory/juno"],
+    blockExplorerUrls: ["https://www.mintscan.io/juno"],
+    vmType: "CVM",
+  },
 };
 
 /**
